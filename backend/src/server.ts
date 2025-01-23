@@ -5,11 +5,11 @@ import dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });
 dotenv.config({ path: '.env' });
 
-import mustConnectDb from "./db";
-import { databaseUrl } from "./config";
+import mustConnectDb from './db';
+import {databaseUrl} from './config';
 
 async function bootstrap() {
-  await mustConnectDb(databaseUrl)
+  await mustConnectDb(databaseUrl);
 
   const app = express();
   const PORT = process.env.PORT || 3000;
@@ -21,4 +21,4 @@ async function bootstrap() {
   });
 }
 
-bootstrap()
+bootstrap();

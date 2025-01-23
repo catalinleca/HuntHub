@@ -1,1 +1,1 @@
-export const databaseUrl = process.env.MONGODB_URI
+export const databaseUrl = process.env.MONGODB_URI;
