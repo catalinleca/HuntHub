@@ -1,10 +1,24 @@
 import express from 'express';
+import dotenv from 'dotenv';
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+// Load .env.local file first
+dotenv.config({ path: '.env.local' });
+dotenv.config({ path: '.env' });
 
-app.use(express.json());
+import mustConnectDb from "./db";
+import { databaseUrl } from "./config";
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+async function bootstrap() {
+  await mustConnectDb(databaseUrl)
+
+  const app = express();
+  const PORT = process.env.PORT || 3000;
+
+  app.use(express.json());
+
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });
+}
+
+bootstrap()
