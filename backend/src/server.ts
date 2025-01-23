@@ -6,7 +6,7 @@ dotenv.config({ path: '.env.local' });
 dotenv.config({ path: '.env' });
 
 import mustConnectDb from './db';
-import {databaseUrl} from './config';
+import { databaseUrl } from './config';
 
 async function bootstrap() {
   await mustConnectDb(databaseUrl);

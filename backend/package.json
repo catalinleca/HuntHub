@@ -8,7 +8,9 @@
     "start": "node dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "format": "prettier --write \"src/**/*.{js,ts,json,md}\"",
-    "format:check": "prettier --check \"src/**/*.{js,ts,json,md}\""
+    "format:check": "prettier --check \"src/**/*.{js,ts,json,md}\"",
+    "lint": "eslint 'src/**/*.ts'",
+    "lint:fix": "eslint 'src/**/*.ts' --fix"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +24,11 @@
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.10",
+    "@typescript-eslint/eslint-plugin": "^8.21.0",
+    "@typescript-eslint/parser": "^8.21.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
     "prettier": "^3.4.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.7.3"
