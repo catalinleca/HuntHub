@@ -23,6 +23,7 @@ module.exports = {
       'warn',
       { argsIgnorePattern: '^_' }, // Ignore unused variables starting with _
     ],
+    '@typescript-eslint/no-require-imports': 'off',
   },
   ignorePatterns: [
     'node_modules/', // Ignore node_modules directory

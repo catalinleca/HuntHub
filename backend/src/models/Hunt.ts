@@ -1,0 +1,1 @@
+const HuntSchema = new HuntSchema({})
