@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": "22.13.1"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
@@ -10,7 +13,8 @@
     "format": "prettier --write \"src/**/*.{js,ts,json,md}\"",
     "format:check": "prettier --check \"src/**/*.{js,ts,json,md}\"",
     "lint": "eslint 'src/**/*.ts'",
-    "lint:fix": "eslint 'src/**/*.ts' --fix"
+    "lint:fix": "eslint 'src/**/*.ts' --fix",
+    "schemagen": "swagger-typescript-api -p ./src/openapi/HuntHub_models.yaml -o ./src/openapi --no-client --name HuntHubTypes.ts"
   },
   "keywords": [],
   "author": "",
@@ -36,7 +40,9 @@
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.3",
+    "openapi-typescript": "^7.6.0",
     "prettier": "^3.4.2",
+    "swagger-typescript-api": "^13.0.23",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.7.3"
   }

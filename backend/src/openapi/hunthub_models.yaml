@@ -1,0 +1,125 @@
+openapi: 3.0.0
+info:
+  title: HuntHub API
+  version: 1.0.0
+  description: API for managing treasure hunts
+paths: {}
+
+components:
+  schemas:
+    HuntStatus:
+      type: string
+      enum: [draft, published, archived]
+
+    HuntVisibility:
+      type: string
+      enum: [private, public, unlisted]
+
+    HuntLocation:
+      type: object
+      properties:
+        lat:
+          type: number
+        lng:
+          type: number
+        radius:
+          type: number
+      required:
+        - lat
+        - lng
+        - radius
+
+    HuntAccessType:
+      type: string
+      enum: [creator, viewer, editor]
+
+    Hunt:
+      type: object
+      properties:
+        id:
+          type: string
+        creatorId:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        isPublished:
+          type: boolean
+        currentVersion:
+          type: integer
+        status:
+          $ref: '#/components/schemas/HuntStatus'
+        visibility:
+          $ref: '#/components/schemas/HuntVisibility'
+        startLocation:
+          $ref: '#/components/schemas/HuntLocation'
+        createdAt:
+          type: string
+          example: "2024-02-01T10:12:45Z"
+          format: date-time
+        updatedAt:
+          type: string
+          example: "2024-02-01T10:12:45Z"
+          format: date-time
+      required:
+        - id
+        - creatorId
+        - name
+        - isPublished
+        - currentVersion
+        - status
+        - createdAt
+        - updatedAt
+
+    User:
+      type: object
+      properties:
+        firebaseUid:
+          type: string
+        email:
+          type: string
+        fistName:
+          type: string
+        lastName:
+          type: string
+        displayName:
+          type: string
+        profilePicture:
+          type: string
+        bio:
+          type: string
+        createdAt:
+          type: string
+          example: "2024-02-01T10:12:45Z"
+          format: date-time
+        updatedAt:
+          type: string
+          example: "2024-02-01T10:12:45Z"
+          format: date-time
+      required:
+        - firebaseUid
+        - email
+        - firstName
+        - lastName
+        - createdAt
+        - updatedAt
+
+    HuntAccess:
+      type: object
+      properties:
+        huntId:
+          type: string
+        userId:
+          type: string
+        accessType:
+          $ref: '#/components/schemas/HuntAccessType'
+        sharedAt:
+          type: string
+          example: "2024-02-01T10:12:45Z"
+          format: date-time
+      required:
+        - huntId
+        - userId
+        - accessType
+        - sharedAt
