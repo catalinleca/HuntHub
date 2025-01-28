@@ -14,7 +14,8 @@
     "format:check": "prettier --check \"src/**/*.{js,ts,json,md}\"",
     "lint": "eslint 'src/**/*.ts'",
     "lint:fix": "eslint 'src/**/*.ts' --fix",
-    "schemagen": "swagger-typescript-api -p ./src/openapi/HuntHub_models.yaml -o ./src/openapi --no-client --name HuntHubTypes.ts"
+    "schemagen": "swagger-typescript-api -p ./src/openapi/HuntHub_models.yaml -o ./src/openapi --no-client --name HuntHubTypes.ts",
+    "generate-zodies": "npx ts-to-zod ./src/openapi/HuntHubTypes.ts ./src/utils/validation/schemas.ts"
   },
   "keywords": [],
   "author": "",
@@ -44,6 +45,7 @@
     "prettier": "^3.4.2",
     "swagger-typescript-api": "^13.0.23",
     "ts-node-dev": "^2.0.0",
+    "ts-to-zod": "^3.15.0",
     "typescript": "^5.7.3"
   }
 }
