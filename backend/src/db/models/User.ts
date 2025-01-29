@@ -1,4 +1,4 @@
-import { Schema, model, Types } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
 
 interface IUser {
   firebaseUid: string;
@@ -64,7 +64,7 @@ userSchema.pre('save', (next) => {
 });
 
 userSchema.post('save', (error, doc, next) => {
-  if (error.name === 'MongoError' && error.code === 11000) {
+  if (error?.name === 'MongoError' && error?.code === 11000) {
     next(new Error('Email or Firebase UID already exists'));
   } else {
     next(error);
@@ -86,6 +86,6 @@ userSchema.virtual('fullProfile').get(() => {
   };
 });
 
-const User = mongoose.model('User', userSchema);
+const User = model('User', userSchema);
 
 module.exports = User;

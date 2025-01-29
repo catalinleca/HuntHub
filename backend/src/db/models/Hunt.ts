@@ -1,42 +1,8 @@
 import { Schema, model } from 'mongoose';
+import { HuntStatus, HuntVisibility, IHunt } from '../schemas/Hunt';
+import { locationSchema } from '../schemas/Location';
 
-enum HuntStatus {
-  Draft = 'draft',
-  Published = 'published',
-  Archived = 'archived',
-}
-
-enum HuntVisibility {
-  Private = 'private',
-  Public = 'public',
-  Unlisted = 'unlisted',
-}
-
-export interface ILocation {
-  lat: number;
-  lng: number;
-  radius: number;
-}
-
-const locationSchema = new Schema<ILocation>({
-  lat: Number,
-  lng: Number,
-  radius: Number,
-});
-
-interface HuntDocument {
-  creatorId: string;
-  name: string;
-  description: string;
-  isPublished: boolean;
-  currentVersion: number;
-  stepOrder: string[];
-  status: HuntStatus;
-  visibility: HuntVisibility;
-  startLocation: ILocation;
-}
-
-const huntSchema: Schema<HuntDocument> = new Schema<HuntDocument>(
+const huntSchema: Schema<IHunt> = new Schema<IHunt>(
   {
     creatorId: { type: String, required: true },
     name: { type: String, required: true },

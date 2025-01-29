@@ -1,26 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import { Schema, model } from 'mongoose';
+import { IStepProgress, StepProgressStatus, Submission } from '../schemas/StepProgress';
 
-interface Submission {
-  timestamp: Date;
-  content: any;
-  isCorrect: boolean;
-}
-
-enum StepProgressStatus {
-  Locked = 'locked',
-  Active = 'active',
-  Completed = 'completed',
-}
-
-export interface IStepProgress {
-  stepId: mongoose.Types.ObjectId;
-  status: StepProgressStatus;
-  attempts: number;
-  submissions: Submission[];
-  completedAt?: Date;
-}
-
-const submissionSchema = new Schema<Submission>({
+export const submissionSchema = new Schema<Submission>({
   timestamp: { type: Date, required: true },
   content: { type: Schema.Types.Mixed, required: true },
   isCorrect: { type: Boolean, required: true },
@@ -39,6 +20,6 @@ export const stepProgressSchema: Schema<IStepProgress> = new Schema<IStepProgres
   },
 );
 
-const StepProgress = mongoose.model('StepProgress', stepProgressSchema);
+const StepProgress = model('StepProgress', stepProgressSchema);
 
 export default StepProgress;
