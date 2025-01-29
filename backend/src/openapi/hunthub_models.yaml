@@ -33,6 +33,18 @@ components:
       type: string
       enum: [creator, viewer, editor]
 
+    ChallengeType:
+      type: string
+      enum: [clue, quiz, mission, task]
+
+    OptionType:
+      type: string
+      enum: [choice, input]
+
+    MissionType:
+      type: string
+      enum: [upload-media, match-location]
+
     Hunt:
       type: object
       properties:
@@ -54,6 +66,10 @@ components:
           $ref: '#/components/schemas/HuntVisibility'
         startLocation:
           $ref: '#/components/schemas/HuntLocation'
+        steps:
+          type: array
+          items:
+              $ref: '#/components/schemas/Step'
         createdAt:
           type: string
           example: "2024-02-01T10:12:45Z"
@@ -69,8 +85,112 @@ components:
         - isPublished
         - currentVersion
         - status
-        - createdAt
-        - updatedAt
+
+    Step:
+      type: object
+      properties:
+        id:
+          type: string
+        huntId:
+          type: string
+        challengeType:
+          $ref: '#/components/schemas/ChallengeType'
+        challenge:
+          $ref: '#/components/schemas/Challenge'
+        requiredLocation:
+          $ref: '#/components/schemas/HuntLocation'
+        hint:
+          type: string
+        timeLimit:
+          type: number
+        maxAttempts:
+          type: number
+        createdAt:
+          type: string
+          example: "2024-02-01T10:12:45Z"
+          format: date-time
+        updatedAt:
+          type: string
+          example: "2024-02-01T10:12:45Z"
+          format: date-time
+        required:
+          - id
+          - huntId
+          - challengeType
+          - challenge
+
+
+    Challenge:
+      type: object
+      properties:
+        clue:
+          $ref: '#/components/schemas/Clue'
+        quiz:
+          $ref: '#/components/schemas/Quiz'
+        mission:
+          $ref: '#/components/schemas/Mission'
+        task:
+          $ref: '#/components/schemas/Task'
+
+    Clue:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+
+    Option:
+      type: object
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+      required:
+        - id
+        - text
+
+    Quiz:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        target:
+          $ref: '#/components/schemas/Option'
+        type:
+          $ref: '#/components/schemas/OptionType'
+        distractors:
+            type: array
+            items:
+                $ref: '#/components/schemas/Option'
+
+    Mission:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        targetAsset:
+          type: string//
+        targetLocation:
+          $ref: '#/components/schemas/HuntLocation'
+        type:
+          $ref: '#/components/schemas/MissionType'
+
+    Task:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        target:
+          type: string
+
 
     User:
       type: object
