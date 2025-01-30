@@ -1,5 +1,4 @@
 import { Schema, model } from 'mongoose';
-import { stepProgressSchema } from './StepProgress';
 import { HuntProgressStatus, IHuntProgress } from '../schemas/HuntProgress';
 
 const huntProgressSchema: Schema<IHuntProgress> = new Schema<IHuntProgress>(
@@ -10,12 +9,14 @@ const huntProgressSchema: Schema<IHuntProgress> = new Schema<IHuntProgress>(
     status: { type: String, enum: Object.values(HuntProgressStatus), required: true, default: HuntProgressStatus.ToDo },
     startedAt: { type: Date, default: Date.now },
     completedAt: { type: Date },
-    stepProgresses: [stepProgressSchema],
   },
   {
     timestamps: true,
   },
 );
+
+huntProgressSchema.index({ huntId: 1, playerId: 1 }, { unique: true });
+huntProgressSchema.index({ playerId: 1, status: 1 });
 
 const HuntProgress = model('HuntProgress', huntProgressSchema);
 

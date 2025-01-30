@@ -27,6 +27,9 @@ const huntSchema: Schema<IHunt> = new Schema<IHunt>(
   },
 );
 
+huntSchema.index({ creatorId: 1 });
+huntSchema.index({ isPublished: 1, visibility: 1 });
+
 const Hunt = model('Hunt', huntSchema);
 
 export default Hunt;

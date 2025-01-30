@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { IStepProgress } from './StepProgress';
 
 export enum HuntProgressStatus {
   InProgress = 'in_progress',
@@ -15,5 +14,4 @@ export interface IHuntProgress {
   status: HuntProgressStatus;
   startedAt: Date;
   completedAt?: Date;
-  stepProgresses: IStepProgress[];
 }

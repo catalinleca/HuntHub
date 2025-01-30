@@ -9,7 +9,9 @@ export const submissionSchema = new Schema<Submission>({
 
 export const stepProgressSchema: Schema<IStepProgress> = new Schema<IStepProgress>(
   {
-    stepId: { type: String, required: true, ref: 'Step' },
+    huntId: { type: Schema.Types.ObjectId, required: true, ref: 'Hunt' },
+    playerId: { type: Schema.Types.ObjectId, required: true, ref: 'Player' }, // Add this for better querying
+    stepId: { type: Schema.Types.ObjectId, required: true, ref: 'Step' },
     status: { type: String, enum: Object.values(StepProgressStatus), required: true },
     attempts: { type: Number, required: true, default: 0 },
     submissions: { type: [submissionSchema], required: true },
@@ -19,6 +21,9 @@ export const stepProgressSchema: Schema<IStepProgress> = new Schema<IStepProgres
     timestamps: true,
   },
 );
+
+stepProgressSchema.index({ huntId: 1, playerId: 1, stepId: 1 }, { unique: true });
+stepProgressSchema.index({ playerId: 1, status: 1 });
 
 const StepProgress = model('StepProgress', stepProgressSchema);
 

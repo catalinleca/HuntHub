@@ -19,6 +19,8 @@ const stepSchema = new Schema<IStep>(
   { timestamps: true },
 );
 
+stepSchema.index({ huntId: 1 });
+
 const Step = model('Step', stepSchema);
 
 export default Step;

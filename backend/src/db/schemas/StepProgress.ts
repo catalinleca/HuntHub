@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 export interface Submission {
   timestamp: Date;
-  content: any;
+  content: unknown;
   isCorrect: boolean;
 }
 
