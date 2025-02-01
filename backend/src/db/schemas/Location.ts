@@ -1,10 +1,5 @@
 import { Schema } from 'mongoose';
-
-export interface ILocation {
-  lat: number;
-  lng: number;
-  radius: number;
-}
+import { ILocation } from '../interfaces/Location';
 
 export const locationSchema = new Schema<ILocation>({
   lat: Number,

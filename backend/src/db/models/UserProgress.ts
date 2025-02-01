@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import { HuntProgressStatus, IUserProgress } from '../schemas/UserProgress';
+import { HuntProgressStatus, IUserProgress } from '../interfaces/UserProgress';
 
 const userProgressSchema: Schema<IUserProgress> = new Schema<IUserProgress>(
   {

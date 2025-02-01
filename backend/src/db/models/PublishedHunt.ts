@@ -1,5 +1,5 @@
 import { Schema, model, Types } from 'mongoose';
-import { IPublishedHunt } from '../schemas/PublishedHunt';
+import { IPublishedHunt } from '../types/PublishedHunt';
 
 const publishedHuntSchema = new Schema<IPublishedHunt>(
   {

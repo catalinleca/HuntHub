@@ -1,4 +1,4 @@
-import { ILocation } from './Location';
+import { ILocation } from '../schemas/Location';
 import mongoose from 'mongoose';
 
 export enum HuntStatus {

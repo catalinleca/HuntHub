@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { ILiveHunt } from '../schemas/LiveHunt';
+import { ILiveHunt } from '../interfaces/LiveHunt';
 
 const liveHuntSchema = new Schema<ILiveHunt>({
   versionId: {

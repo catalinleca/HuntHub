@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { IStepProgress, ISubmission } from '../schemas/StepProgress';
+import { IStepProgress, ISubmission } from '../interfaces/StepProgress';
 
 export const submissionSchema = new Schema<ISubmission>(
   {

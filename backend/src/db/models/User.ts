@@ -1,14 +1,5 @@
-import { Schema, Types, model } from 'mongoose';
-
-interface IUser {
-  firebaseUid: string;
-  email: string;
-  displayName?: string;
-  profilePicture?: Types.ObjectId;
-  bio?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { Schema, model } from 'mongoose';
+import { IUser } from '../interfaces/User';
 
 const userSchema = new Schema<IUser>(
   {
@@ -88,4 +79,4 @@ userSchema.virtual('fullProfile').get(() => {
 
 const User = model('User', userSchema);
 
-module.exports = User;
+export default User;

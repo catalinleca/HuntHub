@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { IAsset, MimeTypes } from '../schemas/Asset';
+import { IAsset, MimeTypes } from '../interfaces/Asset';
 
 const assetSchema = new Schema<IAsset>(
   {

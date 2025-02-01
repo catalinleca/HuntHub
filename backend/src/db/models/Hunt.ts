@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { HuntStatus, HuntVisibility, IHunt } from '../schemas/Hunt';
+import { HuntStatus, HuntVisibility, IHunt } from '../interfaces/Hunt';
 import { locationSchema } from '../schemas/Location';
 
 const huntSchema: Schema<IHunt> = new Schema<IHunt>(

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { ILocation } from './Location';
+import { ILocation } from '../schemas/Location';
 
 export enum ChallengeType {
   Clue = 'clue',
