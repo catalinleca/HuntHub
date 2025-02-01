@@ -4,17 +4,18 @@ import { locationSchema } from '../schemas/Location';
 
 const huntSchema: Schema<IHunt> = new Schema<IHunt>(
   {
-    creatorId: { type: String, required: true },
-    name: { type: String, required: true },
-    description: { type: String, required: true },
-    isPublished: { type: Boolean, default: false },
-    currentVersion: { type: Number, default: 1 },
-    stepOrder: { type: [String], default: [] },
+    creatorId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
+
     status: {
       type: String,
       enum: Object.values(HuntStatus),
       default: HuntStatus.Draft,
     },
+
+    stepOrder: { type: [Schema.Types.ObjectId], ref: 'Step', default: [] },
+    name: { type: String, required: true },
+    description: { type: String, required: true },
+
     visibility: {
       type: String,
       enum: Object.values(HuntVisibility),

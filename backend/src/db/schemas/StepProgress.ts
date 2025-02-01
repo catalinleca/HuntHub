@@ -1,21 +1,18 @@
-import mongoose from 'mongoose';
+import { Types } from 'mongoose';
 
-export interface Submission {
+export interface ISubmission {
   timestamp: Date;
   content: unknown;
   isCorrect: boolean;
 }
 
-export enum StepProgressStatus {
-  Locked = 'locked',
-  Active = 'active',
-  Completed = 'completed',
-}
-
 export interface IStepProgress {
-  stepId: mongoose.Types.ObjectId;
-  status: StepProgressStatus;
-  attempts: number;
-  submissions: Submission[];
-  completedAt?: Date;
+  progressId: Types.ObjectId;
+  userId: Types.ObjectId;
+  stepId: Types.ObjectId;
+  attempt: number;
+  submissions: ISubmission[]; // Adjust the type as needed
+  isCorrect: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }

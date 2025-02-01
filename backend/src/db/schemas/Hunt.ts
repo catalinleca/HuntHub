@@ -1,4 +1,5 @@
 import { ILocation } from './Location';
+import mongoose from 'mongoose';
 
 export enum HuntStatus {
   Draft = 'draft',
@@ -13,12 +14,13 @@ export enum HuntVisibility {
 }
 
 export interface IHunt {
-  creatorId: string;
+  id: mongoose.Types.ObjectId;
+  creatorId: mongoose.Types.ObjectId;
   name: string;
   description: string;
   isPublished: boolean;
   currentVersion: number;
-  stepOrder: string[];
+  stepOrder: mongoose.Types.ObjectId[];
   status: HuntStatus;
   visibility: HuntVisibility;
   startLocation: ILocation;

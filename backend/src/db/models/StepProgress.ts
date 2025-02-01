@@ -1,29 +1,35 @@
 import { Schema, model } from 'mongoose';
-import { IStepProgress, StepProgressStatus, Submission } from '../schemas/StepProgress';
+import { IStepProgress, ISubmission } from '../schemas/StepProgress';
 
-export const submissionSchema = new Schema<Submission>({
-  timestamp: { type: Date, required: true },
-  content: { type: Schema.Types.Mixed, required: true },
-  isCorrect: { type: Boolean, required: true },
-});
-
-export const stepProgressSchema: Schema<IStepProgress> = new Schema<IStepProgress>(
+export const submissionSchema = new Schema<ISubmission>(
   {
-    huntId: { type: Schema.Types.ObjectId, required: true, ref: 'Hunt' },
-    playerId: { type: Schema.Types.ObjectId, required: true, ref: 'Player' }, // Add this for better querying
+    timestamp: { type: Date, required: true },
+    content: { type: Schema.Types.Mixed, required: true },
+    isCorrect: { type: Boolean, required: true },
+  },
+  { _id: false },
+);
+
+export const stepProgressSchema: Schema = new Schema<IStepProgress>(
+  {
+    progressId: { type: Schema.Types.ObjectId, required: true, ref: 'UserProgress' },
+    userId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
     stepId: { type: Schema.Types.ObjectId, required: true, ref: 'Step' },
-    status: { type: String, enum: Object.values(StepProgressStatus), required: true },
-    attempts: { type: Number, required: true, default: 0 },
+    attempt: { type: Number, required: true },
     submissions: { type: [submissionSchema], required: true },
-    completedAt: { type: Date },
+    isCorrect: { type: Boolean, required: true },
   },
   {
     timestamps: true,
   },
 );
 
-stepProgressSchema.index({ huntId: 1, playerId: 1, stepId: 1 }, { unique: true });
-stepProgressSchema.index({ playerId: 1, status: 1 });
+stepProgressSchema.index({ userId: 1, stepId: 1 });
+stepProgressSchema.index({ stepId: 1, attempt: 1 });
+
+stepProgressSchema.index({ progressId: 1, stepId: 1 }, { unique: true });
+stepProgressSchema.index({ userId: 1, createdAt: -1 });
+stepProgressSchema.index({ stepId: 1, isCorrect: 1 });
 
 const StepProgress = model('StepProgress', stepProgressSchema);
 

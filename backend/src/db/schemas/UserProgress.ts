@@ -7,11 +7,12 @@ export enum HuntProgressStatus {
   ToDo = 'to_do',
 }
 
-export interface IHuntProgress {
+export interface IUserProgress {
+  userId: mongoose.Types.ObjectId;
   huntId: mongoose.Types.ObjectId;
-  playerId: mongoose.Types.ObjectId;
-  currentStepId: mongoose.Types.ObjectId;
   status: HuntProgressStatus;
+  currentStepId: mongoose.Types.ObjectId;
+  completedSteps: mongoose.Types.ObjectId[]; // does it make sense to store this here?
   startedAt: Date;
   completedAt?: Date;
 }
