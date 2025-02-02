@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
-import { IUser } from '../interfaces/User';
+import { IUser } from '../types/User';
+import { MongoError } from 'mongodb';
 
 const userSchema = new Schema<IUser>(
   {
@@ -54,7 +55,7 @@ userSchema.pre('save', (next) => {
   next();
 });
 
-userSchema.post('save', (error, doc, next) => {
+userSchema.post('save', (error: MongoError, doc, next) => {
   if (error?.name === 'MongoError' && error?.code === 11000) {
     next(new Error('Email or Firebase UID already exists'));
   } else {

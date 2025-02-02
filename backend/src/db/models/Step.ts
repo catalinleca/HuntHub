@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
-import { ChallengeType, IStep } from '../interfaces/Step';
-import { locationSchema } from '../schemas/Location';
+import { ChallengeType, IStep } from '../types/Step';
+import { locationSchema } from '../schemas';
 
 const stepSchema = new Schema<IStep>(
   {

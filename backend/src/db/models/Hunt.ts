@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
-import { HuntStatus, HuntVisibility, IHunt } from '../interfaces/Hunt';
-import { locationSchema } from '../schemas/Location';
+import { HuntStatus, HuntVisibility, IHunt } from '../types/Hunt';
+import { locationSchema } from '../schemas';
 
 const huntSchema: Schema<IHunt> = new Schema<IHunt>(
   {
