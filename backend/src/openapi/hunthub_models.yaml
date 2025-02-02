@@ -1,0 +1,245 @@
+openapi: 3.0.0
+info:
+  title: HuntHub API
+  version: 1.0.0
+  description: API for managing treasure hunts
+paths: {}
+
+components:
+  schemas:
+    HuntStatus:
+      type: string
+      enum: [draft, published, archived]
+
+    HuntVisibility:
+      type: string
+      enum: [private, public, unlisted]
+
+    HuntLocation:
+      type: object
+      properties:
+        lat:
+          type: number
+        lng:
+          type: number
+        radius:
+          type: number
+      required:
+        - lat
+        - lng
+        - radius
+
+    HuntAccessType:
+      type: string
+      enum: [creator, viewer, editor]
+
+    ChallengeType:
+      type: string
+      enum: [clue, quiz, mission, task]
+
+    OptionType:
+      type: string
+      enum: [choice, input]
+
+    MissionType:
+      type: string
+      enum: [upload-media, match-location]
+
+    Hunt:
+      type: object
+      properties:
+        id:
+          type: string
+        creatorId:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        isPublished:
+          type: boolean
+        currentVersion:
+          type: integer
+        status:
+          $ref: '#/components/schemas/HuntStatus'
+        visibility:
+          $ref: '#/components/schemas/HuntVisibility'
+        startLocation:
+          $ref: '#/components/schemas/HuntLocation'
+        steps:
+          type: array
+          items:
+              $ref: '#/components/schemas/Step'
+        createdAt:
+          type: string
+          example: "2024-02-01T10:12:45Z"
+          format: date-time
+        updatedAt:
+          type: string
+          example: "2024-02-01T10:12:45Z"
+          format: date-time
+      required:
+        - id
+        - creatorId
+        - name
+        - isPublished
+        - currentVersion
+        - status
+
+    Step:
+      type: object
+      properties:
+        id:
+          type: string
+        huntId:
+          type: string
+        challengeType:
+          $ref: '#/components/schemas/ChallengeType'
+        challenge:
+          $ref: '#/components/schemas/Challenge'
+        requiredLocation:
+          $ref: '#/components/schemas/HuntLocation'
+        hint:
+          type: string
+        timeLimit:
+          type: number
+        maxAttempts:
+          type: number
+        createdAt:
+          type: string
+          example: "2024-02-01T10:12:45Z"
+          format: date-time
+        updatedAt:
+          type: string
+          example: "2024-02-01T10:12:45Z"
+          format: date-time
+        required:
+          - id
+          - huntId
+          - challengeType
+          - challenge
+
+
+    Challenge:
+      type: object
+      properties:
+        clue:
+          $ref: '#/components/schemas/Clue'
+        quiz:
+          $ref: '#/components/schemas/Quiz'
+        mission:
+          $ref: '#/components/schemas/Mission'
+        task:
+          $ref: '#/components/schemas/Task'
+
+    Clue:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+
+    Option:
+      type: object
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+      required:
+        - id
+        - text
+
+    Quiz:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        target:
+          $ref: '#/components/schemas/Option'
+        type:
+          $ref: '#/components/schemas/OptionType'
+        distractors:
+            type: array
+            items:
+                $ref: '#/components/schemas/Option'
+
+    Mission:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        targetAsset:
+          type: string//
+        targetLocation:
+          $ref: '#/components/schemas/HuntLocation'
+        type:
+          $ref: '#/components/schemas/MissionType'
+
+    Task:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        target:
+          type: string
+
+
+    User:
+      type: object
+      properties:
+        firebaseUid:
+          type: string
+        email:
+          type: string
+        fistName:
+          type: string
+        lastName:
+          type: string
+        displayName:
+          type: string
+        profilePicture:
+          type: string
+        bio:
+          type: string
+        createdAt:
+          type: string
+          example: "2024-02-01T10:12:45Z"
+          format: date-time
+        updatedAt:
+          type: string
+          example: "2024-02-01T10:12:45Z"
+          format: date-time
+      required:
+        - firebaseUid
+        - email
+        - firstName
+        - lastName
+        - createdAt
+        - updatedAt
+
+    HuntAccess:
+      type: object
+      properties:
+        huntId:
+          type: string
+        userId:
+          type: string
+        accessType:
+          $ref: '#/components/schemas/HuntAccessType'
+        sharedAt:
+          type: string
+          example: "2024-02-01T10:12:45Z"
+          format: date-time
+      required:
+        - huntId
+        - userId
+        - accessType
+        - sharedAt
