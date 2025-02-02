@@ -13,7 +13,7 @@ export interface ISubmission {
 }
 
 export interface IStepProgress {
-  stepId: string;
+  stepId: mongoose.Types.ObjectId;
   attempts?: number;
   completed?: boolean;
   responses?: ISubmission[];

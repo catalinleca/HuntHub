@@ -1,5 +1,5 @@
-import { ILocation } from '../schemas/Location';
 import mongoose from 'mongoose';
+import { ILocation } from './Location';
 
 export enum HuntStatus {
   Draft = 'draft',

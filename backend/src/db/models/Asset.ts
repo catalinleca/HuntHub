@@ -13,7 +13,7 @@ const assetSchema = new Schema<IAsset>(
     mimeType: {
       type: String,
       required: true,
-      enum: [Object.values(MimeTypes)],
+      enum: Object.values(MimeTypes),
     },
     storageLocation: {
       bucket: String,

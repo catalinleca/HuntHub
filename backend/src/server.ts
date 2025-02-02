@@ -10,10 +10,13 @@ import mustConnectDb from './db';
 import { databaseUrl } from './config';
 
 async function bootstrap() {
+  if (!databaseUrl) {
+    throw new Error('Database URL not found');
+  }
   await mustConnectDb(databaseUrl);
 
   const app = express();
-  const PORT = process.env.PORT || 3000;
+  const PORT = process?.env.PORT || 3000;
 
   app.use(bodyParser.json());
 
