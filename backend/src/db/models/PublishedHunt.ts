@@ -1,7 +1,16 @@
-import { Schema, model, Types } from 'mongoose';
+import { Schema, Document, model, Types, Model } from 'mongoose';
 import { IPublishedHunt } from '../types/PublishedHunt';
 
-const publishedHuntSchema = new Schema<IPublishedHunt>(
+interface PublishedHuntStatics {
+  findLatestVersion(huntId: Types.ObjectId): Promise<IPublishedHunt | null>;
+  findVersion(huntId: Types.ObjectId, version: number): Promise<IPublishedHunt | null>;
+}
+
+type PublishedHuntDocument = IPublishedHunt & Document<Types.ObjectId>;
+
+type PublishedHuntModel = Model<PublishedHuntDocument, {}, PublishedHuntStatics>;
+
+const publishedHuntSchema = new Schema<PublishedHuntDocument, PublishedHuntModel, PublishedHuntStatics>(
   {
     huntId: {
       type: Schema.Types.ObjectId,
@@ -15,7 +24,6 @@ const publishedHuntSchema = new Schema<IPublishedHunt>(
       required: true,
     },
     version: { type: Number, required: true },
-
     name: {
       type: String,
       required: true,
@@ -35,18 +43,18 @@ const publishedHuntSchema = new Schema<IPublishedHunt>(
   },
 );
 
-publishedHuntSchema.index({ huntId: 1, version: 1 }, { unique: true }); // make huntId + version uniqeu
+publishedHuntSchema.index({ huntId: 1, version: 1 }, { unique: true });
 publishedHuntSchema.index({ huntId: 1, publishedAt: -1 });
 publishedHuntSchema.index({ versionId: 1 }, { unique: true });
 
-publishedHuntSchema.statics.findLatestVersion = (huntId: Types.ObjectId) => {
+publishedHuntSchema.statics.findLatestVersion = function (huntId: Types.ObjectId) {
   return this.findOne({ huntId }).sort({ publishedAt: -1 }).exec();
 };
 
-publishedHuntSchema.statics.findVersion = (huntId: Types.ObjectId, version: number) => {
+publishedHuntSchema.statics.findVersion = function (huntId: Types.ObjectId, version: number) {
   return this.findOne({ huntId, version }).exec();
 };
 
-const PublishedHunt = model('PublishedHunt', publishedHuntSchema);
+const PublishedHunt = model<PublishedHuntDocument, PublishedHuntModel>('PublishedHunt', publishedHuntSchema);
 
 export default PublishedHunt;

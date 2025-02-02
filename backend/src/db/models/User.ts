@@ -1,8 +1,19 @@
-import { Schema, model } from 'mongoose';
-import { IUser } from '../types/User';
-import { MongoError } from 'mongodb';
+import { Schema, model, Document, Model, Types } from 'mongoose';
+import { IUser, IUserFullProfile } from '@db/types/User';
 
-const userSchema = new Schema<IUser>(
+interface UserStatics {
+  findByFirebaseUid(firebaseUid: string): Promise<IUser | null>;
+}
+
+interface UserVirtuals {
+  fullProfile: IUserFullProfile;
+}
+
+type UserDocument = Document<Types.ObjectId, {}, IUser> & IUser & UserVirtuals;
+
+type UserModel = Model<UserDocument, {}, UserVirtuals> & UserStatics;
+
+const userSchema = new Schema<IUser, UserModel, UserVirtuals>(
   {
     firebaseUid: {
       type: String,
@@ -26,7 +37,7 @@ const userSchema = new Schema<IUser>(
       type: String,
       ref: 'Asset',
       validate: {
-        validator: (v) => {
+        validator: function (v: string): boolean {
           return !v || /^https?:\/\/.+/.test(v);
         },
         message: 'Profile picture must be a valid URL',
@@ -39,45 +50,26 @@ const userSchema = new Schema<IUser>(
   },
   {
     timestamps: true,
-    toJSON: {
-      virtuals: true,
-    },
-    toObject: {
-      virtuals: true,
-    },
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   },
 );
 
-userSchema.pre('save', (next) => {
-  if (this.email) {
-    this.email = this.email.toLowerCase();
-  }
-  next();
-});
-
-userSchema.post('save', (error: MongoError, doc, next) => {
-  if (error?.name === 'MongoError' && error?.code === 11000) {
-    next(new Error('Email or Firebase UID already exists'));
-  } else {
-    next(error);
-  }
-});
-
-userSchema.statics.findByFirebaseUid = (firebaseUid) => {
+userSchema.static('findByFirebaseUid', function (firebaseUid: string) {
   return this.findOne({ firebaseUid });
-};
+});
 
-userSchema.virtual('fullProfile').get(() => {
+userSchema.virtual('fullProfile').get(function (this: UserDocument) {
   return {
-    id: this._id,
+    id: this._id.toString(),
     firebaseUid: this.firebaseUid,
     email: this.email,
     displayName: this.displayName || this.email.split('@')[0],
     profilePicture: this.profilePicture,
-    bio: this.bio,
+    bio: this.bio ?? '',
   };
 });
 
-const User = model('User', userSchema);
+const User = model<IUser, UserModel>('User', userSchema);
 
 export default User;

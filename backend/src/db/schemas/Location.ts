@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import { ILocation } from '../interfaces/Location';
+import { ILocation } from '@db/types/Location';
 
 export const locationSchema = new Schema<ILocation>({
   lat: Number,
