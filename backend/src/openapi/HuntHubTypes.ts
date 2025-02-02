@@ -127,10 +127,11 @@ export interface Task {
 }
 
 export interface User {
+  id: string;
   firebaseUid: string;
   email: string;
-  fistName?: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   displayName?: string;
   profilePicture?: string;
   bio?: string;
@@ -138,12 +139,12 @@ export interface User {
    * @format date-time
    * @example "2024-02-01T10:12:45Z"
    */
-  createdAt: string;
+  createdAt?: string;
   /**
    * @format date-time
    * @example "2024-02-01T10:12:45Z"
    */
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export interface HuntAccess {

@@ -1,19 +1,7 @@
-import { Schema, model, Document, Model, Types } from 'mongoose';
-import { IUser, IUserFullProfile } from '@db/types/User';
+import { Schema, model } from 'mongoose';
+import { IUser } from '@db/types/User';
 
-interface UserStatics {
-  findByFirebaseUid(firebaseUid: string): Promise<IUser | null>;
-}
-
-interface UserVirtuals {
-  fullProfile: IUserFullProfile;
-}
-
-type UserDocument = Document<Types.ObjectId, {}, IUser> & IUser & UserVirtuals;
-
-type UserModel = Model<UserDocument, {}, UserVirtuals> & UserStatics;
-
-const userSchema = new Schema<IUser, UserModel, UserVirtuals>(
+const userSchema = new Schema<IUser>(
   {
     firebaseUid: {
       type: String,
@@ -28,10 +16,21 @@ const userSchema = new Schema<IUser, UserModel, UserVirtuals>(
       lowercase: true,
       trim: true,
     },
+    firstName: {
+      type: String,
+      required: true,
+      trim: true,
+      maxLength: 50,
+    },
+    lastName: {
+      type: String,
+      trim: true,
+      maxLength: 50,
+    },
     displayName: {
       type: String,
       trim: true,
-      maxLength: 100,
+      maxLength: 50,
     },
     profilePicture: {
       type: String,
@@ -59,17 +58,6 @@ userSchema.static('findByFirebaseUid', function (firebaseUid: string) {
   return this.findOne({ firebaseUid });
 });
 
-userSchema.virtual('fullProfile').get(function (this: UserDocument) {
-  return {
-    id: this._id.toString(),
-    firebaseUid: this.firebaseUid,
-    email: this.email,
-    displayName: this.displayName || this.email.split('@')[0],
-    profilePicture: this.profilePicture,
-    bio: this.bio ?? '',
-  };
-});
-
-const User = model<IUser, UserModel>('User', userSchema);
+const User = model<IUser>('User', userSchema);
 
 export default User;

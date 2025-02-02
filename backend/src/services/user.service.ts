@@ -12,8 +12,18 @@ export class UserService implements IUserService {
     try {
       const user = await UserModel.findOne({
         firebaseId,
-      });
-      return user;
+      }).lean({ virtuals: true });
+
+      if (!user) {
+        return null;
+      }
+
+      return {
+        ...user,
+        firstName: user.firstName || '',
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString(),
+      };
     } catch (error) {
       console.error(error);
       throw new Error('Failed to get user');

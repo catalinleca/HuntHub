@@ -1,21 +1,12 @@
-import mongoose from 'mongoose';
-
 export interface IUser {
+  id: string;
   firebaseUid: string;
   email: string;
+  firstName: string;
+  lastName?: string;
   displayName?: string;
   profilePicture?: string;
   bio?: string;
   createdAt: Date;
   updatedAt: Date;
-}
-
-export interface IUserFullProfile extends mongoose.Document {
-  firebaseUid: string;
-  email: string;
-  displayName: string;
-  profilePicture?: string;
-  bio: string;
-  createdAt?: Date;
-  updatedAt?: Date;
 }

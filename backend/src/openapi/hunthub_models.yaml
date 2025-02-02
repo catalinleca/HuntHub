@@ -187,11 +187,13 @@ components:
     User:
       type: object
       properties:
+        id:
+          type: string
         firebaseUid:
           type: string
         email:
           type: string
-        fistName:
+        firstName:
           type: string
         lastName:
           type: string
@@ -210,12 +212,10 @@ components:
           example: "2024-02-01T10:12:45Z"
           format: date-time
       required:
+        - id
         - firebaseUid
         - email
         - firstName
-        - lastName
-        - createdAt
-        - updatedAt
 
     HuntAccess:
       type: object

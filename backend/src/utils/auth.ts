@@ -1,10 +1,10 @@
 import { DecodedIdToken } from 'firebase-admin/lib/auth';
-import { User } from '@/openapi/HuntHubTypes';
 import { TYPES } from '@/types';
 import { IUserService } from '@/services/user.service';
 import { container } from '@/config/inversify';
+import { CompactUser } from '@/types/CompactUser';
 
-export const authUser = async (token: DecodedIdToken): Promise<User> => {
+export const authUser = async (token: DecodedIdToken): Promise<CompactUser> => {
   const userService = container.get<IUserService>(TYPES.UserService);
 
   try {
@@ -12,7 +12,12 @@ export const authUser = async (token: DecodedIdToken): Promise<User> => {
     if (!user) {
       throw new Error('User not found');
     }
-    return user;
+
+    return {
+      id: user.id,
+      firebaseUid: user.firebaseUid,
+      email: user.email,
+    };
   } catch (err) {
     console.error(err);
     throw new Error('Failed to authenticate user');
