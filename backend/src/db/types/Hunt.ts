@@ -7,21 +7,14 @@ export enum HuntStatus {
   Archived = 'archived',
 }
 
-export enum HuntVisibility {
-  Private = 'private',
-  Public = 'public',
-  Unlisted = 'unlisted',
-}
-
-export interface IHunt {
-  id: mongoose.Types.ObjectId;
+export interface IHunt extends mongoose.Document {
   creatorId: mongoose.Types.ObjectId;
-  name: string;
-  description: string;
-  isPublished: boolean;
-  currentVersion: number;
-  stepOrder: mongoose.Types.ObjectId[];
   status: HuntStatus;
-  visibility: HuntVisibility;
-  startLocation: ILocation;
+  name: string;
+  description?: string;
+  currentVersion: number;
+  stepOrder?: mongoose.Types.ObjectId[];
+  startLocation?: ILocation;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

@@ -8,7 +8,7 @@ export enum ChallengeType {
   Task = 'task',
 }
 
-export interface IStep {
+export interface IStep extends mongoose.Document {
   huntId: mongoose.Types.ObjectId;
   type: ChallengeType;
   challenge: unknown;
@@ -16,4 +16,6 @@ export interface IStep {
   requiredLocation?: ILocation;
   timeLimit?: number;
   maxAttempts?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

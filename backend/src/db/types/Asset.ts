@@ -1,4 +1,4 @@
-import { Types } from 'mongoose';
+import mongoose from 'mongoose';
 
 export enum MimeTypes {
   JPEG = 'image/jpeg',
@@ -6,7 +6,7 @@ export enum MimeTypes {
   MP4 = 'video/mp4',
 }
 
-export interface IAsset {
+export interface IAsset extends mongoose.Document {
   originalFilename?: string;
   size?: number;
   thumbnailUrl?: string;
@@ -16,12 +16,12 @@ export interface IAsset {
     bucket?: string;
     path?: string;
   };
-  huntId: Types.ObjectId;
-  ownerId: Types.ObjectId;
+  huntId: mongoose.Types.ObjectId;
+  ownerId: mongoose.Types.ObjectId;
   usage?: {
     model: string;
     field: string;
-    documentId: Types.ObjectId;
+    documentId: mongoose.Types.ObjectId;
   }[];
   createdAt: Date;
   updatedAt: Date;

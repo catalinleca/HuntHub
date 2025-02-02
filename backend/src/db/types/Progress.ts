@@ -22,7 +22,7 @@ export interface IStepProgress {
   duration?: number;
 }
 
-export interface IProgress {
+export interface IProgress extends mongoose.Document {
   userId: mongoose.Types.ObjectId;
   sessionId: string;
   isAnonymous: boolean;
@@ -40,4 +40,7 @@ export interface IProgress {
 
   playerName: string;
   rating?: number;
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }
