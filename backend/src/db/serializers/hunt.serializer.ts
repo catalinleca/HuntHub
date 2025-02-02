@@ -17,6 +17,6 @@ export class HuntSerializer implements ISerializer<IHunt, Hunt> {
       steps: [],
       createdAt: model.createdAt?.toISOString(),
       updatedAt: model.updatedAt?.toISOString(),
-    };
+    } as Hunt;
   }
 }
