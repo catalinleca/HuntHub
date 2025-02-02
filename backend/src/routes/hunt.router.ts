@@ -1,7 +1,13 @@
 import express from 'express';
+import { TYPES } from '@/types';
+import { container } from '@/config/inversify';
+import { HuntController } from '@/controllers/hunt.controller';
 
-const router = express.Router();
+const huntRouter = express.Router();
+const controller = container.get<HuntController>(TYPES.HuntController);
 
-// router.post('/hunts', createHunt);
+huntRouter.post('/', (req, res) => {
+  controller.createHunt(req, res);
+});
 
-export default router;
+export default huntRouter;

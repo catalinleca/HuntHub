@@ -8,7 +8,7 @@ export enum HuntStatus {
 }
 
 export interface IHunt extends mongoose.Document {
-  creatorId: mongoose.Types.ObjectId;
+  creatorId: string; // TODO revert
   status: HuntStatus;
   name: string;
   description?: string;

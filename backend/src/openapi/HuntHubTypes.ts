@@ -65,11 +65,18 @@ export interface Hunt {
   updatedAt?: string;
 }
 
+export interface HuntCreate {
+  name: string;
+  description?: string;
+  startLocation?: HuntLocation;
+  steps?: StepCreate[];
+}
+
 export interface Step {
-  id?: string;
+  id: string;
   huntId?: string;
   type?: ChallengeType;
-  challenge?: Challenge;
+  challenge: Challenge;
   requiredLocation?: HuntLocation;
   hint?: string;
   timeLimit?: number;
@@ -84,7 +91,16 @@ export interface Step {
    * @example "2024-02-01T10:12:45Z"
    */
   updatedAt?: string;
-  required?: any;
+}
+
+export interface StepCreate {
+  huntId?: string;
+  type?: ChallengeType;
+  challenge: Challenge;
+  requiredLocation?: HuntLocation;
+  hint?: string;
+  timeLimit?: number;
+  maxAttempts?: number;
 }
 
 export interface Challenge {

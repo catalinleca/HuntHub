@@ -20,7 +20,6 @@ export class UserService implements IUserService {
 
       return {
         ...user,
-        firstName: user.firstName || '',
         createdAt: user.createdAt.toISOString(),
         updatedAt: user.updatedAt.toISOString(),
       };

@@ -4,14 +4,14 @@ import { locationSchema } from '../schemas';
 
 const huntSchema: Schema<IHunt> = new Schema<IHunt>(
   {
-    creatorId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
+    creatorId: { type: String, required: true }, // TODO revert
     status: {
       type: String,
       enum: Object.values(HuntStatus),
       default: HuntStatus.Draft,
     },
     name: { type: String, required: true },
-    description: { type: String, required: true },
+    description: { type: String },
     currentVersion: { type: Number, default: 1 },
     stepOrder: { type: [Schema.Types.ObjectId], ref: 'Step', default: [] },
     startLocation: locationSchema,

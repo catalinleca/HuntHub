@@ -11,7 +11,7 @@ components:
       type: string
       enum: [draft, published, archived]
 
-    HuntLocation:
+    Location:
       type: object
       properties:
         lat:
@@ -57,7 +57,7 @@ components:
         status:
           $ref: '#/components/schemas/HuntStatus'
         startLocation:
-          $ref: '#/components/schemas/HuntLocation'
+          $ref: '#/components/schemas/Location'
         steps:
           type: array
           items:
@@ -78,6 +78,27 @@ components:
         - currentVersion
         - status
 
+    HuntCreate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        startLocation:
+          $ref: '#/components/schemas/Location'
+        steps:
+          type: array
+          items:
+              $ref: '#/components/schemas/StepCreate'
+      required:
+        - id
+        - creatorId
+        - name
+        - isPublished
+        - currentVersion
+        - status
+
     Step:
       type: object
       properties:
@@ -90,7 +111,7 @@ components:
         challenge:
           $ref: '#/components/schemas/Challenge'
         requiredLocation:
-          $ref: '#/components/schemas/HuntLocation'
+          $ref: '#/components/schemas/Location'
         hint:
           type: string
         timeLimit:
@@ -105,12 +126,31 @@ components:
           type: string
           example: "2024-02-01T10:12:45Z"
           format: date-time
-        required:
-          - id
-          - huntId
-          - challengeType
-          - challenge
+      required:
+        - id
+        - challengeType
+        - challenge
 
+    StepCreate:
+      type: object
+      properties:
+        huntId:
+          type: string
+        type:
+          $ref: '#/components/schemas/ChallengeType'
+        challenge:
+          $ref: '#/components/schemas/Challenge'
+        requiredLocation:
+          $ref: '#/components/schemas/Location'
+        hint:
+          type: string
+        timeLimit:
+          type: number
+        maxAttempts:
+          type: number
+      required:
+        - challengeType
+        - challenge
 
     Challenge:
       type: object
@@ -167,9 +207,9 @@ components:
         description:
           type: string
         targetAsset:
-          type: string//
+          type: string
         targetLocation:
-          $ref: '#/components/schemas/HuntLocation'
+          $ref: '#/components/schemas/Location'
         type:
           $ref: '#/components/schemas/MissionType'
 
@@ -215,7 +255,6 @@ components:
         - id
         - firebaseUid
         - email
-        - firstName
 
     HuntAccess:
       type: object
