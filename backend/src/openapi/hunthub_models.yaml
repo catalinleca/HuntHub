@@ -11,10 +11,6 @@ components:
       type: string
       enum: [draft, published, archived]
 
-    HuntVisibility:
-      type: string
-      enum: [private, public, unlisted]
-
     HuntLocation:
       type: object
       properties:
@@ -56,14 +52,10 @@ components:
           type: string
         description:
           type: string
-        isPublished:
-          type: boolean
         currentVersion:
           type: integer
         status:
           $ref: '#/components/schemas/HuntStatus'
-        visibility:
-          $ref: '#/components/schemas/HuntVisibility'
         startLocation:
           $ref: '#/components/schemas/HuntLocation'
         steps:
@@ -93,7 +85,7 @@ components:
           type: string
         huntId:
           type: string
-        challengeType:
+        type:
           $ref: '#/components/schemas/ChallengeType'
         challenge:
           $ref: '#/components/schemas/Challenge'

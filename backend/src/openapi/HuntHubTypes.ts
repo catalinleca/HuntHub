@@ -15,12 +15,6 @@ export enum HuntStatus {
   Archived = 'archived',
 }
 
-export enum HuntVisibility {
-  Private = 'private',
-  Public = 'public',
-  Unlisted = 'unlisted',
-}
-
 export interface HuntLocation {
   lat: number;
   lng: number;
@@ -33,26 +27,103 @@ export enum HuntAccessType {
   Editor = 'editor',
 }
 
+export enum ChallengeType {
+  Clue = 'clue',
+  Quiz = 'quiz',
+  Mission = 'mission',
+  Task = 'task',
+}
+
+export enum OptionType {
+  Choice = 'choice',
+  Input = 'input',
+}
+
+export enum MissionType {
+  UploadMedia = 'upload-media',
+  MatchLocation = 'match-location',
+}
+
 export interface Hunt {
   id: string;
   creatorId: string;
   name: string;
   description?: string;
-  isPublished: boolean;
   currentVersion: number;
   status: HuntStatus;
-  visibility?: HuntVisibility;
   startLocation?: HuntLocation;
+  steps?: Step[];
   /**
    * @format date-time
    * @example "2024-02-01T10:12:45Z"
    */
-  createdAt: string;
+  createdAt?: string;
   /**
    * @format date-time
    * @example "2024-02-01T10:12:45Z"
    */
-  updatedAt: string;
+  updatedAt?: string;
+}
+
+export interface Step {
+  id?: string;
+  huntId?: string;
+  type?: ChallengeType;
+  challenge?: Challenge;
+  requiredLocation?: HuntLocation;
+  hint?: string;
+  timeLimit?: number;
+  maxAttempts?: number;
+  /**
+   * @format date-time
+   * @example "2024-02-01T10:12:45Z"
+   */
+  createdAt?: string;
+  /**
+   * @format date-time
+   * @example "2024-02-01T10:12:45Z"
+   */
+  updatedAt?: string;
+  required?: any;
+}
+
+export interface Challenge {
+  clue?: Clue;
+  quiz?: Quiz;
+  mission?: Mission;
+  task?: Task;
+}
+
+export interface Clue {
+  title?: string;
+  description?: string;
+}
+
+export interface Option {
+  id: string;
+  text: string;
+}
+
+export interface Quiz {
+  title?: string;
+  description?: string;
+  target?: Option;
+  type?: OptionType;
+  distractors?: Option[];
+}
+
+export interface Mission {
+  title?: string;
+  description?: string;
+  targetAsset?: string;
+  targetLocation?: HuntLocation;
+  type?: MissionType;
+}
+
+export interface Task {
+  title?: string;
+  description?: string;
+  target?: string;
 }
 
 export interface User {

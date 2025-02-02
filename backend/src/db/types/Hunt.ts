@@ -13,8 +13,8 @@ export interface IHunt extends mongoose.Document {
   name: string;
   description?: string;
   currentVersion: number;
-  stepOrder?: mongoose.Types.ObjectId[];
   startLocation?: ILocation;
+  stepOrder?: mongoose.Types.ObjectId[];
   createdAt?: Date;
   updatedAt?: Date;
 }

@@ -1,8 +1,8 @@
+import 'reflect-metadata';
 import express from 'express';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 
-// Load .env.local file first
 dotenv.config({ path: '.env.local' });
 dotenv.config({ path: '.env' });
 
