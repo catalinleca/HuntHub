@@ -7,7 +7,7 @@ import { Hunt } from '@/openapi/HuntHubTypes';
 export class HuntSerializer implements ISerializer<IHunt, Hunt> {
   toDTO(model: IHunt): Hunt {
     return {
-      id: (model._id as string).toString(),
+      id: model._id!.toString(),
       creatorId: model.creatorId.toString(),
       name: model.name,
       description: model.description,
