@@ -26,7 +26,7 @@ export const huntSchema = z.object({
 });
 
 export const userSchema = z.object({
-  firebaseUid: z.string(),
+  firebaseId: z.string(),
   email: z.string(),
   firstName: z.string().optional(),
   lastName: z.string(),

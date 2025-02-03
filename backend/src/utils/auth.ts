@@ -15,7 +15,7 @@ export const authUser = async (token: DecodedIdToken): Promise<CompactUser> => {
 
     return {
       id: user.id,
-      firebaseUid: user.firebaseUid,
+      firebaseId: user.firebaseId,
       email: user.email,
     };
   } catch (err) {

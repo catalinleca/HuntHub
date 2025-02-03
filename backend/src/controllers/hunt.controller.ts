@@ -3,8 +3,12 @@ import { Request, Response } from 'express';
 import { TYPES } from '@/types';
 import { HuntService } from '@/services/hunt.service';
 
+export interface IHuntController {
+  createHunt(req: Request, res: Response): Promise<Response>;
+}
+
 @injectable()
-export class HuntController {
+export class HuntController implements IHuntController {
   constructor(@inject(TYPES.HuntService) private huntService: HuntService) {}
 
   async createHunt(req: Request, res: Response) {

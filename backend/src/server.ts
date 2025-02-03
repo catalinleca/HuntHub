@@ -9,8 +9,10 @@ dotenv.config({ path: '.env' });
 
 import mustConnectDb from './db';
 import { databaseUrl } from './config';
+import './config/firebase';
 
 import huntRouter from '@/routes/hunt.router';
+import authRouter from '@/routes/auth.routes';
 
 async function bootstrap() {
   if (!databaseUrl) {
@@ -23,6 +25,7 @@ async function bootstrap() {
 
   const PORT = process?.env.PORT || 3000;
 
+  app.use('/auth', authRouter);
   app.use('/api/hunts', huntRouter);
 
   app.listen(PORT, () => {

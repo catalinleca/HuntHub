@@ -11,6 +11,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 
     const decodedToken = await auth().verifyIdToken(token);
     if (decodedToken) {
+      console.log('===decodedToken===', decodedToken);
       req.user = await authUser(decodedToken);
     }
     next();

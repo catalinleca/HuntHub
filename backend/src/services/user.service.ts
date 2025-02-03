@@ -4,6 +4,7 @@ import { UserModel } from '@db/models';
 
 export interface IUserService {
   getUserByFirebaseId(firebaseId: string): Promise<User | null>;
+  createOrUpdateUser(userData: { firebaseId: string; email: string; displayName?: string }): Promise<User>;
 }
 
 @injectable()
@@ -26,6 +27,34 @@ export class UserService implements IUserService {
     } catch (error) {
       console.error(error);
       throw new Error('Failed to get user');
+    }
+  }
+
+  async createOrUpdateUser(userData: { firebaseId: string; email: string; displayName?: string }): Promise<User> {
+    try {
+      const user = await UserModel.findOneAndUpdate(
+        { firebaseId: userData.firebaseId },
+        {
+          $set: {
+            email: userData.email,
+            displayName: userData.displayName,
+          },
+        },
+        {
+          new: true,
+          upsert: true,
+          lean: { virtuals: true },
+        },
+      );
+
+      return {
+        ...user,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString(),
+      } as User;
+    } catch (error) {
+      console.error(error);
+      throw new Error('Failed to create/update user');
     }
   }
 }

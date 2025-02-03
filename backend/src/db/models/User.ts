@@ -3,7 +3,7 @@ import { IUser } from '@db/types/User';
 
 const userSchema = new Schema<IUser>(
   {
-    firebaseUid: {
+    firebaseId: {
       type: String,
       required: true,
       unique: true,
@@ -54,8 +54,8 @@ const userSchema = new Schema<IUser>(
   },
 );
 
-userSchema.static('findByFirebaseUid', function (firebaseUid: string) {
-  return this.findOne({ firebaseUid });
+userSchema.static('findByFirebaseId', function (firebaseId: string) {
+  return this.findOne({ firebaseId });
 });
 
 const User = model<IUser>('User', userSchema);
