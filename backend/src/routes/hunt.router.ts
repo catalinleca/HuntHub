@@ -10,4 +10,12 @@ huntRouter.post('/', (req, res) => {
   controller.createHunt(req, res);
 });
 
+huntRouter.get('/', (req, res) => {
+  controller.getAllHunts(req, res);
+});
+
+huntRouter.get('/:id', (req, res) => {
+  controller.getHuntById(req, res);
+});
+
 export default huntRouter;
