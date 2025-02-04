@@ -9,12 +9,8 @@ export interface SignUpCredentials {
   displayName: string;
 }
 
+// TODO: move into headers when the app is ready
 export interface AuthResponse {
   accessToken: string;
   refreshToken?: string;
-  user?: {
-    uid: string;
-    email: string;
-    displayName: string;
-  };
 }

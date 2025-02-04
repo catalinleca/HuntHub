@@ -5,6 +5,7 @@ import { IUserService } from '@/services/user.service';
 import { TYPES } from '@/types';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, adminAuth } from '@/config/firebase';
+import { FirebaseAuthError } from '@/utils/errors/handleFirebaseError';
 
 export interface IAuthService {
   login(credentials: LoginCredentials): Promise<AuthResponse>;
@@ -26,20 +27,14 @@ export class AuthService implements IAuthService {
       const idToken = await userCredentials.user.getIdToken();
       const refreshToken = userCredentials.user.refreshToken;
 
-      const user = await this.userService.createOrUpdateUser({
-        firebaseId: userCredentials.user.uid,
-        email: userCredentials.user.email || '',
-        displayName: userCredentials.user.displayName || undefined,
-      });
-
-      console.log('===user: ', user);
+      const user = await this.userService.getUserByFirebaseId(userCredentials.user.uid);
 
       return {
         accessToken: idToken,
         refreshToken: refreshToken,
       };
     } catch (error) {
-      this.handleFirebaseError(error);
+      throw new FirebaseAuthError(error);
     }
   }
 
@@ -60,13 +55,12 @@ export class AuthService implements IAuthService {
         email: userCredential.user.email || '',
         displayName: displayName,
       });
-      console.log('===user: ', user);
 
       return {
         accessToken: token,
       };
     } catch (error) {
-      this.handleFirebaseError(error);
+      throw new FirebaseAuthError(error);
     }
   }
 
@@ -76,25 +70,8 @@ export class AuthService implements IAuthService {
       const newToken = await adminAuth.createCustomToken(decodedToken.uid);
 
       return { accessToken: newToken };
-    } catch (err) {
-      this.handleFirebaseError(err);
-    }
-  }
-
-  private handleFirebaseError(error: any): never {
-    const errorCode = error.code;
-    switch (errorCode) {
-      case 'auth/user-not-found':
-      case 'auth/wrong-password':
-        throw new AppError('Invalid email or password', 401);
-      case 'auth/invalid-email':
-        throw new AppError('Invalid email format', 400);
-      case 'auth/user-disabled':
-        throw new AppError('Account has been disabled', 403);
-      case 'auth/too-many-requests':
-        throw new AppError('Too many login attempts. Please try again later', 429);
-      default:
-        throw new AppError('Authentication failed', 500);
+    } catch (error) {
+      throw new FirebaseAuthError(error);
     }
   }
 }

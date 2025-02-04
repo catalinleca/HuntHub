@@ -1,5 +1,3 @@
-import dotenv from 'dotenv';
-
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { cert, initializeApp as initializeAdminApp, ServiceAccount } from 'firebase-admin/app';
@@ -29,7 +27,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-console.log('===Firebase initialized===');
-
+console.log('Firebase initialized');
 export const auth = getAuth(app);
 export const adminAuth = getAdminAuth(adminApp);

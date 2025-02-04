@@ -1,4 +1,3 @@
-import dotenv from 'dotenv';
 import { Request, Response, NextFunction } from 'express';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types';
@@ -26,7 +25,6 @@ export class AuthController implements IAuthController {
 
       res.status(200).json({
         message: 'Login successful',
-        user: authResponse.user,
       });
     } catch (error) {
       next(error);
@@ -78,13 +76,13 @@ export class AuthController implements IAuthController {
 
       res.status(201).json({
         message: 'User created',
-        user: authResponse.user,
       });
     } catch (error) {
       next(error);
     }
   }
 
+  // TODO: remove and add to headers
   private setCookies(res: Response, authTokens: { accessToken: string; refreshToken?: string }) {
     res.cookie('access_token', authTokens.accessToken, {
       httpOnly: true,

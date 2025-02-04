@@ -13,6 +13,7 @@ import './config/firebase';
 
 import huntRouter from '@/routes/hunt.router';
 import authRouter from '@/routes/auth.routes';
+import { errorHandler } from '@/middlewares/error.middleware';
 
 async function bootstrap() {
   if (!databaseUrl) {
@@ -23,11 +24,12 @@ async function bootstrap() {
   const app = express();
   app.use(bodyParser.json());
 
-  const PORT = process?.env.PORT || 3000;
-
   app.use('/auth', authRouter);
   app.use('/api/hunts', huntRouter);
 
+  app.use(errorHandler);
+
+  const PORT = process?.env.PORT || 3000;
   app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
   });
