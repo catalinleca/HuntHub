@@ -5,6 +5,8 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -15,5 +17,5 @@
       "@db/*": ["src/db/*"],
     }
   },
-  "include": ["src/**/*", "tests/**/*"],
+  "include": ["src/**/*", "tests/**/*", "backend/src/config/firebase.ts"],
 }

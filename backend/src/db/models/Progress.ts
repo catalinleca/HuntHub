@@ -26,7 +26,7 @@ const StepProgressSchema = new Schema<IStepProgress>(
 const ProgressSchema = new Schema<IProgress>(
   {
     userId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
-    sessionId: { type: String, required: true, index: true },
+    sessionId: { type: String, required: true },
     isAnonymous: { type: Boolean, required: true, default: true },
 
     huntId: { type: Schema.Types.ObjectId, required: true, ref: 'Hunt' },

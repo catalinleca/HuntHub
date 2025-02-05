@@ -1,26 +1,19 @@
 import { Schema, model } from 'mongoose';
-import { HuntStatus, HuntVisibility, IHunt } from '../types/Hunt';
+import { HuntStatus, IHunt } from '../types/Hunt';
 import { locationSchema } from '../schemas';
 
 const huntSchema: Schema<IHunt> = new Schema<IHunt>(
   {
-    creatorId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
-
+    creatorId: { type: String, required: true }, // TODO revert
     status: {
       type: String,
       enum: Object.values(HuntStatus),
       default: HuntStatus.Draft,
     },
-
-    stepOrder: { type: [Schema.Types.ObjectId], ref: 'Step', default: [] },
     name: { type: String, required: true },
-    description: { type: String, required: true },
-
-    visibility: {
-      type: String,
-      enum: Object.values(HuntVisibility),
-      default: HuntVisibility.Private,
-    },
+    description: { type: String },
+    currentVersion: { type: Number, default: 1 },
+    stepOrder: { type: [Schema.Types.ObjectId], ref: 'Step', default: [] },
     startLocation: locationSchema,
   },
   {

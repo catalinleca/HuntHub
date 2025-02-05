@@ -39,7 +39,7 @@ const publishedHuntSchema = new Schema<PublishedHuntDocument, PublishedHuntModel
     },
   },
   {
-    timestamps: true,
+    timestamps: false,
   },
 );
 

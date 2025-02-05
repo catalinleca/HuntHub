@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
-export interface IPublishedHunt {
-  _id: mongoose.Types.ObjectId;
+export interface IPublishedHunt extends mongoose.Document {
   huntId: mongoose.Types.ObjectId;
   versionId: mongoose.Types.ObjectId;
   version: number;
