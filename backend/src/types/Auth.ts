@@ -4,12 +4,13 @@ export interface LoginCredentials {
 }
 
 export interface SignUpCredentials {
+  firebaseUid?: string;
   email: string;
   password: string;
+  firstName: string;
   displayName: string;
 }
 
-// TODO: move into headers when the app is ready
 export interface AuthResponse {
   accessToken: string;
   refreshToken?: string;

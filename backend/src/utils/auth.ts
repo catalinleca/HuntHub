@@ -3,23 +3,19 @@ import { TYPES } from '@/types';
 import { IUserService } from '@/services/user.service';
 import { container } from '@/config/inversify';
 import { CompactUser } from '@/types/CompactUser';
+import { NotFoundError } from '@/utils/errors/NotFoundError';
 
 export const authUser = async (token: DecodedIdToken): Promise<CompactUser> => {
   const userService = container.get<IUserService>(TYPES.UserService);
 
-  try {
-    const user = await userService.getUserByFirebaseId(token.uid);
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    return {
-      id: user.id,
-      firebaseId: user.firebaseId,
-      email: user.email,
-    };
-  } catch (err) {
-    console.error(err);
-    throw new Error('Failed to authenticate user');
+  const user = await userService.getUserByFirebaseUid(token.uid);
+  if (!user) {
+    throw new NotFoundError();
   }
+
+  return {
+    id: user.id,
+    firebaseUid: user.firebaseUid,
+    email: user.email,
+  };
 };

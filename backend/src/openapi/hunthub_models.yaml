@@ -229,7 +229,7 @@ components:
       properties:
         id:
           type: string
-        firebaseId:
+        firebaseUid:
           type: string
         email:
           type: string
@@ -253,7 +253,7 @@ components:
           format: date-time
       required:
         - id
-        - firebaseId
+        - firebaseUid
         - email
 
     HuntAccess:

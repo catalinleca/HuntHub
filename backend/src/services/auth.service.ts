@@ -1,11 +1,11 @@
 import { inject, injectable } from 'inversify';
 import { AuthResponse, LoginCredentials, SignUpCredentials } from '@/types/Auth';
-import { AppError } from '@/utils/errors/AppError';
 import { IUserService } from '@/services/user.service';
 import { TYPES } from '@/types';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, adminAuth } from '@/config/firebase';
-import { FirebaseAuthError } from '@/utils/errors/handleFirebaseError';
+import { FirebaseAuthError } from '@/utils/errors/FirebaseAuthError';
+import { handleWithFirebaseError } from '@/utils/errors/handleFirebaseCall';
 
 export interface IAuthService {
   login(credentials: LoginCredentials): Promise<AuthResponse>;
@@ -27,8 +27,9 @@ export class AuthService implements IAuthService {
       const idToken = await userCredentials.user.getIdToken();
       const refreshToken = userCredentials.user.refreshToken;
 
-      const user = await this.userService.getUserByFirebaseId(userCredentials.user.uid);
+      await this.userService.getUserByFirebaseUid(userCredentials.user.uid);
 
+      //TODO: remove
       return {
         accessToken: idToken,
         refreshToken: refreshToken,
@@ -42,25 +43,25 @@ export class AuthService implements IAuthService {
     await this.auth.signOut();
   }
 
-  async signUp(credentials: SignUpCredentials): Promise<AuthResponse> {
+  async signUp(user: SignUpCredentials): Promise<AuthResponse> {
+    const { password, ...userData } = user;
+
+    const firebaseUser = await handleWithFirebaseError(() => {
+      return createUserWithEmailAndPassword(this.auth, userData.email, password);
+    });
+
+    const token = await firebaseUser.user.getIdToken();
+
     try {
-      const { email, password, displayName } = credentials;
-      const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
-      console.log('===userCredential: ', userCredential);
+      await this.userService.createUser({
+        ...userData,
+        firebaseUid: firebaseUser.user.uid,
+      } as Required<SignUpCredentials>);
 
-      const token = await userCredential.user.getIdToken();
-
-      const user = await this.userService.createOrUpdateUser({
-        firebaseId: userCredential.user.uid,
-        email: userCredential.user.email || '',
-        displayName: displayName,
-      });
-
-      return {
-        accessToken: token,
-      };
+      return { accessToken: token };
     } catch (error) {
-      throw new FirebaseAuthError(error);
+      await firebaseUser.user.delete();
+      throw error;
     }
   }
 

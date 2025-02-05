@@ -1,6 +1,6 @@
 export interface IUser {
   id: string;
-  firebaseId: string;
+  firebaseUid: string;
   email: string;
   firstName: string;
   lastName?: string;

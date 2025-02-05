@@ -14,6 +14,7 @@ import './config/firebase';
 import huntRouter from '@/routes/hunt.router';
 import authRouter from '@/routes/auth.routes';
 import { errorHandler } from '@/middlewares/error.middleware';
+import { authMiddleware } from '@/middlewares/auth.middleware';
 
 async function bootstrap() {
   if (!databaseUrl) {
@@ -25,6 +26,7 @@ async function bootstrap() {
   app.use(bodyParser.json());
 
   app.use('/auth', authRouter);
+  app.use('/api', authMiddleware);
   app.use('/api/hunts', huntRouter);
 
   app.use(errorHandler);

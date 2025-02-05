@@ -144,7 +144,7 @@ export interface Task {
 
 export interface User {
   id: string;
-  firebaseId: string;
+  firebaseUid: string;
   email: string;
   firstName?: string;
   lastName?: string;
