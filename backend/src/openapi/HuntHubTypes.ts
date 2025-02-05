@@ -15,7 +15,7 @@ export enum HuntStatus {
   Archived = 'archived',
 }
 
-export interface HuntLocation {
+export interface Location {
   lat: number;
   lng: number;
   radius: number;
@@ -51,7 +51,7 @@ export interface Hunt {
   description?: string;
   currentVersion: number;
   status: HuntStatus;
-  startLocation?: HuntLocation;
+  startLocation?: Location;
   steps?: Step[];
   /**
    * @format date-time
@@ -68,7 +68,7 @@ export interface Hunt {
 export interface HuntCreate {
   name: string;
   description?: string;
-  startLocation?: HuntLocation;
+  startLocation?: Location;
   steps?: StepCreate[];
 }
 
@@ -77,7 +77,7 @@ export interface Step {
   huntId?: string;
   type?: ChallengeType;
   challenge: Challenge;
-  requiredLocation?: HuntLocation;
+  requiredLocation?: Location;
   hint?: string;
   timeLimit?: number;
   maxAttempts?: number;
@@ -94,21 +94,20 @@ export interface Step {
 }
 
 export interface StepCreate {
-  huntId?: string;
-  type?: ChallengeType;
+  type: ChallengeType;
   challenge: Challenge;
-  requiredLocation?: HuntLocation;
+  requiredLocation?: Location;
   hint?: string;
   timeLimit?: number;
   maxAttempts?: number;
 }
 
-export interface Challenge {
+export type Challenge = (Clue | Quiz | Mission | Task) & {
   clue?: Clue;
   quiz?: Quiz;
   mission?: Mission;
   task?: Task;
-}
+};
 
 export interface Clue {
   title?: string;
@@ -132,7 +131,7 @@ export interface Mission {
   title?: string;
   description?: string;
   targetAsset?: string;
-  targetLocation?: HuntLocation;
+  targetLocation?: Location;
   type?: MissionType;
 }
 

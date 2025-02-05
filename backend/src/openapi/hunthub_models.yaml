@@ -3,7 +3,104 @@ info:
   title: HuntHub API
   version: 1.0.0
   description: API for managing treasure hunts
-paths: {}
+paths:
+  /api/hunts:
+    post:
+      summary: Create a new hunt
+      tags: [ Hunts ]
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HuntCreate'
+      responses:
+        201:
+          description: Hunt created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hunt'
+        401:
+          description: Unauthorized
+        400:
+          description: Invalid input
+
+    get:
+      summary: Get all hunts for the authenticated user
+      tags: [ Hunts ]
+      security:
+        - bearerAuth: [ ]
+      responses:
+        200:
+          description: List of hunts retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Hunt'
+        401:
+          description: Unauthorized
+
+  /api/hunts/{huntId}:
+    get:
+      summary: Get a specific hunt by ID
+      tags: [ Hunts ]
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: huntId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Hunt retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hunt'
+        401:
+          description: Unauthorized
+        404:
+          description: Hunt not found
+
+  /api/hunts/{huntId}/steps:
+    post:
+      summary: Create a new step for a hunt
+      tags: [ Steps ]
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: huntId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StepCreate'
+      responses:
+        201:
+          description: Step created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Step'
+        401:
+          description: Unauthorized
+        400:
+          description: Invalid input
+        404:
+          description: Hunt not found
+
 
 components:
   schemas:
@@ -134,8 +231,6 @@ components:
     StepCreate:
       type: object
       properties:
-        huntId:
-          type: string
         type:
           $ref: '#/components/schemas/ChallengeType'
         challenge:
@@ -149,7 +244,7 @@ components:
         maxAttempts:
           type: number
       required:
-        - challengeType
+        - type
         - challenge
 
     Challenge:
@@ -163,6 +258,11 @@ components:
           $ref: '#/components/schemas/Mission'
         task:
           $ref: '#/components/schemas/Task'
+      oneOf:
+        - $ref: '#/components/schemas/Clue'
+        - $ref: '#/components/schemas/Quiz'
+        - $ref: '#/components/schemas/Mission'
+        - $ref: '#/components/schemas/Task'
 
     Clue:
       type: object

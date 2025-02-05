@@ -17,7 +17,8 @@
     "lint": "eslint 'src/**/*.ts'",
     "lint:fix": "eslint 'src/**/*.ts' --fix",
     "schemagen": "swagger-typescript-api -p ./src/openapi/HuntHub_models.yaml -o ./src/openapi --no-client --name HuntHubTypes.ts",
-    "generate-zodies": "npx ts-to-zod ./src/openapi/HuntHubTypes.ts ./src/utils/validation/schemas.ts"
+    "generate-zodies": "npx ts-to-zod ./src/openapi/HuntHubTypes.ts ./src/utils/validation/zodies.ts",
+    "generate-zodios": "npx openapi-zod-client ./src/openapi/hunthub_models.yaml -o ./src/utils/validation/zodios.ts"
   },
   "keywords": [],
   "author": "",

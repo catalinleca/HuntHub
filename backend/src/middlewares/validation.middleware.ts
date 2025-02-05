@@ -1,21 +1,19 @@
 import { NextFunction, Request, Response } from 'express';
-import { ZodSchema, ZodError } from 'zod';
+import { ZodSchema } from 'zod';
 import { ValidationError } from '@/utils/errors/ValidationError';
+import { validateSchema } from '@/utils/validation/validateSchema';
 
-export const validateRequest = (schema: ZodSchema) => async (req: Request, res: Response, next: NextFunction) => {
+export const validationMiddleware = (schema: ZodSchema) => async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await schema.parseAsync(req.body);
-    return next();
-  } catch (error) {
-    if (error instanceof ZodError) {
-      const errors = error.errors.map((err) => ({
-        field: err.path.join('.'),
-        message: err.message,
-      }));
+    const result = await validateSchema(schema, req.body);
 
-      next(new ValidationError('Wrong payload', errors));
+    if (result.success) {
+      throw new Error();
+      return next();
     }
 
-    return next(error);
+    return next(new ValidationError('Wrong payload', result.errors));
+  } catch (error) {
+    next(error);
   }
 };

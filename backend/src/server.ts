@@ -13,6 +13,8 @@ import './config/firebase';
 
 import huntRouter from '@/routes/hunt.router';
 import authRouter from '@/routes/auth.routes';
+import stepRouter from '@/routes/step.router';
+
 import { errorHandler } from '@/middlewares/error.middleware';
 import { authMiddleware } from '@/middlewares/auth.middleware';
 
@@ -27,6 +29,7 @@ async function bootstrap() {
 
   app.use('/auth', authRouter);
   app.use('/api', authMiddleware);
+  app.use('/api/hunts/:huntId/steps', stepRouter);
   app.use('/api/hunts', huntRouter);
 
   app.use(errorHandler);
