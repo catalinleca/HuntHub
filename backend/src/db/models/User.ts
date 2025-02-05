@@ -49,14 +49,8 @@ const userSchema = new Schema<IUser>(
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
   },
 );
-
-userSchema.static('findByFirebaseUid', function (firebaseUid: string) {
-  return this.findOne({ firebaseUid });
-});
 
 const User = model('User', userSchema);
 

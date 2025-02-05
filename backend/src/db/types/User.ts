@@ -7,6 +7,6 @@ export interface IUser {
   displayName?: string;
   profilePicture?: string;
   bio?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: string;
+  updatedAt?: string;
 }

@@ -13,26 +13,18 @@ export class UserService implements IUserService {
   async getUserByFirebaseUid(firebaseUid: string): Promise<User | null> {
     const user = await UserModel.findOne({
       firebaseUid,
-    }).lean({ virtuals: true });
+    }).exec();
 
     if (!user) {
       return null;
     }
 
-    return {
-      ...user,
-      createdAt: user.createdAt.toISOString(),
-      updatedAt: user.updatedAt.toISOString(),
-    } as User;
+    return user.toJSON();
   }
 
   async createUser(userData: Required<SignUpCredentials>): Promise<User> {
     const user = await UserModel.create(userData);
 
-    return {
-      ...user,
-      createdAt: user.createdAt.toISOString(),
-      updatedAt: user.updatedAt.toISOString(),
-    } as User;
+    return user.toJSON();
   }
 }

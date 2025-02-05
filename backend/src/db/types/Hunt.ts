@@ -7,7 +7,8 @@ export enum HuntStatus {
   Archived = 'archived',
 }
 
-export interface IHunt extends mongoose.Document {
+export interface IHunt {
+  id: string;
   creatorId: string; // TODO revert
   status: HuntStatus;
   name: string;
@@ -15,6 +16,6 @@ export interface IHunt extends mongoose.Document {
   currentVersion: number;
   startLocation?: ILocation;
   stepOrder?: mongoose.Types.ObjectId[];
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt?: string;
+  updatedAt?: string;
 }

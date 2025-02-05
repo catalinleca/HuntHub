@@ -1,10 +1,7 @@
 import 'reflect-metadata';
 import { Container } from 'inversify';
 import { UserService, IUserService } from '@/services/user.service';
-import { ISerializer, TYPES } from '@/types';
-import { HuntSerializer } from '@db/serializers/hunt.serializer';
-import { IHunt } from '@db/types/Hunt';
-import { Hunt } from '@/openapi/HuntHubTypes';
+import { TYPES } from '@/types';
 import { HuntService, IHuntService } from '@/services/hunt.service';
 import { HuntController, IHuntController } from '@/controllers/hunt.controller';
 import { AuthService, IAuthService } from '@/services/auth.service';
@@ -19,6 +16,6 @@ container.bind<IAuthService>(TYPES.AuthService).to(AuthService);
 container.bind<IUserService>(TYPES.UserService).to(UserService);
 container.bind<IHuntService>(TYPES.HuntService).to(HuntService);
 
-container.bind<ISerializer<IHunt, Hunt>>(TYPES.HuntSerializer).to(HuntSerializer);
+// container.bind<ISerializer<IHunt, Hunt>>(TYPES.HuntSerializer).to(HuntSerializer);
 
 export { container };

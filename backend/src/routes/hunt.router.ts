@@ -6,16 +6,16 @@ import { IHuntController } from '@/controllers/hunt.controller';
 const huntRouter = express.Router();
 const controller = container.get<IHuntController>(TYPES.HuntController);
 
-huntRouter.post('/', (req, res) => {
-  controller.createHunt(req, res);
+huntRouter.post('/', (req, res, next) => {
+  controller.createHunt(req, res).catch(next);
 });
 
-huntRouter.get('/', (req, res) => {
-  controller.getAllUserHunts(req, res);
+huntRouter.get('/', (req, res, next) => {
+  controller.getAllUserHunts(req, res).catch(next);
 });
 
-huntRouter.get('/:id', (req, res) => {
-  controller.getUserHuntById(req, res);
+huntRouter.get('/:id', (req, res, next) => {
+  controller.getUserHuntById(req, res).catch(next);
 });
 
 export default huntRouter;

@@ -3,6 +3,8 @@ import { AppError } from '@/utils/errors/AppError';
 import { ValidationError } from '@/utils/errors/ValidationError';
 
 export const errorHandler: ErrorRequestHandler = (err: Error, req: Request, res: Response, _: NextFunction) => {
+  console.error(err);
+
   if (err instanceof ValidationError) {
     res.status(err.statusCode).send({ message: err.message, errors: err.errors });
   } else if (err instanceof AppError) {

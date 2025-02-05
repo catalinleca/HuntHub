@@ -6,7 +6,7 @@ export const TYPES = {
   UserService: Symbol.for('UserService'),
   HuntService: Symbol.for('HuntService'),
 
-  HuntSerializer: Symbol.for('HuntSerializer'),
+  // HuntSerializer: Symbol.for('HuntSerializer'),
 };
 
 export interface ISerializer<TModel, TDTO> {
