@@ -32,8 +32,7 @@ export class HuntController implements IHuntController {
   }
 
   async getAllUserHunts(req: Request, res: Response) {
-    const userId = req.params.id;
-    const hunts = await this.huntService.getUserHunts(userId);
+    const hunts = await this.huntService.getUserHunts(req.user.id);
 
     return res.status(200).json(hunts);
   }
