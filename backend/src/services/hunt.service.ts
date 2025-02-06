@@ -32,7 +32,9 @@ export class HuntService implements IHuntService {
       creatorId: userId,
     }).exec();
 
-    return hunts.map((hunt) => hunt.toJSON()) as Hunt[];
+    const hunts2 = hunts.map((hunt) => hunt.toObject());
+
+    return hunts2 as Hunt[];
   }
 
   async getHuntById(id: string): Promise<Hunt> {

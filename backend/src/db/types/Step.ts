@@ -8,9 +8,9 @@ export enum ChallengeType {
   Task = 'task',
 }
 
-export interface IStep {
-  id: string;
-  huntId: string; // TODO change to mongoose.Types.ObjectId
+export interface IStep extends mongoose.Document {
+  id: string; // TODO this should not be here
+  huntId: mongoose.Types.ObjectId; // TODO change to mongoose.Types.ObjectId
   type: ChallengeType;
   challenge: unknown;
   hint?: string;

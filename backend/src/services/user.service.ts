@@ -19,7 +19,9 @@ export class UserService implements IUserService {
       return null;
     }
 
-    return user.toJSON();
+    const user2 = user.toObject();
+
+    return user;
   }
 
   async createUser(userData: Required<SignUpCredentials>): Promise<User> {

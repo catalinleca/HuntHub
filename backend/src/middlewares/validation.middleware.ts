@@ -8,7 +8,7 @@ export const validationMiddleware = (schema: ZodSchema) => async (req: Request, 
     const result = await validateSchema(schema, req.body);
 
     if (result.success) {
-      throw new Error();
+      // throw new Error();
       return next();
     }
 

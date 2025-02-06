@@ -50,6 +50,9 @@ export class StepService implements IStepService {
       throw new NotFoundError();
     }
 
-    return step.toJSON() as Step;
+    return {
+      ...step.toJSON(),
+      huntId: step.id.toString(),
+    };
   }
 }

@@ -4,7 +4,7 @@ import { locationSchema } from '../schemas';
 
 const stepSchema = new Schema<IStep>(
   {
-    huntId: { type: String, ref: 'Hunt', required: true }, // TODO: change
+    huntId: { type: Schema.ObjectId, ref: 'Hunt', required: true }, // TODO: change
     type: {
       type: String,
       enum: Object.values(ChallengeType),

@@ -22,7 +22,7 @@ function baseTransform(_: unknown, ret: any) {
 export default async function mustConnectDb(connectionURI: string) {
   try {
     await mongoose.connect(connectionURI);
-    mongoose.set('toJSON', {
+    mongoose.set('toObject', {
       transform: baseTransform,
     });
 
