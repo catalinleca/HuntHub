@@ -237,6 +237,8 @@ components:
           $ref: '#/components/schemas/Challenge'
         requiredLocation:
           $ref: '#/components/schemas/Location'
+        huntId:
+          type: string
         hint:
           type: string
         timeLimit:

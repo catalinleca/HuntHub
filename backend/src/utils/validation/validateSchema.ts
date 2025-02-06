@@ -1,6 +1,6 @@
 import { ZodError, ZodSchema } from 'zod';
 
-interface FieldError {
+export interface FieldError {
   field: string;
   message: string;
 }

@@ -17,9 +17,7 @@ export class AuthController implements IAuthController {
   constructor(@inject(TYPES.AuthService) private authService: IAuthService) {}
 
   async login(req: Request, res: Response) {
-    const credentials = loginSchema.parse(req.body);
-
-    const authResponse = await this.authService.login(credentials);
+    const authResponse = await this.authService.login(req.body);
 
     this.setCookies(res, authResponse);
 
@@ -55,9 +53,7 @@ export class AuthController implements IAuthController {
   }
 
   async signUp(req: Request, res: Response) {
-    const credentials = signUpSchema.parse(req.body);
-
-    const authResponse = await this.authService.signUp(credentials);
+    const authResponse = await this.authService.signUp(req.body);
 
     this.setCookies(res, authResponse);
 

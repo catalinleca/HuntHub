@@ -16,10 +16,14 @@ export class StepController implements IStepController {
 
   async createStep(req: Request, res: Response) {
     const step = req.body;
+    const huntId = req.params.huntId;
 
-    // const createdStep = await this.stepService.createStep(step, req.user.id);
+    const createdStep = await this.stepService.createStep({
+      ...step,
+      huntId,
+    });
 
-    return res.status(201).json({});
+    return res.status(201).json(createdStep);
   }
 
   async getAllSteps(req: Request, res: Response) {

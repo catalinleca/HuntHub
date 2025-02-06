@@ -36,3 +36,7 @@ export const strictStepCreateSchema = z
       path: ['challenge'],
     },
   );
+
+export const createStepParamsSchema = z.object({
+  huntId: z.string(),
+});

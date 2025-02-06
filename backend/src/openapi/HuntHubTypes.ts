@@ -45,7 +45,7 @@ export enum MissionType {
 }
 
 export interface Hunt {
-  id?: string;
+  id: string;
   creatorId: string;
   name: string;
   description?: string;
@@ -97,6 +97,7 @@ export interface StepCreate {
   type: ChallengeType;
   challenge: Challenge;
   requiredLocation?: Location;
+  huntId?: string;
   hint?: string;
   timeLimit?: number;
   maxAttempts?: number;

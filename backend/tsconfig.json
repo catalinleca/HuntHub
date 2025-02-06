@@ -10,6 +10,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "strictNullChecks": false,
     "types": ["node"],
     "baseUrl": ".",
     "paths": {
