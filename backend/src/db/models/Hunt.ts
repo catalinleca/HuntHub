@@ -1,6 +1,8 @@
 import { Schema, model } from 'mongoose';
 import { HuntStatus, IHunt } from '../types/Hunt';
 import { locationSchema } from '../schemas';
+import { Step } from '@/openapi/HuntHubTypes';
+import { IStep } from '@db/types/Step';
 
 const huntSchema = new Schema<IHunt>(
   {
@@ -18,6 +20,14 @@ const huntSchema = new Schema<IHunt>(
   },
   {
     timestamps: true,
+    toObject: {
+      transform: function (doc, ret) {
+        if (doc.populated('stepOrder')) {
+          ret.stepOrder = (doc.stepOrder as any[]).map((step) => step.toObject());
+        }
+        return ret;
+      },
+    },
   },
 );
 

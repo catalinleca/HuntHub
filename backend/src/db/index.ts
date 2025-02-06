@@ -25,7 +25,7 @@ export default async function mustConnectDb(connectionURI: string) {
       transform: baseTransform,
       virtuals: true,
       versionKey: false,
-      depopulate: true,
+      depopulate: false,
       flattenObjectIds: true,
     });
 

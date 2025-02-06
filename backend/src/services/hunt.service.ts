@@ -45,7 +45,8 @@ export class HuntService implements IHuntService {
   }
 
   async getUserHuntById(id: string, userId: string): Promise<Hunt> {
-    const hunt = await HuntModel.findById(id).where('creatorId').equals(userId).exec();
+    const hunt = await HuntModel.findById(id).where('creatorId').equals(userId).populate('stepOrder').exec();
+
     if (!hunt) {
       throw new NotFoundError();
     }

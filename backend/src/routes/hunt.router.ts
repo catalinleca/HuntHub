@@ -3,7 +3,7 @@ import { TYPES } from '@/types';
 import { container } from '@/config/inversify';
 import { IHuntController } from '@/controllers/hunt.controller';
 
-const huntRouter = express.Router();
+const huntRouter = express.Router({ mergeParams: true });
 const controller = container.get<IHuntController>(TYPES.HuntController);
 
 huntRouter.post('/', (req, res, next) => {
