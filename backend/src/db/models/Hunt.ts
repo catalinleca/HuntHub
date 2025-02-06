@@ -2,9 +2,9 @@ import { Schema, model } from 'mongoose';
 import { HuntStatus, IHunt } from '../types/Hunt';
 import { locationSchema } from '../schemas';
 
-const huntSchema: Schema<IHunt> = new Schema<IHunt>(
+const huntSchema = new Schema<IHunt>(
   {
-    creatorId: { type: String, required: true }, // TODO revert
+    creatorId: { type: Schema.Types.ObjectId, ref: 'User', required: true }, // TODO revert
     status: {
       type: String,
       enum: Object.values(HuntStatus),

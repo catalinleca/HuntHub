@@ -1,5 +1,6 @@
-export interface IUser {
-  id: string;
+import mongoose from 'mongoose';
+
+export interface IUser extends mongoose.Document {
   firebaseUid: string;
   email: string;
   firstName: string;
@@ -7,6 +8,6 @@ export interface IUser {
   displayName?: string;
   profilePicture?: string;
   bio?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

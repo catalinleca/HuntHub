@@ -18,23 +18,19 @@ export class HuntService implements IHuntService {
       ...hunt,
     });
 
-    return createdHunt.toJSON() as Hunt;
+    return createdHunt.toObject<Hunt>();
   }
 
   async getAllHunts(): Promise<Hunt[]> {
     const hunts = await HuntModel.find().exec();
 
-    return hunts.map((hunt) => hunt.toJSON()) as Hunt[];
+    return hunts.map((hunt) => hunt.toObject<Hunt>());
   }
 
   async getUserHunts(userId: string): Promise<Hunt[]> {
-    const hunts = await HuntModel.find({
-      creatorId: userId,
-    }).exec();
+    const hunts = await HuntModel.find({ creatorId: userId }).exec();
 
-    const hunts2 = hunts.map((hunt) => hunt.toObject());
-
-    return hunts2 as Hunt[];
+    return hunts.map((hunt) => hunt.toObject<Hunt>());
   }
 
   async getHuntById(id: string): Promise<Hunt> {
@@ -43,7 +39,7 @@ export class HuntService implements IHuntService {
       throw new NotFoundError();
     }
 
-    return hunt.toJSON() as Hunt;
+    return hunt.toObject<Hunt>();
   }
 
   async getUserHuntById(id: string, userId: string): Promise<Hunt> {
@@ -52,6 +48,6 @@ export class HuntService implements IHuntService {
       throw new NotFoundError();
     }
 
-    return hunt.toJSON() as Hunt;
+    return hunt.toObject<Hunt>();
   }
 }

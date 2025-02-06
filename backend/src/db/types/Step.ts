@@ -9,14 +9,13 @@ export enum ChallengeType {
 }
 
 export interface IStep extends mongoose.Document {
-  id: string; // TODO this should not be here
-  huntId: mongoose.Types.ObjectId; // TODO change to mongoose.Types.ObjectId
+  huntId: mongoose.Types.ObjectId;
   type: ChallengeType;
   challenge: unknown;
   hint?: string;
   requiredLocation?: ILocation;
   timeLimit?: number;
   maxAttempts?: number;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

@@ -18,13 +18,13 @@ export class StepService implements IStepService {
       ...step,
     });
 
-    return createdStep.toJSON() as Step;
+    return createdStep.toObject<Step>();
   }
 
   async getAllSteps(): Promise<Step[]> {
     const steps = await StepModel.find().exec();
 
-    return steps.map((step) => step.toJSON()) as Step[];
+    return steps.map((step) => step.toObject<Step>());
   }
 
   async getUserSteps(userId: string): Promise<Step[]> {
@@ -32,7 +32,7 @@ export class StepService implements IStepService {
       creatorId: userId,
     }).exec();
 
-    return steps.map((step) => step.toJSON()) as Step[];
+    return steps.map((step) => step.toObject<Step>());
   }
 
   async getStepById(id: string): Promise<Step> {
@@ -41,7 +41,7 @@ export class StepService implements IStepService {
       throw new NotFoundError();
     }
 
-    return step.toJSON() as Step;
+    return step.toObject<Step>();
   }
 
   async getUserStepById(id: string, userId: string): Promise<Step> {
@@ -50,9 +50,6 @@ export class StepService implements IStepService {
       throw new NotFoundError();
     }
 
-    return {
-      ...step.toJSON(),
-      huntId: step.id.toString(),
-    };
+    return step.toObject<Step>();
   }
 }

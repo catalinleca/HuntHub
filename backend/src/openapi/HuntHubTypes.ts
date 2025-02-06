@@ -45,7 +45,7 @@ export enum MissionType {
 }
 
 export interface Hunt {
-  id: string;
+  id?: string;
   creatorId: string;
   name: string;
   description?: string;

@@ -34,7 +34,8 @@ const publishedHuntSchema = new Schema<PublishedHuntDocument, PublishedHuntModel
       required: true,
     },
     publishedBy: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'User',
       required: true,
     },
   },

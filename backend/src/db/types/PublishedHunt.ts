@@ -6,5 +6,5 @@ export interface IPublishedHunt extends mongoose.Document {
   version: number;
   name: string;
   publishedAt: Date;
-  publishedBy: string;
+  publishedBy: mongoose.Types.ObjectId;
 }

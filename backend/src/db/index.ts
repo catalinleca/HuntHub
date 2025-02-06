@@ -4,7 +4,6 @@ import mongoose from 'mongoose';
 function baseTransform(_: unknown, ret: any) {
   const id = ret._id.toString();
   delete ret._id;
-  delete ret.__v;
 
   if (ret?.createdAt) {
     ret.createdAt = ret.createdAt.toISOString();
@@ -24,6 +23,10 @@ export default async function mustConnectDb(connectionURI: string) {
     await mongoose.connect(connectionURI);
     mongoose.set('toObject', {
       transform: baseTransform,
+      virtuals: true,
+      versionKey: false,
+      depopulate: true,
+      flattenObjectIds: true,
     });
 
     console.log('Connected to MongoDB');

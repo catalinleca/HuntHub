@@ -19,14 +19,12 @@ export class UserService implements IUserService {
       return null;
     }
 
-    const user2 = user.toObject();
-
-    return user;
+    return user.toObject<User>();
   }
 
   async createUser(userData: Required<SignUpCredentials>): Promise<User> {
     const user = await UserModel.create(userData);
 
-    return user.toJSON();
+    return user.toObject<User>();
   }
 }
