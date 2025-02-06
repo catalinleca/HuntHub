@@ -22,6 +22,7 @@ const huntSchema = new Schema<IHunt>(
     timestamps: true,
     toObject: {
       transform: function (doc, ret) {
+        // TODO: no bueno
         if (doc.populated('stepOrder')) {
           ret.stepOrder = (doc.stepOrder as any[]).map((step) => step.toObject());
         }
