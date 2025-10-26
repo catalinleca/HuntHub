@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import { HuntProgressStatus, IProgress, IStepProgress, ISubmission } from '../types/Progress';
+import { HuntProgressStatus, IProgress, IStepProgress, ISubmission } from '@db/types';
 
 const SubmissionSchema = new Schema<ISubmission>(
   {

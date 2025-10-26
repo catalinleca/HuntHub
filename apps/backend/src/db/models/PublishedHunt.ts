@@ -1,5 +1,5 @@
 import { Schema, Document, model, Types, Model } from 'mongoose';
-import { IPublishedHunt } from '../types/PublishedHunt';
+import { IPublishedHunt } from '@db/types';
 
 interface PublishedHuntStatics {
   findLatestVersion(huntId: Types.ObjectId): Promise<IPublishedHunt | null>;
