@@ -3,8 +3,10 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
+    "module": "Node16",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "moduleResolution": "node16",
     "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"],

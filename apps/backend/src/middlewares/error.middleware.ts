@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response, ErrorRequestHandler } from 'express';
-import { AppError } from '@/utils/errors/AppError';
-import { ValidationError } from '@/utils/errors/ValidationError';
+import { AppError } from '@/common/errors/AppError';
+import { ValidationError } from '@/common/errors/ValidationError';
 
 export const errorHandler: ErrorRequestHandler = (err: Error, req: Request, res: Response, _: NextFunction) => {
   console.error(err);

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types';
 import { IAuthService } from '@/services/auth.service';
-import { loginSchema, signUpSchema } from '@/utils/validation/schemas/auth.schema';
+import { loginSchema, signUpSchema } from '@/validation/schemas/auth.schema';
 import { AuthResponse } from '@/types/Auth';
 
 export interface IAuthController {

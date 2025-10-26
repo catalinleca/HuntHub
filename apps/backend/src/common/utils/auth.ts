@@ -1,9 +1,9 @@
-import { DecodedIdToken } from 'firebase-admin/lib/auth';
+import type { DecodedIdToken } from 'firebase-admin/auth';
 import { TYPES } from '@/types';
 import { IUserService } from '@/services/user.service';
 import { container } from '@/config/inversify';
 import { CompactUser } from '@/types/CompactUser';
-import { NotFoundError } from '@/utils/errors/NotFoundError';
+import { NotFoundError } from '@/common/errors/NotFoundError';
 
 export const authUser = async (token: DecodedIdToken): Promise<CompactUser> => {
   const userService = container.get<IUserService>(TYPES.UserService);

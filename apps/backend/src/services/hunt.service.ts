@@ -1,7 +1,7 @@
 import { Hunt, HuntCreate } from '@hunthub/shared';
 import { injectable } from 'inversify';
 import { HuntModel } from '@db/models';
-import { NotFoundError } from '@/utils/errors/NotFoundError';
+import { NotFoundError } from '@/common/errors/NotFoundError';
 
 export interface IHuntService {
   createHunt(hunt: HuntCreate, creatorId: string): Promise<Hunt>;

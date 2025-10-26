@@ -3,7 +3,7 @@ import { TYPES } from '@/types';
 import { IAuthController } from '@/controllers/auth.controller';
 import { container } from '@/config/inversify';
 import { validateRequest } from '@/middlewares/validation.middleware';
-import { loginSchema, signUpSchema } from '@/utils/validation/schemas/auth.schema';
+import { loginSchema, signUpSchema } from '@/validation/schemas/auth.schema';
 
 const authRouter = express.Router();
 const authController = container.get<IAuthController>(TYPES.AuthController);

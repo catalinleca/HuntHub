@@ -1,4 +1,4 @@
-import { AppError } from '@/utils/errors/AppError';
+import { AppError } from '@/common/errors/AppError';
 
 interface FieldError {
   field: string;

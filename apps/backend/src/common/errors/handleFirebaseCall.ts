@@ -1,4 +1,4 @@
-import { FirebaseAuthError } from '@/utils/errors/FirebaseAuthError';
+import { FirebaseAuthError } from '@/common/errors/FirebaseAuthError';
 
 type FirebaseOperation<T> = () => Promise<T>;
 

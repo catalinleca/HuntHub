@@ -1,4 +1,4 @@
-import { AppError } from '@/utils/errors/AppError';
+import { AppError } from '@/common/errors/AppError';
 
 export class FirebaseAuthError extends AppError {
   readonly originalError: Error;

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { auth } from 'firebase-admin';
-import { authUser } from '@/utils/auth';
-import { UnauthorizedError } from '@/utils/errors/UnauthorizedError';
+import { authUser } from '@/common/utils/auth';
+import { UnauthorizedError } from '@/common/errors/UnauthorizedError';
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   try {

@@ -83,8 +83,11 @@ components:
       properties:
         name:
           type: string
+          minLength: 1
+          maxLength: 100
         description:
           type: string
+          maxLength: 500
         startLocation:
           $ref: '#/components/schemas/Location'
         steps:
@@ -92,12 +95,7 @@ components:
           items:
               $ref: '#/components/schemas/StepCreate'
       required:
-        - id
-        - creatorId
         - name
-        - isPublished
-        - currentVersion
-        - status
 
     Step:
       type: object

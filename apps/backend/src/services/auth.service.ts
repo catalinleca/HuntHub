@@ -4,8 +4,8 @@ import { IUserService } from '@/services/user.service';
 import { TYPES } from '@/types';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, adminAuth } from '@/config/firebase';
-import { FirebaseAuthError } from '@/utils/errors/FirebaseAuthError';
-import { handleWithFirebaseError } from '@/utils/errors/handleFirebaseCall';
+import { FirebaseAuthError } from '@/common/errors/FirebaseAuthError';
+import { handleWithFirebaseError } from '@/common/errors/handleFirebaseCall';
 
 export interface IAuthService {
   login(credentials: LoginCredentials): Promise<AuthResponse>;

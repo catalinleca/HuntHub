@@ -6,6 +6,7 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@db/(.*)$': '<rootDir>/src/db/$1',
+    '^@hunthub/shared/schemas$': '<rootDir>/../../packages/shared/src/schemas/index.ts',
     '^@hunthub/shared$': '<rootDir>/../../packages/shared/src/index.ts',
     '^@hunthub/shared/(.*)$': '<rootDir>/../../packages/shared/src/$1',
   },

@@ -1,4 +1,4 @@
-import { AppError } from '@/utils/errors/AppError';
+import { AppError } from '@/common/errors/AppError';
 
 export class ForbiddenError extends AppError {
   constructor(message = 'Forbidden') {

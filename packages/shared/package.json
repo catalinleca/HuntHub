@@ -4,9 +4,21 @@
   "description": "Shared types, validation, and constants for HuntHub",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./schemas": {
+      "types": "./dist/schemas/index.d.ts",
+      "default": "./dist/schemas/index.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
-    "generate": "ts-node scripts/generate.ts",
+    "generate": "npm run generate:types && npm run generate:zod",
+    "generate:types": "ts-node scripts/generate.ts",
+    "generate:zod": "openapi-zod-client ./openapi/hunthub_models.yaml -o ./src/schemas/gen/index.ts --export-schemas",
     "watch": "tsc --watch"
   },
   "dependencies": {
@@ -14,6 +26,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "openapi-zod-client": "^1.18.3",
     "swagger-typescript-api": "^13.0.3",
     "ts-node": "^10.9.1",
     "ts-to-zod": "^3.0.0",
