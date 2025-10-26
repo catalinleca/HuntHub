@@ -463,4 +463,457 @@ export const FREE_TIER_HUNT_LIMIT = 2;
 
 ---
 
+## Future Enhancement: Full OpenAPI Spec with Endpoint Types
+
+**Current MVP approach:** Schema-only OpenAPI (types only, no endpoint definitions)
+
+**Future enhancement:** Add full API contract with typed endpoints
+
+### Why Add This Later?
+
+**When you might want it:**
+- Multiple developers working on FE/BE separately
+- Need clear API contract documentation
+- Want automated API documentation (Swagger UI)
+- Want to validate backend matches OpenAPI spec
+- Building public API for third parties
+
+**For MVP:** Skip this - adds complexity without much benefit when you control both FE and BE
+
+---
+
+### Current Setup (Schema-Only)
+
+**OpenAPI:**
+```yaml
+paths: {}  # ← Empty - no endpoints defined
+
+components:
+  schemas:
+    Hunt:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+
+    HuntCreate:
+      type: object
+      properties:
+        name: { type: string }
+```
+
+**Generation script:**
+```typescript
+// packages/shared/scripts/generate.ts
+await generateApi({
+  input: './openapi/hunthub_models.yaml',
+  output: './src/types',
+  name: 'index.ts',
+
+  generateClient: false,
+  generateRouteTypes: false,
+  extractRequestParams: false,      // ← No extraction
+  extractRequestBody: false,        // ← No extraction
+  extractResponseBody: false,       // ← No extraction
+});
+```
+
+**Generates:**
+```typescript
+// Clean schema types only
+export interface Hunt {
+  id: string;
+  name: string;
+}
+
+export interface HuntCreate {
+  name: string;
+}
+```
+
+**Frontend writes manual API client:**
+```typescript
+// packages/frontend/src/api/hunts.ts
+import { Hunt, HuntCreate } from '@hunthub/shared/types';
+
+export const huntsApi = {
+  create: async (data: HuntCreate): Promise<Hunt> => {
+    return axios.post('/api/hunts', data);
+  },
+
+  getById: async (id: string): Promise<Hunt> => {
+    return axios.get(`/api/hunts/${id}`);
+  },
+};
+```
+
+---
+
+### Future Enhancement (Full OpenAPI Spec)
+
+**Step 1: Add paths to OpenAPI**
+
+```yaml
+paths:
+  /api/hunts:
+    post:
+      operationId: createHunt
+      summary: Create a new hunt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HuntCreate'
+      responses:
+        '201':
+          description: Hunt created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hunt'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+
+  /api/hunts/{id}:
+    get:
+      operationId: getHuntById
+      summary: Get hunt by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Hunt found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hunt'
+        '404':
+          description: Hunt not found
+
+    put:
+      operationId: updateHunt
+      summary: Update hunt
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HuntUpdate'
+      responses:
+        '200':
+          description: Hunt updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hunt'
+
+    delete:
+      operationId: deleteHunt
+      summary: Delete hunt
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Hunt deleted successfully
+
+components:
+  schemas:
+    Hunt: { ... }
+    HuntCreate: { ... }
+    HuntUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        description: { type: string }
+```
+
+**Step 2: Update generation script to enable extraction**
+
+```typescript
+// packages/shared/scripts/generate.ts
+await generateApi({
+  input: './openapi/hunthub_models.yaml',
+  output: './src/types',
+  name: 'index.ts',
+
+  generateClient: false,              // Still no HTTP client
+  generateRouteTypes: true,           // ← Enable endpoint types
+  extractRequestParams: true,         // ← Enable
+  extractRequestBody: true,           // ← Enable
+  extractResponseBody: true,          // ← Enable
+  extractResponseError: true,         // ← Enable
+
+  // Clean output
+  cleanOutput: true,
+  modular: false,
+});
+```
+
+**Step 3: Generates endpoint types**
+
+```typescript
+// packages/shared/src/types/index.ts
+
+// Schema types (same as before)
+export interface Hunt {
+  id: string;
+  name: string;
+  creatorId: string;
+}
+
+export interface HuntCreate {
+  name: string;
+  description?: string;
+}
+
+export interface HuntUpdate {
+  name?: string;
+  description?: string;
+}
+
+// NEW: Endpoint types
+export namespace Hunts {
+  /**
+   * POST /api/hunts
+   * Create a new hunt
+   */
+  export namespace CreateHunt {
+    export type RequestBody = HuntCreate;
+    export type Response = Hunt;
+    export type ErrorResponse = { message: string };
+  }
+
+  /**
+   * GET /api/hunts/{id}
+   * Get hunt by ID
+   */
+  export namespace GetHuntById {
+    export interface PathParams {
+      id: string;
+    }
+    export type Response = Hunt;
+    export type ErrorResponse = { message: string };
+  }
+
+  /**
+   * PUT /api/hunts/{id}
+   * Update hunt
+   */
+  export namespace UpdateHunt {
+    export interface PathParams {
+      id: string;
+    }
+    export type RequestBody = HuntUpdate;
+    export type Response = Hunt;
+  }
+
+  /**
+   * DELETE /api/hunts/{id}
+   * Delete hunt
+   */
+  export namespace DeleteHunt {
+    export interface PathParams {
+      id: string;
+    }
+    export type Response = void;
+  }
+}
+```
+
+**Step 4: Frontend uses generated endpoint types**
+
+```typescript
+// packages/frontend/src/api/hunts.ts
+import { Hunts } from '@hunthub/shared/types';
+import { api } from './client';
+
+export const huntsApi = {
+  create: async (
+    data: Hunts.CreateHunt.RequestBody
+  ): Promise<Hunts.CreateHunt.Response> => {
+    const response = await api.post<Hunts.CreateHunt.Response>(
+      '/api/hunts',
+      data
+    );
+    return response.data;
+  },
+
+  getById: async (
+    params: Hunts.GetHuntById.PathParams
+  ): Promise<Hunts.GetHuntById.Response> => {
+    const response = await api.get<Hunts.GetHuntById.Response>(
+      `/api/hunts/${params.id}`
+    );
+    return response.data;
+  },
+
+  update: async (
+    params: Hunts.UpdateHunt.PathParams,
+    data: Hunts.UpdateHunt.RequestBody
+  ): Promise<Hunts.UpdateHunt.Response> => {
+    const response = await api.put<Hunts.UpdateHunt.Response>(
+      `/api/hunts/${params.id}`,
+      data
+    );
+    return response.data;
+  },
+
+  delete: async (
+    params: Hunts.DeleteHunt.PathParams
+  ): Promise<void> => {
+    await api.delete(`/api/hunts/${params.id}`);
+  },
+};
+```
+
+---
+
+### Benefits of Full OpenAPI Spec
+
+**Single source of truth:**
+- ✅ OpenAPI defines data types AND endpoints
+- ✅ Frontend and backend must match spec
+- ✅ Breaking changes caught immediately
+
+**Better type safety:**
+- ✅ Path parameters typed (can't pass wrong type)
+- ✅ Request/response bodies explicitly typed
+- ✅ Error responses typed
+
+**Auto-documentation:**
+- ✅ Generate Swagger UI docs automatically
+- ✅ API docs always up to date
+- ✅ Interactive API explorer
+
+**Validation:**
+- ✅ Can validate backend routes match OpenAPI
+- ✅ Can validate frontend calls match OpenAPI
+- ✅ CI/CD can catch mismatches
+
+**Example CI/CD check:**
+```yaml
+# .github/workflows/validate-api.yml
+- name: Validate backend matches OpenAPI
+  run: |
+    npm run generate:types
+    npm run validate:api-spec
+    # Fails if backend routes don't match OpenAPI
+```
+
+---
+
+### Trade-offs
+
+**Schema-only (MVP - current):**
+- ✅ Simple and fast
+- ✅ Less to maintain
+- ✅ Frontend has full flexibility
+- ❌ No single source of truth for endpoints
+- ❌ Manual API client code
+
+**Full OpenAPI spec (Future):**
+- ✅ Single source of truth
+- ✅ Better type safety
+- ✅ Auto-generated documentation
+- ❌ More to maintain
+- ❌ Must update OpenAPI for every endpoint change
+- ❌ Less frontend flexibility
+
+---
+
+### Migration Path
+
+**When you're ready to add full spec:**
+
+1. **Add one endpoint at a time:**
+   ```yaml
+   paths:
+     /api/hunts:
+       post: { ... }  # Start with one
+   ```
+
+2. **Enable extraction flags**
+
+3. **Generate and test**
+
+4. **Update frontend to use generated types**
+
+5. **Add remaining endpoints incrementally**
+
+6. **Add to CI/CD pipeline**
+
+**No need to do everything at once** - can migrate endpoint by endpoint
+
+---
+
+### Alternative: Fully Generated Client
+
+**If you want even MORE automation:**
+
+Use a different tool like **openapi-typescript-codegen** or **orval**:
+
+```bash
+npm install --save-dev @hey-api/openapi-typescript-codegen
+```
+
+**Generates complete typed API client:**
+
+```typescript
+// Fully generated - no manual API client code!
+import { HuntsService } from '@hunthub/shared/api';
+
+// All typed, auto-generated from OpenAPI
+const hunt = await HuntsService.createHunt({ name: 'Barcelona' });
+const hunt2 = await HuntsService.getHuntById('123');
+await HuntsService.updateHunt('123', { name: 'New name' });
+await HuntsService.deleteHunt('123');
+```
+
+**Pros:**
+- ✅ Zero manual API client code
+- ✅ Perfect type safety
+- ✅ Changes automatically on OpenAPI update
+
+**Cons:**
+- ❌ Less control over client behavior
+- ❌ Harder to customize (interceptors, auth, etc.)
+- ❌ More complex generated code
+
+---
+
+### Recommendation
+
+**For HuntHub MVP:**
+- ✅ Keep schema-only OpenAPI (current approach)
+- ✅ Manual frontend API client (simple, flexible)
+- ✅ Revisit after MVP is working
+
+**Add full OpenAPI spec when:**
+- Multiple developers need clear API contract
+- Want automated API documentation
+- Building public API
+- Need strict validation in CI/CD
+
+**This documentation ensures you won't forget the option exists!**
+
+---
+
 **This is your schema sharing strategy. It's solid, scalable, and template-ready.**

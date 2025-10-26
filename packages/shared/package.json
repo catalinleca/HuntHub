@@ -1,0 +1,22 @@
+{
+  "name": "@hunthub/shared",
+  "version": "1.0.0",
+  "description": "Shared types, validation, and constants for HuntHub",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "generate": "ts-node scripts/generate.ts",
+    "watch": "tsc --watch"
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "swagger-typescript-api": "^13.0.3",
+    "ts-node": "^10.9.1",
+    "ts-to-zod": "^3.0.0",
+    "typescript": "^5.3.3"
+  }
+}

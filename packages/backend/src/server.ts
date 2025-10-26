@@ -1,4 +1,4 @@
-import 'module-alias/register';
+import 'tsconfig-paths/register';
 import 'reflect-metadata';
 import express from 'express';
 import dotenv from 'dotenv';
@@ -8,7 +8,7 @@ dotenv.config({ path: '.env.local' });
 dotenv.config({ path: '.env' });
 
 import mustConnectDb from './db';
-import { databaseUrl } from './config';
+import { databaseUrl } from './env.config';
 import './config/firebase';
 
 import huntRouter from '@/routes/hunt.router';

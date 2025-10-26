@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { User } from '@/openapi/HuntHubTypes';
+import { User } from '@hunthub/shared';
 import { UserModel } from '@db/models';
 import { SignUpCredentials } from '@/types/Auth';
 

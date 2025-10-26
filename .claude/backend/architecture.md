@@ -192,6 +192,6 @@ src/
 - Access via `process.env.VAR_NAME`
 
 **Key configs:**
-- `src/config.ts` - Export config values
+- `src/env.config.ts` - Export config values
 - `src/config/firebase.ts` - Initialize Firebase Admin
 - `src/config/inversify.ts` - DI container setup

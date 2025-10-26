@@ -1,10 +1,9 @@
-module.exports = {
+modeule.exports = {
+  root: true,
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: 'module',
-    project: './tsconfig.json',
-    tsconfigRootDir: __dirname,
   },
   extends: [
     'eslint:recommended',
@@ -22,14 +21,13 @@ module.exports = {
       'warn',
       { argsIgnorePattern: '^_' },
     ],
-    '@typescript-eslint/no-require-imports': 'off',
-    '@typescript-eslint/no-empty-object-type': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',
   },
   ignorePatterns: [
     'node_modules/',
     'dist/',
-    'package-lock.json',
-    '**/*.js', // Ignore JavaScript files
+    'build/',
+    '*.js',
+    '**/*.md',
   ],
 };

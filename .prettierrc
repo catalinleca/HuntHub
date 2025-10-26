@@ -5,6 +5,5 @@
   "endOfLine": "lf",
   "semi": true,
   "singleQuote": true,
-  "trailingComma": "all",
-  "embeddedLanguageFormatting": "off"
+  "trailingComma": "all"
 }

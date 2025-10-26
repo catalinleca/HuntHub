@@ -1,6 +1,6 @@
 # Project State & Context
 
-**Last updated:** 2025-02-05
+**Last updated:** 2025-10-26
 
 ## Current Focus
 
@@ -26,6 +26,16 @@
 
 ## Recent Work (Last 1-2 Commits)
 
+**2025-10-26: Monorepo Setup Complete** ✅
+- Migrated to npm workspaces monorepo structure
+- Created `packages/shared/` for types, validation, and constants
+- Moved backend to `packages/backend/`
+- Set up OpenAPI → TypeScript type generation in shared package
+- Configured root configs with package-level inheritance (TypeScript, ESLint, Prettier)
+- Fixed module resolution: Using `tsconfig-paths` for runtime path aliases
+- Secured Firebase service account (gitignored, example file created)
+- Updated all imports to use `@hunthub/shared`
+
 **Commit 4b88846** (2025-02-05): Merge PR #3 - User service, Hunt service, Auth fixes
 - Added user service with CRUD operations
 - Completed hunt service with basic operations
@@ -39,26 +49,30 @@
 
 ## What's Working Now
 
-✅ Backend server runs and connects to MongoDB
-✅ Firebase authentication integrated
+✅ Monorepo structure with npm workspaces
+✅ Shared package for types and constants
+✅ OpenAPI → TypeScript type generation
+✅ Runtime module resolution with tsconfig-paths
+✅ Backend server runs (needs MongoDB connection fix)
+✅ Firebase service account configured
 ✅ User registration and login
 ✅ Hunt creation and retrieval
 ✅ Basic error handling and validation
 
 ## Immediate Next Steps
 
-**Updated: 2025-02-05 after completing requirements session**
+**Updated: 2025-10-26 after completing monorepo setup**
 
 **All critical decisions made. Ready to build.**
 
-**Priority 1: Set up monorepo** (~4-5 hours)
-- Create packages/shared, packages/backend, packages/frontend
-- Configure npm workspaces
-- Set up OpenAPI → TypeScript → Zod generation
-- Update imports to @hunthub/shared
-- See: `schema-sharing-final-strategy.md`
+**Priority 1: ~~Set up monorepo~~** ✅ **COMPLETE**
+- ✅ Created packages/shared, packages/backend
+- ✅ Configured npm workspaces
+- ✅ Set up OpenAPI → TypeScript generation
+- ✅ Updated all imports to @hunthub/shared
+- ✅ Configured tsconfig-paths for runtime resolution
 
-**Priority 2: Complete Hunt CRUD** (~1 week)
+**Priority 2: Fix MongoDB connection and complete Hunt CRUD** (~1 week)
 1. Update hunt endpoint
 2. Delete hunt endpoint
 3. Validation with Zod schemas
@@ -109,23 +123,50 @@ For now, keeping it simple with single file until we see if it becomes unwieldy.
 
 **Starting a session:**
 ```bash
-cd /Users/catalinleca/leca/HuntHub/backend
+cd /Users/catalinleca/leca/HuntHub
 claude  # Boot Claude Code - context auto-loads
 ```
 
 **Common tasks:**
 ```bash
-npm run dev          # Start development server
-npm run type-check   # Type checking
-npm run lint         # Lint code
-npm run format       # Format code
+# From root
+npm run dev:backend              # Start backend dev server
+npm run build:shared             # Build shared package
+npm run generate                 # Generate types from OpenAPI
+npm run lint                     # Lint all packages
+npm run format                   # Format all packages
+
+# From packages/backend
+npm run dev                      # Start dev server with hot reload
+npm run type-check               # Type checking
+npm run build                    # Build for production
 ```
 
 ## Repository Structure
 
 ```
 HuntHub/
-├── backend/         # Express + TypeScript API (current work)
-├── frontend/        # [Not started]
-└── .claude/         # Claude Code memory files
+├── packages/
+│   ├── shared/                  # Shared types, validation, constants
+│   │   ├── src/
+│   │   │   ├── types/          # Generated from OpenAPI
+│   │   │   ├── constants/      # Enums, configs
+│   │   │   └── index.ts        # Barrel exports
+│   │   ├── openapi/            # OpenAPI schema (source of truth)
+│   │   └── scripts/            # Type generation scripts
+│   ├── backend/                # Express + TypeScript API
+│   │   ├── src/
+│   │   │   ├── config/         # App configuration
+│   │   │   ├── controllers/    # HTTP handlers
+│   │   │   ├── db/             # Models, schemas, types
+│   │   │   ├── middlewares/    # Express middlewares
+│   │   │   ├── routes/         # Route definitions
+│   │   │   ├── services/       # Business logic
+│   │   │   ├── types/          # TypeScript types
+│   │   │   └── utils/          # Helpers, errors, validation
+│   │   └── firebaseService.json # (gitignored, see .example)
+│   └── frontend/               # [Not started]
+├── .claude/                    # Claude Code memory files
+├── node_modules/               # Hoisted dependencies
+└── package.json                # Root workspace config
 ```

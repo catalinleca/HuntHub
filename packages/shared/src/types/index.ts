@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+// @ts-nocheck
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -9,39 +10,39 @@
  * ---------------------------------------------------------------
  */
 
-export enum HuntStatus {
-  Draft = 'draft',
-  Published = 'published',
-  Archived = 'archived',
-}
-
-export interface HuntLocation {
-  lat: number;
-  lng: number;
-  radius: number;
-}
-
-export enum HuntAccessType {
-  Creator = 'creator',
-  Viewer = 'viewer',
-  Editor = 'editor',
-}
-
-export enum ChallengeType {
-  Clue = 'clue',
-  Quiz = 'quiz',
-  Mission = 'mission',
-  Task = 'task',
+export enum MissionType {
+  UploadMedia = "upload-media",
+  MatchLocation = "match-location",
 }
 
 export enum OptionType {
-  Choice = 'choice',
-  Input = 'input',
+  Choice = "choice",
+  Input = "input",
 }
 
-export enum MissionType {
-  UploadMedia = 'upload-media',
-  MatchLocation = 'match-location',
+export enum ChallengeType {
+  Clue = "clue",
+  Quiz = "quiz",
+  Mission = "mission",
+  Task = "task",
+}
+
+export enum HuntAccessType {
+  Creator = "creator",
+  Viewer = "viewer",
+  Editor = "editor",
+}
+
+export enum HuntStatus {
+  Draft = "draft",
+  Published = "published",
+  Archived = "archived",
+}
+
+export interface Location {
+  lat: number;
+  lng: number;
+  radius: number;
 }
 
 export interface Hunt {
@@ -51,7 +52,7 @@ export interface Hunt {
   description?: string;
   currentVersion: number;
   status: HuntStatus;
-  startLocation?: HuntLocation;
+  startLocation?: Location;
   steps?: Step[];
   /**
    * @format date-time
@@ -68,7 +69,7 @@ export interface Hunt {
 export interface HuntCreate {
   name: string;
   description?: string;
-  startLocation?: HuntLocation;
+  startLocation?: Location;
   steps?: StepCreate[];
 }
 
@@ -77,7 +78,7 @@ export interface Step {
   huntId?: string;
   type?: ChallengeType;
   challenge: Challenge;
-  requiredLocation?: HuntLocation;
+  requiredLocation?: Location;
   hint?: string;
   timeLimit?: number;
   maxAttempts?: number;
@@ -97,7 +98,7 @@ export interface StepCreate {
   huntId?: string;
   type?: ChallengeType;
   challenge: Challenge;
-  requiredLocation?: HuntLocation;
+  requiredLocation?: Location;
   hint?: string;
   timeLimit?: number;
   maxAttempts?: number;
@@ -132,7 +133,7 @@ export interface Mission {
   title?: string;
   description?: string;
   targetAsset?: string;
-  targetLocation?: HuntLocation;
+  targetLocation?: Location;
   type?: MissionType;
 }
 

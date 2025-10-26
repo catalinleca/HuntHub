@@ -1,4 +1,4 @@
-import { User } from '@/openapi/HuntHubTypes';
+import { User } from '@hunthub/shared';
 
 declare global {
   namespace Express {
