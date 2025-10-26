@@ -2,7 +2,7 @@
 
 **Last updated:** 2025-10-26
 
-**Recent work:** Monorepo setup complete, type sharing implemented
+**Recent work:** Validation refactored (domain-organized), testing infrastructure complete
 
 ## ✅ Implemented
 
@@ -67,13 +67,27 @@
 - [x] OpenAPI schema definition (hunthub_models.yaml)
 - [x] Type generation from OpenAPI (HuntHubTypes.ts)
 - [x] Validation middleware with Zod
+- [x] Domain-organized validation structure (validation/schemas/)
 - [x] Auth validation schemas
+- [x] Hunt validation schemas (imported from @hunthub/shared/schemas)
+- [x] User validation schemas (imported from @hunthub/shared/schemas)
+
+### Testing Infrastructure (NEW - 2025-10-26)
+- [x] Jest configuration with TypeScript support
+- [x] Integration test setup (supertest + MongoDB Memory Server)
+- [x] Test factories for creating test data (User, Hunt)
+- [x] Firebase auth mocking helpers
+- [x] Test database setup and cleanup utilities
+- [x] Hunt CRUD integration tests (create, read, list)
+- [x] Validation testing (required fields, error responses)
+- [x] Authentication testing (401 unauthorized cases)
 
 ### Tooling
 - [x] TypeScript configuration (strict mode)
 - [x] ESLint + Prettier setup
 - [x] Dev scripts (hot reload, type checking)
 - [x] Build scripts
+- [x] Test scripts (jest with coverage support)
 
 ## 🚧 Partially Implemented / Known Issues
 
@@ -166,12 +180,12 @@ POST   /api/hunts/:id/steps    # Add step
 
 ## Technical Debt / TODOs
 
-1. **Serializers removed** - Now using mongoose toJSON() method
+1. **Serializers removed** - Now using mongoose toJSON() method ✅
 2. **creatorId reference** - Has "TODO revert" comment in Hunt.ts:7
-3. **Validation schemas** - Only auth schemas exist, need hunt schemas
+3. **Validation schemas** - Domain-organized structure complete ✅
 4. **Type inconsistencies** - OpenAPI types vs DB types need reconciliation
 5. **Error messages** - Some errors lack descriptive messages
-6. **Testing** - No tests written yet
+6. **Testing** - Integration tests implemented ✅ (need more test coverage)
 7. **Documentation** - No API docs yet (Swagger UI installed but not configured)
 
 ## Next Steps (Suggested)
