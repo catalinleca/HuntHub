@@ -1,11 +1,6 @@
 import mongoose from 'mongoose';
 import { ILocation } from './Location';
-
-export enum HuntStatus {
-  Draft = 'draft',
-  Published = 'published',
-  Archived = 'archived',
-}
+import { HuntStatus } from '@hunthub/shared';
 
 export interface IHunt {
   id: string;

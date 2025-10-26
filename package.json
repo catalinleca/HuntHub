@@ -4,6 +4,7 @@
   "private": true,
   "description": "HuntHub - Treasure hunt platform",
   "workspaces": [
+    "apps/*",
     "packages/*"
   ],
   "scripts": {

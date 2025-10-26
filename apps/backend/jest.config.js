@@ -6,8 +6,8 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@db/(.*)$': '<rootDir>/src/db/$1',
-    '^@hunthub/shared$': '<rootDir>/../shared/src/index.ts',
-    '^@hunthub/shared/(.*)$': '<rootDir>/../shared/src/$1',
+    '^@hunthub/shared$': '<rootDir>/../../packages/shared/src/index.ts',
+    '^@hunthub/shared/(.*)$': '<rootDir>/../../packages/shared/src/$1',
   },
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
