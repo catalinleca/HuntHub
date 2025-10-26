@@ -4,6 +4,27 @@ import mongoose from 'mongoose';
 let mongoServer: MongoMemoryServer | null = null;
 
 /**
+ * Base transform for toJSON - converts _id to id and formats dates
+ */
+function baseTransform(_: unknown, ret: any) {
+  const id = ret._id.toString();
+  delete ret._id;
+  delete ret.__v;
+
+  if (ret?.createdAt) {
+    ret.createdAt = ret.createdAt.toISOString();
+  }
+  if (ret?.updatedAt) {
+    ret.updatedAt = ret.updatedAt.toISOString();
+  }
+
+  return {
+    id,
+    ...ret,
+  };
+}
+
+/**
  * Connect to in-memory MongoDB for testing
  */
 export const connectTestDatabase = async (): Promise<void> => {
@@ -14,6 +35,11 @@ export const connectTestDatabase = async (): Promise<void> => {
 
     // Connect mongoose to in-memory DB
     await mongoose.connect(mongoUri);
+
+    // Configure toJSON transform (same as production)
+    mongoose.set('toJSON', {
+      transform: baseTransform,
+    });
 
     console.log('✅ Connected to in-memory test database');
   } catch (error) {

@@ -5,7 +5,8 @@ import { createTestUser } from '../../setup/factories/user.factory';
 import { createTestHunt, generateHuntData } from '../../setup/factories/hunt.factory';
 import { mockFirebaseAuth, createTestAuthToken, clearFirebaseAuthMocks } from '../../helpers/authHelper';
 import { IUser } from '@db/types/User';
-import { IHunt, HuntStatus } from '@db/types/Hunt';
+import { IHunt } from '@db/types/Hunt';
+import { HuntStatus } from '@hunthub/shared';
 
 describe('Hunt CRUD Integration Tests', () => {
   let app: Express;
@@ -75,7 +76,10 @@ describe('Hunt CRUD Integration Tests', () => {
         .send({}) // Empty body
         .expect(400);
 
-      expect(response.body).toHaveProperty('error');
+      expect(response.body).toHaveProperty('message');
+      expect(response.body).toHaveProperty('errors');
+      expect(response.body.errors).toBeInstanceOf(Array);
+      expect(response.body.errors.length).toBeGreaterThan(0);
     });
   });
 

@@ -13,9 +13,12 @@ module.exports = {
     '^.+\\.tsx?$': ['ts-jest', {
       tsconfig: 'tsconfig.test.json',
     }],
+    '^.+\\.m?js$': ['ts-jest', {
+      tsconfig: 'tsconfig.test.json',
+    }],
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(@faker-js)/)',
+    'node_modules/(?!(@faker-js|@hunthub)/)',
   ],
   collectCoverageFrom: [
     'src/**/*.ts',
