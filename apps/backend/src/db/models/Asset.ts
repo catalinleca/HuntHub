@@ -3,9 +3,12 @@ import { IAsset, MimeTypes } from '@db/types';
 
 const assetSchema = new Schema<IAsset>(
   {
-    originalFilename: String,
-    size: Number,
-    thumbnailUrl: String,
+    ownerId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      index: true,
+    },
     url: {
       type: String,
       required: true,
@@ -15,37 +18,31 @@ const assetSchema = new Schema<IAsset>(
       required: true,
       enum: Object.values(MimeTypes),
     },
+    originalFilename: String,
+    size: Number,
+    thumbnailUrl: String,
     storageLocation: {
       bucket: String,
       path: String,
-    },
-    huntId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Hunt',
-      required: true,
-      index: true,
-    },
-    ownerId: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-      index: true,
     },
     usage: {
       type: [
         {
           model: String, // e.g., 'User', 'Hunt', 'Step'
-          field: String, // e.g., 'profilePicture', 'media'
+          field: String, // e.g., 'challenge.mission.targetAssetId', 'profilePicture'
           documentId: Schema.Types.ObjectId,
         },
       ],
-      index: true,
     },
   },
   {
     timestamps: true,
   },
 );
+
+// Indexes
+assetSchema.index({ ownerId: 1, createdAt: -1 }); // Get user's media library sorted by newest
+assetSchema.index({ 'usage.documentId': 1 }); // Find assets used in specific documents
 
 const Asset = model('Asset', assetSchema);
 

@@ -9,6 +9,15 @@ const OptionType = z.enum(['choice', 'input']);
 const MissionType = z.enum(['upload-media', 'match-location']);
 const Clue = z.object({ title: z.string(), description: z.string() }).partial().passthrough();
 const Option = z.object({ id: z.string(), text: z.string() }).passthrough();
+const QuizValidation = z
+  .object({
+    mode: z.enum(['exact', 'fuzzy', 'contains', 'numeric-range']),
+    caseSensitive: z.boolean(),
+    range: z.object({ min: z.number(), max: z.number() }).partial().passthrough(),
+    acceptableAnswers: z.array(z.string()),
+  })
+  .partial()
+  .passthrough();
 const Quiz = z
   .object({
     title: z.string(),
@@ -16,6 +25,7 @@ const Quiz = z
     target: Option,
     type: OptionType,
     distractors: z.array(Option),
+    validation: QuizValidation,
   })
   .partial()
   .passthrough();
@@ -23,13 +33,23 @@ const Mission = z
   .object({
     title: z.string(),
     description: z.string(),
-    targetAsset: z.string(),
+    referenceAssetIds: z.array(z.string()),
     targetLocation: Location,
     type: MissionType,
+    aiInstructions: z.string(),
+    aiModel: z.enum(['gpt-4-vision', 'claude-vision', 'gemini-vision']),
   })
   .partial()
   .passthrough();
-const Task = z.object({ title: z.string(), description: z.string(), target: z.string() }).partial().passthrough();
+const Task = z
+  .object({
+    title: z.string(),
+    instructions: z.string(),
+    aiInstructions: z.string(),
+    aiModel: z.enum(['gpt-4', 'claude', 'gemini']),
+  })
+  .partial()
+  .passthrough();
 const Challenge = z.object({ clue: Clue, quiz: Quiz, mission: Mission, task: Task }).partial().passthrough();
 const Step = z
   .object({
@@ -41,6 +61,7 @@ const Step = z
     hint: z.string().optional(),
     timeLimit: z.number().optional(),
     maxAttempts: z.number().optional(),
+    metadata: z.object({}).partial().passthrough().optional(),
     createdAt: z.string().datetime({ offset: true }).optional(),
     updatedAt: z.string().datetime({ offset: true }).optional(),
   })
@@ -110,6 +131,7 @@ export const schemas = {
   MissionType,
   Clue,
   Option,
+  QuizValidation,
   Quiz,
   Mission,
   Task,

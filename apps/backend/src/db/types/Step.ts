@@ -16,6 +16,7 @@ export interface IStep extends mongoose.Document {
   requiredLocation?: ILocation;
   timeLimit?: number;
   maxAttempts?: number;
+  metadata?: Record<string, any>;  // Extensibility escape hatch
   createdAt?: Date;
   updatedAt?: Date;
 }

@@ -116,6 +116,10 @@ components:
           type: number
         maxAttempts:
           type: number
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Flexible key-value storage for extensibility
         createdAt:
           type: string
           example: "2024-02-01T10:12:45Z"
@@ -181,6 +185,27 @@ components:
         - id
         - text
 
+    QuizValidation:
+      type: object
+      description: Validation configuration for quiz answers (future feature)
+      properties:
+        mode:
+          type: string
+          enum: [exact, fuzzy, contains, numeric-range]
+        caseSensitive:
+          type: boolean
+        range:
+          type: object
+          properties:
+            min:
+              type: number
+            max:
+              type: number
+        acceptableAnswers:
+          type: array
+          items:
+            type: string
+
     Quiz:
       type: object
       properties:
@@ -196,6 +221,9 @@ components:
             type: array
             items:
                 $ref: '#/components/schemas/Option'
+        validation:
+          $ref: '#/components/schemas/QuizValidation'
+          description: Optional validation rules (future feature)
 
     Mission:
       type: object
@@ -204,22 +232,38 @@ components:
           type: string
         description:
           type: string
-        targetAsset:
-          type: string
+        referenceAssetIds:
+          type: array
+          items:
+            type: string
+          description: Author's reference images/media shown to player
         targetLocation:
           $ref: '#/components/schemas/Location'
         type:
           $ref: '#/components/schemas/MissionType'
+        aiInstructions:
+          type: string
+          description: Instructions for AI to validate player's upload (future feature)
+        aiModel:
+          type: string
+          enum: [gpt-4-vision, claude-vision, gemini-vision]
+          description: Which AI model to use for validation (future feature)
 
     Task:
       type: object
       properties:
         title:
           type: string
-        description:
+        instructions:
           type: string
-        target:
+          description: What the player should do (shown to player)
+        aiInstructions:
           type: string
+          description: Instructions for AI to validate player's response
+        aiModel:
+          type: string
+          enum: [gpt-4, claude, gemini]
+          description: Which AI model to use for validation (future feature)
 
 
     User:

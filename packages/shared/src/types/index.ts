@@ -67,7 +67,12 @@ export interface Hunt {
 }
 
 export interface HuntCreate {
+  /**
+   * @minLength 1
+   * @maxLength 100
+   */
   name: string;
+  /** @maxLength 500 */
   description?: string;
   startLocation?: Location;
   steps?: StepCreate[];
@@ -82,6 +87,8 @@ export interface Step {
   hint?: string;
   timeLimit?: number;
   maxAttempts?: number;
+  /** Flexible key-value storage for extensibility */
+  metadata?: Record<string, any>;
   /**
    * @format date-time
    * @example "2024-02-01T10:12:45Z"
@@ -121,26 +128,48 @@ export interface Option {
   text: string;
 }
 
+/** Validation configuration for quiz answers (future feature) */
+export interface QuizValidation {
+  mode?: "exact" | "fuzzy" | "contains" | "numeric-range";
+  caseSensitive?: boolean;
+  range?: {
+    min?: number;
+    max?: number;
+  };
+  acceptableAnswers?: string[];
+}
+
 export interface Quiz {
   title?: string;
   description?: string;
   target?: Option;
   type?: OptionType;
   distractors?: Option[];
+  /** Optional validation rules (future feature) */
+  validation?: QuizValidation;
 }
 
 export interface Mission {
   title?: string;
   description?: string;
-  targetAsset?: string;
+  /** Author's reference images/media shown to player */
+  referenceAssetIds?: string[];
   targetLocation?: Location;
   type?: MissionType;
+  /** Instructions for AI to validate player's upload (future feature) */
+  aiInstructions?: string;
+  /** Which AI model to use for validation (future feature) */
+  aiModel?: "gpt-4-vision" | "claude-vision" | "gemini-vision";
 }
 
 export interface Task {
   title?: string;
-  description?: string;
-  target?: string;
+  /** What the player should do (shown to player) */
+  instructions?: string;
+  /** Instructions for AI to validate player's response */
+  aiInstructions?: string;
+  /** Which AI model to use for validation (future feature) */
+  aiModel?: "gpt-4" | "claude" | "gemini";
 }
 
 export interface User {

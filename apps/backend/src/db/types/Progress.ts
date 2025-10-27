@@ -8,8 +8,13 @@ export enum HuntProgressStatus {
 
 export interface ISubmission {
   timestamp: Date;
-  content: unknown;
+  content: unknown;  // Flexible: string, asset ID, array, coordinates, etc.
   isCorrect: boolean;
+
+  // Extended fields for richer validation (AI features, feedback)
+  score?: number;               // Quality/confidence score (0-1 or 0-10)
+  feedback?: string;            // Player guidance message from AI or system
+  metadata?: Record<string, any>;  // Extensibility escape hatch
 }
 
 export interface IStepProgress {

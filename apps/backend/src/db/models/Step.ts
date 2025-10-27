@@ -15,6 +15,7 @@ const stepSchema = new Schema<IStep>(
     requiredLocation: locationSchema,
     timeLimit: Number,
     maxAttempts: Number,
+    metadata: { type: Schema.Types.Mixed },  // Flexible key-value storage
   },
   { timestamps: true },
 );
