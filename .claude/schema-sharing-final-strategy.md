@@ -16,25 +16,33 @@
 ```
 hunthub/
 ├── package.json              # Root workspace config
-├── packages/
-│   ├── shared/               # ← Shared types, validation, constants
-│   │   ├── package.json
-│   │   ├── tsconfig.json
-│   │   ├── src/
-│   │   │   ├── types/        # Generated from OpenAPI
-│   │   │   ├── validation/   # Zod schemas
-│   │   │   ├── constants/    # Enums, configs
-│   │   │   └── index.ts
-│   │   └── scripts/
-│   │       └── generate.ts   # OpenAPI → Types → Zod
+├── apps/
 │   ├── backend/
-│   │   ├── package.json
-│   │   ├── src/
-│   │   └── (imports from @hunthub/shared)
+│   │   └── api/              # ← Backend Express API (@hunthub/api)
+│   │       ├── package.json
+│   │       ├── src/
+│   │       └── (imports from @hunthub/shared)
 │   └── frontend/
+│       ├── editor/           # ← Hunt creation app (desktop)
+│       │   ├── package.json
+│       │   ├── src/
+│       │   └── (imports from @hunthub/shared)
+│       └── player/           # ← Hunt playing app (mobile)
+│           ├── package.json
+│           ├── src/
+│           └── (imports from @hunthub/shared)
+├── packages/
+│   └── shared/               # ← Shared types, validation, constants (@hunthub/shared)
 │       ├── package.json
+│       ├── tsconfig.json
 │       ├── src/
-│       └── (imports from @hunthub/shared)
+│       │   ├── types/        # Generated from OpenAPI
+│       │   ├── schemas/      # Zod validation schemas
+│       │   ├── constants/    # Enums, configs
+│       │   └── index.ts
+│       ├── openapi/
+│       └── scripts/
+│           └── generate.ts   # OpenAPI → Types → Zod
 └── .claude/                  # Your context files
 ```
 
@@ -46,12 +54,17 @@ hunthub/
   "name": "hunthub",
   "private": true,
   "workspaces": [
+    "apps/backend/*",
+    "apps/frontend/*",
     "packages/*"
   ],
   "scripts": {
     "build:shared": "npm run build --workspace=@hunthub/shared",
-    "build:all": "npm run build:shared && npm run build --workspaces",
-    "generate:types": "npm run generate --workspace=@hunthub/shared"
+    "build:api": "npm run build --workspace=@hunthub/api",
+    "build:all": "npm run build --workspaces --if-present",
+    "dev:api": "npm run dev --workspace=@hunthub/api",
+    "dev:backend": "npm run dev:api",
+    "generate": "npm run generate --workspace=@hunthub/shared"
   }
 }
 ```
@@ -73,10 +86,10 @@ hunthub/
 }
 ```
 
-**packages/backend/package.json:**
+**apps/backend/api/package.json:**
 ```json
 {
-  "name": "@hunthub/backend",
+  "name": "@hunthub/api",
   "dependencies": {
     "@hunthub/shared": "*",  // ← References local package
     "express": "...",
@@ -85,10 +98,22 @@ hunthub/
 }
 ```
 
-**packages/frontend/package.json:**
+**apps/frontend/editor/package.json:**
 ```json
 {
-  "name": "@hunthub/frontend",
+  "name": "@hunthub/editor",
+  "dependencies": {
+    "@hunthub/shared": "*",  // ← References local package
+    "react": "...",
+    // ...
+  }
+}
+```
+
+**apps/frontend/player/package.json:**
+```json
+{
+  "name": "@hunthub/player",
   "dependencies": {
     "@hunthub/shared": "*",  // ← References local package
     "react": "...",

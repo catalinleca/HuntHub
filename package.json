@@ -4,14 +4,17 @@
   "private": true,
   "description": "HuntHub - Treasure hunt platform",
   "workspaces": [
-    "apps/*",
+    "apps/backend/*",
+    "apps/frontend/*",
     "packages/*"
   ],
   "scripts": {
     "build:shared": "npm run build --workspace=@hunthub/shared",
-    "build:backend": "npm run build --workspace=@hunthub/backend",
+    "build:api": "npm run build --workspace=@hunthub/api",
+    "build:backend": "npm run build:api",
     "build:all": "npm run build --workspaces --if-present",
-    "dev:backend": "npm run dev --workspace=@hunthub/backend",
+    "dev:api": "npm run dev --workspace=@hunthub/api",
+    "dev:backend": "npm run dev:api",
     "generate": "npm run generate --workspace=@hunthub/shared",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"**/*.{ts,json,md}\"",

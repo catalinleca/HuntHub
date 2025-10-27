@@ -1,6 +1,6 @@
 # Project State & Context
 
-**Last updated:** 2025-10-26
+**Last updated:** 2025-10-27
 
 ## Current Focus
 
@@ -26,10 +26,18 @@
 
 ## Recent Work (Last 1-2 Commits)
 
+**2025-10-27: Monorepo Restructure for Multiple Apps** ✅
+- Reorganized for 2 frontends (editor + player) + 1 backend (API)
+- Moved `apps/backend/` → `apps/backend/api/` (renamed to `@hunthub/api`)
+- Created structure: `apps/backend/*` and `apps/frontend/*`
+- Updated workspace config to support nested app structure
+- Ready for React editor and player apps to be added
+- Backend compiles cleanly with new structure
+
 **2025-10-26: Monorepo Setup Complete** ✅
 - Migrated to npm workspaces monorepo structure
 - Created `packages/shared/` for types, validation, and constants
-- Moved backend to `packages/backend/`
+- Moved backend to `apps/backend/`
 - Set up OpenAPI → TypeScript type generation in shared package
 - Configured root configs with package-level inheritance (TypeScript, ESLint, Prettier)
 - Fixed module resolution: Using `tsconfig-paths` for runtime path aliases
@@ -130,42 +138,53 @@ claude  # Boot Claude Code - context auto-loads
 **Common tasks:**
 ```bash
 # From root
-npm run dev:backend              # Start backend dev server
+npm run dev:backend              # Start backend API dev server (alias for dev:api)
+npm run dev:api                  # Start backend API dev server
 npm run build:shared             # Build shared package
+npm run build:api                # Build backend API
 npm run generate                 # Generate types from OpenAPI
 npm run lint                     # Lint all packages
 npm run format                   # Format all packages
 
-# From packages/backend
+# From apps/backend/api
 npm run dev                      # Start dev server with hot reload
-npm run type-check               # Type checking
+npm run type-check               # Type checking (watch mode)
 npm run build                    # Build for production
+npm run test                     # Run tests
 ```
 
 ## Repository Structure
 
 ```
 HuntHub/
+├── apps/
+│   ├── backend/
+│   │   └── api/                # Express + TypeScript API (@hunthub/api)
+│   │       ├── src/
+│   │       │   ├── config/     # App configuration
+│   │       │   ├── controllers/ # HTTP handlers
+│   │       │   ├── db/         # Models, schemas, types
+│   │       │   ├── middlewares/ # Express middlewares
+│   │       │   ├── routes/     # Route definitions
+│   │       │   ├── services/   # Business logic
+│   │       │   ├── types/      # TypeScript types
+│   │       │   └── utils/      # Helpers, errors, validation
+│   │       ├── tests/          # Integration tests
+│   │       ├── firebaseService.json # (gitignored, see .example)
+│   │       └── package.json    # @hunthub/api
+│   └── frontend/
+│       ├── editor/             # Hunt creation app (desktop) [Not started]
+│       └── player/             # Hunt playing app (mobile-responsive) [Not started]
 ├── packages/
-│   ├── shared/                  # Shared types, validation, constants
-│   │   ├── src/
-│   │   │   ├── types/          # Generated from OpenAPI
-│   │   │   ├── constants/      # Enums, configs
-│   │   │   └── index.ts        # Barrel exports
-│   │   ├── openapi/            # OpenAPI schema (source of truth)
-│   │   └── scripts/            # Type generation scripts
-│   ├── backend/                # Express + TypeScript API
-│   │   ├── src/
-│   │   │   ├── config/         # App configuration
-│   │   │   ├── controllers/    # HTTP handlers
-│   │   │   ├── db/             # Models, schemas, types
-│   │   │   ├── middlewares/    # Express middlewares
-│   │   │   ├── routes/         # Route definitions
-│   │   │   ├── services/       # Business logic
-│   │   │   ├── types/          # TypeScript types
-│   │   │   └── utils/          # Helpers, errors, validation
-│   │   └── firebaseService.json # (gitignored, see .example)
-│   └── frontend/               # [Not started]
+│   └── shared/                 # Shared types, validation, constants (@hunthub/shared)
+│       ├── src/
+│       │   ├── types/          # Generated from OpenAPI
+│       │   ├── schemas/        # Zod validation schemas
+│       │   ├── constants/      # Enums, configs
+│       │   └── index.ts        # Barrel exports
+│       ├── openapi/            # OpenAPI schema (source of truth)
+│       ├── scripts/            # Type generation scripts
+│       └── package.json        # @hunthub/shared
 ├── .claude/                    # Claude Code memory files
 ├── node_modules/               # Hoisted dependencies
 └── package.json                # Root workspace config

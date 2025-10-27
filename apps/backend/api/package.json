@@ -1,5 +1,5 @@
 {
-  "name": "@hunthub/backend",
+  "name": "@hunthub/api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
