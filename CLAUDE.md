@@ -19,6 +19,7 @@ It imports all context about the project, so Claude always knows:
 
 @.claude/NEXT-SESSION-START-HERE.md
 @.claude/project-state.md
+@.claude/ROADMAP.md
 
 ## Project Overview & Requirements
 
@@ -34,6 +35,7 @@ It imports all context about the project, so Claude always knows:
 
 @.claude/challenge-types-guide.md
 @.claude/data-model-decisions.md
+@.claude/player-api-design.md
 
 ## Backend Context
 

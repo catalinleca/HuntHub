@@ -40,60 +40,43 @@ You finished requirements and made all critical decisions on 2025-02-05.
 
 ---
 
-### 2. Implement Tree VIEW API (Current Priority)
+### 2. ~~Comprehensive Roadmap Created~~ ✅ **COMPLETE** (2025-10-27)
 
-**NEW: Tree vs Branching Decision (2025-10-27)**
-- ✅ Tree VIEW (visualization + lazy loading) - **Implement NOW**
-- ⏸️ Gameplay branching (conditional paths) - **Future V1.1+**
+**Completed:**
+- ✅ Created `ROADMAP.md` with 14-week MVP timeline
+- ✅ 13 Epics broken into 70+ stories
+- ✅ NOW/NEXT/LATER prioritization
+- ✅ Fixed dependency order: Tree VIEW after CRUD, Assets before Player
+- ✅ Story-level and epic-level dependency diagrams
+- ✅ No circular dependencies, clear implementation path
 
-**See:** `.claude/tree-and-branching-strategy.md` for full context
+**See:** `.claude/ROADMAP.md` for complete timeline
 
-**Phase 1: Tree VIEW API (~1 week)**
-- [ ] Create `GET /hunts/:id/tree` endpoint (compact step list)
-- [ ] Update `GET /hunts` to include `stepCount`
-- [ ] Ensure `GET /steps/:id` returns full details
-- [ ] Add indexes for performance
-- [ ] Frontend tree component (lazy loads steps)
+---
 
-**Why this matters:**
-- Better editor UX (visual overview of hunt)
-- Production-quality API (lazy loading pattern)
+### 3. Complete Hunt CRUD + Step CRUD (Current Priority)
+
+**CORRECTED: Tree VIEW moved to NEXT phase**
+- Tree VIEW needs complete Step CRUD to be useful
+- Can't visualize steps that don't exist yet
+- Need solid CRUD foundation first
+
+**NOW Sprint (Week 1 - 6.5 days):**
+- [ ] Update hunt (PUT /api/hunts/:id) - 1 day
+- [ ] Delete hunt (DELETE /api/hunts/:id) - 1 day
+- [ ] Create step (POST /api/hunts/:id/steps) - 2 days
+- [ ] Update step (PUT /api/steps/:id) - 1.5 days
+- [ ] Delete step (DELETE /api/steps/:id) - 1 day
+
+**Why this is priority:**
+- Solid CRUD foundation needed before anything else
+- Tree VIEW makes sense only after we can create/edit steps
+- Tests need actual step data to validate endpoints
 - Foundation for future branching
 
 ---
 
-### 3. Fix MongoDB Connection & Complete Backend MVP
-
-**Priority order:**
-
-**Phase 1: Hunt CRUD**
-- [ ] Update hunt (PUT /api/hunts/:id)
-- [ ] Delete hunt (DELETE /api/hunts/:id)
-- [ ] List user's hunts (already have this)
-
-**Phase 2: Step Management**
-- [ ] Add step to hunt (POST /api/hunts/:id/steps)
-- [ ] Update step (PUT /api/steps/:id)
-- [ ] Delete step (DELETE /api/steps/:id)
-- [ ] Reorder steps (PUT /api/hunts/:id/step-order)
-
-**Phase 3: Publishing (MVP Version)**
-- [ ] Publish hunt (POST /api/hunts/:id/publish)
-  - Clones hunt + steps
-  - Creates PublishedHunt record
-  - Creates LiveHunt record (mark as live)
-- [ ] Get live version (GET /api/hunts/:id/live)
-
-**Phase 4: Hunt Player**
-- [ ] Get live hunt for playing (GET /api/play/:huntId)
-- [ ] Submit step completion (POST /api/play/:huntId/steps/:stepId/complete)
-- [ ] Get user progress (GET /api/play/:huntId/progress)
-
-**See:** `.claude/backend/current-state.md` for full tracking
-
----
-
-### 3. Apply SOLID Improvements (As You Build)
+### 4. Apply SOLID Improvements (As You Build)
 
 **Key pattern to add: Challenge Type Strategy**
 
@@ -121,21 +104,26 @@ See `.claude/mongodb-vs-postgres.md` section "MongoDB Best Practices"
 
 ## 📚 Key Documents to Reference
 
+**When planning work:**
+- `ROADMAP.md` - 14-week timeline, all epics and stories (NEW ✨)
+- `project-state.md` - Current focus and immediate next steps
+- `backend/current-state.md` - What's implemented vs pending
+
 **When building features:**
 - `application-overview.md` - What features to build
-- `tree-and-branching-strategy.md` - Tree VIEW + future branching (NEW)
-- `backend/patterns.md` - Code conventions
-- `backend/architecture.md` - How things fit together
+- `tree-and-branching-strategy.md` - Tree VIEW + future branching
+- `backend/patterns.md` - Code conventions with examples
+- `backend/architecture.md` - Tech stack and data flow
 - `publishing-workflow.md` - Publishing system design
 
 **When making decisions:**
-- `decisions-needed.md` - All decisions (most are done!)
-- `design-concerns.md` - Issues I flagged
+- `reference/decisions-needed.md` - Historical decision log
+- `reference/design-concerns.md` - Issues flagged in Feb 2025
 
-**When stuck:**
-- `solid-principles.md` - How to make extensible code
-- `mongodb-vs-postgres.md` - MongoDB patterns
-- `production-best-practices-type-sharing.md` - Why monorepo
+**When stuck on patterns:**
+- `decisions/solid-principles.md` - How to make extensible code
+- `decisions/mongodb-vs-postgres.md` - MongoDB patterns
+- `decisions/production-best-practices-type-sharing.md` - Why monorepo
 
 ---
 
@@ -145,9 +133,12 @@ See `.claude/mongodb-vs-postgres.md` section "MongoDB Best Practices"
 - Your behavior principles (senior engineer, challenge me)
 - Complete HuntHub requirements
 - All architectural decisions
+- **14-week roadmap with 70+ stories** (NEW ✨)
+- **Corrected dependencies: CRUD first, then Tree VIEW** (NEW ✨)
 - MongoDB choice and reasoning
 - Monorepo strategy
 - Publishing workflow design
+- Tree VIEW strategy + future branching plans
 - SOLID principles
 - Current backend state
 - What's done vs pending
@@ -160,61 +151,57 @@ See `.claude/mongodb-vs-postgres.md` section "MongoDB Best Practices"
 
 **Good openers:**
 
-✅ "Let's set up the monorepo structure"
+✅ "Let's implement Hunt CRUD endpoints (Update/Delete)"
 ✅ "Let's build the Step CRUD endpoints"
-✅ "Let's implement the publishing workflow"
+✅ "Let's work on the NOW sprint from ROADMAP.md"
 ✅ "What should we work on next?"
 
 **I'll suggest priorities based on:**
+- ROADMAP.md NOW section (current sprint)
 - What's blocking other work
-- MVP critical path
-- Logical implementation order
+- MVP critical path from dependency diagrams
 
 ---
 
 ## 🛠️ Before You Start Coding
 
-**1. Git commit current state:**
+**1. Check the roadmap:**
 ```bash
-git add .claude/
-git commit -m "docs: complete requirements and architecture decisions
-
-- Decided on MongoDB + monorepo approach
-- Defined publishing workflow
-- Documented SOLID principles
-- All critical decisions made
-- Ready for implementation"
+cat .claude/ROADMAP.md | grep -A 20 "NOW (This Week"
 ```
+See what's in the current sprint (Week 1: Hunt CRUD + Step CRUD)
 
 **2. Optional: Read these if you want refresh:**
-- `design-concerns.md` - Issues I spotted
-- `solid-principles.md` - Extension patterns
-- `publishing-workflow.md` - Your complex versioning design
+- `ROADMAP.md` - See full 14-week timeline
+- `reference/design-concerns.md` - Issues flagged in Feb 2025
+- `decisions/solid-principles.md` - Extension patterns
+- `publishing-workflow.md` - Complex versioning design
 
-**3. Confirm monorepo setup is priority:**
-- This unblocks type sharing
-- Should be done before building more features
-- ~4-5 hours of work
+**3. Quick context check:**
+- ✅ Monorepo complete (packages/shared + apps/backend/api)
+- ✅ All major decisions made
+- ✅ Roadmap created with dependency fixes
+- 🎯 Current priority: Hunt CRUD + Step CRUD (NOW sprint)
 
 ---
 
 ## 🎯 Success Criteria for Next Session
 
 **Minimum (if short session):**
-- [ ] Monorepo structure set up
-- [ ] Shared package with types working
-- [ ] Backend imports @hunthub/shared
+- [ ] Hunt Update endpoint (PUT /api/hunts/:id)
+- [ ] Hunt Delete endpoint (DELETE /api/hunts/:id)
+- [ ] Tests passing
 
 **Good (normal session):**
-- [ ] Monorepo done ✓
-- [ ] One more feature (Hunt update/delete OR Step CRUD)
+- [ ] Hunt CRUD complete (Update + Delete) ✓
+- [ ] Step Create started or done (POST /api/hunts/:id/steps)
 - [ ] Following SOLID patterns
 
 **Great (long session):**
-- [ ] Monorepo done ✓
-- [ ] Hunt CRUD complete
-- [ ] Step CRUD started or done
+- [ ] Hunt CRUD complete ✓
+- [ ] Step Create + Update + Delete endpoints done
 - [ ] Good test coverage
+- [ ] Week 1 NOW sprint complete
 
 ---
 
@@ -240,50 +227,64 @@ git commit -m "docs: complete requirements and architecture decisions
 
 ## 🔥 Token Budget Note
 
-**This session used ~123k tokens.**
+**Recent sessions:**
+- **2025-02-05:** ~123k tokens (Requirements definition)
+- **2025-10-26:** ~80k tokens (Monorepo setup)
+- **2025-10-27:** ~100k tokens (Roadmap creation + dependency fixes)
 
-**Why so many:**
-- Defined entire requirements from scratch
-- Created 13+ documentation files
-- Researched production best practices
-- Made all critical decisions
+**Why planning sessions use more tokens:**
+- Creating comprehensive documentation
+- Researching production best practices
+- Validating dependencies and fixing contradictions
+- Making all critical decisions upfront
 
-**Next sessions will use WAY less:**
-- Context already documented
+**Next sessions will use less:**
+- Context already documented (auto-loads)
 - Decisions made
-- Just implementing features
+- Roadmap complete
+- Just implementing features from NOW sprint
 
-**Typical session:** ~20-40k tokens
-**This session:** Planning/architecture heavy (one-time cost)
+**Typical implementation session:** ~20-40k tokens
+**Planning sessions:** ~80-120k tokens (one-time cost)
 
-**It was worth it - you now have:**
-- Complete picture
+**Worth it - you now have:**
+- Complete 14-week roadmap
 - All decisions made
 - Production-grade architecture
-- Never forget context again
+- No circular dependencies
+- Clear path to MVP
 
 ---
 
 ## 📝 Quick Commands
 
 ```bash
-# See what to work on
+# See current sprint tasks
+cat .claude/ROADMAP.md | grep -A 20 "NOW (This Week"
+
+# See what's implemented
+cat .claude/backend/current-state.md | grep "✅"
+
+# See what's pending
 cat .claude/backend/current-state.md | grep "❌"
 
-# Review decisions
-cat .claude/decisions-needed.md | grep "DECIDED"
-
-# Check patterns
+# Check code patterns
 cat .claude/backend/patterns.md
+
+# Review all decisions
+cat .claude/reference/decisions-needed.md | grep "DECIDED"
 
 # Update context after work
 # Just tell me: "Update backend state - completed [feature]"
+# Or: "Mark ROADMAP stories complete: BE-1.4, BE-1.5"
 ```
 
 ---
 
 **🎉 YOU'RE READY TO BUILD!**
 
-**Next session: "Let's implement the tree VIEW API" → Start with `GET /hunts/:id/tree` endpoint.**
+**Next session: "Let's start the NOW sprint" → Begin with Hunt CRUD (Update + Delete) from ROADMAP.md.**
+
+**Corrected priority: Hunt CRUD + Step CRUD FIRST, then Tree VIEW in NEXT phase.**
 
 **All context auto-loads. You can take breaks. Nothing is forgotten.** 🚀

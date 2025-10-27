@@ -26,6 +26,14 @@
 
 ## Recent Work (Last 1-2 Commits)
 
+**2025-10-27: Comprehensive Roadmap Created** ✅
+- Created detailed 14-week MVP roadmap (ROADMAP.md)
+- 13 Epics broken down into 70+ stories
+- NOW/NEXT/LATER prioritization
+- Fixed dependency order: Tree VIEW after CRUD, Assets before Player
+- Story-level and epic-level dependency diagrams
+- Ready to follow clear implementation path
+
 **2025-10-27: Monorepo Restructure for Multiple Apps** ✅
 - Reorganized for 2 frontends (editor + player) + 1 backend (API)
 - Moved `apps/backend/` → `apps/backend/api/` (renamed to `@hunthub/api`)
@@ -69,64 +77,68 @@
 
 ## Immediate Next Steps
 
-**Updated: 2025-10-26 after completing monorepo setup**
+**Updated: 2025-10-27 after roadmap dependency fixes**
 
-**All critical decisions made. Ready to build.**
+**All critical decisions made. Roadmap complete. Ready to build.**
 
 **Priority 1: ~~Set up monorepo~~** ✅ **COMPLETE**
-- ✅ Created packages/shared, packages/backend
+- ✅ Created packages/shared, apps/backend/api
 - ✅ Configured npm workspaces
 - ✅ Set up OpenAPI → TypeScript generation
 - ✅ Updated all imports to @hunthub/shared
 - ✅ Configured tsconfig-paths for runtime resolution
 
-**Priority 2: Implement Tree VIEW API** (~1 week) **← CURRENT PRIORITY**
-1. Create `GET /api/hunts/:id/tree` endpoint (compact step list)
-2. Update `GET /api/hunts` to include `stepCount`
-3. Ensure `GET /api/steps/:id` returns full details
-4. Add database indexes (huntId, order)
-5. Frontend tree component (lazy loads steps)
+**Priority 2: Complete Hunt CRUD + Step CRUD** (This Week) **← CURRENT PRIORITY**
 
-**See:** `.claude/tree-and-branching-strategy.md` for complete design
+**NOW Sprint (Week 1 - 6.5 days):**
+1. Update hunt (PUT /api/hunts/:id) - 1 day
+2. Delete hunt (DELETE /api/hunts/:id) - 1 day
+3. Create step (POST /api/hunts/:id/steps) - 2 days
+4. Update step (PUT /api/steps/:id) - 1.5 days
+5. Delete step (DELETE /api/steps/:id) - 1 day
 
-**Why this is priority:** Better editor UX, production-quality API pattern, foundation for future branching
+**Why this is priority:** Need solid CRUD foundation before Tree VIEW makes sense
 
-**Priority 3: Complete Hunt CRUD** (~3-4 days)
-1. Update hunt endpoint (PUT /api/hunts/:id)
-2. Delete hunt endpoint (DELETE /api/hunts/:id)
-3. Validation with Zod schemas
+**Priority 3: Step Management + Tree VIEW** (Weeks 2-4) **← NEXT**
+1. Reorder steps (PUT /api/hunts/:id/step-order)
+2. Challenge type validation (Strategy pattern)
+3. Get hunt tree (GET /api/hunts/:id/tree)
+4. Add stepCount to hunt list
+5. Get step details (GET /api/steps/:id)
+6. Database indexes
 
-**Priority 4: Step Management** (~1 week)
-1. Add step to hunt (POST /api/hunts/:id/steps)
-2. Update step (PUT /api/steps/:id)
-3. Delete step (DELETE /api/steps/:id)
-4. Reorder steps (PUT /api/hunts/:id/step-order)
+**See:** `.claude/ROADMAP.md` for complete timeline
 
-**Priority 5: Publishing MVP** (~1-2 weeks)
-1. Simplified workflow: Draft → Published (skip Review for MVP)
-2. Publish hunt (clone hunt + steps)
-3. Create PublishedHunt record
-4. Create LiveHunt record
-5. Get live version for playing
+**Priority 4: Asset Management** (Weeks 2-4)
+1. Upload asset (POST /api/assets)
+2. Attach asset to step
+3. Get asset (GET /api/assets/:id)
 
-**Priority 6: Hunt Player** (~1-2 weeks)
+**Note:** Assets must be done before Player API (missions need file uploads)
+
+**Priority 5: Publishing MVP** (Weeks 4-5)
+1. Publish hunt (POST /api/hunts/:id/publish)
+2. Get live version (GET /api/hunts/:id/live)
+3. Simplified workflow: Draft → Published (skip Review for MVP)
+
+**Priority 6: Hunt Player API** (Weeks 5-6)
 1. Get live hunt for playing
 2. Submit step completion
-3. Track progress
-4. Completion flow
+3. Validate challenges
+4. Track progress
+
+**Note:** Player API structure needs discussion before implementation
 
 ## Blockers
 
 **[NONE CURRENTLY]**
 
-## Future Consideration
+## Documentation Status
 
-**Context file structure:** If `backend/current-state.md` grows too large (200+ lines), consider splitting into:
-- `roadmap.md` (planned features)
-- `progress.md` (active work)
-- `changelog.md` (completed history)
-
-For now, keeping it simple with single file until we see if it becomes unwieldy.
+**✅ Complete roadmap:** See `ROADMAP.md` for comprehensive 14-week timeline
+**✅ Organized .claude files:** Recently reorganized for clarity (decisions/, reference/, etc.)
+**✅ All major decisions documented:** MongoDB, monorepo, versioning strategy, etc.
+**✅ Dependencies validated:** No circular logic, clear implementation order
 
 ## Questions to Resolve
 
@@ -137,6 +149,13 @@ For now, keeping it simple with single file until we see if it becomes unwieldy.
 3. ✅ Frontend tech stack - React + MUI + TypeScript (see frontend/overview.md)
 4. ⚠️ Deployment - TBD (see deployment/strategy.md)
 5. ✅ Type sharing - Monorepo with shared package (DECIDED)
+
+**New question (2025-10-27):**
+
+6. ⚠️ Player API structure - Needs discussion before Week 5-6 implementation
+   - Current design: `/api/play/:huntId`, `/api/play/:huntId/steps/:stepId/complete`, `/api/play/:huntId/progress`
+   - Alternatives: Separate validation endpoint? Different route prefix (`/api/player/`)?
+   - Timeline: Decide by Week 4 (before Player API implementation)
 
 ## Development Workflow
 
