@@ -80,26 +80,37 @@
 - ✅ Updated all imports to @hunthub/shared
 - ✅ Configured tsconfig-paths for runtime resolution
 
-**Priority 2: Fix MongoDB connection and complete Hunt CRUD** (~1 week)
-1. Update hunt endpoint
-2. Delete hunt endpoint
+**Priority 2: Implement Tree VIEW API** (~1 week) **← CURRENT PRIORITY**
+1. Create `GET /api/hunts/:id/tree` endpoint (compact step list)
+2. Update `GET /api/hunts` to include `stepCount`
+3. Ensure `GET /api/steps/:id` returns full details
+4. Add database indexes (huntId, order)
+5. Frontend tree component (lazy loads steps)
+
+**See:** `.claude/tree-and-branching-strategy.md` for complete design
+
+**Why this is priority:** Better editor UX, production-quality API pattern, foundation for future branching
+
+**Priority 3: Complete Hunt CRUD** (~3-4 days)
+1. Update hunt endpoint (PUT /api/hunts/:id)
+2. Delete hunt endpoint (DELETE /api/hunts/:id)
 3. Validation with Zod schemas
 
-**Priority 3: Step Management** (~1 week)
-1. Add step to hunt
-2. Update step
-3. Delete step
-4. Reorder steps
+**Priority 4: Step Management** (~1 week)
+1. Add step to hunt (POST /api/hunts/:id/steps)
+2. Update step (PUT /api/steps/:id)
+3. Delete step (DELETE /api/steps/:id)
+4. Reorder steps (PUT /api/hunts/:id/step-order)
 
-**Priority 4: Publishing MVP** (~1-2 weeks)
-1. Publish hunt (clone hunt + steps)
-2. Create PublishedHunt record
-3. Create LiveHunt record
-4. Get live version for playing
-5. (Skip Review state for MVP)
+**Priority 5: Publishing MVP** (~1-2 weeks)
+1. Simplified workflow: Draft → Published (skip Review for MVP)
+2. Publish hunt (clone hunt + steps)
+3. Create PublishedHunt record
+4. Create LiveHunt record
+5. Get live version for playing
 
-**Priority 5: Hunt Player** (~1-2 weeks)
-1. Get live hunt
+**Priority 6: Hunt Player** (~1-2 weeks)
+1. Get live hunt for playing
 2. Submit step completion
 3. Track progress
 4. Completion flow

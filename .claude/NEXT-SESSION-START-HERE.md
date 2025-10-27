@@ -22,22 +22,47 @@ You finished requirements and made all critical decisions on 2025-02-05.
 
 ## 🎯 Next Steps (In Order)
 
-### 1. ~~Set Up Monorepo~~ ✅ **COMPLETE** (2025-10-26)
+### 1. ~~Set Up Monorepo~~ ✅ **COMPLETE** (2025-10-27)
 
 **Completed:**
-- ✅ Created npm workspaces monorepo structure
+- ✅ Created npm workspaces monorepo structure (2025-10-26)
 - ✅ Set up `packages/shared/` with OpenAPI → TypeScript generation
-- ✅ Moved backend to `packages/backend/`
+- ✅ Moved backend to `apps/backend/api/` (renamed to `@hunthub/api`)
+- ✅ Created structure for 2 frontends: `apps/frontend/editor/` and `apps/frontend/player/`
+- ✅ Updated workspace config to `apps/backend/*` and `apps/frontend/*`
 - ✅ Updated all imports to `@hunthub/shared`
 - ✅ Fixed module resolution with `tsconfig-paths`
 - ✅ Secured Firebase service account (gitignored, example created)
 - ✅ Root configs with package inheritance established
+- ✅ Backend compiles cleanly with new structure
 
-**See:** `.claude/monorepo-lessons-learned.md` for detailed insights
+**See:** `.claude/project-state.md` for full structure diagram
 
 ---
 
-### 2. Fix MongoDB Connection & Complete Backend MVP
+### 2. Implement Tree VIEW API (Current Priority)
+
+**NEW: Tree vs Branching Decision (2025-10-27)**
+- ✅ Tree VIEW (visualization + lazy loading) - **Implement NOW**
+- ⏸️ Gameplay branching (conditional paths) - **Future V1.1+**
+
+**See:** `.claude/tree-and-branching-strategy.md` for full context
+
+**Phase 1: Tree VIEW API (~1 week)**
+- [ ] Create `GET /hunts/:id/tree` endpoint (compact step list)
+- [ ] Update `GET /hunts` to include `stepCount`
+- [ ] Ensure `GET /steps/:id` returns full details
+- [ ] Add indexes for performance
+- [ ] Frontend tree component (lazy loads steps)
+
+**Why this matters:**
+- Better editor UX (visual overview of hunt)
+- Production-quality API (lazy loading pattern)
+- Foundation for future branching
+
+---
+
+### 3. Fix MongoDB Connection & Complete Backend MVP
 
 **Priority order:**
 
@@ -98,6 +123,7 @@ See `.claude/mongodb-vs-postgres.md` section "MongoDB Best Practices"
 
 **When building features:**
 - `application-overview.md` - What features to build
+- `tree-and-branching-strategy.md` - Tree VIEW + future branching (NEW)
 - `backend/patterns.md` - Code conventions
 - `backend/architecture.md` - How things fit together
 - `publishing-workflow.md` - Publishing system design
@@ -258,6 +284,6 @@ cat .claude/backend/patterns.md
 
 **🎉 YOU'RE READY TO BUILD!**
 
-**Next session: "Let's set up the monorepo" → I'll guide you through it step by step.**
+**Next session: "Let's implement the tree VIEW API" → Start with `GET /hunts/:id/tree` endpoint.**
 
 **All context auto-loads. You can take breaks. Nothing is forgotten.** 🚀

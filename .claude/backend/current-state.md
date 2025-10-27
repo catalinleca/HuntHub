@@ -1,19 +1,24 @@
 # Backend Current State
 
-**Last updated:** 2025-10-26
+**Last updated:** 2025-10-27
 
-**Recent work:** Validation refactored (domain-organized), testing infrastructure complete
+**Recent work:** Monorepo restructured for multiple apps, tree VIEW API design documented
 
 ## ✅ Implemented
 
-### Monorepo Infrastructure (NEW - 2025-10-26)
-- [x] npm workspaces configuration
+### Monorepo Infrastructure (2025-10-26/27)
+- [x] npm workspaces configuration with nested app structure
 - [x] Shared package (@hunthub/shared) for types, validation, constants
 - [x] OpenAPI → TypeScript type generation
 - [x] Root-level configs with package inheritance (TypeScript, ESLint, Prettier)
 - [x] Runtime module resolution with tsconfig-paths
 - [x] Dependency hoisting to root node_modules
 - [x] Type imports from @hunthub/shared across backend
+- [x] Restructured for multiple apps:
+  - `apps/backend/api/` - Backend API (@hunthub/api)
+  - `apps/frontend/editor/` - Hunt creation app (planned)
+  - `apps/frontend/player/` - Hunt playing app (planned)
+- [x] Workspace config supports nested structure (`apps/backend/*`, `apps/frontend/*`)
 
 ### Core Infrastructure
 - [x] Express server setup with TypeScript
@@ -168,14 +173,29 @@ GET    /api/hunts              # Get current user's hunts
 GET    /api/hunts/:id          # Get hunt by ID
 ```
 
-**Needed:**
+**Needed - High Priority (Tree VIEW API):**
+```
+GET    /api/hunts/:id/tree     # Get compact step list for tree visualization (PRIORITY)
+GET    /api/steps/:id          # Get full step details
+```
+
+**Needed - Core CRUD:**
 ```
 PUT    /api/hunts/:id          # Update hunt
 DELETE /api/hunts/:id          # Delete hunt
-POST   /api/hunts/:id/publish  # Publish hunt
-GET    /api/hunts/:id/steps    # Get steps
 POST   /api/hunts/:id/steps    # Add step
-...and many more
+PUT    /api/steps/:id          # Update step
+DELETE /api/steps/:id          # Delete step
+PUT    /api/hunts/:id/step-order # Reorder steps
+```
+
+**Needed - Publishing & Playing:**
+```
+POST   /api/hunts/:id/publish  # Publish hunt
+GET    /api/hunts/:id/live     # Get live version
+GET    /api/play/:huntId       # Get live hunt for playing
+POST   /api/play/:huntId/steps/:stepId/complete  # Submit step completion
+GET    /api/play/:huntId/progress  # Get user progress
 ```
 
 ## Technical Debt / TODOs
@@ -188,12 +208,108 @@ POST   /api/hunts/:id/steps    # Add step
 6. **Testing** - Integration tests implemented ✅ (need more test coverage)
 7. **Documentation** - No API docs yet (Swagger UI installed but not configured)
 
-## Next Steps (Suggested)
+## 🎯 Current Priority: Tree VIEW API (2025-10-27)
 
-1. **Complete Hunt CRUD** - Update, delete, publish endpoints
-2. **Step Management** - Full CRUD for hunt steps
-3. **Challenge Validation** - Implement challenge-specific logic
-4. **Hunt Publishing** - Workflow from draft → published
-5. **LiveHunt** - Enable users to start/participate in hunts
-6. **Testing** - Add unit/integration tests
-7. **API Documentation** - Configure Swagger UI
+**Decision made:** Implement tree VIEW (visualization with lazy loading) NOW, reserve gameplay branching for V1.1+
+
+**See:** `.claude/tree-and-branching-strategy.md` for complete context
+
+### Tree VIEW API Implementation (~1 week)
+
+**Backend work:**
+- [ ] Create `GET /api/hunts/:id/tree` endpoint
+  - Returns compact step list (id, type, title, order)
+  - No full challenge data (lazy loading pattern)
+  - Performance optimized for large step counts
+- [ ] Update `GET /api/hunts` to include `stepCount`
+  - Add to response: `{ id, name, status, stepCount, updatedAt }`
+  - Allows UI to show step count without fetching steps
+- [ ] Ensure `GET /api/steps/:id` returns full step details
+  - Full challenge data loaded on demand
+  - When user clicks step in tree
+- [ ] Add database indexes for performance
+  - Index on `Step.huntId` for efficient tree queries
+  - Index on `Step.order` for sorted retrieval
+
+**API Design Pattern (Lazy Loading):**
+```typescript
+// 1. GET /api/hunts - Compact list
+Response: {
+  hunts: [
+    { id: "hunt-1", name: "Barcelona", status: "draft", stepCount: 14 }
+  ]
+}
+
+// 2. GET /api/hunts/:id/tree - Compact step list
+Response: {
+  id: "hunt-1",
+  name: "Barcelona Adventure",
+  steps: [
+    { id: "step-1", type: "clue", title: "Find Sagrada", order: 1 },
+    { id: "step-2", type: "quiz", title: "Who designed it?", order: 2 }
+  ]
+}
+
+// 3. GET /api/steps/:id - Full details on click
+Response: {
+  id: "step-1",
+  type: "clue",
+  challenge: { clue: { title: "...", description: "..." } },
+  hint: "...",
+  requiredLocation: { lat: 41.4, lng: 2.17, radius: 50 }
+}
+```
+
+**Frontend work (separate):**
+- Tree component showing compact step list
+- Lazy load full details on step click
+- Visual tree representation in editor
+
+**Why this matters:**
+- Better editor UX (visual overview)
+- Production-quality API (efficient data transfer)
+- Foundation for future branching (V1.1+)
+- Scalable (works with 100+ steps)
+
+**Future (V1.1+): Gameplay Branching**
+- Use existing `Step.metadata` field (no model changes needed!)
+- Add branching logic to player API
+- No breaking changes to current implementation
+
+---
+
+## Next Steps (Priority Order)
+
+1. **🔥 Tree VIEW API** (~1 week) - **CURRENT PRIORITY**
+   - Implement endpoints above
+   - Add indexes
+   - Test with large step counts
+
+2. **Complete Hunt CRUD** (~3-4 days)
+   - Update hunt (PUT /api/hunts/:id)
+   - Delete hunt (DELETE /api/hunts/:id)
+
+3. **Step Management** (~1 week)
+   - Full CRUD for hunt steps
+   - Add step (POST /api/hunts/:id/steps)
+   - Update step (PUT /api/steps/:id)
+   - Delete step (DELETE /api/steps/:id)
+   - Reorder steps (PUT /api/hunts/:id/step-order)
+
+4. **Publishing MVP** (~1-2 weeks)
+   - Simplified: Draft → Published (skip Review for MVP)
+   - Publish hunt (clone hunt + steps)
+   - Create PublishedHunt record
+   - Create LiveHunt record
+
+5. **Hunt Player** (~1-2 weeks)
+   - Get live hunt for playing
+   - Submit step completion
+   - Track progress
+
+6. **Testing** - Ongoing
+   - Add integration tests for new endpoints
+   - Test tree API performance
+
+7. **API Documentation** - Lower priority
+   - Configure Swagger UI

@@ -8,20 +8,35 @@ Every time you start Claude Code in this project, all these files automatically 
 
 ```
 .claude/
-├── README.md                    # This file
-├── application-overview.md      # What HuntHub is, target users, features
-├── requirements.md              # Functional/non-functional requirements
-├── project-state.md             # Current focus, recent work, next steps
+├── README.md                          # This file
+├── NEXT-SESSION-START-HERE.md         # Quick start for next session
+├── project-state.md                   # Current focus, recent work, next steps
+├── application-overview.md            # What HuntHub is, target users, features
+├── requirements.md                    # Functional/non-functional requirements
+├── publishing-workflow.md             # Complex versioning system design
+├── tree-and-branching-strategy.md     # Current priority: Tree VIEW API
+├── challenge-types-guide.md           # Challenge type reference
+├── data-model-decisions.md            # Why each model field exists
 ├── behavior/
-│   └── principles.md            # How Claude should think and work
+│   └── principles.md                  # How Claude should think and work
 ├── backend/
-│   ├── architecture.md          # Tech stack, patterns, data flow
-│   ├── patterns.md              # Code conventions and examples
-│   └── current-state.md         # What's done, what's pending
+│   ├── architecture.md                # Tech stack, patterns, data flow
+│   ├── patterns.md                    # Code conventions and examples
+│   └── current-state.md               # What's done, what's pending
+├── decisions/
+│   ├── mongodb-vs-postgres.md         # Database choice analysis
+│   ├── schema-sharing-final-strategy.md
+│   ├── production-best-practices-type-sharing.md
+│   ├── solid-principles.md            # SOLID patterns reference
+│   └── schema-validation-strategy.md  # Three-layer validation
+├── reference/  (Historical - not auto-loaded)
+│   ├── decisions-needed.md            # Old decision log
+│   ├── design-concerns.md             # Feb 2025 discussion
+│   └── session-summary-2025-02-05.md  # Requirements session
 ├── frontend/
-│   └── overview.md              # Frontend plans (placeholder)
+│   └── overview.md                    # Frontend plans (placeholder)
 └── deployment/
-    └── strategy.md              # Deployment plans (placeholder)
+    └── strategy.md                    # Deployment plans (placeholder)
 ```
 
 ## 🔄 How It Works
