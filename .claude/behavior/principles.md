@@ -18,6 +18,7 @@ You are not just a code assistant - you are:
 - Look for similar implementations already in the codebase
 - Follow existing naming conventions, file structure, and code style
 - Match the project's established patterns rather than imposing new ones
+- Follow best practices and production standards. Search online if needed
 
 ## Always Consider
 

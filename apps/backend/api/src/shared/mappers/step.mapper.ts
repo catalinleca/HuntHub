@@ -1,31 +1,14 @@
 import { HydratedDocument } from 'mongoose';
+import { Step, ChallengeType, Challenge } from '@hunthub/shared';
 import { IStep } from '@/database/types/Step';
 
-export interface StepDTO {
-  id: string;
-  huntId: string;
-  type: string;
-  challenge: unknown;
-  hint?: string;
-  requiredLocation?: {
-    lat: number;
-    lng: number;
-    radius: number;
-  };
-  timeLimit?: number;
-  maxAttempts?: number;
-  metadata?: Record<string, any>;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
 export class StepMapper {
-  static toDTO(doc: HydratedDocument<IStep>): StepDTO {
+  static toDTO(doc: HydratedDocument<IStep>): Step {
     return {
       id: doc._id.toString(),
       huntId: doc.huntId.toString(),
-      type: doc.type,
-      challenge: doc.challenge,
+      type: doc.type as ChallengeType,
+      challenge: doc.challenge as Challenge,
       hint: doc.hint,
       requiredLocation: doc.requiredLocation
         ? {
@@ -42,7 +25,7 @@ export class StepMapper {
     };
   }
 
-  static toDTOs(docs: HydratedDocument<IStep>[]): StepDTO[] {
+  static toDTOs(docs: HydratedDocument<IStep>[]): Step[] {
     return docs.map((doc) => this.toDTO(doc));
   }
 }
