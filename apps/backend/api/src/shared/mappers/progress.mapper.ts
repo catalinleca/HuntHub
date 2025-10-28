@@ -1,6 +1,7 @@
 import { HydratedDocument } from 'mongoose';
-import { IProgress, IStepProgress, ISubmission } from '@/database/types/Progress';
+import { IProgress } from '@/database/types/Progress';
 
+// TODO: Move ProgressDTO to @hunthub/shared when Progress API is implemented
 export interface ProgressDTO {
   id: string;
   userId?: string;
@@ -36,7 +37,7 @@ export interface ProgressDTO {
 }
 
 export class ProgressMapper {
-  static toDTO(doc: HydratedDocument<IProgress>): ProgressDTO {
+  static fromDocument(doc: HydratedDocument<IProgress>): ProgressDTO {
     return {
       id: doc._id.toString(),
       userId: doc.userId?.toString(),
@@ -72,7 +73,7 @@ export class ProgressMapper {
     };
   }
 
-  static toDTOs(docs: HydratedDocument<IProgress>[]): ProgressDTO[] {
-    return docs.map((doc) => this.toDTO(doc));
+  static fromDocuments(docs: HydratedDocument<IProgress>[]): ProgressDTO[] {
+    return docs.map((doc) => this.fromDocument(doc));
   }
 }

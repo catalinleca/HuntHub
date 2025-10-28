@@ -1,6 +1,7 @@
 import { HydratedDocument } from 'mongoose';
 import { IPublishedHunt } from '@/database/types/PublishedHunt';
 
+// TODO: Move PublishedHuntDTO to @hunthub/shared when Publishing API is implemented
 export interface PublishedHuntDTO {
   id: string;
   huntId: string;
@@ -14,7 +15,7 @@ export interface PublishedHuntDTO {
 }
 
 export class PublishedHuntMapper {
-  static toDTO(doc: HydratedDocument<IPublishedHunt>): PublishedHuntDTO {
+  static fromDocument(doc: HydratedDocument<IPublishedHunt>): PublishedHuntDTO {
     return {
       id: doc._id.toString(),
       huntId: doc.huntId.toString(),
@@ -28,7 +29,7 @@ export class PublishedHuntMapper {
     };
   }
 
-  static toDTOs(docs: HydratedDocument<IPublishedHunt>[]): PublishedHuntDTO[] {
-    return docs.map((doc) => this.toDTO(doc));
+  static fromDocuments(docs: HydratedDocument<IPublishedHunt>[]): PublishedHuntDTO[] {
+    return docs.map((doc) => this.fromDocument(doc));
   }
 }

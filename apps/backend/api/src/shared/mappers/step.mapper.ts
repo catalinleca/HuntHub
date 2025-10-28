@@ -1,13 +1,42 @@
-import { HydratedDocument } from 'mongoose';
-import { Step, ChallengeType, Challenge } from '@hunthub/shared';
+import { HydratedDocument, Types } from 'mongoose';
+import { Step, StepCreate, ChallengeType, Challenge } from '@hunthub/shared';
 import { IStep } from '@/database/types/Step';
 
 export class StepMapper {
-  static toDTO(doc: HydratedDocument<IStep>): Step {
+  /**
+   * Type guard: Validates ChallengeType enum at runtime
+   * Catches corrupt data before it reaches API response
+   */
+  private static isChallengeType(type: string): type is ChallengeType {
+    return Object.values(ChallengeType).includes(type as ChallengeType);
+  }
+
+  static toDocument(dto: StepCreate, huntId: string): Partial<IStep> {
+    return {
+      huntId: new Types.ObjectId(huntId),
+      type: dto.type,
+      challenge: dto.challenge,
+      hint: dto.hint,
+      requiredLocation: dto.requiredLocation,
+      timeLimit: dto.timeLimit,
+      maxAttempts: dto.maxAttempts,
+      // Mongoose provides defaults for metadata
+    };
+  }
+
+  static fromDocument(doc: HydratedDocument<IStep>): Step {
+    // Runtime validation: Check enum
+    if (!this.isChallengeType(doc.type)) {
+      throw new Error(
+        `Data integrity error: Invalid challenge type "${doc.type}" in step ${doc._id}. ` +
+          `Expected one of: ${Object.values(ChallengeType).join(', ')}`
+      );
+    }
+
     return {
       id: doc._id.toString(),
       huntId: doc.huntId.toString(),
-      type: doc.type as ChallengeType,
+      type: doc.type, // TypeScript knows this is ChallengeType after type guard
       challenge: doc.challenge as Challenge,
       hint: doc.hint,
       requiredLocation: doc.requiredLocation
@@ -25,7 +54,7 @@ export class StepMapper {
     };
   }
 
-  static toDTOs(docs: HydratedDocument<IStep>[]): Step[] {
-    return docs.map((doc) => this.toDTO(doc));
+  static fromDocuments(docs: HydratedDocument<IStep>[]): Step[] {
+    return docs.map((doc) => this.fromDocument(doc));
   }
 }

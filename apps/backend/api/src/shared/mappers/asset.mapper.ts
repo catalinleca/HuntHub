@@ -1,6 +1,7 @@
 import { HydratedDocument } from 'mongoose';
-import { IAsset, IStorageLocation, IAssetUsage } from '@/database/types/Asset';
+import { IAsset } from '@/database/types/Asset';
 
+// TODO: Move AssetDTO to @hunthub/shared when Asset API is implemented
 export interface AssetDTO {
   id: string;
   ownerId: string;
@@ -23,7 +24,7 @@ export interface AssetDTO {
 }
 
 export class AssetMapper {
-  static toDTO(doc: HydratedDocument<IAsset>): AssetDTO {
+  static fromDocument(doc: HydratedDocument<IAsset>): AssetDTO {
     return {
       id: doc._id.toString(),
       ownerId: doc.ownerId.toString(),
@@ -48,7 +49,7 @@ export class AssetMapper {
     };
   }
 
-  static toDTOs(docs: HydratedDocument<IAsset>[]): AssetDTO[] {
-    return docs.map((doc) => this.toDTO(doc));
+  static fromDocuments(docs: HydratedDocument<IAsset>[]): AssetDTO[] {
+    return docs.map((doc) => this.fromDocument(doc));
   }
 }
