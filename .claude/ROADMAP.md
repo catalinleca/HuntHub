@@ -936,7 +936,6 @@ Total critical path: ~50-55 days (10-11 weeks to deployable MVP)
 
 **Last updated:** 2025-10-27
 **Next review:** Weekly (update progress and adjust estimates)
-**Maintained by:** See UPDATE-GUIDE.md for how to update this roadmap
 
 ---
 
