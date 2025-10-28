@@ -14,6 +14,7 @@ It imports all context about the project, so Claude always knows:
 ## Core Behavior & Principles
 
 @.claude/behavior/principles.md
+@.claude/decisions/solid-principles.md
 
 ## 🚀 Quick Start & Current Focus
 
@@ -48,7 +49,6 @@ It imports all context about the project, so Claude always knows:
 @.claude/decisions/mongodb-vs-postgres.md
 @.claude/decisions/schema-sharing-final-strategy.md
 @.claude/decisions/production-best-practices-type-sharing.md
-@.claude/decisions/solid-principles.md
 @.claude/decisions/schema-validation-strategy.md
 
 ## Frontend & Deployment (Future Work)
