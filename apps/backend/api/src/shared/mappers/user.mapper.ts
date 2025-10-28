@@ -4,18 +4,21 @@ import { User } from '@hunthub/shared';
 
 export class UserMapper {
   static toDTO(doc: HydratedDocument<IUser>): User {
-    const json = doc.toJSON(); // baseTransform already handles id, dates, __v
-
-    // User doesn't have ObjectId arrays, so json is already correct!
-    // baseTransform handled:
-    // - _id → id
-    // - removed __v
-    // - dates → ISO strings
-
-    return json as User;
+    return {
+      id: doc._id.toString(),
+      firebaseUid: doc.firebaseUid,
+      email: doc.email,
+      firstName: doc.firstName,
+      lastName: doc.lastName,
+      displayName: doc.displayName,
+      profilePicture: doc.profilePicture,
+      bio: doc.bio,
+      createdAt: doc.createdAt?.toString(),
+      updatedAt: doc.updatedAt?.toString(),
+    };
   }
 
   static toDTOArray(docs: HydratedDocument<IUser>[]): User[] {
-    return docs.map(doc => this.toDTO(doc));
+    return docs.map((doc) => this.toDTO(doc));
   }
 }

@@ -5,7 +5,7 @@ import { HuntStatus } from '@hunthub/shared';
 
 const huntSchema: Schema<IHunt> = new Schema<IHunt>(
   {
-    creatorId: { type: String, required: true }, // TODO revert
+    creatorId: { type: String, required: true },
     status: {
       type: String,
       enum: Object.values(HuntStatus),
@@ -23,14 +23,37 @@ const huntSchema: Schema<IHunt> = new Schema<IHunt>(
 );
 
 huntSchema.index({ creatorId: 1 });
+huntSchema.index({ status: 1 });
+huntSchema.index({ creatorId: 1, status: 1 });
 
-// Static methods (Active Record pattern)
 interface IHuntModel extends Model<IHunt> {
   findUserHunts(userId: string): Promise<HydratedDocument<IHunt>[]>;
+
+  findByIdAndCreator(huntId: string, userId: string): Promise<HydratedDocument<IHunt> | null>;
+
+  hasHunts(userId: string): Promise<boolean>;
+
+  findPublished(): Promise<HydratedDocument<IHunt>[]>;
 }
 
-huntSchema.statics.findUserHunts = function(userId: string) {
-  return this.find({ creatorId: userId }).exec();
+huntSchema.statics.findUserHunts = function (userId: string) {
+  return this.find({ creatorId: userId }).sort({ updatedAt: -1 }).exec();
+};
+
+huntSchema.statics.findByIdAndCreator = function (huntId: string, userId: string) {
+  return this.findOne({
+    _id: huntId,
+    creatorId: userId,
+  }).exec();
+};
+
+huntSchema.statics.hasHunts = async function (userId: string): Promise<boolean> {
+  const count = await this.countDocuments({ creatorId: userId }).limit(1);
+  return count > 0;
+};
+
+huntSchema.statics.findPublished = function () {
+  return this.find({ status: HuntStatus.Published }).sort({ createdAt: -1 }).exec();
 };
 
 const HuntModel = model<IHunt, IHuntModel>('Hunt', huntSchema);
