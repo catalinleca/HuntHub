@@ -1,27 +1,55 @@
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
+import { Hunt, HuntCreate, HuntStatus } from '@hunthub/shared';
 import { IHunt } from '@/database/types/Hunt';
-import { Hunt } from '@hunthub/shared';
 
 export class HuntMapper {
-  static toDTO(doc: HydratedDocument<IHunt>): Hunt {
+  /**
+   * Type guard: Validates HuntStatus enum at runtime
+   * Catches corrupt data before it reaches API response
+   */
+  private static isHuntStatus(status: string): status is HuntStatus {
+    return Object.values(HuntStatus).includes(status as HuntStatus);
+  }
+
+  static toDocument(dto: HuntCreate, creatorId: string): Partial<IHunt> {
+    return {
+      creatorId: new Types.ObjectId(creatorId),
+      name: dto.name,
+      description: dto.description,
+      startLocation: dto.startLocation,
+      // Mongoose provides defaults: status='draft', currentVersion=1, stepOrder=[]
+    };
+  }
+
+  static fromDocument(doc: HydratedDocument<IHunt>): Hunt {
+    // Runtime validation: Check enum
+    if (!this.isHuntStatus(doc.status)) {
+      throw new Error(
+        `Data integrity error: Invalid hunt status "${doc.status}" in hunt ${doc._id}. ` +
+          `Expected one of: ${Object.values(HuntStatus).join(', ')}`
+      );
+    }
+
     return {
       id: doc._id.toString(),
       creatorId: doc.creatorId.toString(),
       name: doc.name,
       description: doc.description,
       currentVersion: doc.currentVersion,
-      status: doc.status,
-      startLocation: doc.startLocation ? {
-        lat: doc.startLocation.lat,
-        lng: doc.startLocation.lng,
-        radius: doc.startLocation.radius,
-      } : undefined,
+      status: doc.status, // TypeScript knows this is HuntStatus after type guard
+      startLocation: doc.startLocation
+        ? {
+            lat: doc.startLocation.lat,
+            lng: doc.startLocation.lng,
+            radius: doc.startLocation.radius,
+          }
+        : undefined,
       createdAt: doc.createdAt?.toString(),
       updatedAt: doc.updatedAt?.toString(),
     };
   }
 
-  static toDTOArray(docs: HydratedDocument<IHunt>[]): Hunt[] {
-    return docs.map(doc => this.toDTO(doc));
+  static fromDocuments(docs: HydratedDocument<IHunt>[]): Hunt[] {
+    return docs.map((doc) => this.fromDocument(doc));
   }
 }
