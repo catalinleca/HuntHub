@@ -20,12 +20,12 @@ export class UserService implements IUserService {
       return null;
     }
 
-    return UserMapper.toDTO(user);
+    return UserMapper.fromDocument(user);
   }
 
   async createUser(userData: Required<SignUpCredentials>): Promise<User> {
-    const user = await UserModel.create(userData);
-
-    return UserMapper.toDTO(user);
+    const docData = UserMapper.toDocument(userData);
+    const user = await UserModel.create(docData);
+    return UserMapper.fromDocument(user);
   }
 }

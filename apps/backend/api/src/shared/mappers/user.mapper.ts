@@ -1,9 +1,20 @@
 import { HydratedDocument } from 'mongoose';
-import { IUser } from '@/database/types/User';
 import { User } from '@hunthub/shared';
+import { IUser } from '@/database/types/User';
+import { SignUpCredentials } from '@/modules/auth/auth.types';
 
 export class UserMapper {
-  static toDTO(doc: HydratedDocument<IUser>): User {
+  static toDocument(dto: SignUpCredentials): Partial<IUser> {
+    return {
+      firebaseUid: dto.firebaseUid!,
+      email: dto.email,
+      firstName: dto.firstName,
+      displayName: dto.displayName,
+      // Mongoose provides defaults for: lastName, profilePicture, bio
+    };
+  }
+
+  static fromDocument(doc: HydratedDocument<IUser>): User {
     return {
       id: doc._id.toString(),
       firebaseUid: doc.firebaseUid,
@@ -18,7 +29,7 @@ export class UserMapper {
     };
   }
 
-  static toDTOArray(docs: HydratedDocument<IUser>[]): User[] {
-    return docs.map((doc) => this.toDTO(doc));
+  static fromDocuments(docs: HydratedDocument<IUser>[]): User[] {
+    return docs.map((doc) => this.fromDocument(doc));
   }
 }
