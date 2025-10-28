@@ -1,23 +1,36 @@
 # HuntHub Development Roadmap
 
-**Last updated:** 2025-10-27
+**Last updated:** 2025-10-28
 
 **Product vision:** Portfolio-quality treasure hunt platform with location-based challenges, built production-ready in 2 months.
 
 **Timeline:** MVP → V1.1 → V1.2 (phased delivery)
+
+**🔄 Recent Changes (2025-10-28):**
+- ✅ Fixed dependency order: Tree VIEW now AFTER Step CRUD
+- ⚠️ **CRITICAL:** Moved Assets from Week 6-7 to Week 3 (blocks Publishing and Player)
+- ✅ Updated Publishing to depend on Assets (can't publish missions without file upload)
+- ✅ Correct implementation order: Hunt → Step → Tree → Assets → Publishing → Player
 
 ---
 
 ## 📊 Progress Overview
 
 **Current Phase:** MVP (Backend Foundation)
-**Current Sprint:** Tree VIEW API + Hunt CRUD
+**Current Sprint:** Hunt CRUD + Step CRUD (Week 1)
 **Overall Progress:** ~25% to MVP completion
 
 **Key Metrics:**
-- Backend Epics: 2/6 complete (33%)
+- Backend Epics: 1/6 complete (17%) - Epic 1 (Hunt CRUD) at 60%
 - Frontend Epics: 0/4 started (0%)
 - Integration Epics: 0/2 started (0%)
+
+**Updated Timeline:**
+- Week 1: Hunt CRUD + Step CRUD ← NOW
+- Week 2: Complete Step Management + Tree VIEW
+- Week 3: Asset Management (CRITICAL - moved from Week 6-7)
+- Week 4: Publishing Workflow
+- Week 5-6: Player API
 
 ---
 
@@ -79,22 +92,22 @@
 
 ---
 
-## Epic 2: Tree VIEW API 🔥 (Current Priority - 0%)
+## Epic 2: Tree VIEW API (Not Started - 0%)
 
 **Goal:** Efficient step visualization with lazy loading
-**Timeline:** Week 1-2
+**Timeline:** Week 2 (AFTER Step CRUD)
 **Status:** 0/4 stories complete
 
 ### Stories
 
-- [ ] **BE-2.1:** Get hunt tree (GET /api/hunts/:id/tree) 📍 NOW
+- [ ] **BE-2.1:** Get hunt tree (GET /api/hunts/:id/tree) 📍 NEXT
   - Returns compact step list (id, type, title, order)
   - No full challenge data
   - Optimized query
-  - **Depends on:** BE-3.1 (need steps in DB to test)
+  - **Depends on:** BE-3.1, BE-3.2, BE-3.3 (Step CRUD complete)
   - Time: 1.5 days
 
-- [ ] **BE-2.2:** Add stepCount to hunt list (GET /api/hunts) 📍 NOW
+- [ ] **BE-2.2:** Add stepCount to hunt list (GET /api/hunts) 📍 NEXT
   - Enhance existing endpoint
   - Aggregate count from steps collection
   - Time: 0.5 days
@@ -111,7 +124,7 @@
   - Performance testing with 100+ steps
   - Time: 0.5 days
 
-**Dependencies:** BE-3.1 (Create step) must be done first
+**Dependencies:** Epic 3 (Step CRUD) must be complete first
 **Blockers:** None
 **See:** `.claude/tree-and-branching-strategy.md`
 
@@ -188,7 +201,9 @@
   - Validate version exists
   - Time: 1 day
 
-**Dependencies:** Hunt + Step CRUD complete
+**Dependencies:**
+- Hunt + Step CRUD complete
+- Asset Management (Epic 6) - Can't publish missions without file upload support
 **Blockers:** None
 **Notes:** Skip "Review" status for MVP
 **See:** `.claude/publishing-workflow.md`
@@ -280,7 +295,7 @@
 ## Epic 6: Asset Management (Not Started - 0%)
 
 **Goal:** Support file uploads for missions
-**Timeline:** Week 6-7
+**Timeline:** Week 3 (BEFORE Publishing and Player)
 **Status:** 0/3 stories complete
 
 ### Stories
@@ -676,27 +691,34 @@
 
 ## 📍 NEXT (Weeks 2-4)
 
-**Backend:**
+**Week 2: Complete Step Management + Tree VIEW**
 - [ ] BE-3.4: Reorder steps (PUT /api/hunts/:id/step-order) - 1 day
 - [ ] BE-3.5: Challenge type validation (Strategy pattern) - 2 days
 - [ ] BE-2.1: Get hunt tree (GET /api/hunts/:id/tree) - 1.5 days
-  - **NOW we have solid Step CRUD to test with**
+  - ✅ NOW we have solid Step CRUD to test with
 - [ ] BE-2.2: Add stepCount to hunt list - 0.5 days
 - [ ] BE-2.3: Get step details (GET /api/steps/:id) - 1 day
 - [ ] BE-2.4: Database indexes - 0.5 days
+
+**Week 3: Asset Management (CRITICAL - blocks Publishing and Player)**
 - [ ] BE-6.1: Upload asset (POST /api/assets) - 2 days
-  - **Moved before Player API - missions need this**
+  - ⚠️ MUST be done before Publishing
 - [ ] BE-6.2: Attach asset to step - 1 day
 - [ ] BE-6.3: Get asset (GET /api/assets/:id) - 0.5 days
+
+**Week 4: Publishing Workflow**
 - [ ] BE-4.1: Publish hunt (POST /api/hunts/:id/publish) - 3 days
+  - ✅ Can now publish hunts with mission steps
 - [ ] BE-4.2: Get live version (GET /api/hunts/:id/live) - 1 day
+- [ ] BE-4.3: List published versions - 1 day
+- [ ] BE-4.4: Set live version - 1 day
 
-**Goal:** Complete Step Management + Tree VIEW + Assets + Basic Publishing
+**Goal:** Complete Step Management + Tree VIEW + Assets + Publishing
 
-**Time:** 3 weeks (14 days of work)
-**Story Points:** 32 points (~10-11 points/week = sustainable)
+**Time:** 3 weeks (16 days of work)
+**Story Points:** 35 points
 
-**Note:** Assets before Player API - missions need file uploads
+**Critical Path:** Step CRUD → Tree VIEW → Assets → Publishing → Player
 
 ---
 
@@ -738,51 +760,76 @@
 
 **Weeks 2-4 (NEXT) - Must be done in this order:**
 ```
+Week 2: Step Management + Tree VIEW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 BE-3.4 (Reorder steps) ───────────┐
                                   │
-BE-3.5 (Challenge validation) ────┴──> Now Step CRUD is solid
+BE-3.5 (Challenge validation) ────┴──> Step CRUD now complete
                                         │
                                         ├──> BE-2.1 (Get hunt tree)
                                         │    BE-2.2 (Add stepCount)
                                         │    BE-2.3 (Get step details)
                                         │    BE-2.4 (Database indexes)
                                         │    ↓
-                                        │    Tree VIEW complete
+                                        │    ✅ Tree VIEW complete
+                                        │
+Week 3: Asset Management (CRITICAL)    │
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━      │
                                         │
                                         ├──> BE-6.1 (Upload asset)
                                         │    BE-6.2 (Attach to step)
                                         │    BE-6.3 (Get asset)
                                         │    ↓
-                                        │    Assets complete (needed for missions)
+                                        │    ✅ Assets complete
+                                        │    ⚠️ REQUIRED for Publishing + Player
+                                        │
+Week 4: Publishing Workflow             │
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━      │
                                         │
                                         └──> BE-4.1 (Publish hunt)
                                              BE-4.2 (Get live version)
+                                             BE-4.3 (List versions)
+                                             BE-4.4 (Set live version)
                                              ↓
-                                             Publishing ready
+                                             ✅ Publishing ready
+                                             ↓
+                                        Week 5: Player API (depends on Assets)
 ```
 
 ## Epic-Level Dependencies
 
 ```
-Epic 1 (Hunt CRUD)
+Epic 1 (Hunt CRUD) ✅ Week 1
     │
-    ├──> Epic 2 (Tree VIEW) ──┐
-    │                          │
-    └──> Epic 3 (Step CRUD) ───┴──> Epic 4 (Publishing)
-                │                          │
-                │                          ├──> Epic 5 (Player API)
-                │                          │
-    Epic 6 (Assets) ───────────────────────┘
-                                           │
-                                           ▼
-    Epic 8 (Dashboard) ──> Epic 9 (Editor) ──> Epic 10 (Pub UI) ──> Epic 11 (Player)
-                                                                           │
-    Epic 12 (Stripe) ──────────────────────────────────────────────────────┤
-    Epic 7 (AI) ───────────────────────────────────────────────────────────┤
-                                                                           │
-                                                                           ▼
-                                            Epic 13 (Deployment) <─────────┘
+    └──> Epic 3 (Step CRUD) - Week 1-2
+              │
+              ├──> Epic 2 (Tree VIEW) - Week 2
+              │
+              └──> Epic 6 (Assets) - Week 3 ⚠️ CRITICAL
+                        │
+                        ├──> Epic 4 (Publishing) - Week 4
+                        │         │
+                        │         └──> Epic 10 (Pub UI) - Week 10-11
+                        │
+                        └──> Epic 5 (Player API) - Week 5-6
+                                  │
+                                  └──> Epic 11 (Player UI) - Week 11-12
+
+Epic 8 (Dashboard) - Week 7-8
+    │
+    └──> Epic 9 (Editor) - Week 8-10
+
+Epic 12 (Stripe) - Week 12-13 (post-MVP)
+Epic 7 (AI) - V1.1 (post-MVP)
+
+Epic 13 (Deployment) - Week 13-14 (final)
 ```
+
+**Key Changes from Original Plan:**
+- ✅ Tree VIEW moved AFTER Step CRUD (needs steps to visualize)
+- ⚠️ Assets moved from Week 6-7 to Week 3 (CRITICAL for Publishing + Player)
+- ✅ Publishing now depends on Assets (can't publish missions without file upload)
+- ✅ Player API already depended on Assets (correct in original plan)
 
 ## Critical Path (Longest dependency chain)
 
