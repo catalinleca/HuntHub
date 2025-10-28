@@ -3,6 +3,11 @@
 **Last updated:** 2025-10-28
 
 **Recent work:**
+- **Production data flow patterns applied (2025-10-28)**
+  - All 7 mappers updated: Hunt, User, Step, Asset, Progress, PublishedHunt, LiveHunt
+  - Implemented: toDocument (API→DB), fromDocument (DB→API), type guards for enums
+  - Mongoose validation constraints added (minLength, maxLength, trim)
+  - Complete documentation: `.claude/backend/data-flow.md`
 - Three-layer architecture implemented (modules/, features/, services/)
 - Complete database schema migration (all 5 models + mappers)
 - Fixed ObjectId references for proper Mongoose relationships
@@ -284,21 +289,25 @@ Response: {
 
 ## Next Steps (Priority Order)
 
-1. **🔥 Tree VIEW API** (~1 week) - **CURRENT PRIORITY**
-   - Implement endpoints above
-   - Add indexes
-   - Test with large step counts
+1. **🔥 Validate Login Flow** (~30 mins) - **NEXT SESSION START**
+   - Test signup/login endpoints
+   - Verify Firebase authentication works
+   - Verify JWT token flow
+   - Ensure auth middleware works correctly
+   - Ready to start implementing Hunt CRUD endpoints
 
-2. **Complete Hunt CRUD** (~3-4 days)
+2. **Complete Hunt CRUD** (~3-4 days) - **AFTER LOGIN VALIDATION**
    - Update hunt (PUT /api/hunts/:id)
    - Delete hunt (DELETE /api/hunts/:id)
+   - Now has proper mapper pattern (toDocument/fromDocument ready!)
 
-3. **Step Management** (~1 week)
+3. **Step Management** (~1 week) - **Week 1-2 from ROADMAP**
    - Full CRUD for hunt steps
    - Add step (POST /api/hunts/:id/steps)
    - Update step (PUT /api/steps/:id)
    - Delete step (DELETE /api/steps/:id)
    - Reorder steps (PUT /api/hunts/:id/step-order)
+   - Mapper ready with ChallengeType type guard!
 
 4. **Publishing MVP** (~1-2 weeks)
    - Simplified: Draft → Published (skip Review for MVP)
