@@ -6,7 +6,7 @@ export class HuntMapper {
   static toDTO(doc: HydratedDocument<IHunt>): Hunt {
     return {
       id: doc._id.toString(),
-      creatorId: doc.creatorId,
+      creatorId: doc.creatorId.toString(),
       name: doc.name,
       description: doc.description,
       currentVersion: doc.currentVersion,

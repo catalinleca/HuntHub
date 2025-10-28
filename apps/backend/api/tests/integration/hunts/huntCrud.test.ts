@@ -6,7 +6,7 @@ import { createTestHunt, generateHuntData } from '../../setup/factories/hunt.fac
 import { mockFirebaseAuth, createTestAuthToken, clearFirebaseAuthMocks } from '../../helpers/authHelper';
 import { IUser } from '@/database/types/User';
 import { IHunt } from '@/database/types/Hunt';
-import { HuntStatus } from '@hunthub/shared';
+import { Hunt, HuntStatus } from '@hunthub/shared';
 
 describe('Hunt CRUD Integration Tests', () => {
   let app: Express;
@@ -141,7 +141,7 @@ describe('Hunt CRUD Integration Tests', () => {
         .expect(200);
 
       expect(response.body).toHaveLength(3);
-      expect(response.body.every((hunt: IHunt) => hunt.creatorId === testUser.id)).toBe(true);
+      expect(response.body.every((hunt: Hunt) => hunt.creatorId === testUser.id)).toBe(true);
     });
 
     it('should return empty array when user has no hunts', async () => {

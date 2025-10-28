@@ -79,7 +79,7 @@ export const HuntSchema = z.object({
 
 ### 4. Database Types (Separate)
 
-**File:** `src/db/types/Hunt.ts`
+**File:** `src/database/types/Hunt.ts`
 
 ```typescript
 export interface IHunt {
@@ -98,7 +98,7 @@ export interface IHunt {
 
 ### 5. Mongoose Schemas
 
-**File:** `src/db/models/Hunt.ts`
+**File:** `src/database/models/Hunt.ts`
 
 ```typescript
 const huntSchema = new Schema<IHunt>({

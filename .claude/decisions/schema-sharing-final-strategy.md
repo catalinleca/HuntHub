@@ -179,7 +179,7 @@ hunthub/
 ### Backend Service
 
 ```typescript
-// packages/backend/src/services/hunt.service.ts
+// apps/backend/api/src/services/hunt.service.ts
 import { Hunt, HuntCreate } from '@hunthub/shared/types';
 import { huntCreateSchema } from '@hunthub/shared/validation';
 
@@ -196,7 +196,7 @@ export class HuntService {
 ### Backend Middleware
 
 ```typescript
-// packages/backend/src/middlewares/validation.middleware.ts
+// apps/backend/api/src/middlewares/validation.middleware.ts
 import { huntCreateSchema } from '@hunthub/shared/validation';
 
 router.post('/hunts',
@@ -208,7 +208,7 @@ router.post('/hunts',
 ### Frontend Form
 
 ```typescript
-// packages/frontend/src/pages/CreateHunt.tsx
+// apps/frontend/editor/src/pages/CreateHunt.tsx
 import { HuntCreate } from '@hunthub/shared/types';
 import { huntCreateSchema } from '@hunthub/shared/validation';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -262,7 +262,7 @@ export interface Hunt {
 
 ❌ **UI-specific validation:**
 ```typescript
-// Frontend only (packages/frontend/src/validation/)
+// Frontend only (apps/frontend/editor/src/validation/)
 export const huntFormSchema = huntCreateSchema.extend({
   confirmPublish: z.boolean(), // UI checkbox
   previewMode: z.boolean(),    // UI state
@@ -271,7 +271,7 @@ export const huntFormSchema = huntCreateSchema.extend({
 
 ❌ **Backend-specific validation:**
 ```typescript
-// Backend only (packages/backend/src/validation/)
+// Backend only (apps/backend/api/src/validation/)
 export const huntCreateWithAuthSchema = huntCreateSchema.extend({
   creatorId: z.string().uuid(), // Added by backend
 });
@@ -279,7 +279,7 @@ export const huntCreateWithAuthSchema = huntCreateSchema.extend({
 
 ❌ **Database-specific types:**
 ```typescript
-// Backend only (packages/backend/src/db/types/)
+// Backend only (apps/backend/api/src/database/types/)
 export interface IHunt {
   _id: mongoose.Types.ObjectId; // Mongo-specific
   stepOrder: mongoose.Types.ObjectId[]; // References
@@ -421,10 +421,10 @@ npm install @hunthub/types
 
 ## Action Items
 
-- [ ] Create workspace structure
-- [ ] Move backend to `packages/backend`
-- [ ] Create `packages/shared` with generation
-- [ ] Configure imports
+- [x] Create workspace structure
+- [x] Move backend to `apps/backend/api`
+- [x] Create `packages/shared` with generation
+- [x] Configure imports
 - [ ] Test build process
 - [ ] Add to template documentation
 
@@ -558,7 +558,7 @@ export interface HuntCreate {
 
 **Frontend writes manual API client:**
 ```typescript
-// packages/frontend/src/api/hunts.ts
+// apps/frontend/editor/src/api/hunts.ts
 import { Hunt, HuntCreate } from '@hunthub/shared/types';
 
 export const huntsApi = {
@@ -766,7 +766,7 @@ export namespace Hunts {
 **Step 4: Frontend uses generated endpoint types**
 
 ```typescript
-// packages/frontend/src/api/hunts.ts
+// apps/frontend/editor/src/api/hunts.ts
 import { Hunts } from '@hunthub/shared/types';
 import { api } from './client';
 

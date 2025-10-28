@@ -4,7 +4,7 @@ import { HuntStatus } from '@hunthub/shared';
 
 export interface IHunt {
   id: string;
-  creatorId: string;
+  creatorId: mongoose.Types.ObjectId;
   status: HuntStatus;
   name: string;
   description?: string;

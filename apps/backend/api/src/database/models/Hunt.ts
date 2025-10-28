@@ -5,7 +5,11 @@ import { HuntStatus } from '@hunthub/shared';
 
 const huntSchema: Schema<IHunt> = new Schema<IHunt>(
   {
-    creatorId: { type: String, required: true },
+    creatorId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     status: {
       type: String,
       enum: Object.values(HuntStatus),

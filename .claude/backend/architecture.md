@@ -21,7 +21,7 @@
 **Development:**
 - ts-node-dev - Hot reload in development
 - ESLint + Prettier - Code quality
-- Module aliases (@/, @db/)
+- Module aliases (@/)
 
 ## Architecture Pattern: Layered Architecture
 
@@ -56,13 +56,13 @@ Request → Router → Middleware → Controller → Service → Model → Datab
 - Return domain types (from OpenAPI)
 - Interface + Implementation pattern (IService/Service)
 
-### 5. **Models** (`src/db/models/`)
+### 5. **Models** (`src/database/models/`)
 - Mongoose schemas and models
 - Indexes for performance
 - Timestamps enabled (createdAt, updatedAt)
 - Use toJSON() for serialization (not custom serializers)
 
-### 6. **Types** (`src/db/types/`, `src/openapi/`)
+### 6. **Types** (`src/database/types/`, `src/openapi/`)
 - Database types (IHunt, IUser) - used by Mongoose
 - API types (Hunt, User) - generated from OpenAPI YAML
 - Enums for status/types (HuntStatus, ChallengeType)
@@ -169,15 +169,16 @@ Controller returns 201 + JSON
 src/
 ├── config/           # App config, DI container, Firebase
 ├── controllers/      # HTTP handlers
-├── db/
+├── database/
 │   ├── models/       # Mongoose models
 │   ├── schemas/      # Reusable Mongoose schemas
-│   ├── types/        # TypeScript interfaces for DB
-│   └── serializers/  # [DEPRECATED - use toJSON()]
+│   └── types/        # TypeScript interfaces for DB
 ├── middlewares/      # Express middlewares
 ├── openapi/          # OpenAPI schema + generated types
 ├── routes/           # Express routers
 ├── services/         # Business logic
+├── shared/
+│   └── mappers/      # Transform DB types to API DTOs
 ├── types/            # Shared TypeScript types
 └── utils/
     ├── errors/       # Custom error classes

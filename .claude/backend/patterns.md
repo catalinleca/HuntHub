@@ -116,7 +116,11 @@ import { IHunt, HuntStatus } from '../types/Hunt';
 
 const huntSchema: Schema<IHunt> = new Schema<IHunt>(
   {
-    creatorId: { type: String, required: true },
+    creatorId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     status: {
       type: String,
       enum: Object.values(HuntStatus),
@@ -131,9 +135,9 @@ const huntSchema: Schema<IHunt> = new Schema<IHunt>(
 
 huntSchema.index({ creatorId: 1 });
 
-const Hunt = model('Hunt', huntSchema);
+const HuntModel = model('Hunt', huntSchema);
 
-export default Hunt;
+export default HuntModel;
 ```
 
 **Key conventions:**
@@ -142,7 +146,8 @@ export default Hunt;
 - Enable timestamps: `{ timestamps: true }`
 - Define indexes for frequently queried fields
 - Use enums for status fields
-- Use `{ type: String, ref: 'ModelName' }` for references
+- Use `{ type: Schema.Types.ObjectId, ref: 'ModelName' }` for ObjectId references
+- Export as `*Model` (e.g., `HuntModel`, `UserModel`)
 
 ### Error Handling Pattern
 
@@ -281,11 +286,11 @@ type HuntCreateType = z.infer<typeof HuntCreate>;
 
 **Two type systems:**
 
-1. **Database types** (`src/db/types/`) - Used by Mongoose
+1. **Database types** (`src/database/types/`) - Used by Mongoose
 ```typescript
 export interface IHunt {
   id: string;
-  creatorId: string;
+  creatorId: mongoose.Types.ObjectId;
   name: string;
   // ... mongoose-specific fields
 }
@@ -310,7 +315,7 @@ export interface Hunt {
 
 ```typescript
 // Module aliases
-import { HuntModel } from '@db/models';
+import HuntModel from '@/database/models/Hunt';
 import { IHuntService } from '@/services/hunt.service';
 
 // Relative imports for nearby files
@@ -320,7 +325,7 @@ import { NotFoundError } from './errors/NotFoundError';
 import { Hunt, HuntCreate } from '@/openapi/HuntHubTypes';
 
 // DB types
-import { IHunt } from '@db/types/Hunt';
+import { IHunt } from '@/database/types/Hunt';
 ```
 
 ## Testing Patterns
@@ -432,8 +437,8 @@ describe('Hunt CRUD Integration Tests', () => {
 ```typescript
 // tests/setup/factories/user.factory.ts
 import { faker } from '@faker-js/faker';
-import UserModel from '@db/models/User';
-import { IUser } from '@db/types/User';
+import UserModel from '@/database/models/User';
+import { IUser } from '@/database/types/User';
 
 export const generateUserData = (overrides?: Partial<IUser>) => ({
   firebaseUid: faker.string.uuid(),
@@ -455,8 +460,8 @@ export const createTestUser = async (overrides?: Partial<IUser>): Promise<IUser>
 ```typescript
 // tests/setup/factories/hunt.factory.ts
 import { faker } from '@faker-js/faker';
-import HuntModel from '@db/models/Hunt';
-import { IHunt } from '@db/types/Hunt';
+import HuntModel from '@/database/models/Hunt';
+import { IHunt } from '@/database/types/Hunt';
 import { HuntStatus } from '@hunthub/shared';
 
 export const generateHuntData = (overrides?: Partial<IHunt>) => ({
