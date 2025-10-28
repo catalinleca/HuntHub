@@ -1,1 +1,0 @@
-export { locationSchema } from './Location';

@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
-import { UserModel } from '@db/models';
-import { IUser } from '@db/types';
+import { UserModel } from '@/database/models';
+import { IUser } from '@/database/types';
 
 export interface CreateUserOptions {
   firebaseUid?: string;

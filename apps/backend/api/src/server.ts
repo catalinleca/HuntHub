@@ -7,14 +7,13 @@ import bodyParser from 'body-parser';
 dotenv.config({ path: '.env.local' });
 dotenv.config({ path: '.env' });
 
-import mustConnectDb from './db';
-import { databaseUrl } from './env.config';
+import mustConnectDb from './database';
+import { databaseUrl } from './config/env.config';
 import './config/firebase';
 
-import huntRouter from '@/routes/hunt.router';
-import authRouter from '@/routes/auth.routes';
-import { errorHandler } from '@/middlewares/error.middleware';
-import { authMiddleware } from '@/middlewares/auth.middleware';
+import huntRouter from '@/modules/hunts/hunt.routes';
+import authRouter from '@/modules/auth/auth.routes';
+import { errorHandler, authMiddleware } from '@/shared/middlewares';
 
 async function bootstrap() {
   if (!databaseUrl) {

@@ -1,5 +1,5 @@
 import { auth } from 'firebase-admin';
-import { IUser } from '@db/types';
+import { IUser } from '@/database/types';
 
 /**
  * Mock Firebase Admin auth for testing

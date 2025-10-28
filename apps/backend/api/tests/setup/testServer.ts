@@ -3,10 +3,10 @@ import 'reflect-metadata';
 import express, { Express } from 'express';
 import bodyParser from 'body-parser';
 
-import huntRouter from '@/routes/hunt.router';
-import authRouter from '@/routes/auth.routes';
-import { errorHandler } from '@/middlewares/error.middleware';
-import { authMiddleware } from '@/middlewares/auth.middleware';
+import huntRouter from '@/modules/hunts/hunt.routes';
+import authRouter from '@/modules/auth/auth.routes';
+import { errorHandler } from '@/shared/middlewares/error.middleware';
+import { authMiddleware } from '@/shared/middlewares/auth.middleware';
 
 export const createTestApp = (): Express => {
   const app = express();

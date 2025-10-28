@@ -10,7 +10,7 @@ import {
   firebaseStorageBucket,
   firebaseMessagingSenderId,
   firebaseAppId,
-} from '@/env.config';
+} from './env.config';
 
 const adminApp = initializeAdminApp({
   credential: cert(serviceAccount as ServiceAccount),

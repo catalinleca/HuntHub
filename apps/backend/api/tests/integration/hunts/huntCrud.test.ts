@@ -4,8 +4,8 @@ import { createTestApp } from '../../setup/testServer';
 import { createTestUser } from '../../setup/factories/user.factory';
 import { createTestHunt, generateHuntData } from '../../setup/factories/hunt.factory';
 import { mockFirebaseAuth, createTestAuthToken, clearFirebaseAuthMocks } from '../../helpers/authHelper';
-import { IUser } from '@db/types/User';
-import { IHunt } from '@db/types/Hunt';
+import { IUser } from '@/database/types/User';
+import { IHunt } from '@/database/types/Hunt';
 import { HuntStatus } from '@hunthub/shared';
 
 describe('Hunt CRUD Integration Tests', () => {

@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
-import { HuntModel } from '@db/models';
-import { IHunt, ILocation } from '@db/types';
+import { HuntModel } from '@/database/models';
+import { IHunt, ILocation } from '@/database/types';
 import { HuntStatus } from '@hunthub/shared';
 
 export interface CreateHuntOptions {
