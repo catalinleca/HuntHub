@@ -1,4 +1,4 @@
-import { Hunt, HuntCreate } from '@hunthub/shared';
+import { Hunt, HuntCreate, HuntUpdate } from '@hunthub/shared';
 import { injectable } from 'inversify';
 import HuntModel from '@/database/models/Hunt';
 import { HuntMapper } from '@/shared/mappers';
@@ -10,6 +10,7 @@ export interface IHuntService {
   getUserHunts(userId: string): Promise<Hunt[]>;
   getHuntById(id: string): Promise<Hunt>;
   getUserHuntById(id: string, userId: string): Promise<Hunt>;
+  updateHunt(id: string, huntData: HuntUpdate, userId: string): Promise<Hunt>;
 }
 
 @injectable()
@@ -26,7 +27,6 @@ export class HuntService implements IHuntService {
   }
 
   async getUserHunts(userId: string): Promise<Hunt[]> {
-    // Using static method from Active Record pattern
     const hunts = await HuntModel.findUserHunts(userId);
     return HuntMapper.fromDocuments(hunts);
   }
@@ -47,5 +47,18 @@ export class HuntService implements IHuntService {
     }
 
     return HuntMapper.fromDocument(hunt);
+  }
+
+  async updateHunt(id: string, huntData: HuntUpdate, userId: string): Promise<Hunt> {
+    const existingHunt = await HuntModel.findByIdAndCreator(id, userId);
+    if (!existingHunt) {
+      throw new NotFoundError();
+    }
+
+    const updateData = HuntMapper.toDocumentUpdate(huntData);
+    existingHunt.set(updateData);
+
+    await existingHunt.save();
+    return HuntMapper.fromDocument(existingHunt);
   }
 }

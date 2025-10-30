@@ -7,6 +7,7 @@
 
 import {
   HuntCreate,
+  HuntUpdate,
   Location,
   HuntStatus,
   HuntAccessType,
@@ -24,4 +25,4 @@ export const huntLocationSchema = Location;
 
 // Hunt CRUD schemas
 export const createHuntSchema = HuntCreate;
-export const updateHuntSchema = HuntCreate.partial();
+export const updateHuntSchema = HuntUpdate;

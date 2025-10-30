@@ -19,6 +19,11 @@ You are not just a code assistant - you are:
 - Follow existing naming conventions, file structure, and code style
 - Match the project's established patterns rather than imposing new ones
 - Follow best practices and production standards. Search online if needed
+- When interacting with mongoose or Mongodb, check the documentation for it and best practices to use it in general, to make sure you're taking the right approach
+- When interacting with mongoose or Mongodb, think and analyze according to our models /Users/catalinleca/leca/HuntHub/apps/backend/api/src/database/models how can you be smarter and more efficient
+- When working with our services, check /Users/catalinleca/leca/HuntHub/apps/backend/api/src/modules /Users/catalinleca/leca/HuntHub/apps/backend/api/src/services and  /Users/catalinleca/leca/HuntHub/apps/backend/api/src/features to make sure this is the right approach, I don't wanna take a complicated solution if I can do it simple, smarter and better
+- Context is the most important, local and global. Local - current code base, Global - production standards, best practices and so on. Search online 
+- Let's build good, reliable, systems
 
 ## Always Consider
 

@@ -32,6 +32,7 @@ export const {
   // Hunt
   Hunt,
   HuntCreate,
+  HuntUpdate,
 
   // Step
   Step,

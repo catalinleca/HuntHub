@@ -78,6 +78,18 @@ export interface HuntCreate {
   steps?: StepCreate[];
 }
 
+/** Hunt metadata update (steps managed via separate endpoints) */
+export interface HuntUpdate {
+  /**
+   * @minLength 1
+   * @maxLength 100
+   */
+  name: string;
+  /** @maxLength 500 */
+  description?: string;
+  startLocation?: Location;
+}
+
 export interface Step {
   id: string;
   huntId?: string;

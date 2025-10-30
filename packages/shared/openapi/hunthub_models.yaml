@@ -97,6 +97,22 @@ components:
       required:
         - name
 
+    HuntUpdate:
+      type: object
+      description: Hunt metadata update (steps managed via separate endpoints)
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 500
+        startLocation:
+          $ref: '#/components/schemas/Location'
+      required:
+        - name
+
     Step:
       type: object
       properties:

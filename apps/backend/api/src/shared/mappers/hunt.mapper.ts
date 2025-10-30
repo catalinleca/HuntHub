@@ -1,5 +1,5 @@
 import { HydratedDocument, Types } from 'mongoose';
-import { Hunt, HuntCreate, HuntStatus } from '@hunthub/shared';
+import { Hunt, HuntCreate, HuntUpdate, HuntStatus } from '@hunthub/shared';
 import { IHunt } from '@/database/types/Hunt';
 
 export class HuntMapper {
@@ -21,12 +21,20 @@ export class HuntMapper {
     };
   }
 
+  static toDocumentUpdate(dto: HuntUpdate): Partial<IHunt> {
+    return {
+      name: dto.name,
+      description: dto.description,
+      startLocation: dto.startLocation,
+    };
+  }
+
   static fromDocument(doc: HydratedDocument<IHunt>): Hunt {
     // Runtime validation: Check enum
     if (!this.isHuntStatus(doc.status)) {
       throw new Error(
         `Data integrity error: Invalid hunt status "${doc.status}" in hunt ${doc._id}. ` +
-          `Expected one of: ${Object.values(HuntStatus).join(', ')}`
+          `Expected one of: ${Object.values(HuntStatus).join(', ')}`,
       );
     }
 
