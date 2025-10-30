@@ -78,10 +78,22 @@ export interface HuntCreate {
   steps?: StepCreate[];
 }
 
+/** Hunt metadata update (steps managed via separate endpoints) */
+export interface HuntUpdate {
+  /**
+   * @minLength 1
+   * @maxLength 100
+   */
+  name: string;
+  /** @maxLength 500 */
+  description?: string;
+  startLocation?: Location;
+}
+
 export interface Step {
   id: string;
-  huntId?: string;
-  type?: ChallengeType;
+  huntId: string;
+  type: ChallengeType;
   challenge: Challenge;
   requiredLocation?: Location;
   hint?: string;
@@ -101,9 +113,19 @@ export interface Step {
   updatedAt?: string;
 }
 
+/** Step creation (huntId comes from URL parameter) */
 export interface StepCreate {
-  huntId?: string;
-  type?: ChallengeType;
+  type: ChallengeType;
+  challenge: Challenge;
+  requiredLocation?: Location;
+  hint?: string;
+  timeLimit?: number;
+  maxAttempts?: number;
+}
+
+/** Step update (only editable fields, no id/huntId/timestamps) */
+export interface StepUpdate {
+  type: ChallengeType;
   challenge: Challenge;
   requiredLocation?: Location;
   hint?: string;

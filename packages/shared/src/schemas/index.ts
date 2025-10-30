@@ -32,10 +32,12 @@ export const {
   // Hunt
   Hunt,
   HuntCreate,
+  HuntUpdate,
 
   // Step
   Step,
   StepCreate,
+  StepUpdate,
 
   // User
   User,

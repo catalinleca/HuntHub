@@ -1,5 +1,5 @@
 import { HydratedDocument, Types } from 'mongoose';
-import { Step, StepCreate, ChallengeType, Challenge } from '@hunthub/shared';
+import { Step, StepCreate, StepUpdate, ChallengeType, Challenge } from '@hunthub/shared';
 import { IStep } from '@/database/types/Step';
 
 export class StepMapper {
@@ -21,6 +21,17 @@ export class StepMapper {
       timeLimit: dto.timeLimit,
       maxAttempts: dto.maxAttempts,
       // Mongoose provides defaults for metadata
+    };
+  }
+
+  static toDocumentUpdate(dto: StepUpdate): Partial<IStep> {
+    return {
+      type: dto.type,
+      challenge: dto.challenge,
+      hint: dto.hint,
+      requiredLocation: dto.requiredLocation,
+      timeLimit: dto.timeLimit,
+      maxAttempts: dto.maxAttempts,
     };
   }
 

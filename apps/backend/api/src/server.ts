@@ -12,6 +12,7 @@ import { databaseUrl } from './config/env.config';
 import './config/firebase';
 
 import huntRouter from '@/modules/hunts/hunt.routes';
+import stepRouter from '@/modules/steps/step.routes';
 import authRouter from '@/modules/auth/auth.routes';
 import { errorHandler, authMiddleware } from '@/shared/middlewares';
 
@@ -27,6 +28,7 @@ async function bootstrap() {
   app.use('/auth', authRouter);
   app.use('/api', authMiddleware);
   app.use('/api/hunts', huntRouter);
+  app.use('/api/hunts', stepRouter);
 
   app.use(errorHandler);
 

@@ -5,8 +5,10 @@
  * for backend-specific hunt validation.
  */
 
+import { z } from 'zod';
 import {
   HuntCreate,
+  HuntUpdate,
   Location,
   HuntStatus,
   HuntAccessType,
@@ -24,4 +26,8 @@ export const huntLocationSchema = Location;
 
 // Hunt CRUD schemas
 export const createHuntSchema = HuntCreate;
-export const updateHuntSchema = HuntCreate.partial();
+export const updateHuntSchema = HuntUpdate;
+
+export const reorderStepsSchema = z.object({
+  stepOrder: z.array(z.string()).min(1, 'Step order array cannot be empty'),
+});

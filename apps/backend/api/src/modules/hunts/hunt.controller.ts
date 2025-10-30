@@ -7,6 +7,9 @@ export interface IHuntController {
   createHunt(req: Request, res: Response): Promise<Response>;
   getAllUserHunts(req: Request, res: Response): Promise<Response>;
   getUserHuntById(req: Request, res: Response): Promise<Response>;
+  updateHunt(req: Request, res: Response): Promise<Response>;
+  deleteHunt(req: Request, res: Response): Promise<Response>;
+  reorderSteps(req: Request, res: Response): Promise<Response>;
 }
 
 @injectable()
@@ -28,5 +31,25 @@ export class HuntController implements IHuntController {
     const id = req.params.id;
     const hunt = await this.huntService.getUserHuntById(id, req.user.id);
     return res.status(200).json(hunt);
+  }
+
+  async updateHunt(req: Request, res: Response) {
+    const id = req.params.id;
+    const huntData = req.body;
+    const updatedHunt = await this.huntService.updateHunt(id, huntData, req.user.id);
+    return res.status(200).json(updatedHunt);
+  }
+
+  async deleteHunt(req: Request, res: Response) {
+    const id = req.params.id;
+    await this.huntService.deleteHunt(id, req.user.id);
+    return res.status(204).send();
+  }
+
+  async reorderSteps(req: Request, res: Response) {
+    const id = req.params.id;
+    const { stepOrder } = req.body;
+    const updatedHunt = await this.huntService.reorderSteps(id, stepOrder, req.user.id);
+    return res.status(200).json(updatedHunt);
   }
 }
