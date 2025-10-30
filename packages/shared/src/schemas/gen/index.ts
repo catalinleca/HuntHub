@@ -54,8 +54,8 @@ const Challenge = z.object({ clue: Clue, quiz: Quiz, mission: Mission, task: Tas
 const Step = z
   .object({
     id: z.string(),
-    huntId: z.string().optional(),
-    type: ChallengeType.optional(),
+    huntId: z.string(),
+    type: ChallengeType,
     challenge: Challenge,
     requiredLocation: Location.optional(),
     hint: z.string().optional(),
@@ -82,8 +82,7 @@ const Hunt = z
   .passthrough();
 const StepCreate = z
   .object({
-    huntId: z.string().optional(),
-    type: ChallengeType.optional(),
+    type: ChallengeType,
     challenge: Challenge,
     requiredLocation: Location.optional(),
     hint: z.string().optional(),
@@ -104,6 +103,16 @@ const HuntUpdate = z
     name: z.string().min(1).max(100),
     description: z.string().max(500).optional(),
     startLocation: Location.optional(),
+  })
+  .passthrough();
+const StepUpdate = z
+  .object({
+    type: ChallengeType,
+    challenge: Challenge,
+    requiredLocation: Location.optional(),
+    hint: z.string().optional(),
+    timeLimit: z.number().optional(),
+    maxAttempts: z.number().optional(),
   })
   .passthrough();
 const User = z
@@ -129,7 +138,7 @@ const HuntAccess = z
   })
   .passthrough();
 
-export const schemas = {
+export const schemas: Record<string, any> = {
   HuntStatus,
   Location,
   HuntAccessType,
@@ -148,6 +157,7 @@ export const schemas = {
   StepCreate,
   HuntCreate,
   HuntUpdate,
+  StepUpdate,
   User,
   HuntAccess,
 };

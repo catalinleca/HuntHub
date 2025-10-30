@@ -146,14 +146,14 @@ components:
           format: date-time
       required:
         - id
-        - challengeType
+        - huntId
+        - type
         - challenge
 
     StepCreate:
       type: object
+      description: Step creation (huntId comes from URL parameter)
       properties:
-        huntId:
-          type: string
         type:
           $ref: '#/components/schemas/ChallengeType'
         challenge:
@@ -167,7 +167,27 @@ components:
         maxAttempts:
           type: number
       required:
-        - challengeType
+        - type
+        - challenge
+
+    StepUpdate:
+      type: object
+      description: Step update (only editable fields, no id/huntId/timestamps)
+      properties:
+        type:
+          $ref: '#/components/schemas/ChallengeType'
+        challenge:
+          $ref: '#/components/schemas/Challenge'
+        requiredLocation:
+          $ref: '#/components/schemas/Location'
+        hint:
+          type: string
+        timeLimit:
+          type: number
+        maxAttempts:
+          type: number
+      required:
+        - type
         - challenge
 
     Challenge:

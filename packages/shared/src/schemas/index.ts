@@ -37,6 +37,7 @@ export const {
   // Step
   Step,
   StepCreate,
+  StepUpdate,
 
   // User
   User,
