@@ -2,16 +2,26 @@
 
 **Last updated:** 2025-10-28
 
-**Recent work:**
-- **Production data flow patterns applied (2025-10-28)**
-  - All 7 mappers updated: Hunt, User, Step, Asset, Progress, PublishedHunt, LiveHunt
-  - Implemented: toDocument (API→DB), fromDocument (DB→API), type guards for enums
-  - Mongoose validation constraints added (minLength, maxLength, trim)
-  - Complete documentation: `.claude/backend/data-flow.md`
-- Three-layer architecture implemented (modules/, features/, services/)
-- Complete database schema migration (all 5 models + mappers)
-- Fixed ObjectId references for proper Mongoose relationships
-- All tests passing, build successful
+**🎉 Week 1 NOW Sprint: COMPLETE!**
+
+**Recent work (2025-10-28):**
+- ✅ **Hunt CRUD Complete** (6/6 endpoints)
+- ✅ **Step CRUD Complete** (3/3 endpoints)
+- ✅ **Reorder Steps endpoint** (bonus - from Week 2)
+- ✅ **OpenAPI schema fixes**: Fixed type/challengeType inconsistencies, made required fields actually required
+- ✅ **Production patterns documented**: See `.claude/backend/hunt-step-implementation-decisions.md`
+
+**⚠️ CRITICAL NEXT: UUID Migration**
+- **Problem**: Currently exposing MongoDB ObjectIds in API responses (security issue)
+- **Solution**: Dual ID system (internal ObjectId + external UUID)
+- **Status**: Documented, ready to implement
+- **Priority**: HIGH - Must fix before continuing feature development
+
+**Previous work (2025-10-27/28):**
+- Production data flow patterns applied (all 7 mappers)
+- Implemented: toDocument (API→DB), fromDocument (DB→API), type guards for enums
+- Mongoose validation constraints added (minLength, maxLength, trim)
+- Complete documentation: `.claude/backend/data-flow.md`
 
 ## ✅ Implemented
 
@@ -54,18 +64,36 @@
 - [x] Firebase UID mapping to internal user ID
 - [x] User profile fields (name, email, bio, picture)
 
-### Hunt Management
+### Hunt Management (COMPLETE - Week 1)
 - [x] Hunt model (Mongoose schema)
 - [x] Hunt types/interfaces (IHunt, HuntStatus enum)
-- [x] Hunt service:
+- [x] Hunt mapper (toDocument, toDocumentUpdate, fromDocument)
+- [x] Hunt service (full CRUD):
   - createHunt()
   - getAllHunts()
   - getUserHunts()
   - getHuntById()
   - getUserHuntById()
-- [x] Hunt controller
-- [x] Hunt routes (`/api/hunts`)
-- [x] Basic hunt properties (name, description, status, version, startLocation)
+  - updateHunt() (metadata only)
+  - deleteHunt() (cascade delete steps)
+  - reorderSteps()
+  - verifyOwnership() (reusable authorization)
+- [x] Hunt controller (all endpoints)
+- [x] Hunt routes (all CRUD + reorder)
+- [x] Hunt validation schemas (create, update, reorder)
+
+### Step Management (COMPLETE - Week 1)
+- [x] Step model (Mongoose schema)
+- [x] Step types/interfaces (IStep, ChallengeType enum)
+- [x] Step mapper (toDocument, toDocumentUpdate, fromDocument)
+- [x] Step service (full CRUD):
+  - createStep() (auto-append to stepOrder)
+  - updateStep()
+  - deleteStep() (remove from stepOrder)
+- [x] Step controller (all endpoints)
+- [x] Step routes (RESTful nested: /api/hunts/:huntId/steps/...)
+- [x] Step validation schemas (create, update)
+- [x] Dependency injection (StepService injects HuntService for authorization)
 
 ### Data Models (Defined)
 - [x] Hunt
@@ -103,26 +131,32 @@
 - [x] Build scripts
 - [x] Test scripts (jest with coverage support)
 
-## 🚧 Partially Implemented / Known Issues
+## 🚧 Known Issues & Technical Debt
 
-### Hunt Features
-- [ ] Hunt step management (steps exist in schema but no CRUD endpoints)
+### CRITICAL: Security Issue
+- ⚠️ **Exposing MongoDB ObjectIds in API** - Must migrate to UUID before production
+  - Problem: ObjectIds contain timestamp, reveal DB implementation, predictable
+  - Solution: Dual ID system (internal ObjectId + external UUID v4)
+  - Impact: All models, mappers, services need updating
+  - Status: Ready to implement (next task)
+
+### Hunt Features (Pending)
 - [ ] Hunt publishing workflow (status transitions)
 - [ ] Hunt sharing/access control (HuntAccess model exists but not wired up)
 - [ ] Hunt versioning logic (currentVersion field exists but not used)
 
 ### Challenge Types
 - [x] Types defined in OpenAPI (Clue, Quiz, Mission, Task)
-- [ ] Challenge creation/validation logic
-- [ ] Challenge response handling
-- [ ] Scoring/completion logic
+- [x] Challenge structure in steps (discriminated union)
+- [ ] Challenge validation by type (Strategy pattern - Week 2)
+- [ ] Challenge response handling (Player API - Week 5-6)
+- [ ] Scoring/completion logic (Player API - Week 5-6)
 
 ### Data Models (Defined but Not Used)
-- [ ] Step service/controller/routes
-- [ ] Asset service/controller/routes (for media uploads)
-- [ ] Progress service/controller/routes (tracking user progress)
-- [ ] LiveHunt service (active hunt instances)
-- [ ] PublishedHunt service (hunt versions)
+- [ ] Asset service/controller/routes (for media uploads - Week 3)
+- [ ] Progress service/controller/routes (tracking user progress - Week 5-6)
+- [ ] LiveHunt service (active hunt instances - Week 5-6)
+- [ ] PublishedHunt service (hunt versions - Week 4-5)
 
 ## ❌ Not Yet Implemented
 
@@ -163,39 +197,41 @@
 ## Database Schema Status
 
 **Collections in use:**
-- `users` - Active
-- `hunts` - Active
-- `steps` - Defined, not used
-- `assets` - Defined, not used
-- `progress` - Defined, not used
-- `livehunts` - Defined, not used
+- `users` - Active (full CRUD)
+- `hunts` - Active (full CRUD)
+- `steps` - Active (full CRUD - Week 1 complete)
+- `assets` - Defined, not used (Week 3)
+- `progress` - Defined, not used (Week 5-6)
+- `livehunts` - Defined, not used (Week 5-6)
 - `publishedhunts` - Defined, not used
 
 ## API Endpoints
 
-**Implemented:**
+**✅ Implemented (Week 1 Complete):**
 ```
 POST   /auth/signup
 POST   /auth/login
-POST   /api/hunts              # Create hunt
-GET    /api/hunts              # Get current user's hunts
-GET    /api/hunts/:id          # Get hunt by ID
+
+# Hunt CRUD (6/6)
+POST   /api/hunts                          # Create hunt
+GET    /api/hunts                          # List user's hunts
+GET    /api/hunts/:id                      # Get hunt by ID
+PUT    /api/hunts/:id                      # Update hunt (metadata only)
+DELETE /api/hunts/:id                      # Delete hunt (cascade delete steps)
+PUT    /api/hunts/:id/step-order           # Reorder steps
+
+# Step CRUD (3/3)
+POST   /api/hunts/:huntId/steps            # Create step
+PUT    /api/hunts/:huntId/steps/:stepId    # Update step
+DELETE /api/hunts/:huntId/steps/:stepId    # Delete step
 ```
 
-**Needed - High Priority (Tree VIEW API):**
+**📋 Needed - Week 2 (Tree VIEW API):**
 ```
-GET    /api/hunts/:id/tree     # Get compact step list for tree visualization (PRIORITY)
-GET    /api/steps/:id          # Get full step details
-```
-
-**Needed - Core CRUD:**
-```
-PUT    /api/hunts/:id          # Update hunt
-DELETE /api/hunts/:id          # Delete hunt
-POST   /api/hunts/:id/steps    # Add step
-PUT    /api/steps/:id          # Update step
-DELETE /api/steps/:id          # Delete step
-PUT    /api/hunts/:id/step-order # Reorder steps
+GET    /api/hunts/:id/tree                 # Get compact step list (lazy loading)
+GET    /api/steps/:id                      # Get full step details
+# + Add stepCount to GET /api/hunts response
+# + Database indexes
 ```
 
 **Needed - Publishing & Playing:**
@@ -209,120 +245,98 @@ GET    /api/play/:huntId/progress  # Get user progress
 
 ## Technical Debt / TODOs
 
-1. **Serializers removed** - Now using mongoose toJSON() method ✅
-2. **creatorId reference** - Has "TODO revert" comment in Hunt.ts:7
-3. **Validation schemas** - Domain-organized structure complete ✅
-4. **Type inconsistencies** - OpenAPI types vs DB types need reconciliation
-5. **Error messages** - Some errors lack descriptive messages
-6. **Testing** - Integration tests implemented ✅ (need more test coverage)
-7. **Documentation** - No API docs yet (Swagger UI installed but not configured)
+1. ⚠️ **CRITICAL: Exposing MongoDB ObjectIds** - Must migrate to UUIDs (NEXT TASK)
+2. **Validation schemas** - Domain-organized structure complete ✅
+3. **OpenAPI schema inconsistencies** - Fixed type/challengeType mismatches ✅
+4. **Error messages** - Some errors lack descriptive messages
+5. **Testing** - Integration tests implemented ✅ (need more test coverage for Step CRUD)
+6. **Documentation** - No API docs yet (Swagger UI installed but not configured)
 
-## 🎯 Current Priority: Tree VIEW API (2025-10-27)
+## 🎯 Current Priority: Numeric ID Migration (CRITICAL - 2025-10-30)
 
-**Decision made:** Implement tree VIEW (visualization with lazy loading) NOW, reserve gameplay branching for V1.1+
+**Problem:** Exposing MongoDB ObjectIds in API responses (security + architecture issue)
 
-**See:** `.claude/tree-and-branching-strategy.md` for complete context
+**Solution:** Dual ID system with **sequential numeric IDs**
+- **Internal ID**: MongoDB ObjectId (`_id`) - database only, never exposed
+- **External ID**: Numeric sequential ID (`huntId: 1332`, `stepId: 13344`) - API layer, human-readable
 
-### Tree VIEW API Implementation (~1 week)
+**Why numeric IDs:**
+1. **Human-readable**: "Check hunt 1332" vs "Check hunt 550e8400-e29b..."
+2. **Short URLs**: `/api/hunts/1332` (perfect for QR codes)
+3. **Easy to share**: Can verbally communicate IDs
+4. **Production standard**: GitHub, Twitter, Stripe all use sequential IDs
+5. **Authorization-based security**: Enumeration is safe with proper auth (we have this)
+
+**Why this is critical:**
+1. **Security**: ObjectIds contain timestamps → reveals creation order/timing
+2. **Implementation leakage**: Tells the world you're using MongoDB
+3. **Migration difficulty**: Tied to MongoDB format forever
+4. **Predictability**: ObjectIds are somewhat sequential
+5. **Production best practice**: External IDs should be opaque
+
+**Scope of changes:**
+- **7 Models**: Hunt, Step, User, Asset, Progress, PublishedHunt, LiveHunt
+- **Counter Model**: New model for auto-incrementing IDs
+- **7 Mappers**: Return numeric IDs, update foreign keys
+- **All Services**: Query by numeric ID instead of ObjectId
+- **All Foreign Keys**: Change from ObjectId to number (`huntId: 1332`)
+- **Database**: Add numeric ID field with unique index to all models
+- **Pre-save hooks**: Auto-generate numeric IDs on document creation
+- **OpenAPI schema**: Update to `type: integer`
+
+**Implementation time estimate:** 2-3 hours
+
+**See:** Complete validated plan in `.claude/backend/NUMERIC-ID-MIGRATION-PLAN.md`
+
+---
+
+## 📋 Next After UUID Migration: Week 2 (Tree VIEW API)
 
 **Backend work:**
-- [ ] Create `GET /api/hunts/:id/tree` endpoint
-  - Returns compact step list (id, type, title, order)
-  - No full challenge data (lazy loading pattern)
-  - Performance optimized for large step counts
+- [ ] Create `GET /api/hunts/:id/tree` endpoint (compact step list)
 - [ ] Update `GET /api/hunts` to include `stepCount`
-  - Add to response: `{ id, name, status, stepCount, updatedAt }`
-  - Allows UI to show step count without fetching steps
 - [ ] Ensure `GET /api/steps/:id` returns full step details
-  - Full challenge data loaded on demand
-  - When user clicks step in tree
 - [ ] Add database indexes for performance
-  - Index on `Step.huntId` for efficient tree queries
-  - Index on `Step.order` for sorted retrieval
 
-**API Design Pattern (Lazy Loading):**
-```typescript
-// 1. GET /api/hunts - Compact list
-Response: {
-  hunts: [
-    { id: "hunt-1", name: "Barcelona", status: "draft", stepCount: 14 }
-  ]
-}
-
-// 2. GET /api/hunts/:id/tree - Compact step list
-Response: {
-  id: "hunt-1",
-  name: "Barcelona Adventure",
-  steps: [
-    { id: "step-1", type: "clue", title: "Find Sagrada", order: 1 },
-    { id: "step-2", type: "quiz", title: "Who designed it?", order: 2 }
-  ]
-}
-
-// 3. GET /api/steps/:id - Full details on click
-Response: {
-  id: "step-1",
-  type: "clue",
-  challenge: { clue: { title: "...", description: "..." } },
-  hint: "...",
-  requiredLocation: { lat: 41.4, lng: 2.17, radius: 50 }
-}
-```
-
-**Frontend work (separate):**
-- Tree component showing compact step list
-- Lazy load full details on step click
-- Visual tree representation in editor
-
-**Why this matters:**
-- Better editor UX (visual overview)
-- Production-quality API (efficient data transfer)
-- Foundation for future branching (V1.1+)
-- Scalable (works with 100+ steps)
-
-**Future (V1.1+): Gameplay Branching**
-- Use existing `Step.metadata` field (no model changes needed!)
-- Add branching logic to player API
-- No breaking changes to current implementation
+**See:** `.claude/tree-and-branching-strategy.md` for complete context
 
 ---
 
 ## Next Steps (Priority Order)
 
-1. **🔥 Validate Login Flow** (~30 mins) - **NEXT SESSION START**
-   - Test signup/login endpoints
-   - Verify Firebase authentication works
-   - Verify JWT token flow
-   - Ensure auth middleware works correctly
-   - Ready to start implementing Hunt CRUD endpoints
+1. **🔥 UUID Migration** (~2-3 hours) - **CURRENT TASK**
+   - Add `id: string` field to all models
+   - Generate UUIDs on create (v4)
+   - Query by UUID instead of ObjectId
+   - Update all foreign key references
+   - Update all mappers and services
+   - Migration plan to be created next
 
-2. **Complete Hunt CRUD** (~3-4 days) - **AFTER LOGIN VALIDATION**
-   - Update hunt (PUT /api/hunts/:id)
-   - Delete hunt (DELETE /api/hunts/:id)
-   - Now has proper mapper pattern (toDocument/fromDocument ready!)
+2. **Tree VIEW API** (~1 week) - **Week 2**
+   - GET /api/hunts/:id/tree (compact step list)
+   - GET /api/steps/:id (full details, lazy loading)
+   - Add stepCount to hunt list
+   - Database indexes
 
-3. **Step Management** (~1 week) - **Week 1-2 from ROADMAP**
-   - Full CRUD for hunt steps
-   - Add step (POST /api/hunts/:id/steps)
-   - Update step (PUT /api/steps/:id)
-   - Delete step (DELETE /api/steps/:id)
-   - Reorder steps (PUT /api/hunts/:id/step-order)
-   - Mapper ready with ChallengeType type guard!
+3. **Challenge Validation** (~2 days) - **Week 2**
+   - Strategy pattern for validators
+   - ClueValidator, QuizValidator, MissionValidator, TaskValidator
 
-4. **Publishing MVP** (~1-2 weeks)
-   - Simplified: Draft → Published (skip Review for MVP)
-   - Publish hunt (clone hunt + steps)
-   - Create PublishedHunt record
-   - Create LiveHunt record
+4. **Asset Management** (~3 days) - **Week 3 (CRITICAL - moved up)**
+   - File upload (multer + Firebase Storage/S3)
+   - Attach assets to steps
+   - Required before Publishing
 
-5. **Hunt Player** (~1-2 weeks)
-   - Get live hunt for playing
-   - Submit step completion
+5. **Publishing Workflow** (~1-2 weeks) - **Week 4-5**
+   - Simplified: Draft → Published
+   - Clone hunt + steps
+   - PublishedHunt + LiveHunt records
+
+6. **Player API** (~1-2 weeks) - **Week 5-6**
+   - Get live hunt
+   - Submit completions
    - Track progress
 
-6. **Testing** - Ongoing
-   - Add integration tests for new endpoints
-   - Test tree API performance
-
-7. **API Documentation** - Lower priority
-   - Configure Swagger UI
+7. **Testing** - **Ongoing**
+   - Add Step CRUD integration tests
+   - Test UUID migration

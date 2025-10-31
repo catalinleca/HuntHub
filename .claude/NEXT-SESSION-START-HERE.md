@@ -1,129 +1,156 @@
 # 🚀 START HERE - Next Session Quick Guide
 
-**When you open Claude Code next time, I'll auto-load all context. Here's what to do:**
+**Last updated:** 2025-10-28
+
+**When you open Claude Code next time, I'll auto-load all context.**
 
 ---
 
-## ✅ All Major Decisions Made
+## 🎉 Week 1 Complete! (2025-10-28)
 
-You finished requirements and made all critical decisions on 2025-02-05.
-
-**Quick summary:**
-- ✅ MongoDB (keep it, define good patterns)
-- ✅ Monorepo with shared types (production standard)
-- ✅ Complex versioning (phased: MVP → V1.1 → V1.2)
-- ✅ Separate steps collection (better for progress tracking)
-- ✅ Skip Review state for MVP (add later with OCP)
-- ✅ Active hunts = published hunts only
-
-**All decisions:** See `.claude/decisions-needed.md`
-
----
-
-## 🎯 Next Steps (In Order)
-
-### 1. ~~Set Up Monorepo~~ ✅ **COMPLETE** (2025-10-27)
+You just finished the NOW sprint with **100% completion**:
 
 **Completed:**
-- ✅ Created npm workspaces monorepo structure (2025-10-26)
-- ✅ Set up `packages/shared/` with OpenAPI → TypeScript generation
-- ✅ Moved backend to `apps/backend/api/` (renamed to `@hunthub/api`)
-- ✅ Created structure for 2 frontends: `apps/frontend/editor/` and `apps/frontend/player/`
-- ✅ Updated workspace config to `apps/backend/*` and `apps/frontend/*`
-- ✅ Updated all imports to `@hunthub/shared`
-- ✅ Fixed module resolution with `tsconfig-paths`
-- ✅ Secured Firebase service account (gitignored, example created)
-- ✅ Root configs with package inheritance established
-- ✅ Backend compiles cleanly with new structure
+- ✅ Hunt CRUD (6/6 endpoints) - Create, Read, List, Update, Delete, Reorder
+- ✅ Step CRUD (3/3 endpoints) - Create, Update, Delete
+- ✅ OpenAPI schema fixes (type/challengeType inconsistencies resolved)
+- ✅ Production patterns established and documented
+- ✅ Reorder Steps endpoint (bonus - from Week 2 plan)
 
-**See:** `.claude/project-state.md` for full structure diagram
-
----
-
-### 2. ~~Comprehensive Roadmap Created~~ ✅ **COMPLETE** (2025-10-27)
-
-**Completed:**
-- ✅ Created `ROADMAP.md` with 14-week MVP timeline
-- ✅ 13 Epics broken into 70+ stories
-- ✅ NOW/NEXT/LATER prioritization
-- ✅ Fixed dependency order: Tree VIEW after CRUD, Assets before Player
-- ✅ Story-level and epic-level dependency diagrams
-- ✅ No circular dependencies, clear implementation path
-
-**See:** `.claude/ROADMAP.md` for complete timeline
+**Key decisions documented:**
+- See `.claude/backend/hunt-step-implementation-decisions.md`
+- Why separate Step collection
+- Why stepOrder array (no order field)
+- Why nested RESTful routes
+- Why clean DTO separation
+- Reusable authorization patterns
 
 ---
 
-### 3. Complete Hunt CRUD + Step CRUD (Current Priority)
+## ⚠️ CRITICAL NEXT: Numeric ID Migration (2-3 hours)
 
-**CORRECTED: Tree VIEW moved to NEXT phase**
-- Tree VIEW needs complete Step CRUD to be useful
-- Can't visualize steps that don't exist yet
-- Need solid CRUD foundation first
+**THE ISSUE:**
+Currently exposing MongoDB ObjectIds in API responses - **security and architecture problem**
 
-**NOW Sprint (Week 1 - 6.5 days):**
-- [ ] Update hunt (PUT /api/hunts/:id) - 1 day
-- [ ] Delete hunt (DELETE /api/hunts/:id) - 1 day
-- [ ] Create step (POST /api/hunts/:id/steps) - 2 days
-- [ ] Update step (PUT /api/steps/:id) - 1.5 days
-- [ ] Delete step (DELETE /api/steps/:id) - 1 day
-
-**Why this is priority:**
-- Solid CRUD foundation needed before anything else
-- Tree VIEW makes sense only after we can create/edit steps
-- Tests need actual step data to validate endpoints
-- Foundation for future branching
-
----
-
-### 4. Apply SOLID Improvements (As You Build)
-
-**Key pattern to add: Challenge Type Strategy**
-
-See `.claude/solid-principles.md` for examples.
-
-**When adding challenge validation:**
-```typescript
-// Don't do big if/else
-// Use strategy pattern instead
-
-interface IChallengeValidator {
-  validate(challenge: Challenge): boolean;
+**Example of the problem:**
+```json
+{
+  "id": "507f1f77bcf86cd799439011",  // ❌ MongoDB ObjectId (bad!)
+  "huntId": "507f191e810c19729de860ea" // ❌ Reveals DB implementation
 }
-
-class ClueValidator implements IChallengeValidator {...}
-class QuizValidator implements IChallengeValidator {...}
-// etc.
 ```
 
-**MongoDB patterns:**
+**THE SOLUTION:**
+Dual ID system with **sequential numeric IDs**:
+- **Internal ID**: MongoDB ObjectId (`_id`) - database only, never exposed
+- **External ID**: Numeric sequential ID - API layer, human-readable
 
-See `.claude/mongodb-vs-postgres.md` section "MongoDB Best Practices"
+```json
+{
+  "huntId": 1332,      // ✅ Human-readable number!
+  "stepId": 13344      // ✅ Easy to remember and share
+}
+```
+
+**WHY NUMERIC IDs:**
+1. **Human-readable**: "Check hunt 1332" vs "Check hunt 550e8400-e29b..."
+2. **Short URLs**: `/api/hunts/1332` (perfect for QR codes!)
+3. **Easy to share**: Can verbally communicate IDs
+4. **Production standard**: GitHub (#1332), Twitter, Stripe all use sequential IDs
+5. **Authorization-based security**: Enumeration is safe with proper auth (we have this)
+
+**WHY THIS IS CRITICAL:**
+1. **Security**: ObjectIds contain timestamps → reveals creation order/timing
+2. **Implementation leakage**: Tells the world you're using MongoDB
+3. **Migration difficulty**: Tied to MongoDB format forever
+4. **Predictability**: ObjectIds are somewhat sequential
+5. **Production best practice**: External IDs should be opaque
+
+**SCOPE OF CHANGES:**
+- 7 Models: Hunt, Step, User, Asset, Progress, PublishedHunt, LiveHunt
+- Counter Model: New model for auto-incrementing sequential IDs
+- 7 Mappers: Return numeric IDs, update foreign keys
+- All Services: Query by numeric ID instead of ObjectId
+- All Foreign Keys: Change from ObjectId to number (`huntId: 1332`)
+- Pre-save hooks: Auto-generate numeric IDs on document creation
+- OpenAPI schema: Update to `type: integer`
+
+**TIME ESTIMATE:** 2-3 hours
+
+**VALIDATION:** ✅ Validated against production standards and MongoDB best practices
+
+**SEE COMPLETE PLAN:** `.claude/backend/NUMERIC-ID-MIGRATION-PLAN.md`
+- Production standards validation (GitHub, Twitter, Stripe patterns)
+- MongoDB/Mongoose best practices checklist
+- Complete implementation guide with code examples
+- Migration strategy for existing data
+- Security analysis (enumeration attacks, authorization)
+- Testing strategy
+- Rollback plan
 
 ---
 
-## 📚 Key Documents to Reference
+## 📋 What's Next After UUID Migration
 
-**When planning work:**
-- `ROADMAP.md` - 14-week timeline, all epics and stories (NEW ✨)
-- `project-state.md` - Current focus and immediate next steps
-- `backend/current-state.md` - What's implemented vs pending
+### Week 2: Tree VIEW + Challenge Validation
+- GET /api/hunts/:id/tree (compact step list, lazy loading)
+- GET /api/steps/:id (full details)
+- Add stepCount to hunt list
+- Database indexes
+- Challenge type validation (Strategy pattern)
 
-**When building features:**
-- `application-overview.md` - What features to build
-- `tree-and-branching-strategy.md` - Tree VIEW + future branching
-- `backend/patterns.md` - Code conventions with examples
-- `backend/architecture.md` - Tech stack and data flow
-- `publishing-workflow.md` - Publishing system design
+### Week 3: Asset Management (CRITICAL)
+- File upload (multer + Firebase Storage or S3)
+- Attach assets to steps
+- **Must be done before Publishing** (missions need file uploads)
 
-**When making decisions:**
-- `reference/decisions-needed.md` - Historical decision log
-- `reference/design-concerns.md` - Issues flagged in Feb 2025
+### Week 4-5: Publishing Workflow
+- Publish hunt (clone hunt + steps)
+- PublishedHunt + LiveHunt records
+- Version management
 
-**When stuck on patterns:**
-- `decisions/solid-principles.md` - How to make extensible code
-- `decisions/mongodb-vs-postgres.md` - MongoDB patterns
-- `decisions/production-best-practices-type-sharing.md` - Why monorepo
+### Week 5-6: Player API
+- Get live hunt
+- Submit completions
+- Track progress
+
+**See:** `.claude/ROADMAP.md` for full 14-week timeline
+
+---
+
+## ✅ Major Decisions Made (2025-02-05)
+
+- ✅ MongoDB (with production best practices)
+- ✅ Monorepo with shared types (production standard)
+- ✅ OpenAPI as source of truth
+- ✅ Separate steps collection (better for progress tracking)
+- ✅ Skip Review state for MVP (add later with OCP)
+- ✅ Simplified publishing workflow (MVP)
+
+**All decisions:** See `.claude/reference/decisions-needed.md`
+
+---
+
+## 🏗️ Infrastructure Complete
+
+### 1. Monorepo Setup ✅ (2025-10-26/27)
+- npm workspaces with nested structure
+- `packages/shared/` - Types, validation, constants
+- `apps/backend/api/` - Express API
+- OpenAPI → TypeScript → Zod generation
+- All imports use `@hunthub/shared`
+
+### 2. Roadmap Complete ✅ (2025-10-27)
+- 14-week MVP timeline
+- 13 Epics, 70+ stories
+- NOW/NEXT/LATER prioritization
+- Dependency validation
+
+### 3. Week 1 Sprint Complete ✅ (2025-10-28)
+- Hunt + Step CRUD (9/9 endpoints)
+- RESTful nested routes
+- Production patterns (mappers, DI, authorization)
+- OpenAPI schema fixed
 
 ---
 
@@ -133,15 +160,13 @@ See `.claude/mongodb-vs-postgres.md` section "MongoDB Best Practices"
 - Your behavior principles (senior engineer, challenge me)
 - Complete HuntHub requirements
 - All architectural decisions
-- **14-week roadmap with 70+ stories** (NEW ✨)
-- **Corrected dependencies: CRUD first, then Tree VIEW** (NEW ✨)
-- MongoDB choice and reasoning
+- 14-week roadmap
+- MongoDB best practices
 - Monorepo strategy
 - Publishing workflow design
-- Tree VIEW strategy + future branching plans
-- SOLID principles
-- Current backend state
-- What's done vs pending
+- **Week 1 completion status**
+- **UUID migration urgency**
+- Production patterns and reasoning
 
 **You don't need to remind me of anything.** Just say what you want to work on.
 
@@ -149,142 +174,96 @@ See `.claude/mongodb-vs-postgres.md` section "MongoDB Best Practices"
 
 ## 💬 How to Start Next Session
 
-**Good openers:**
+**Recommended:**
+✅ "Let's implement the UUID migration"
+✅ "Create the UUID migration plan"
+✅ "Start with UUID migration - begin with Hunt model"
 
-✅ "Let's implement Hunt CRUD endpoints (Update/Delete)"
-✅ "Let's build the Step CRUD endpoints"
-✅ "Let's work on the NOW sprint from ROADMAP.md"
-✅ "What should we work on next?"
-
-**I'll suggest priorities based on:**
-- ROADMAP.md NOW section (current sprint)
-- What's blocking other work
-- MVP critical path from dependency diagrams
+**You can also:**
+- Ask me to summarize Week 1 achievements
+- Ask about the UUID migration scope
+- Ask what's after UUID migration
+- Jump straight to implementation
 
 ---
 
-## 🛠️ Before You Start Coding
+## 🛠️ Quick Context Check
 
-**1. Check the roadmap:**
+**If you want a refresh before starting:**
+
 ```bash
-cat .claude/ROADMAP.md | grep -A 20 "NOW (This Week"
+# See Week 1 decisions and reasoning
+cat .claude/backend/hunt-step-implementation-decisions.md
+
+# See current backend state
+cat .claude/backend/current-state.md | head -100
+
+# See full roadmap
+cat .claude/ROADMAP.md | grep -A 20 "NOW (CRITICAL"
+
+# See completed endpoints
+cat .claude/backend/current-state.md | grep "Implemented (Week 1"
 ```
-See what's in the current sprint (Week 1: Hunt CRUD + Step CRUD)
-
-**2. Optional: Read these if you want refresh:**
-- `ROADMAP.md` - See full 14-week timeline
-- `reference/design-concerns.md` - Issues flagged in Feb 2025
-- `decisions/solid-principles.md` - Extension patterns
-- `publishing-workflow.md` - Complex versioning design
-
-**3. Quick context check:**
-- ✅ Monorepo complete (packages/shared + apps/backend/api)
-- ✅ All major decisions made
-- ✅ Roadmap created with dependency fixes
-- 🎯 Current priority: Hunt CRUD + Step CRUD (NOW sprint)
 
 ---
 
-## 🎯 Success Criteria for Next Session
+## 🎯 Success Criteria
 
-**Minimum (if short session):**
-- [ ] Hunt Update endpoint (PUT /api/hunts/:id)
-- [ ] Hunt Delete endpoint (DELETE /api/hunts/:id)
+**For Numeric ID Migration Session:**
+
+**Minimum:**
+- [x] Migration plan created and validated ✅
+- [ ] Counter model created
+- [ ] Hunt model updated (add huntId: number field, unique index, pre-save hook)
+- [ ] HuntMapper updated (return numeric huntId)
+- [ ] HuntService queries by huntId
+
+**Good:**
+- [ ] All 7 models updated (Hunt, Step, User, Asset, Progress, PublishedHunt, LiveHunt)
+- [ ] All 7 mappers updated (return numeric IDs)
+- [ ] All services query by numeric ID
+- [ ] OpenAPI schema updated (`type: integer`)
+- [ ] TypeScript types regenerated
 - [ ] Tests passing
 
-**Good (normal session):**
-- [ ] Hunt CRUD complete (Update + Delete) ✓
-- [ ] Step Create started or done (POST /api/hunts/:id/steps)
-- [ ] Following SOLID patterns
-
-**Great (long session):**
-- [ ] Hunt CRUD complete ✓
-- [ ] Step Create + Update + Delete endpoints done
-- [ ] Good test coverage
-- [ ] Week 1 NOW sprint complete
+**Great:**
+- [ ] Complete numeric ID migration
+- [ ] All endpoints tested and working with numeric IDs
+- [ ] Routes work: `/api/hunts/1332/steps/13344`
+- [ ] Foreign keys updated (stepOrder: number[], creatorId: number)
+- [ ] Migration script written (for existing data)
+- [ ] Documentation updated
+- [ ] Ready for Week 2
 
 ---
 
-## ⚠️ Things to Remember
+## ⚠️ Remember
 
-**Architecture principles:**
-- Open for extension, closed for modification (SOLID-O)
-- Use strategy pattern for challenge types
-- Interface + implementation (DI with InversifyJS)
-- Three-layer validation (UI, API, DB)
+**Numeric ID Migration is CRITICAL because:**
+1. **Security issue**: Exposing MongoDB ObjectIds (contain timestamps, predictable)
+2. **Architecture best practice**: Separate internal DB IDs from external API IDs
+3. **Blocks production deployment**: Can't ship with exposed ObjectIds
+4. **Better now than later**: Easier to fix before building more features
+5. **Portfolio quality**: Shows production-grade patterns (GitHub, Twitter, Stripe do this)
 
-**MVP scope:**
-- Draft → Publish (skip Review for now)
-- One version per hunt (add multiple versions in V1.1)
-- Separate steps (you had good reason - progress tracking)
+**Numeric IDs are production standard:**
+- ✅ GitHub uses issue numbers: `#1332`
+- ✅ Twitter uses numeric tweet IDs
+- ✅ Stripe uses sequential customer IDs
+- ✅ Human-readable, perfect for QR codes
+- ✅ Safe with proper authorization (we have this)
 
-**Don't gold-plate:**
-- Get MVP working first
-- Add complex versioning in phases
-- Follow your own advice: "extension not modification"
-
----
-
-## 🔥 Token Budget Note
-
-**Recent sessions:**
-- **2025-02-05:** ~123k tokens (Requirements definition)
-- **2025-10-26:** ~80k tokens (Monorepo setup)
-- **2025-10-27:** ~100k tokens (Roadmap creation + dependency fixes)
-
-**Why planning sessions use more tokens:**
-- Creating comprehensive documentation
-- Researching production best practices
-- Validating dependencies and fixing contradictions
-- Making all critical decisions upfront
-
-**Next sessions will use less:**
-- Context already documented (auto-loads)
-- Decisions made
-- Roadmap complete
-- Just implementing features from NOW sprint
-
-**Typical implementation session:** ~20-40k tokens
-**Planning sessions:** ~80-120k tokens (one-time cost)
-
-**Worth it - you now have:**
-- Complete 14-week roadmap
-- All decisions made
-- Production-grade architecture
-- No circular dependencies
-- Clear path to MVP
+**This is a portfolio project - show production-quality patterns from day one!**
 
 ---
 
-## 📝 Quick Commands
+**🔥 NEXT TASK: Numeric ID Migration - Implementation Ready!**
 
-```bash
-# See current sprint tasks
-cat .claude/ROADMAP.md | grep -A 20 "NOW (This Week"
+**Quick Start:**
+1. Read `.claude/backend/NUMERIC-ID-MIGRATION-PLAN.md` (complete validated plan)
+2. Create Counter model (15 min)
+3. Update Hunt model as template (20 min)
+4. Apply pattern to remaining models (1 hour)
+5. Test everything (30 min)
 
-# See what's implemented
-cat .claude/backend/current-state.md | grep "✅"
-
-# See what's pending
-cat .claude/backend/current-state.md | grep "❌"
-
-# Check code patterns
-cat .claude/backend/patterns.md
-
-# Review all decisions
-cat .claude/reference/decisions-needed.md | grep "DECIDED"
-
-# Update context after work
-# Just tell me: "Update backend state - completed [feature]"
-# Or: "Mark ROADMAP stories complete: BE-1.4, BE-1.5"
-```
-
----
-
-**🎉 YOU'RE READY TO BUILD!**
-
-**Next session: "Let's start the NOW sprint" → Begin with Hunt CRUD (Update + Delete) from ROADMAP.md.**
-
-**Corrected priority: Hunt CRUD + Step CRUD FIRST, then Tree VIEW in NEXT phase.**
-
-**All context auto-loads. You can take breaks. Nothing is forgotten.** 🚀
+**Complete plan with code examples, security analysis, and MongoDB best practices validation.**
