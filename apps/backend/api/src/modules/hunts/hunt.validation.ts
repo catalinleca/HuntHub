@@ -29,5 +29,5 @@ export const createHuntSchema = HuntCreate;
 export const updateHuntSchema = HuntUpdate;
 
 export const reorderStepsSchema = z.object({
-  stepOrder: z.array(z.string()).min(1, 'Step order array cannot be empty'),
+  stepOrder: z.array(z.number().int()).min(1, 'Step order array cannot be empty'),
 });

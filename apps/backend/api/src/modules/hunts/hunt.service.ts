@@ -11,12 +11,12 @@ export interface IHuntService {
   createHunt(hunt: HuntCreate, creatorId: string): Promise<Hunt>;
   getAllHunts(): Promise<Hunt[]>;
   getUserHunts(userId: string): Promise<Hunt[]>;
-  getHuntById(id: string): Promise<Hunt>;
-  getUserHuntById(id: string, userId: string): Promise<Hunt>;
-  updateHunt(id: string, huntData: HuntUpdate, userId: string): Promise<Hunt>;
-  deleteHunt(id: string, userId: string): Promise<void>;
-  reorderSteps(huntId: string, stepOrder: string[], userId: string): Promise<Hunt>;
-  verifyOwnership(huntId: string, userId: string): Promise<Hunt>;
+  getHuntById(huntId: number): Promise<Hunt>;
+  getUserHuntById(huntId: number, userId: string): Promise<Hunt>;
+  updateHunt(huntId: number, huntData: HuntUpdate, userId: string): Promise<Hunt>;
+  deleteHunt(huntId: number, userId: string): Promise<void>;
+  reorderSteps(huntId: number, stepOrder: number[], userId: string): Promise<Hunt>;
+  verifyOwnership(huntId: number, userId: string): Promise<Hunt>;
 }
 
 @injectable()
@@ -37,8 +37,8 @@ export class HuntService implements IHuntService {
     return HuntMapper.fromDocuments(hunts);
   }
 
-  async getHuntById(id: string): Promise<Hunt> {
-    const hunt = await HuntModel.findById(id).exec();
+  async getHuntById(huntId: number): Promise<Hunt> {
+    const hunt = await HuntModel.findOne({ huntId }).exec();
     if (!hunt) {
       throw new NotFoundError();
     }
@@ -46,8 +46,8 @@ export class HuntService implements IHuntService {
     return HuntMapper.fromDocument(hunt);
   }
 
-  async getUserHuntById(id: string, userId: string): Promise<Hunt> {
-    const hunt = await HuntModel.findByIdAndCreator(id, userId)
+  async getUserHuntById(huntId: number, userId: string): Promise<Hunt> {
+    const hunt = await HuntModel.findByHuntIdAndCreator(huntId, userId);
     if (!hunt) {
       throw new NotFoundError();
     }
@@ -55,8 +55,8 @@ export class HuntService implements IHuntService {
     return HuntMapper.fromDocument(hunt);
   }
 
-  async updateHunt(id: string, huntData: HuntUpdate, userId: string): Promise<Hunt> {
-    const existingHunt = await HuntModel.findByIdAndCreator(id, userId);
+  async updateHunt(huntId: number, huntData: HuntUpdate, userId: string): Promise<Hunt> {
+    const existingHunt = await HuntModel.findByHuntIdAndCreator(huntId, userId);
     if (!existingHunt) {
       throw new NotFoundError();
     }
@@ -68,41 +68,40 @@ export class HuntService implements IHuntService {
     return HuntMapper.fromDocument(existingHunt);
   }
 
-  async deleteHunt(id: string, userId: string): Promise<void> {
-    const existingHunt = await HuntModel.findByIdAndCreator(id, userId);
+  async deleteHunt(huntId: number, userId: string): Promise<void> {
+    const existingHunt = await HuntModel.findByHuntIdAndCreator(huntId, userId);
     if (!existingHunt) {
       throw new NotFoundError();
     }
 
-    await StepModel.deleteMany({ huntId: id });
+    await StepModel.deleteMany({ huntId: huntId });
 
     await existingHunt.deleteOne();
   }
 
-  async reorderSteps(huntId: string, stepOrder: string[], userId: string): Promise<Hunt> {
-    const hunt = await HuntModel.findByIdAndCreator(huntId, userId);
+  async reorderSteps(huntId: number, stepOrder: number[], userId: string): Promise<Hunt> {
+    const hunt = await HuntModel.findByHuntIdAndCreator(huntId, userId);
     if (!hunt) {
       throw new NotFoundError();
     }
 
-    const stepObjectIds = stepOrder.map((id) => new Types.ObjectId(id));
     const stepsCount = await StepModel.countDocuments({
-      _id: { $in: stepObjectIds },
-      huntId: hunt._id,
+      stepId: { $in: stepOrder },
+      huntId: huntId,
     });
 
     if (stepsCount !== stepOrder.length) {
       throw new ValidationError('Invalid step IDs: some steps do not belong to this hunt', []);
     }
 
-    hunt.stepOrder = stepObjectIds;
+    hunt.stepOrder = stepOrder;
     await hunt.save();
 
     return HuntMapper.fromDocument(hunt);
   }
 
-  async verifyOwnership(huntId: string, userId: string): Promise<Hunt> {
-    const huntDoc = await HuntModel.findById(huntId);
+  async verifyOwnership(huntId: number, userId: string): Promise<Hunt> {
+    const huntDoc = await HuntModel.findOne({ huntId }).exec();
     if (!huntDoc) {
       throw new NotFoundError();
     }

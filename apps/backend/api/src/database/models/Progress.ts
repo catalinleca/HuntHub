@@ -1,10 +1,5 @@
 import { model, Schema, Model, HydratedDocument } from 'mongoose';
-import {
-  HuntProgressStatus,
-  IProgress,
-  IStepProgress,
-  ISubmission,
-} from '../types/Progress';
+import { HuntProgressStatus, IProgress, IStepProgress, ISubmission } from '../types/Progress';
 
 const SubmissionSchema = new Schema<ISubmission>(
   {
@@ -109,26 +104,18 @@ progressSchema.statics.findBySession = function (sessionId: string) {
 };
 
 progressSchema.statics.findByUser = function (userId: string) {
-  return this.find({ userId })
-    .sort({ startedAt: -1 })
-    .exec();
+  return this.find({ userId }).sort({ startedAt: -1 }).exec();
 };
 
 progressSchema.statics.findByHunt = function (huntId: string) {
-  return this.find({ huntId })
-    .sort({ startedAt: -1 })
-    .exec();
+  return this.find({ huntId }).sort({ startedAt: -1 }).exec();
 };
 
 progressSchema.statics.findCompletedByHunt = function (huntId: string) {
-  return this.find({ huntId, status: HuntProgressStatus.Completed })
-    .sort({ completedAt: -1 })
-    .exec();
+  return this.find({ huntId, status: HuntProgressStatus.Completed }).sort({ completedAt: -1 }).exec();
 };
 
-progressSchema.statics.countActiveByHunt = async function (
-  huntId: string,
-): Promise<number> {
+progressSchema.statics.countActiveByHunt = async function (huntId: string): Promise<number> {
   return this.countDocuments({
     huntId,
     status: HuntProgressStatus.InProgress,

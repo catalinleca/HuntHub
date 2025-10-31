@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import { ILocation } from '@/database/schemas/location.schema';
 
 /**
@@ -8,8 +7,8 @@ import { ILocation } from '@/database/schemas/location.schema';
  * They can be: Clue, Quiz, Mission, or Task.
  */
 export interface IStep {
-  id: string;
-  huntId: mongoose.Types.ObjectId;
+  stepId: number;
+  huntId: number;
   type: string; // ChallengeType from shared package
   challenge: unknown; // Flexible: clue, quiz, mission, or task
   hint?: string;

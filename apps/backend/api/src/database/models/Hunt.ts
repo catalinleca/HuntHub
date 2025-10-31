@@ -2,9 +2,16 @@ import { Schema, model, Model, HydratedDocument } from 'mongoose';
 import { IHunt } from '../types/Hunt';
 import { locationSchema } from '@/database/schemas/location.schema';
 import { HuntStatus } from '@hunthub/shared';
+import { getNextSequence } from './Counter';
 
 const huntSchema: Schema<IHunt> = new Schema<IHunt>(
   {
+    huntId: {
+      type: Number,
+      required: false,
+      unique: true,
+      index: true,
+    },
     creatorId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
@@ -27,7 +34,7 @@ const huntSchema: Schema<IHunt> = new Schema<IHunt>(
       maxLength: [500, 'Hunt description cannot exceed 500 characters'],
     },
     currentVersion: { type: Number, default: 1 },
-    stepOrder: { type: [Schema.Types.ObjectId], ref: 'Step', default: [] },
+    stepOrder: { type: [Number], default: [] },
     startLocation: locationSchema,
   },
   {
@@ -35,6 +42,13 @@ const huntSchema: Schema<IHunt> = new Schema<IHunt>(
   },
 );
 
+huntSchema.pre('save', async function () {
+  if (this.isNew && !this.huntId) {
+    this.huntId = await getNextSequence('hunt');
+  }
+});
+
+huntSchema.index({ huntId: 1 }, { unique: true });
 huntSchema.index({ creatorId: 1 });
 huntSchema.index({ status: 1 });
 huntSchema.index({ creatorId: 1, status: 1 });
@@ -42,7 +56,7 @@ huntSchema.index({ creatorId: 1, status: 1 });
 interface IHuntModel extends Model<IHunt> {
   findUserHunts(userId: string): Promise<HydratedDocument<IHunt>[]>;
 
-  findByIdAndCreator(huntId: string, userId: string): Promise<HydratedDocument<IHunt> | null>;
+  findByHuntIdAndCreator(huntId: number, userId: string): Promise<HydratedDocument<IHunt> | null>;
 
   hasHunts(userId: string): Promise<boolean>;
 
@@ -53,9 +67,9 @@ huntSchema.statics.findUserHunts = function (userId: string) {
   return this.find({ creatorId: userId }).sort({ updatedAt: -1 }).exec();
 };
 
-huntSchema.statics.findByIdAndCreator = function (huntId: string, userId: string) {
+huntSchema.statics.findByHuntIdAndCreator = function (huntId: number, userId: string) {
   return this.findOne({
-    _id: huntId,
+    huntId: huntId,
     creatorId: userId,
   }).exec();
 };

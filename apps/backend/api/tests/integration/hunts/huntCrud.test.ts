@@ -55,7 +55,8 @@ describe('Hunt CRUD Integration Tests', () => {
         currentVersion: 1,
       });
 
-      expect(response.body).toHaveProperty('id');
+      expect(response.body).toHaveProperty('huntId');
+      expect(typeof response.body.huntId).toBe('number');
       expect(response.body).toHaveProperty('createdAt');
       expect(response.body).toHaveProperty('updatedAt');
     });
@@ -95,19 +96,19 @@ describe('Hunt CRUD Integration Tests', () => {
 
     it('should get hunt by ID and return 200', async () => {
       const response = await request(app)
-        .get(`/api/hunts/${createdHunt.id}`)
+        .get(`/api/hunts/${createdHunt.huntId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
       expect(response.body).toMatchObject({
-        id: createdHunt.id,
+        huntId: createdHunt.huntId,
         name: 'Test Hunt',
         creatorId: testUser.id,
       });
     });
 
     it('should return 404 when hunt does not exist', async () => {
-      const fakeId = '507f1f77bcf86cd799439011'; // Valid MongoDB ObjectId format
+      const fakeId = 99999; // Non-existent numeric hunt ID
 
       await request(app)
         .get(`/api/hunts/${fakeId}`)
@@ -115,9 +116,16 @@ describe('Hunt CRUD Integration Tests', () => {
         .expect(404);
     });
 
+    it('should return 400 for invalid hunt ID format', async () => {
+      await request(app)
+        .get('/api/hunts/invalid')
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(400);
+    });
+
     it('should return 401 when accessing without auth', async () => {
       await request(app)
-        .get(`/api/hunts/${createdHunt.id}`)
+        .get(`/api/hunts/${createdHunt.huntId}`)
         .expect(401);
     });
   });

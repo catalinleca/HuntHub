@@ -33,13 +33,13 @@ export class HuntMapper {
     // Runtime validation: Check enum
     if (!this.isHuntStatus(doc.status)) {
       throw new Error(
-        `Data integrity error: Invalid hunt status "${doc.status}" in hunt ${doc._id}. ` +
+        `Data integrity error: Invalid hunt status "${doc.status}" in hunt ${doc.huntId}. ` +
           `Expected one of: ${Object.values(HuntStatus).join(', ')}`,
       );
     }
 
     return {
-      id: doc._id.toString(),
+      huntId: doc.huntId,
       creatorId: doc.creatorId.toString(),
       name: doc.name,
       description: doc.description,
