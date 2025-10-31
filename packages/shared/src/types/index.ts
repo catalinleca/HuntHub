@@ -11,32 +11,32 @@
  */
 
 export enum MissionType {
-  UploadMedia = "upload-media",
-  MatchLocation = "match-location",
+  UploadMedia = 'upload-media',
+  MatchLocation = 'match-location',
 }
 
 export enum OptionType {
-  Choice = "choice",
-  Input = "input",
+  Choice = 'choice',
+  Input = 'input',
 }
 
 export enum ChallengeType {
-  Clue = "clue",
-  Quiz = "quiz",
-  Mission = "mission",
-  Task = "task",
+  Clue = 'clue',
+  Quiz = 'quiz',
+  Mission = 'mission',
+  Task = 'task',
 }
 
 export enum HuntAccessType {
-  Creator = "creator",
-  Viewer = "viewer",
-  Editor = "editor",
+  Creator = 'creator',
+  Viewer = 'viewer',
+  Editor = 'editor',
 }
 
 export enum HuntStatus {
-  Draft = "draft",
-  Published = "published",
-  Archived = "archived",
+  Draft = 'draft',
+  Published = 'published',
+  Archived = 'archived',
 }
 
 export interface Location {
@@ -160,7 +160,7 @@ export interface Option {
 
 /** Validation configuration for quiz answers (future feature) */
 export interface QuizValidation {
-  mode?: "exact" | "fuzzy" | "contains" | "numeric-range";
+  mode?: 'exact' | 'fuzzy' | 'contains' | 'numeric-range';
   caseSensitive?: boolean;
   range?: {
     min?: number;
@@ -189,7 +189,7 @@ export interface Mission {
   /** Instructions for AI to validate player's upload (future feature) */
   aiInstructions?: string;
   /** Which AI model to use for validation (future feature) */
-  aiModel?: "gpt-4-vision" | "claude-vision" | "gemini-vision";
+  aiModel?: 'gpt-4-vision' | 'claude-vision' | 'gemini-vision';
 }
 
 export interface Task {
@@ -199,7 +199,7 @@ export interface Task {
   /** Instructions for AI to validate player's response */
   aiInstructions?: string;
   /** Which AI model to use for validation (future feature) */
-  aiModel?: "gpt-4" | "claude" | "gemini";
+  aiModel?: 'gpt-4' | 'claude' | 'gemini';
 }
 
 export interface User {

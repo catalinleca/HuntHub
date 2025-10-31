@@ -12,9 +12,6 @@ module.exports = {
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
       tsconfig: 'tsconfig.test.json',
-      diagnostics: {
-        ignoreCodes: [151002], // Suppress Node16 hybrid module warning
-      },
     }],
     '^.+\\.m?js$': ['ts-jest', {
       tsconfig: 'tsconfig.test.json',
