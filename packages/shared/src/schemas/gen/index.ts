@@ -75,6 +75,7 @@ const Hunt = z
     currentVersion: z.number().int(),
     status: HuntStatus,
     startLocation: Location.optional(),
+    stepOrder: z.array(z.number().int()).optional(),
     steps: z.array(Step).optional(),
     createdAt: z.string().datetime({ offset: true }).optional(),
     updatedAt: z.string().datetime({ offset: true }).optional(),
@@ -138,7 +139,7 @@ const HuntAccess = z
   })
   .passthrough();
 
-export const schemas: Record<string, any> = {
+export const schemas: Record<string, z.ZodTypeAny> = {
   HuntStatus,
   Location,
   HuntAccessType,

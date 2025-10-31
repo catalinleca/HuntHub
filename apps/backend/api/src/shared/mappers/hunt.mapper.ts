@@ -52,6 +52,7 @@ export class HuntMapper {
             radius: doc.startLocation.radius,
           }
         : undefined,
+      stepOrder: doc.stepOrder,
       createdAt: doc.createdAt?.toString(),
       updatedAt: doc.updatedAt?.toString(),
     };
