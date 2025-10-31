@@ -1,5 +1,6 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
+import CounterModel from '@/database/models/Counter';
 
 let mongoServer: MongoMemoryServer | null = null;
 
@@ -41,6 +42,8 @@ export const connectTestDatabase = async (): Promise<void> => {
       transform: baseTransform,
     });
 
+    await initializeCounters();
+
     console.log('✅ Connected to in-memory test database');
   } catch (error) {
     console.error('❌ Error connecting to test database:', error);
@@ -60,6 +63,24 @@ export const clearTestDatabase = async (): Promise<void> => {
 
   for (const collection of collections) {
     await collection.deleteMany({});
+  }
+
+  // Reinitialize counters after clearing database
+  await initializeCounters();
+};
+
+const initializeCounters = async (): Promise<void> => {
+  const counters = [
+    { name: 'hunt', seq: 999 },
+    { name: 'step', seq: 9999 },
+  ];
+
+  for (const counter of counters) {
+    await CounterModel.findOneAndUpdate(
+      { name: counter.name },
+      { $set: { seq: counter.seq } },  // Reset to starting value each time
+      { upsert: true, new: true },
+    );
   }
 };
 

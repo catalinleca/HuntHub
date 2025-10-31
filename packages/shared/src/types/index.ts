@@ -46,7 +46,8 @@ export interface Location {
 }
 
 export interface Hunt {
-  id: string;
+  /** @example 1332 */
+  huntId: number;
   creatorId: string;
   name: string;
   description?: string;
@@ -91,8 +92,10 @@ export interface HuntUpdate {
 }
 
 export interface Step {
-  id: string;
-  huntId: string;
+  /** @example 10000 */
+  stepId: number;
+  /** @example 1332 */
+  huntId: number;
   type: ChallengeType;
   challenge: Challenge;
   requiredLocation?: Location;

@@ -44,8 +44,9 @@ components:
     Hunt:
       type: object
       properties:
-        id:
-          type: string
+        huntId:
+          type: integer
+          example: 1332
         creatorId:
           type: string
         name:
@@ -71,10 +72,9 @@ components:
           example: "2024-02-01T10:12:45Z"
           format: date-time
       required:
-        - id
+        - huntId
         - creatorId
         - name
-        - isPublished
         - currentVersion
         - status
 
@@ -116,10 +116,12 @@ components:
     Step:
       type: object
       properties:
-        id:
-          type: string
+        stepId:
+          type: integer
+          example: 10000
         huntId:
-          type: string
+          type: integer
+          example: 1332
         type:
           $ref: '#/components/schemas/ChallengeType'
         challenge:
@@ -145,7 +147,7 @@ components:
           example: "2024-02-01T10:12:45Z"
           format: date-time
       required:
-        - id
+        - stepId
         - huntId
         - type
         - challenge

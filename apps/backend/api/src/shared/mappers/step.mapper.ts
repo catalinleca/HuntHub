@@ -11,9 +11,9 @@ export class StepMapper {
     return Object.values(ChallengeType).includes(type as ChallengeType);
   }
 
-  static toDocument(dto: StepCreate, huntId: string): Partial<IStep> {
+  static toDocument(dto: StepCreate, huntId: number): Partial<IStep> {
     return {
-      huntId: new Types.ObjectId(huntId),
+      huntId: huntId,
       type: dto.type,
       challenge: dto.challenge,
       hint: dto.hint,
@@ -39,14 +39,14 @@ export class StepMapper {
     // Runtime validation: Check enum
     if (!this.isChallengeType(doc.type)) {
       throw new Error(
-        `Data integrity error: Invalid challenge type "${doc.type}" in step ${doc._id}. ` +
+        `Data integrity error: Invalid challenge type "${doc.type}" in step ${doc.stepId}. ` +
           `Expected one of: ${Object.values(ChallengeType).join(', ')}`
       );
     }
 
     return {
-      id: doc._id.toString(),
-      huntId: doc.huntId.toString(),
+      stepId: doc.stepId,
+      huntId: doc.huntId,
       type: doc.type, // TypeScript knows this is ChallengeType after type guard
       challenge: doc.challenge as Challenge,
       hint: doc.hint,

@@ -53,8 +53,8 @@ const Task = z
 const Challenge = z.object({ clue: Clue, quiz: Quiz, mission: Mission, task: Task }).partial().passthrough();
 const Step = z
   .object({
-    id: z.string(),
-    huntId: z.string(),
+    stepId: z.number().int(),
+    huntId: z.number().int(),
     type: ChallengeType,
     challenge: Challenge,
     requiredLocation: Location.optional(),
@@ -68,7 +68,7 @@ const Step = z
   .passthrough();
 const Hunt = z
   .object({
-    id: z.string(),
+    huntId: z.number().int(),
     creatorId: z.string(),
     name: z.string(),
     description: z.string().optional(),
