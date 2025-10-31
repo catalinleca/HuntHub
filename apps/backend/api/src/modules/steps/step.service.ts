@@ -23,20 +23,12 @@ export class StepService implements IStepService {
     const docData = StepMapper.toDocument(stepData, huntId);
     const createdStep = await StepModel.create(docData);
 
-    await HuntModel.findOneAndUpdate(
-      { huntId },
-      { $push: { stepOrder: createdStep.stepId } },
-    );
+    await HuntModel.findOneAndUpdate({ huntId }, { $push: { stepOrder: createdStep.stepId } });
 
     return StepMapper.fromDocument(createdStep);
   }
 
-  async updateStep(
-    stepId: number,
-    huntId: number,
-    stepData: StepUpdate,
-    userId: string,
-  ): Promise<Step> {
+  async updateStep(stepId: number, huntId: number, stepData: StepUpdate, userId: string): Promise<Step> {
     await this.huntService.verifyOwnership(huntId, userId);
 
     const step = await StepModel.findOne({ stepId });
@@ -67,10 +59,7 @@ export class StepService implements IStepService {
       throw new NotFoundError();
     }
 
-    await HuntModel.findOneAndUpdate(
-      { huntId },
-      { $pull: { stepOrder: stepId } },
-    );
+    await HuntModel.findOneAndUpdate({ huntId }, { $pull: { stepOrder: stepId } });
 
     await step.deleteOne();
   }

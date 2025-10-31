@@ -53,10 +53,7 @@ stepSchema.index({ huntId: 1, type: 1 }); // Filter steps by type
 interface IStepModel extends Model<IStep> {
   findByHunt(huntId: number): Promise<HydratedDocument<IStep>[]>;
 
-  findByHuntAndType(
-    huntId: number,
-    type: ChallengeType,
-  ): Promise<HydratedDocument<IStep>[]>;
+  findByHuntAndType(huntId: number, type: ChallengeType): Promise<HydratedDocument<IStep>[]>;
 
   countByHunt(huntId: number): Promise<number>;
 
@@ -64,18 +61,11 @@ interface IStepModel extends Model<IStep> {
 }
 
 stepSchema.statics.findByHunt = function (huntId: number) {
-  return this.find({ huntId })
-    .sort({ createdAt: 1 })
-    .exec();
+  return this.find({ huntId }).sort({ createdAt: 1 }).exec();
 };
 
-stepSchema.statics.findByHuntAndType = function (
-  huntId: number,
-  type: ChallengeType,
-) {
-  return this.find({ huntId, type })
-    .sort({ createdAt: 1 })
-    .exec();
+stepSchema.statics.findByHuntAndType = function (huntId: number, type: ChallengeType) {
+  return this.find({ huntId, type }).sort({ createdAt: 1 }).exec();
 };
 
 stepSchema.statics.countByHunt = async function (huntId: number): Promise<number> {

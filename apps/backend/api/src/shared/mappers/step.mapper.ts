@@ -40,7 +40,7 @@ export class StepMapper {
     if (!this.isChallengeType(doc.type)) {
       throw new Error(
         `Data integrity error: Invalid challenge type "${doc.type}" in step ${doc.stepId}. ` +
-          `Expected one of: ${Object.values(ChallengeType).join(', ')}`
+          `Expected one of: ${Object.values(ChallengeType).join(', ')}`,
       );
     }
 

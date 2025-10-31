@@ -22,10 +22,7 @@ export async function getNextSequence(counterName: string): Promise<number> {
   );
 
   if (!counter) {
-    throw new Error(
-      `Counter '${counterName}' not found. ` +
-        `Run 'npm run init-counters' to initialize counters.`,
-    );
+    throw new Error(`Counter '${counterName}' not found. ` + `Run 'npm run init-counters' to initialize counters.`);
   }
 
   return counter.seq;

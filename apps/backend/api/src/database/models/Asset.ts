@@ -45,10 +45,7 @@ assetSchema.index({ mimeType: 1 });
 interface IAssetModel extends Model<IAsset> {
   findByOwner(userId: string): Promise<HydratedDocument<IAsset>[]>;
 
-  findByOwnerAndType(
-    userId: string,
-    mimeType: MimeTypes,
-  ): Promise<HydratedDocument<IAsset>[]>;
+  findByOwnerAndType(userId: string, mimeType: MimeTypes): Promise<HydratedDocument<IAsset>[]>;
 
   findByDocumentUsage(documentId: string): Promise<HydratedDocument<IAsset>[]>;
 
@@ -56,18 +53,11 @@ interface IAssetModel extends Model<IAsset> {
 }
 
 assetSchema.statics.findByOwner = function (userId: string) {
-  return this.find({ ownerId: userId })
-    .sort({ createdAt: -1 })
-    .exec();
+  return this.find({ ownerId: userId }).sort({ createdAt: -1 }).exec();
 };
 
-assetSchema.statics.findByOwnerAndType = function (
-  userId: string,
-  mimeType: MimeTypes,
-) {
-  return this.find({ ownerId: userId, mimeType })
-    .sort({ createdAt: -1 })
-    .exec();
+assetSchema.statics.findByOwnerAndType = function (userId: string, mimeType: MimeTypes) {
+  return this.find({ ownerId: userId, mimeType }).sort({ createdAt: -1 }).exec();
 };
 
 assetSchema.statics.findByDocumentUsage = function (documentId: string) {

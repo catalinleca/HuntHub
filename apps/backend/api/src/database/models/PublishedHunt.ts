@@ -65,23 +65,16 @@ publishedHuntSchema.statics.findAllVersions = function (huntId: string) {
   return this.find({ huntId }).sort({ publishedAt: -1 }).exec();
 };
 
-publishedHuntSchema.statics.getNextVersionNumber = async function (
-  huntId: string,
-): Promise<number> {
+publishedHuntSchema.statics.getNextVersionNumber = async function (huntId: string): Promise<number> {
   const latest = await this.findOne({ huntId }).sort({ version: -1 }).exec();
   return latest ? latest.version + 1 : 1;
 };
 
-publishedHuntSchema.statics.hasPublishedVersions = async function (
-  huntId: string,
-): Promise<boolean> {
+publishedHuntSchema.statics.hasPublishedVersions = async function (huntId: string): Promise<boolean> {
   const count = await this.countDocuments({ huntId }).limit(1);
   return count > 0;
 };
 
-const PublishedHuntModel = model<IPublishedHunt, IPublishedHuntModel>(
-  'PublishedHunt',
-  publishedHuntSchema,
-);
+const PublishedHuntModel = model<IPublishedHunt, IPublishedHuntModel>('PublishedHunt', publishedHuntSchema);
 
 export default PublishedHuntModel;
