@@ -54,6 +54,11 @@ export interface Hunt {
   currentVersion: number;
   status: HuntStatus;
   startLocation?: Location;
+  /**
+   * Ordered array of step IDs defining step sequence
+   * @example [10,23,15]
+   */
+  stepOrder?: number[];
   steps?: Step[];
   /**
    * @format date-time

@@ -59,6 +59,12 @@ components:
           $ref: '#/components/schemas/HuntStatus'
         startLocation:
           $ref: '#/components/schemas/Location'
+        stepOrder:
+          type: array
+          description: "Ordered array of step IDs defining step sequence"
+          items:
+            type: integer
+          example: [10, 23, 15]
         steps:
           type: array
           items:
