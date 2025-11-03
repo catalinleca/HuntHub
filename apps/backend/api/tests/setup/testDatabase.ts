@@ -73,6 +73,7 @@ const initializeCounters = async (): Promise<void> => {
   const counters = [
     { name: 'hunt', seq: 999 },
     { name: 'step', seq: 9999 },
+    { name: 'asset', seq: 99999 },
   ];
 
   for (const counter of counters) {

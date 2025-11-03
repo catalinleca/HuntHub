@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { injectable, inject } from 'inversify';
-import { AssetService } from './asset.service';
+import { IAssetService } from './asset.service';
 import { MimeTypes } from '@/database/types';
 import { ValidationError } from '@/shared/errors';
 import { ALLOWED_MIME_TYPES } from '@/shared/utils/mimeTypes';
+import { TYPES } from '@/shared/types';
 
 export interface IAssetController {
   requestUpload(req: Request, res: Response): Promise<Response>;
@@ -15,7 +16,7 @@ export interface IAssetController {
 
 @injectable()
 export class AssetController implements IAssetController {
-  constructor(@inject(AssetService) private assetService: AssetService) {}
+  constructor(@inject(TYPES.AssetService) private assetService: IAssetService) {}
 
   requestUpload = async (req: Request, res: Response) => {
     const { extension } = req.query;

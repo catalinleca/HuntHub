@@ -1,14 +1,15 @@
 import { inject, injectable } from 'inversify';
-import { StorageService } from '@/services/storage/storage.service';
+import { IStorageService } from '@/services/storage/storage.service';
 import { NotFoundError, ValidationError } from '@/shared/errors';
 import { MimeTypes } from '@/database/types';
 import { AssetCreate, AssetDTO, AssetMapper } from '@/shared/mappers/asset.mapper';
 import { AssetModel } from '@/database/models';
 import { ALLOWED_EXTENSIONS, ALLOWED_MIME_TYPES } from '@/shared/utils/mimeTypes';
 import { awsS3Bucket } from '@/config/env.config';
+import { TYPES } from '@/shared/types';
 
 export interface IAssetService {
-  requestUpload(userId: string, extension: string): Promise<{ signedUrl: string; publicUrl: string }>;
+  requestUpload(userId: string, extension: string): Promise<{ signedUrl: string; publicUrl: string; s3Key: string }>;
   createAsset(userId: string, assetData: AssetCreate): Promise<AssetDTO>;
   getUserAssets(userId: string, mimeType?: MimeTypes): Promise<AssetDTO[]>;
   getAssetById(assetId: number, userId: string): Promise<AssetDTO>;
@@ -19,18 +20,19 @@ export interface IAssetService {
 export class AssetService implements IAssetService {
   private maxSizeBytes = 10 * 1024 * 1024;
 
-  constructor(@inject(StorageService) private storageService: StorageService) {}
+  constructor(@inject(TYPES.StorageService) private storageService: IStorageService) {}
 
-  async requestUpload(userId: string, extension: string): Promise<{ signedUrl: string; publicUrl: string }> {
+  async requestUpload(userId: string, extension: string): Promise<{ signedUrl: string; publicUrl: string; s3Key: string }> {
     if (!ALLOWED_EXTENSIONS.includes(extension.toLowerCase())) {
       throw new ValidationError(`Extension '${extension}' not allowed`, []);
     }
 
-    const { signedUrl, publicUrl } = await this.storageService.generateUploadUrls(userId, extension);
+    const { signedUrl, publicUrl, s3Key } = await this.storageService.generateUploadUrls(userId, extension);
 
     return {
       signedUrl,
       publicUrl,
+      s3Key,
     };
   }
 
