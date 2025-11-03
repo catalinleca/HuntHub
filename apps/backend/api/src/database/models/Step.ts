@@ -9,13 +9,10 @@ const stepSchema: Schema<IStep> = new Schema<IStep>(
     stepId: {
       type: Number,
       required: false,
-      unique: true,
-      index: true,
     },
     huntId: {
       type: Number,
       required: true,
-      index: true,
     },
     type: {
       type: String,
