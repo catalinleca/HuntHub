@@ -1,0 +1,226 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'HuntHub Asset Management Infrastructure - S3 Storage + CloudFront CDN + IAM Roles'
+
+# ------------------------------------------------------------------------------
+# PARAMETERS: Input values we can customize per environment (dev/staging/prod)
+# ------------------------------------------------------------------------------
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - staging
+      - production
+    Description: Deployment environment (affects bucket naming and configuration)
+
+# ------------------------------------------------------------------------------
+# RESOURCES: The actual AWS infrastructure we're creating
+# ------------------------------------------------------------------------------
+Resources:
+
+  # ============================================================================
+  # S3 BUCKET: Where uploaded photos/videos are stored
+  # ============================================================================
+  AssetBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      # Bucket name: hunthub-assets-dev (or -prod based on environment)
+      BucketName: !Sub 'hunthub-assets-${Environment}'
+
+      # CORS: Allow browsers to upload directly to S3
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins:
+              - '*'  # In production, replace with your frontend domain
+            AllowedMethods:
+              - GET      # Download files
+              - PUT      # Upload files
+              - POST     # Upload via form
+              - HEAD     # Check if file exists
+            AllowedHeaders:
+              - '*'      # Allow all headers (Content-Type, etc.)
+            MaxAge: 3000 # Cache CORS preflight for 50 minutes
+
+      # ENCRYPTION: All files encrypted at rest (AES-256)
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256  # AWS-managed encryption
+
+      # VERSIONING: Keep old versions of files (optional, can disable)
+      VersioningConfiguration:
+        Status: Enabled
+
+      # PUBLIC ACCESS BLOCK: Prevent accidental public exposure
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true        # Block public ACLs
+        BlockPublicPolicy: true      # Block public bucket policies
+        IgnorePublicAcls: true       # Ignore any public ACLs
+        RestrictPublicBuckets: true  # Restrict public bucket policies
+
+      # LIFECYCLE: Delete files after X days (optional - currently disabled)
+      # Uncomment if you want to auto-delete old uploads
+      # LifecycleConfiguration:
+      #   Rules:
+      #     - Id: DeleteOldAssets
+      #       Status: Enabled
+      #       ExpirationInDays: 365  # Delete after 1 year
+
+  # ============================================================================
+  # CLOUDFRONT ORIGIN ACCESS IDENTITY: Allows CloudFront to access private S3
+  # ============================================================================
+  CloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub 'OAI for HuntHub Assets - ${Environment}'
+
+  # ============================================================================
+  # S3 BUCKET POLICY: Grant CloudFront permission to read from S3
+  # ============================================================================
+  AssetBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AssetBucket
+      PolicyDocument:
+        Statement:
+          - Sid: AllowCloudFrontRead
+            Effect: Allow
+            Principal:
+              CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
+            Action: 's3:GetObject'
+            Resource: !Sub '${AssetBucket.Arn}/*'
+
+  # ============================================================================
+  # CLOUDFRONT DISTRIBUTION: Global CDN for fast file delivery
+  # ============================================================================
+  AssetCDN:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        # Comment/description
+        Comment: !Sub 'HuntHub Asset CDN - ${Environment}'
+
+        # Enable immediately after creation
+        Enabled: true
+
+        # ORIGIN: Where CloudFront fetches files from (our S3 bucket)
+        Origins:
+          - Id: S3Origin
+            DomainName: !GetAtt AssetBucket.RegionalDomainName
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}'
+
+        # DEFAULT CACHE BEHAVIOR: How CloudFront handles requests
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https  # Force HTTPS
+
+          # Which HTTP methods to allow
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+
+          # Which HTTP methods to cache
+          CachedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+
+          # CACHE POLICY: How long to cache files
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6  # AWS Managed: CachingOptimized
+
+          # CORS: Forward Origin header for CORS to work
+          OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf  # AWS Managed: CORS-S3Origin
+
+        # PRICE CLASS: Which edge locations to use
+        PriceClass: PriceClass_100  # Use only North America & Europe (cheapest)
+
+        # VIEWER CERTIFICATE: SSL/TLS configuration
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true  # Use CloudFront's default SSL cert
+          MinimumProtocolVersion: TLSv1.2_2021  # Modern TLS only
+
+  # ============================================================================
+  # IAM ROLE: Allows backend to generate presigned URLs for S3 uploads
+  # ============================================================================
+  BackendAssetRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'hunthub-backend-assets-${Environment}'
+
+      # TRUST POLICY: Who can assume this role?
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              # In production, replace with your backend's IAM user/role
+              # For now: Allow any AWS user in your account
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+            Action: 'sts:AssumeRole'
+
+      # PERMISSIONS POLICY: What can this role do?
+      Policies:
+        - PolicyName: S3AssetAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # Allow generating presigned URLs and uploading
+              - Sid: AllowPresignedURLGeneration
+                Effect: Allow
+                Action:
+                  - 's3:PutObject'           # Upload files
+                  - 's3:GetObject'           # Download files (for presigned GET URLs)
+                  - 's3:DeleteObject'        # Delete files
+                  - 's3:PutObjectAcl'        # Set file permissions
+                Resource: !Sub '${AssetBucket.Arn}/*'
+
+              # Allow listing bucket (optional, for debugging)
+              - Sid: AllowListBucket
+                Effect: Allow
+                Action:
+                  - 's3:ListBucket'
+                Resource: !GetAtt AssetBucket.Arn
+
+# ------------------------------------------------------------------------------
+# OUTPUTS: Values we need to copy into our backend .env file
+# ------------------------------------------------------------------------------
+Outputs:
+  # S3 Bucket name (for backend to generate presigned URLs)
+  AssetBucketName:
+    Description: S3 bucket name for asset storage
+    Value: !Ref AssetBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-AssetBucketName'
+
+  # CloudFront domain (for serving files to users)
+  AssetCDNDomain:
+    Description: CloudFront CDN domain for asset delivery
+    Value: !GetAtt AssetCDN.DomainName
+    Export:
+      Name: !Sub '${AWS::StackName}-AssetCDNDomain'
+
+  # CloudFront full URL (convenience)
+  AssetCDNURL:
+    Description: Full CloudFront URL (with https://)
+    Value: !Sub 'https://${AssetCDN.DomainName}'
+
+  # IAM Role ARN (for backend to assume permissions)
+  BackendAssetRoleArn:
+    Description: IAM Role ARN for backend to assume
+    Value: !GetAtt BackendAssetRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-BackendAssetRoleArn'
+
+  # AWS Region (for backend SDK configuration)
+  AWSRegion:
+    Description: AWS Region where resources are deployed
+    Value: !Ref AWS::Region
+
+  # Environment
+  Environment:
+    Description: Deployment environment
+    Value: !Ref Environment

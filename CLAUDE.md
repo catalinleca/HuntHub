@@ -62,6 +62,7 @@ It imports all context about the project, so Claude always knows:
 
 Use Read tool to access these historical documents when needed:
 
+
 **Historical/Outdated:**
 - `.claude/reference/decisions-needed.md` - Old decision log (most decisions done)
 - `.claude/reference/design-concerns.md` - Feb 2025 discussion (historical)
@@ -81,6 +82,12 @@ Use Read tool to access these historical documents when needed:
 2. Claude implements following existing patterns
 3. Claude flags issues and suggests improvements
 4. Together we build a well-architected, consistent application
+
+I want you to remember that when talking about aws, and getting
+instructions nad everything, it is really important you give me
+accurate data and info. I don't want any outdated stuff, it is
+difficult to work with them and ideally you should count and use
+on the aws mcp that we installed
 
 ---
 
