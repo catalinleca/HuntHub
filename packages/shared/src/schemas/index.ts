@@ -17,6 +17,7 @@ export const {
   ChallengeType,
   OptionType,
   MissionType,
+  MimeTypes,
 
   // Common types
   Location,
@@ -44,6 +45,12 @@ export const {
 
   // Access
   HuntAccess,
+
+  // Asset
+  AssetUsage,
+  StorageLocation,
+  Asset,
+  AssetCreate,
 } = schemas;
 
 // Also export the schemas object for bulk imports if needed

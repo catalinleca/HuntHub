@@ -1,9 +1,11 @@
-import { HydratedDocument } from 'mongoose';
-import { IAsset } from '@/database/types/Asset';
+import { HydratedDocument, Types } from 'mongoose';
+import { IAsset, MimeTypes } from '@/database/types/Asset';
+import { awsS3Bucket } from '@/config/env.config';
 
-// TODO: Move AssetDTO to @hunthub/shared when Asset API is implemented
+// TODO: Move AssetDTO and AssetCreate to @hunthub/shared when Asset API is implemented
 export interface AssetDTO {
   id: string;
+  assetId: number;
   ownerId: string;
   url: string;
   mimeType: string;
@@ -23,10 +25,19 @@ export interface AssetDTO {
   updatedAt?: string;
 }
 
+export interface AssetCreate {
+  name: string;
+  mime: string;
+  sizeBytes: number;
+  url: string;
+  s3Key: string;
+}
+
 export class AssetMapper {
   static fromDocument(doc: HydratedDocument<IAsset>): AssetDTO {
     return {
       id: doc._id.toString(),
+      assetId: doc.assetId,
       ownerId: doc.ownerId.toString(),
       url: doc.url,
       mimeType: doc.mimeType,
@@ -46,6 +57,20 @@ export class AssetMapper {
       })),
       createdAt: doc.createdAt?.toString(),
       updatedAt: doc.updatedAt?.toString(),
+    };
+  }
+
+  static toDocument(dto: AssetCreate, userId: string): Partial<IAsset> {
+    return {
+      ownerId: new Types.ObjectId(userId),
+      url: dto.url,
+      mimeType: dto.mime as MimeTypes,
+      originalFilename: dto.name,
+      size: dto.sizeBytes,
+      storageLocation: {
+        bucket: awsS3Bucket,
+        path: dto.s3Key
+      },
     };
   }
 

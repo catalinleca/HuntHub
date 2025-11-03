@@ -41,6 +41,10 @@ components:
       type: string
       enum: [upload-media, match-location]
 
+    MimeTypes:
+      type: string
+      enum: [image/jpeg, image/png, image/webp, image/gif, video/mp4, video/webm, audio/mp3, audio/wav, audio/ogg]
+
     Hunt:
       type: object
       properties:
@@ -360,3 +364,93 @@ components:
         - userId
         - accessType
         - sharedAt
+
+    AssetUsage:
+      type: object
+      properties:
+        model:
+          type: string
+        field:
+          type: string
+        documentId:
+          type: string
+      required:
+        - model
+        - field
+        - documentId
+
+    StorageLocation:
+      type: object
+      properties:
+        bucket:
+          type: string
+        path:
+          type: string
+
+    Asset:
+      type: object
+      properties:
+        id:
+          type: string
+        assetId:
+          type: integer
+          example: 5000
+        ownerId:
+          type: string
+        url:
+          type: string
+        mimeType:
+          $ref: '#/components/schemas/MimeTypes'
+        originalFilename:
+          type: string
+        size:
+          type: number
+          description: File size in bytes
+        thumbnailUrl:
+          type: string
+        storageLocation:
+          $ref: '#/components/schemas/StorageLocation'
+        usage:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetUsage'
+          description: Track where this asset is used
+        createdAt:
+          type: string
+          example: "2024-02-01T10:12:45Z"
+          format: date-time
+        updatedAt:
+          type: string
+          example: "2024-02-01T10:12:45Z"
+          format: date-time
+      required:
+        - id
+        - assetId
+        - ownerId
+        - url
+        - mimeType
+
+    AssetCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        mime:
+          type: string
+          minLength: 1
+        sizeBytes:
+          type: number
+          minimum: 1
+        url:
+          type: string
+          minLength: 1
+        s3Key:
+          type: string
+          minLength: 1
+      required:
+        - name
+        - mime
+        - sizeBytes
+        - url
+        - s3Key
