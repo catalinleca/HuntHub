@@ -2,7 +2,6 @@ import { HydratedDocument, Types } from 'mongoose';
 import { IAsset, MimeTypes } from '@/database/types/Asset';
 import { awsS3Bucket } from '@/config/env.config';
 
-// TODO: Move AssetDTO and AssetCreate to @hunthub/shared when Asset API is implemented
 export interface AssetDTO {
   id: string;
   assetId: number;
