@@ -10,33 +10,45 @@
  * ---------------------------------------------------------------
  */
 
+export enum MimeTypes {
+  ImageJpeg = "image/jpeg",
+  ImagePng = "image/png",
+  ImageWebp = "image/webp",
+  ImageGif = "image/gif",
+  VideoMp4 = "video/mp4",
+  VideoWebm = "video/webm",
+  AudioMp3 = "audio/mp3",
+  AudioWav = "audio/wav",
+  AudioOgg = "audio/ogg",
+}
+
 export enum MissionType {
-  UploadMedia = 'upload-media',
-  MatchLocation = 'match-location',
+  UploadMedia = "upload-media",
+  MatchLocation = "match-location",
 }
 
 export enum OptionType {
-  Choice = 'choice',
-  Input = 'input',
+  Choice = "choice",
+  Input = "input",
 }
 
 export enum ChallengeType {
-  Clue = 'clue',
-  Quiz = 'quiz',
-  Mission = 'mission',
-  Task = 'task',
+  Clue = "clue",
+  Quiz = "quiz",
+  Mission = "mission",
+  Task = "task",
 }
 
 export enum HuntAccessType {
-  Creator = 'creator',
-  Viewer = 'viewer',
-  Editor = 'editor',
+  Creator = "creator",
+  Viewer = "viewer",
+  Editor = "editor",
 }
 
 export enum HuntStatus {
-  Draft = 'draft',
-  Published = 'published',
-  Archived = 'archived',
+  Draft = "draft",
+  Published = "published",
+  Archived = "archived",
 }
 
 export interface Location {
@@ -160,7 +172,7 @@ export interface Option {
 
 /** Validation configuration for quiz answers (future feature) */
 export interface QuizValidation {
-  mode?: 'exact' | 'fuzzy' | 'contains' | 'numeric-range';
+  mode?: "exact" | "fuzzy" | "contains" | "numeric-range";
   caseSensitive?: boolean;
   range?: {
     min?: number;
@@ -189,7 +201,7 @@ export interface Mission {
   /** Instructions for AI to validate player's upload (future feature) */
   aiInstructions?: string;
   /** Which AI model to use for validation (future feature) */
-  aiModel?: 'gpt-4-vision' | 'claude-vision' | 'gemini-vision';
+  aiModel?: "gpt-4-vision" | "claude-vision" | "gemini-vision";
 }
 
 export interface Task {
@@ -199,7 +211,7 @@ export interface Task {
   /** Instructions for AI to validate player's response */
   aiInstructions?: string;
   /** Which AI model to use for validation (future feature) */
-  aiModel?: 'gpt-4' | 'claude' | 'gemini';
+  aiModel?: "gpt-4" | "claude" | "gemini";
 }
 
 export interface User {
@@ -232,4 +244,54 @@ export interface HuntAccess {
    * @example "2024-02-01T10:12:45Z"
    */
   sharedAt: string;
+}
+
+export interface AssetUsage {
+  model: string;
+  field: string;
+  documentId: string;
+}
+
+export interface StorageLocation {
+  bucket?: string;
+  path?: string;
+}
+
+export interface Asset {
+  id: string;
+  /** @example 5000 */
+  assetId: number;
+  ownerId: string;
+  url: string;
+  mimeType: MimeTypes;
+  originalFilename?: string;
+  /** File size in bytes */
+  size?: number;
+  thumbnailUrl?: string;
+  storageLocation?: StorageLocation;
+  /** Track where this asset is used */
+  usage?: AssetUsage[];
+  /**
+   * @format date-time
+   * @example "2024-02-01T10:12:45Z"
+   */
+  createdAt?: string;
+  /**
+   * @format date-time
+   * @example "2024-02-01T10:12:45Z"
+   */
+  updatedAt?: string;
+}
+
+export interface AssetCreate {
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  mime: string;
+  /** @min 1 */
+  sizeBytes: number;
+  /** @minLength 1 */
+  url: string;
+  /** @minLength 1 */
+  s3Key: string;
 }

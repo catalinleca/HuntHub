@@ -1,24 +1,7 @@
 import mongoose from 'mongoose';
+import { MimeTypes } from '@hunthub/shared';
 
-export enum MimeTypes {
-  // Images
-  JPEG = 'image/jpeg',
-  PNG = 'image/png',
-  GIF = 'image/gif',
-  WEBP = 'image/webp',
-
-  // Video
-  MP4 = 'video/mp4',
-  WEBM = 'video/webm',
-
-  // Audio
-  MP3 = 'audio/mp3',
-  WAV = 'audio/wav',
-  OGG = 'audio/ogg',
-
-  // Documents
-  PDF = 'application/pdf',
-}
+export { MimeTypes };
 
 export interface IStorageLocation {
   bucket?: string;
@@ -26,8 +9,8 @@ export interface IStorageLocation {
 }
 
 export interface IAssetUsage {
-  model: string; // e.g., 'Step', 'Hunt', 'User'
-  field: string; // e.g., 'challenge.mission.referenceAssetIds', 'profilePicture'
+  model: string;
+  field: string; // 'challenge.mission.referenceAssetIds', 'profilePicture'
   documentId: mongoose.Types.ObjectId;
 }
 
@@ -43,6 +26,7 @@ export interface IAssetUsage {
  */
 export interface IAsset {
   id: string;
+  assetId: number;
   ownerId: mongoose.Types.ObjectId;
   url: string;
   mimeType: MimeTypes;

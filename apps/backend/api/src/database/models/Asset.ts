@@ -1,8 +1,14 @@
 import { Schema, model, Model, HydratedDocument } from 'mongoose';
 import { IAsset, MimeTypes } from '../types/Asset';
+import { getNextSequence } from '@/database/models/Counter';
 
 const assetSchema: Schema<IAsset> = new Schema<IAsset>(
   {
+    assetId: {
+      type: Number, // numeric ids should be used for API responses
+      unique: true,
+      required: false,
+    },
     ownerId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
@@ -41,6 +47,12 @@ const assetSchema: Schema<IAsset> = new Schema<IAsset>(
 assetSchema.index({ ownerId: 1, createdAt: -1 });
 assetSchema.index({ 'usage.documentId': 1 });
 assetSchema.index({ mimeType: 1 });
+
+assetSchema.pre('save', async function () {
+  if (this.isNew && !this.assetId) {
+    this.assetId = await getNextSequence('asset');
+  }
+});
 
 interface IAssetModel extends Model<IAsset> {
   findByOwner(userId: string): Promise<HydratedDocument<IAsset>[]>;

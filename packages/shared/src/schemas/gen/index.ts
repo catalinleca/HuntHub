@@ -7,6 +7,17 @@ const HuntAccessType = z.enum(['creator', 'viewer', 'editor']);
 const ChallengeType = z.enum(['clue', 'quiz', 'mission', 'task']);
 const OptionType = z.enum(['choice', 'input']);
 const MissionType = z.enum(['upload-media', 'match-location']);
+const MimeTypes = z.enum([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'video/mp4',
+  'video/webm',
+  'audio/mp3',
+  'audio/wav',
+  'audio/ogg',
+]);
 const Clue = z.object({ title: z.string(), description: z.string() }).partial().passthrough();
 const Option = z.object({ id: z.string(), text: z.string() }).passthrough();
 const QuizValidation = z
@@ -138,14 +149,42 @@ const HuntAccess = z
     sharedAt: z.string().datetime({ offset: true }),
   })
   .passthrough();
+const AssetUsage = z.object({ model: z.string(), field: z.string(), documentId: z.string() }).passthrough();
+const StorageLocation = z.object({ bucket: z.string(), path: z.string() }).partial().passthrough();
+const Asset = z
+  .object({
+    id: z.string(),
+    assetId: z.number().int(),
+    ownerId: z.string(),
+    url: z.string(),
+    mimeType: MimeTypes,
+    originalFilename: z.string().optional(),
+    size: z.number().optional(),
+    thumbnailUrl: z.string().optional(),
+    storageLocation: StorageLocation.optional(),
+    usage: z.array(AssetUsage).optional(),
+    createdAt: z.string().datetime({ offset: true }).optional(),
+    updatedAt: z.string().datetime({ offset: true }).optional(),
+  })
+  .passthrough();
+const AssetCreate = z
+  .object({
+    name: z.string().min(1),
+    mime: z.string().min(1),
+    sizeBytes: z.number().gte(1),
+    url: z.string().min(1),
+    s3Key: z.string().min(1),
+  })
+  .passthrough();
 
-export const schemas: Record<string, z.ZodTypeAny> = {
+export const schemas: Record<string, any> = {
   HuntStatus,
   Location,
   HuntAccessType,
   ChallengeType,
   OptionType,
   MissionType,
+  MimeTypes,
   Clue,
   Option,
   QuizValidation,
@@ -161,6 +200,10 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   StepUpdate,
   User,
   HuntAccess,
+  AssetUsage,
+  StorageLocation,
+  Asset,
+  AssetCreate,
 };
 
 const endpoints = makeApi([]);

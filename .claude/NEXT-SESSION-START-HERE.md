@@ -1,8 +1,25 @@
 # 🚀 START HERE - Next Session Quick Guide
 
-**Last updated:** 2025-10-28
+**Last updated:** 2025-11-03
 
 **When you open Claude Code next time, I'll auto-load all context.**
+
+---
+
+## 🎉 Asset Management Complete! (2025-11-03)
+
+**Major Achievement:**
+- ✅ Full asset service implementation with AWS S3 integration
+- ✅ StorageService with presigned URL generation for uploads
+- ✅ Complete asset CRUD (5/5 endpoints): Request upload, Create, Read, List, Delete
+- ✅ All 26 integration tests passing with full coverage
+- ✅ AWS infrastructure deployed (S3 bucket, CloudFront CDN, IAM roles)
+- ✅ Test infrastructure complete (MongoDB in-memory DB, AWS SDK mocking)
+- ✅ Mongoose index warnings fixed (Hunt and Step models)
+
+**See:**
+- `.claude/deployment/aws-deployment-complete.md` for AWS infrastructure details
+- `.claude/backend/current-state.md` for complete implementation status
 
 ---
 
@@ -27,82 +44,69 @@ You just finished the NOW sprint with **100% completion**:
 
 ---
 
-## ⚠️ CRITICAL NEXT: Numeric ID Migration (2-3 hours)
+## ✅ Numeric ID Migration: COMPLETE!
 
-**THE ISSUE:**
-Currently exposing MongoDB ObjectIds in API responses - **security and architecture problem**
+**Implemented for all active models:**
+- ✅ Hunt → `huntId: number` with Counter system
+- ✅ Step → `stepId: number` with Counter system
+- ✅ Asset → `assetId: number` with Counter system
+- ✅ Counter model with `getNextSequence()` helper
+- ✅ Pre-save hooks auto-generate IDs on document creation
+- ✅ User uses `firebaseUid` as external identifier (by design)
 
-**Example of the problem:**
-```json
-{
-  "id": "507f1f77bcf86cd799439011",  // ❌ MongoDB ObjectId (bad!)
-  "huntId": "507f191e810c19729de860ea" // ❌ Reveals DB implementation
-}
-```
-
-**THE SOLUTION:**
-Dual ID system with **sequential numeric IDs**:
-- **Internal ID**: MongoDB ObjectId (`_id`) - database only, never exposed
-- **External ID**: Numeric sequential ID - API layer, human-readable
-
+**API now returns:**
 ```json
 {
   "huntId": 1332,      // ✅ Human-readable number!
-  "stepId": 13344      // ✅ Easy to remember and share
+  "stepId": 13344      // ✅ Perfect for QR codes!
 }
 ```
 
-**WHY NUMERIC IDs:**
-1. **Human-readable**: "Check hunt 1332" vs "Check hunt 550e8400-e29b..."
-2. **Short URLs**: `/api/hunts/1332` (perfect for QR codes!)
-3. **Easy to share**: Can verbally communicate IDs
-4. **Production standard**: GitHub (#1332), Twitter, Stripe all use sequential IDs
-5. **Authorization-based security**: Enumeration is safe with proper auth (we have this)
+---
 
-**WHY THIS IS CRITICAL:**
-1. **Security**: ObjectIds contain timestamps → reveals creation order/timing
-2. **Implementation leakage**: Tells the world you're using MongoDB
-3. **Migration difficulty**: Tied to MongoDB format forever
-4. **Predictability**: ObjectIds are somewhat sequential
-5. **Production best practice**: External IDs should be opaque
+## 🚀 CURRENT PRIORITY: Tree VIEW API or Publishing Workflow
 
-**SCOPE OF CHANGES:**
-- 7 Models: Hunt, Step, User, Asset, Progress, PublishedHunt, LiveHunt
-- Counter Model: New model for auto-incrementing sequential IDs
-- 7 Mappers: Return numeric IDs, update foreign keys
-- All Services: Query by numeric ID instead of ObjectId
-- All Foreign Keys: Change from ObjectId to number (`huntId: 1332`)
-- Pre-save hooks: Auto-generate numeric IDs on document creation
-- OpenAPI schema: Update to `type: integer`
+**Two paths forward:**
 
-**TIME ESTIMATE:** 2-3 hours
+### Option A: Tree VIEW API (Week 2 work)
+- GET /api/hunts/:id/tree (compact step list for lazy loading)
+- GET /api/steps/:id (full step details)
+- Add stepCount to hunt list
+- Database indexes for performance
+- Challenge type validation (Strategy pattern)
 
-**VALIDATION:** ✅ Validated against production standards and MongoDB best practices
+### Option B: Publishing Workflow (Week 4-5 work)
+- Publish hunt endpoint (clone hunt + steps)
+- Create PublishedHunt and LiveHunt records
+- Version management
+- QR code generation support
 
-**SEE COMPLETE PLAN:** `.claude/backend/NUMERIC-ID-MIGRATION-PLAN.md`
-- Production standards validation (GitHub, Twitter, Stripe patterns)
-- MongoDB/Mongoose best practices checklist
-- Complete implementation guide with code examples
-- Migration strategy for existing data
-- Security analysis (enumeration attacks, authorization)
-- Testing strategy
-- Rollback plan
+**Recommended:** Start with Tree VIEW API for better editor UX before tackling publishing
 
 ---
 
-## 📋 What's Next After UUID Migration
+## 📋 Roadmap Progress
 
-### Week 2: Tree VIEW + Challenge Validation
+### ✅ Week 1: Hunt & Step CRUD - COMPLETE!
+- Hunt CRUD (6/6 endpoints)
+- Step CRUD (3/3 endpoints)
+- Numeric ID system implemented
+
+### ✅ Week 3: Asset Management - COMPLETE!
+- Asset CRUD with AWS S3 (5/5 endpoints)
+- 26/26 tests passing
+
+### 📍 Week 2: Tree VIEW + Challenge Validation (NEXT)
 - GET /api/hunts/:id/tree (compact step list, lazy loading)
 - GET /api/steps/:id (full details)
 - Add stepCount to hunt list
 - Database indexes
 - Challenge type validation (Strategy pattern)
 
-### Week 3: Asset Management (CRITICAL)
-- File upload (multer + Firebase Storage or S3)
-- Attach assets to steps
-- **Must be done before Publishing** (missions need file uploads)
+### Week 3: ✅ Asset Management - COMPLETE!
+- ✅ File upload with presigned S3 URLs
+- ✅ Asset CRUD endpoints
+- ✅ All 26 integration tests passing
 
 ### Week 4-5: Publishing Workflow
 - Publish hunt (clone hunt + steps)
@@ -164,8 +168,9 @@ Dual ID system with **sequential numeric IDs**:
 - MongoDB best practices
 - Monorepo strategy
 - Publishing workflow design
-- **Week 1 completion status**
-- **UUID migration urgency**
+- **Week 1 completion status** (Hunt + Step CRUD ✅)
+- **Numeric ID migration** (COMPLETE ✅ for all active models)
+- **Asset Management** (COMPLETE ✅ with full AWS S3 integration)
 - Production patterns and reasoning
 
 **You don't need to remind me of anything.** Just say what you want to work on.
@@ -175,14 +180,14 @@ Dual ID system with **sequential numeric IDs**:
 ## 💬 How to Start Next Session
 
 **Recommended:**
-✅ "Let's implement the UUID migration"
-✅ "Create the UUID migration plan"
-✅ "Start with UUID migration - begin with Hunt model"
+✅ "Let's implement the Tree VIEW API"
+✅ "Start with GET /api/hunts/:id/tree endpoint"
+✅ "Work on Publishing Workflow"
 
 **You can also:**
-- Ask me to summarize Week 1 achievements
-- Ask about the UUID migration scope
-- Ask what's after UUID migration
+- Ask me to summarize what's been completed
+- Ask about Tree VIEW vs Publishing priority
+- Ask what's the fastest path to MVP
 - Jump straight to implementation
 
 ---
@@ -207,63 +212,54 @@ cat .claude/backend/current-state.md | grep "Implemented (Week 1"
 
 ---
 
-## 🎯 Success Criteria
+## ✅ Recent Achievements
 
-**For Numeric ID Migration Session:**
+**Completed Work:**
+- [x] Week 1: Hunt + Step CRUD (9/9 endpoints) ✅
+- [x] Numeric ID Migration (Hunt, Step, Asset all use numeric IDs) ✅
+- [x] Counter system with `getNextSequence()` ✅
+- [x] Asset Management with AWS S3 (5/5 endpoints) ✅
+- [x] 26/26 integration tests passing ✅
+- [x] AWS infrastructure deployed (S3, CloudFront, IAM) ✅
+- [x] Test infrastructure (in-memory MongoDB, mocking) ✅
+- [x] Mongoose index warnings fixed ✅
 
-**Minimum:**
-- [x] Migration plan created and validated ✅
-- [ ] Counter model created
-- [ ] Hunt model updated (add huntId: number field, unique index, pre-save hook)
-- [ ] HuntMapper updated (return numeric huntId)
-- [ ] HuntService queries by huntId
-
-**Good:**
-- [ ] All 7 models updated (Hunt, Step, User, Asset, Progress, PublishedHunt, LiveHunt)
-- [ ] All 7 mappers updated (return numeric IDs)
-- [ ] All services query by numeric ID
-- [ ] OpenAPI schema updated (`type: integer`)
-- [ ] TypeScript types regenerated
-- [ ] Tests passing
-
-**Great:**
-- [ ] Complete numeric ID migration
-- [ ] All endpoints tested and working with numeric IDs
-- [ ] Routes work: `/api/hunts/1332/steps/13344`
-- [ ] Foreign keys updated (stepOrder: number[], creatorId: number)
-- [ ] Migration script written (for existing data)
-- [ ] Documentation updated
-- [ ] Ready for Week 2
+**Backend API Progress:**
+- Hunt API: ✅ COMPLETE
+- Step API: ✅ COMPLETE
+- Asset API: ✅ COMPLETE
+- Tree VIEW API: 📍 NEXT
+- Publishing API: 📋 FUTURE
+- Player API: 📋 FUTURE
 
 ---
 
-## ⚠️ Remember
+## 🎯 Next Goals
 
-**Numeric ID Migration is CRITICAL because:**
-1. **Security issue**: Exposing MongoDB ObjectIds (contain timestamps, predictable)
-2. **Architecture best practice**: Separate internal DB IDs from external API IDs
-3. **Blocks production deployment**: Can't ship with exposed ObjectIds
-4. **Better now than later**: Easier to fix before building more features
-5. **Portfolio quality**: Shows production-grade patterns (GitHub, Twitter, Stripe do this)
+**Short Term (Week 2):**
+- Tree VIEW API for efficient step loading
+- Challenge type validation with Strategy pattern
+- Database indexes for performance
 
-**Numeric IDs are production standard:**
-- ✅ GitHub uses issue numbers: `#1332`
-- ✅ Twitter uses numeric tweet IDs
-- ✅ Stripe uses sequential customer IDs
-- ✅ Human-readable, perfect for QR codes
-- ✅ Safe with proper authorization (we have this)
+**Medium Term (Weeks 4-5):**
+- Publishing workflow implementation
+- Hunt versioning system
+- QR code generation support
 
-**This is a portfolio project - show production-quality patterns from day one!**
+**This is a portfolio project - keep showing production-quality patterns!**
 
 ---
 
-**🔥 NEXT TASK: Numeric ID Migration - Implementation Ready!**
+**🔥 READY FOR: Tree VIEW API or Publishing Workflow**
 
-**Quick Start:**
-1. Read `.claude/backend/NUMERIC-ID-MIGRATION-PLAN.md` (complete validated plan)
-2. Create Counter model (15 min)
-3. Update Hunt model as template (20 min)
-4. Apply pattern to remaining models (1 hour)
-5. Test everything (30 min)
+**Two solid options:**
 
-**Complete plan with code examples, security analysis, and MongoDB best practices validation.**
+**Option A - Tree VIEW (Recommended for UX):**
+- Better editor experience with lazy loading
+- Follows original roadmap order
+- ~1 week of work
+
+**Option B - Publishing (Faster to MVP):**
+- Get hunts playable sooner
+- Enables QR code generation
+- ~1-2 weeks of work

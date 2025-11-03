@@ -9,8 +9,6 @@ const huntSchema: Schema<IHunt> = new Schema<IHunt>(
     huntId: {
       type: Number,
       required: false,
-      unique: true,
-      index: true,
     },
     creatorId: {
       type: Schema.Types.ObjectId,
