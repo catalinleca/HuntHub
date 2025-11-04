@@ -1,6 +1,6 @@
 import { Hunt, HuntCreate, HuntUpdate } from '@hunthub/shared';
 import { injectable } from 'inversify';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import StepModel from '@/database/models/Step';
@@ -40,16 +40,25 @@ export class HuntService implements IHuntService {
   }
 
   async createHunt(hunt: HuntCreate, creatorId: string): Promise<Hunt> {
-    // Create Hunt master record using mapper
-    const huntData = HuntMapper.toHuntDocument(creatorId);
-    const createdHunt = await HuntModel.create(huntData);
+    // Use transaction to ensure atomicity (Hunt + HuntVersion created together)
+    const session = await mongoose.startSession();
+    let result: Hunt;
 
-    // Create first HuntVersion (v1) using mapper
-    const versionData = HuntMapper.toVersionDocument(hunt, createdHunt.huntId, 1);
-    const createdVersion = await HuntVersionModel.create(versionData);
+    await session.withTransaction(async () => {
+      // Create Hunt master record using mapper
+      const huntData = HuntMapper.toHuntDocument(creatorId);
+      const [createdHunt] = await HuntModel.create([huntData], { session });
 
-    // Return merged DTO using mapper
-    return HuntMapper.fromDocuments(createdHunt, createdVersion);
+      // Create first HuntVersion (v1) using mapper
+      const versionData = HuntMapper.toVersionDocument(hunt, createdHunt.huntId, 1);
+      const [createdVersion] = await HuntVersionModel.create([versionData], { session });
+
+      // Return merged DTO using mapper
+      result = HuntMapper.fromDocuments(createdHunt, createdVersion);
+    });
+
+    await session.endSession();
+    return result!;
   }
 
   async getAllHunts(): Promise<Hunt[]> {
@@ -123,8 +132,13 @@ export class HuntService implements IHuntService {
       throw new NotFoundError();
     }
 
+    // Delete ALL HuntVersions for this hunt
+    await HuntVersionModel.deleteMany({ huntId });
+
+    // Delete ALL steps across all versions
     await StepModel.deleteMany({ huntId: huntId });
 
+    // Delete Hunt master
     await existingHunt.deleteOne();
   }
 
@@ -134,14 +148,15 @@ export class HuntService implements IHuntService {
       throw new NotFoundError();
     }
 
-    // Validate all steps belong to this hunt
+    // Validate all steps belong to this hunt AND the current draft version
     const stepsCount = await StepModel.countDocuments({
       stepId: { $in: stepOrder },
       huntId: huntId,
+      huntVersion: huntDoc.latestVersion, // Ensure steps are from the draft version
     });
 
     if (stepsCount !== stepOrder.length) {
-      throw new ValidationError('Invalid step IDs: some steps do not belong to this hunt', []);
+      throw new ValidationError('Invalid step IDs: some steps do not belong to this hunt version', []);
     }
 
     // Update stepOrder in draft HuntVersion

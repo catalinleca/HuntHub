@@ -1,8 +1,8 @@
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { MongoMemoryReplSet } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import CounterModel from '@/database/models/Counter';
 
-let mongoServer: MongoMemoryServer | null = null;
+let mongoServer: MongoMemoryReplSet | null = null;
 
 /**
  * Base transform for toJSON - converts _id to id and formats dates
@@ -30,8 +30,10 @@ function baseTransform(_: unknown, ret: any) {
  */
 export const connectTestDatabase = async (): Promise<void> => {
   try {
-    // Create in-memory MongoDB instance
-    mongoServer = await MongoMemoryServer.create();
+    // Create in-memory MongoDB replica set (required for transactions)
+    mongoServer = await MongoMemoryReplSet.create({
+      replSet: { count: 1, storageEngine: 'wiredTiger' },
+    });
     const mongoUri = mongoServer.getUri();
 
     // Connect mongoose to in-memory DB
