@@ -5,6 +5,7 @@ import { ChallengeType } from '@hunthub/shared';
 
 export interface CreateStepOptions {
   huntId?: number;
+  huntVersion?: number;
   type?: ChallengeType;
   challenge?: any;
   hint?: string;
@@ -15,6 +16,7 @@ export interface CreateStepOptions {
 export const createTestStep = async (options: CreateStepOptions = {}): Promise<IStep> => {
   const stepData = {
     huntId: options.huntId || 1000, // Default huntId
+    huntVersion: options.huntVersion || 1, // Default version
     type: options.type || ChallengeType.Clue,
     challenge: options.challenge || {
       clue: {

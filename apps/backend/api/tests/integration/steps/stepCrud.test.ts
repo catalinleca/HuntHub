@@ -10,6 +10,7 @@ import { IHunt } from '@/database/types/Hunt';
 import { IStep } from '@/database/types/Step';
 import { ChallengeType } from '@hunthub/shared';
 import HuntModel from '@/database/models/Hunt';
+import HuntVersionModel from '@/database/models/HuntVersion';
 
 describe('Step CRUD Integration Tests', () => {
   let app: Express;
@@ -86,9 +87,9 @@ describe('Step CRUD Integration Tests', () => {
 
       const stepId = response.body.stepId;
 
-      // Verify step was added to hunt's stepOrder
-      const updatedHunt = await HuntModel.findOne({ huntId: testHunt.huntId });
-      expect(updatedHunt?.stepOrder).toContain(stepId);
+      // Verify step was added to hunt version's stepOrder
+      const huntVersion = await HuntVersionModel.findOne({ huntId: testHunt.huntId, version: 1 });
+      expect(huntVersion?.stepOrder).toContain(stepId);
     });
 
     it('should return 401 when no auth token provided', async () => {
@@ -245,9 +246,9 @@ describe('Step CRUD Integration Tests', () => {
         type: ChallengeType.Clue,
       });
 
-      // Add step to hunt's stepOrder
-      await HuntModel.findOneAndUpdate(
-        { huntId: testHunt.huntId },
+      // Add step to hunt version's stepOrder
+      await HuntVersionModel.findOneAndUpdate(
+        { huntId: testHunt.huntId, version: 1 },
         { $push: { stepOrder: testStep.stepId } },
       );
     });
@@ -265,9 +266,9 @@ describe('Step CRUD Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(204);
 
-      // Verify step was removed from hunt's stepOrder
-      const updatedHunt = await HuntModel.findOne({ huntId: testHunt.huntId });
-      expect(updatedHunt?.stepOrder).not.toContain(testStep.stepId);
+      // Verify step was removed from hunt version's stepOrder
+      const huntVersion = await HuntVersionModel.findOne({ huntId: testHunt.huntId, version: 1 });
+      expect(huntVersion?.stepOrder).not.toContain(testStep.stepId);
     });
 
     it('should return 403 when trying to delete step from another user\'s hunt', async () => {
