@@ -3,8 +3,10 @@ import { ILiveHunt } from '@/database/types/LiveHunt';
 
 // TODO: Move LiveHuntDTO to @hunthub/shared when Publishing API is implemented
 export interface LiveHuntDTO {
-  id: string;
-  versionId: string;
+  huntId: number;
+  huntVersion: number;
+  activePlayerCount: number;
+  lastPlayedAt?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -12,10 +14,12 @@ export interface LiveHuntDTO {
 export class LiveHuntMapper {
   static fromDocument(doc: HydratedDocument<ILiveHunt>): LiveHuntDTO {
     return {
-      id: doc._id.toString(),
-      versionId: doc.versionId.toString(),
-      createdAt: doc.createdAt?.toString(),
-      updatedAt: doc.updatedAt?.toString(),
+      huntId: doc.huntId,
+      huntVersion: doc.huntVersion,
+      activePlayerCount: doc.activePlayerCount,
+      lastPlayedAt: doc.lastPlayedAt?.toISOString(),
+      createdAt: doc.createdAt?.toISOString(),
+      updatedAt: doc.updatedAt?.toISOString(),
     };
   }
 

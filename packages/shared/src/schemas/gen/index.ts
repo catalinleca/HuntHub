@@ -1,7 +1,7 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
-const HuntStatus = z.enum(['draft', 'published', 'archived']);
+const HuntStatus = z.enum(['draft', 'published']);
 const Location = z.object({ lat: z.number(), lng: z.number(), radius: z.number() }).passthrough();
 const HuntAccessType = z.enum(['creator', 'viewer', 'editor']);
 const ChallengeType = z.enum(['clue', 'quiz', 'mission', 'task']);
@@ -83,10 +83,9 @@ const Hunt = z
     creatorId: z.string(),
     name: z.string(),
     description: z.string().optional(),
-    currentVersion: z.number().int(),
     status: HuntStatus,
     startLocation: Location.optional(),
-    stepOrder: z.array(z.number().int()).optional(),
+    stepOrder: z.array(z.number().int()),
     steps: z.array(Step).optional(),
     createdAt: z.string().datetime({ offset: true }).optional(),
     updatedAt: z.string().datetime({ offset: true }).optional(),
@@ -111,11 +110,8 @@ const HuntCreate = z
   })
   .passthrough();
 const HuntUpdate = z
-  .object({
-    name: z.string().min(1).max(100),
-    description: z.string().max(500).optional(),
-    startLocation: Location.optional(),
-  })
+  .object({ name: z.string().min(1).max(100), description: z.string().max(500), startLocation: Location })
+  .partial()
   .passthrough();
 const StepUpdate = z
   .object({
@@ -177,7 +173,7 @@ const AssetCreate = z
   })
   .passthrough();
 
-export const schemas: Record<string, any> = {
+export const schemas: Record<string, z.ZodTypeAny> = {
   HuntStatus,
   Location,
   HuntAccessType,

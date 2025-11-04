@@ -45,10 +45,10 @@ export enum HuntAccessType {
   Editor = "editor",
 }
 
+/** Hunt status: draft (editable) or published (read-only) */
 export enum HuntStatus {
   Draft = "draft",
   Published = "published",
-  Archived = "archived",
 }
 
 export interface Location {
@@ -57,20 +57,22 @@ export interface Location {
   radius: number;
 }
 
+/** Hunt DTO (merges Hunt master + HuntVersion content for frontend) */
 export interface Hunt {
   /** @example 1332 */
   huntId: number;
   creatorId: string;
   name: string;
   description?: string;
-  currentVersion: number;
+  /** Hunt status: draft (editable) or published (read-only) */
   status: HuntStatus;
   startLocation?: Location;
   /**
    * Ordered array of step IDs defining step sequence
    * @example [10,23,15]
    */
-  stepOrder?: number[];
+  stepOrder: number[];
+  /** Optional: Full step details (when populated) */
   steps?: Step[];
   /**
    * @format date-time
@@ -96,13 +98,13 @@ export interface HuntCreate {
   steps?: StepCreate[];
 }
 
-/** Hunt metadata update (steps managed via separate endpoints) */
+/** Hunt content update (updates draft HuntVersion internally) */
 export interface HuntUpdate {
   /**
    * @minLength 1
    * @maxLength 100
    */
-  name: string;
+  name?: string;
   /** @maxLength 500 */
   description?: string;
   startLocation?: Location;

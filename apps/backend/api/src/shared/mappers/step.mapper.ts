@@ -11,9 +11,10 @@ export class StepMapper {
     return Object.values(ChallengeType).includes(type as ChallengeType);
   }
 
-  static toDocument(dto: StepCreate, huntId: number): Partial<IStep> {
+  static toDocument(dto: StepCreate, huntId: number, huntVersion: number): Partial<IStep> {
     return {
-      huntId: huntId,
+      huntId,
+      huntVersion,
       type: dto.type,
       challenge: dto.challenge,
       hint: dto.hint,

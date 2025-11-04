@@ -9,7 +9,8 @@ components:
   schemas:
     HuntStatus:
       type: string
-      enum: [draft, published, archived]
+      enum: [draft, published]
+      description: "Hunt status: draft (editable) or published (read-only)"
 
     Location:
       type: object
@@ -47,6 +48,7 @@ components:
 
     Hunt:
       type: object
+      description: "Hunt DTO (merges Hunt master + HuntVersion content for frontend)"
       properties:
         huntId:
           type: integer
@@ -57,8 +59,6 @@ components:
           type: string
         description:
           type: string
-        currentVersion:
-          type: integer
         status:
           $ref: '#/components/schemas/HuntStatus'
         startLocation:
@@ -71,6 +71,7 @@ components:
           example: [10, 23, 15]
         steps:
           type: array
+          description: "Optional: Full step details (when populated)"
           items:
               $ref: '#/components/schemas/Step'
         createdAt:
@@ -85,8 +86,8 @@ components:
         - huntId
         - creatorId
         - name
-        - currentVersion
         - status
+        - stepOrder
 
     HuntCreate:
       type: object
@@ -109,7 +110,7 @@ components:
 
     HuntUpdate:
       type: object
-      description: Hunt metadata update (steps managed via separate endpoints)
+      description: Hunt content update (updates draft HuntVersion internally)
       properties:
         name:
           type: string
@@ -120,8 +121,6 @@ components:
           maxLength: 500
         startLocation:
           $ref: '#/components/schemas/Location'
-      required:
-        - name
 
     Step:
       type: object
