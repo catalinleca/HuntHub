@@ -1,44 +1,61 @@
 # HuntHub Development Roadmap
 
-**Last updated:** 2025-10-28 (Week 1 COMPLETE!)
+**Last updated:** 2025-11-04 (Versioning System COMPLETE!)
 
 **Product vision:** Portfolio-quality treasure hunt platform with location-based challenges, built production-ready in 2 months.
 
 **Timeline:** MVP → V1.1 → V1.2 (phased delivery)
 
-**🎉 Week 1 Completed (2025-10-28):**
+**🎉 Major Achievements:**
+
+**Week 1 (2025-10-28):**
 - ✅ Hunt CRUD Complete (6/6 endpoints)
 - ✅ Step CRUD Complete (3/3 endpoints)
 - ✅ Reorder Steps (bonus from Week 2)
-- ✅ OpenAPI schema fixes (type/challengeType inconsistencies)
+- ✅ OpenAPI schema fixes
 - ✅ Production patterns documented
 
-**⚠️ CRITICAL NEXT: UUID Migration**
-- Problem: Exposing MongoDB ObjectIds (security issue)
-- Solution: Dual ID system (internal ObjectId + external UUID)
-- Priority: HIGH - Must complete before continuing features
-- Time: 2-3 hours
+**Week 2-3 (2025-11-03):**
+- ✅ Asset Management Complete (5/5 endpoints)
+- ✅ AWS S3 integration with presigned URLs
+- ✅ 26/26 asset tests passing
+
+**Week 3-4 (2025-11-04):**
+- ✅ **Hunt Versioning System Complete!**
+- ✅ Hunt (master) + HuntVersion (content) architecture
+- ✅ Atomic transactions (MongoDB replica set)
+- ✅ Data integrity fixes (cascade delete, validation)
+- ✅ All 69 tests passing
+
+**📍 NEXT: Publishing Workflow**
+- Implement publishHunt() method
+- Clone steps across versions
+- Mark versions as published
+- Time: 4-5 hours
 
 ---
 
 ## 📊 Progress Overview
 
-**Current Phase:** UUID Migration (Critical Architecture Fix)
-**Previous Sprint:** ✅ Week 1 Complete - Hunt CRUD + Step CRUD
-**Overall Progress:** ~30% to MVP completion
+**Current Phase:** Publishing Workflow Implementation
+**Previous Sprint:** ✅ Versioning System Complete - Hunt + HuntVersion architecture
+**Overall Progress:** ~45% to MVP completion
 
 **Key Metrics:**
-- Backend Epics: 2/6 complete (33%) - Epic 1 Complete, Epic 3 Complete
+- Backend Epics: 3.5/6 complete (58%)
+  - ✅ Epic 1: Hunt Management (100%)
+  - ✅ Epic 3: Step Management (100%)
+  - ✅ Epic 6: Asset Management (100%)
+  - 🔄 Epic 4: Publishing Workflow (60% - versioning done, publish method next)
 - Frontend Epics: 0/4 started (0%)
 - Integration Epics: 0/2 started (0%)
 
-**Updated Timeline:**
+**Completed Work:**
 - ✅ Week 1: Hunt CRUD + Step CRUD (COMPLETE)
-- 🔥 UUID Migration: 2-3 hours (CRITICAL - before Week 2)
-- Week 2: Tree VIEW + Challenge Validation
-- Week 3: Asset Management (CRITICAL - blocks Publishing)
-- Week 4: Publishing Workflow
-- Week 5-6: Player API
+- ✅ Week 2-3: Asset Management (COMPLETE)
+- ✅ Week 3-4: Versioning System (COMPLETE)
+- 📍 Week 4: Publishing Workflow (IN PROGRESS)
+- 📋 Week 5-6: Player API (PENDING)
 
 ---
 

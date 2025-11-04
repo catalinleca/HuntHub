@@ -1,10 +1,41 @@
 # Backend Current State
 
-**Last updated:** 2025-11-03
+**Last updated:** 2025-11-04
 
-**🎉 Asset Management Complete! (2025-11-03)**
+**🎉 Hunt Versioning System Complete! (2025-11-04)**
 
-**Recent work (2025-11-03):**
+**Most Recent Work (2025-11-04):**
+- ✅ **Hunt Versioning Architecture** - Hunt (master) + HuntVersion (content) separation
+- ✅ **Phase 1 Complete** - All tests fixed for new schema (43/43 tests passing)
+- ✅ **Phase 2 Complete** - Data integrity fixes:
+  - ✅ Cascade delete includes HuntVersions
+  - ✅ huntVersion validation in reorderSteps (security fix)
+  - ✅ Atomic transactions in createHunt (production-grade)
+- ✅ **Test Infrastructure Upgrade** - MongoDB Memory Server → Replica Set for transaction support
+- ✅ **All 69 tests passing** with full transaction safety
+
+**Architecture Summary:**
+```
+Hunt (master record)
+├─ huntId: number (PK)
+├─ creatorId: string
+├─ latestVersion: number (always draft)
+├─ liveVersion: number (published)
+└─ isDeleted: boolean
+
+HuntVersion (content snapshots)
+├─ huntId + version (compound PK)
+├─ name, description, startLocation
+├─ stepOrder: number[]
+├─ isPublished: boolean
+└─ publishedAt, publishedBy
+
+Step
+├─ huntId + huntVersion (FK to HuntVersion)
+└─ challenge data
+```
+
+**Previous work (2025-11-03):**
 - ✅ **Asset Service Complete** - Full implementation with AWS S3 integration
 - ✅ **StorageService** - Presigned URL generation for S3 uploads
 - ✅ **Asset CRUD endpoints** (5/5) - Request upload, Create, Read, List, Delete
@@ -73,23 +104,27 @@
 - [x] Firebase UID mapping to internal user ID
 - [x] User profile fields (name, email, bio, picture)
 
-### Hunt Management (COMPLETE - Week 1)
-- [x] Hunt model (Mongoose schema)
-- [x] Hunt types/interfaces (IHunt, HuntStatus enum)
-- [x] Hunt mapper (toDocument, toDocumentUpdate, fromDocument)
-- [x] Hunt service (full CRUD):
-  - createHunt()
+### Hunt Management with Versioning (COMPLETE - Week 1 + Versioning 2025-11-04)
+- [x] Hunt model (Mongoose schema) - Master record with version pointers
+- [x] HuntVersion model (Mongoose schema) - Content snapshots
+- [x] Hunt types/interfaces (IHunt, IHuntVersion, HuntStatus enum)
+- [x] Hunt mapper (toDocument, toVersionDocument, fromDocuments)
+- [x] Hunt service (full CRUD with versioning):
+  - createHunt() - **Atomic transaction** (Hunt + HuntVersion)
   - getAllHunts()
   - getUserHunts()
   - getHuntById()
   - getUserHuntById()
-  - updateHunt() (metadata only)
-  - deleteHunt() (cascade delete steps)
-  - reorderSteps()
-  - verifyOwnership() (reusable authorization)
+  - updateHunt() - Updates draft HuntVersion only
+  - deleteHunt() - **Cascade deletes HuntVersions + Steps**
+  - reorderSteps() - **Validates huntVersion** (security fix)
+  - verifyOwnership() - Returns HuntDoc for efficient authorization
+  - addStepToVersion() - Encapsulation for StepService
+  - removeStepFromVersion() - Encapsulation for StepService
 - [x] Hunt controller (all endpoints)
 - [x] Hunt routes (all CRUD + reorder)
 - [x] Hunt validation schemas (create, update, reorder)
+- [ ] publishHunt() - **NEXT** (Phase 3 implementation pending)
 
 ### Step Management (COMPLETE - Week 1)
 - [x] Step model (Mongoose schema)
@@ -123,13 +158,17 @@
 - [x] Hunt validation schemas (imported from @hunthub/shared/schemas)
 - [x] User validation schemas (imported from @hunthub/shared/schemas)
 
-### Testing Infrastructure (NEW - 2025-10-26)
+### Testing Infrastructure (UPGRADED - 2025-11-04)
 - [x] Jest configuration with TypeScript support
-- [x] Integration test setup (supertest + MongoDB Memory Server)
-- [x] Test factories for creating test data (User, Hunt)
+- [x] **MongoDB Memory Replica Set** (upgraded from standalone for transaction support)
+- [x] Integration test setup (supertest + in-memory replica set)
+- [x] Test factories for creating test data (User, Hunt with HuntVersion, Step with huntVersion)
 - [x] Firebase auth mocking helpers
 - [x] Test database setup and cleanup utilities
-- [x] Hunt CRUD integration tests (create, read, list)
+- [x] Hunt CRUD integration tests (23/23 passing)
+- [x] Step CRUD integration tests (20/20 passing)
+- [x] Asset CRUD integration tests (26/26 passing)
+- [x] **Total: 69/69 tests passing** with transaction safety
 - [x] Validation testing (required fields, error responses)
 - [x] Authentication testing (401 unauthorized cases)
 

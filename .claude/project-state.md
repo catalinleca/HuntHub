@@ -1,10 +1,17 @@
 # Project State & Context
 
-**Last updated:** 2025-10-27
+**Last updated:** 2025-11-04
 
 ## Current Focus
 
-🎯 **Finishing the backend** before moving to frontend and deployment
+🎯 **Publishing Workflow Implementation** - Core versioning system complete, ready for Phase 3
+
+**Recent Achievement (2025-11-04):**
+✅ **Hunt Versioning System Complete!**
+- Hunt (master) + HuntVersion (content) architecture fully implemented
+- All 69 tests passing with atomic transaction safety
+- Production-grade data integrity fixes complete
+- Ready for publishing workflow (Phase 3)
 
 ## Project Meta-Goal
 
@@ -26,21 +33,24 @@
 
 ## Recent Work (Last 1-2 Commits)
 
-**2025-10-27: Comprehensive Roadmap Created** ✅
-- Created detailed 14-week MVP roadmap (ROADMAP.md)
-- 13 Epics broken down into 70+ stories
-- NOW/NEXT/LATER prioritization
-- Fixed dependency order: Tree VIEW after CRUD, Assets before Player
-- Story-level and epic-level dependency diagrams
-- Ready to follow clear implementation path
+**2025-11-04: Hunt Versioning System Complete** ✅
+- ✅ **Phase 1 Complete:** All models updated for Hunt (master) + HuntVersion (content) separation
+- ✅ **Phase 2 Complete:** All services updated with versioning logic
+- ✅ **Data Integrity Fixes:** Cascade delete, huntVersion validation, atomic transactions
+- ✅ **Test Infrastructure Upgrade:** MongoDB Memory Replica Set for transaction support
+- ✅ **All 69 tests passing** with full transaction safety
+- 📍 **Next:** Phase 3 - Publishing Workflow (publishHunt() method)
 
-**2025-10-27: Monorepo Restructure for Multiple Apps** ✅
-- Reorganized for 2 frontends (editor + player) + 1 backend (API)
-- Moved `apps/backend/` → `apps/backend/api/` (renamed to `@hunthub/api`)
-- Created structure: `apps/backend/*` and `apps/frontend/*`
-- Updated workspace config to support nested app structure
-- Ready for React editor and player apps to be added
-- Backend compiles cleanly with new structure
+**2025-11-03: Asset Management Complete** ✅
+- Full asset service implementation with AWS S3 integration
+- StorageService with presigned URL generation
+- Asset CRUD endpoints (5/5) with 26/26 tests passing
+- AWS infrastructure deployed (S3 bucket, CloudFront CDN)
+
+**2025-10-28: Hunt & Step CRUD Complete** ✅
+- Hunt CRUD (6/6 endpoints) - Create, Read, List, Update, Delete, Reorder
+- Step CRUD (3/3 endpoints) - Create, Update, Delete
+- OpenAPI schema fixes and production patterns documented
 
 **2025-10-26: Monorepo Setup Complete** ✅
 - Migrated to npm workspaces monorepo structure
@@ -69,35 +79,54 @@
 ✅ Shared package for types and constants
 ✅ OpenAPI → TypeScript type generation
 ✅ Runtime module resolution with tsconfig-paths
-✅ Backend server runs (needs MongoDB connection fix)
-✅ Firebase service account configured
-✅ User registration and login
-✅ Hunt creation and retrieval
-✅ Basic error handling and validation
+✅ Backend server with production-grade patterns
+✅ Firebase authentication
+✅ **Hunt Versioning System (NEW):**
+  - Hunt (master) + HuntVersion (content) separation
+  - Atomic transaction support (MongoDB replica set)
+  - Draft version editing with protection
+  - Cascade delete for data integrity
+  - Cross-version validation
+✅ **Complete CRUD Operations:**
+  - Hunt CRUD (6/6 endpoints)
+  - Step CRUD (3/3 endpoints)
+  - Asset CRUD (5/5 endpoints)
+✅ **Testing Infrastructure:**
+  - MongoDB Memory Replica Set
+  - 69/69 tests passing
+  - Full transaction support in tests
 
 ## Immediate Next Steps
 
-**Updated: 2025-10-27 after roadmap dependency fixes**
+**Updated: 2025-11-04 after versioning system completion**
 
-**All critical decisions made. Roadmap complete. Ready to build.**
+**Priority 1: ~~Hunt Versioning System~~** ✅ **COMPLETE**
+- ✅ Phase 1: Database Models & Types
+- ✅ Phase 2: Service Layer with versioning logic
+- ✅ Data Integrity: Cascade delete, huntVersion validation, atomic transactions
+- ✅ Test Infrastructure: MongoDB replica set for transactions
+- ✅ All 69 tests passing
 
-**Priority 1: ~~Set up monorepo~~** ✅ **COMPLETE**
-- ✅ Created packages/shared, apps/backend/api
-- ✅ Configured npm workspaces
-- ✅ Set up OpenAPI → TypeScript generation
-- ✅ Updated all imports to @hunthub/shared
-- ✅ Configured tsconfig-paths for runtime resolution
+**Priority 2: Publishing Workflow** **← CURRENT PRIORITY**
 
-**Priority 2: Complete Hunt CRUD + Step CRUD** (This Week) **← CURRENT PRIORITY**
+**Phase 3: Publishing (4-5 hours estimated):**
+1. Implement `HuntService.publishHunt()` method
+   - Mark HuntVersion as published (isPublished=true, publishedAt, publishedBy)
+   - Clone all steps from latestVersion → latestVersion+1
+   - Create new draft HuntVersion (latestVersion+1)
+   - Update Hunt.liveVersion to latestVersion
+   - Update Hunt.latestVersion to latestVersion+1
+   - Use transaction for atomicity
+2. Add controller endpoint: `POST /api/hunts/:id/publish`
+3. Add route configuration
+4. Implement validation rules
 
-**NOW Sprint (Week 1 - 6.5 days):**
-1. Update hunt (PUT /api/hunts/:id) - 1 day
-2. Delete hunt (DELETE /api/hunts/:id) - 1 day
-3. Create step (POST /api/hunts/:id/steps) - 2 days
-4. Update step (PUT /api/steps/:id) - 1.5 days
-5. Delete step (DELETE /api/steps/:id) - 1 day
+**Phase 4: Publishing Tests (3-4 hours estimated):**
+1. Basic publishing test (publish v1, verify v2 created)
+2. Full workflow test (edit-publish-edit-publish cycle)
+3. Edge case tests
 
-**Why this is priority:** Need solid CRUD foundation before Tree VIEW makes sense
+**Why this is priority:** Core missing functionality blocking QR code generation and hunt playing
 
 **Priority 3: Step Management + Tree VIEW** (Weeks 2-4) **← NEXT**
 1. Reorder steps (PUT /api/hunts/:id/step-order)

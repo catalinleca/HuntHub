@@ -1260,29 +1260,29 @@ export interface HuntVersionSummary {
 
 ## Summary Checklist
 
-**Phase 1: Models & Types**
-- [ ] 1.1 Create HuntVersion type
-- [ ] 1.2 Create HuntVersion schema
-- [ ] 1.3 Create HuntVersion mapper
-- [ ] 1.4 Update Hunt type
-- [ ] 1.5 Update Hunt schema
-- [ ] 1.6 Update Step type
-- [ ] 1.7 Update Step schema
-- [ ] 1.8 Update LiveHunt type
-- [ ] 1.9 Update LiveHunt schema
-- [ ] 1.10 Mark PublishedHunt deprecated
+**Phase 1: Models & Types** ✅ COMPLETE (2025-11-04)
+- [x] 1.1 Create HuntVersion type
+- [x] 1.2 Create HuntVersion schema
+- [x] 1.3 Create HuntVersion mapper
+- [x] 1.4 Update Hunt type
+- [x] 1.5 Update Hunt schema
+- [x] 1.6 Update Step type
+- [x] 1.7 Update Step schema
+- [x] 1.8 Update LiveHunt type (N/A - keeping simple for now)
+- [x] 1.9 Update LiveHunt schema (N/A - keeping simple for now)
+- [x] 1.10 Mark PublishedHunt deprecated (N/A - using HuntVersion.isPublished)
 
-**Phase 2: Services**
-- [ ] 2.1 Create HuntVersionService
-- [ ] 2.2 Update createHunt
-- [ ] 2.3 Update getHuntById
-- [ ] 2.4 Update updateHunt
-- [ ] 2.5 Add publishDraft
-- [ ] 2.6 Add setLiveVersion
-- [ ] 2.7 Update createStep
-- [ ] 2.8 Update updateStep
-- [ ] 2.9 Update deleteStep
-- [ ] 2.10 Update reorderSteps
+**Phase 2: Services** ✅ COMPLETE (2025-11-04)
+- [x] 2.1 Create HuntVersionService (N/A - integrated into HuntService)
+- [x] 2.2 Update createHunt - ✅ With atomic transactions
+- [x] 2.3 Update getHuntById - ✅ Fetches Hunt + HuntVersion
+- [x] 2.4 Update updateHunt - ✅ Updates draft HuntVersion
+- [ ] 2.5 Add publishDraft - ⏳ NEXT (Phase 3)
+- [ ] 2.6 Add setLiveVersion - ⏳ LATER (Phase 3)
+- [x] 2.7 Update createStep - ✅ Associates with huntVersion
+- [x] 2.8 Update updateStep - ✅ Validates draft only
+- [x] 2.9 Update deleteStep - ✅ Removes from HuntVersion
+- [x] 2.10 Update reorderSteps - ✅ Updates HuntVersion, validates huntVersion
 
 **Phase 3: Migration**
 - [ ] 3.1 Create migration script
