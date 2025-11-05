@@ -98,4 +98,17 @@ export class HuntMapper {
       startLocation: dto.startLocation,
     };
   }
+
+  static toCloneDocument(sourceDoc: HydratedDocument<IHuntVersion>, huntId: number, targetVersion: number): Partial<IHuntVersion> {
+    return {
+      version: targetVersion,
+
+      huntId, // TODO: or use sourceDoc.huntId?
+      name: sourceDoc.name,
+      description: sourceDoc.description,
+      startLocation: sourceDoc.startLocation,
+      stepOrder: [...sourceDoc.stepOrder], // Clone array
+      isPublished: false,
+    }
+  }
 }

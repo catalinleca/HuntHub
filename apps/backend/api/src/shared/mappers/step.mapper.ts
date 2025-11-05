@@ -66,6 +66,29 @@ export class StepMapper {
     };
   }
 
+  /**
+   * Clone step document for a new version. Preserves stepId but updates huntVersion. Used during publishing workflow
+   *
+   * @param sourceDoc - Original step document to clone
+   * @param targetVersion - New version number
+   * @returns Partial IStep ready for Model.create()
+   */
+  static toCloneDocument(sourceDoc: HydratedDocument<IStep>, targetVersion: number): Partial<IStep> {
+    return {
+      huntVersion: targetVersion,
+
+      stepId: sourceDoc.stepId,
+      huntId: sourceDoc.huntId,
+      type: sourceDoc.type,
+      challenge: sourceDoc.challenge, // Mongoose handles deep copy
+      hint: sourceDoc.hint,
+      requiredLocation: sourceDoc.requiredLocation,
+      timeLimit: sourceDoc.timeLimit,
+      maxAttempts: sourceDoc.maxAttempts,
+      metadata: sourceDoc.metadata ? { ...sourceDoc.metadata } : {},
+    };
+  }
+
   static fromDocuments(docs: HydratedDocument<IStep>[]): Step[] {
     return docs.map((doc) => this.fromDocument(doc));
   }

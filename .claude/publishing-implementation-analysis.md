@@ -116,85 +116,321 @@ const result = await HuntModel.findOneAndUpdate(
 
 ---
 
-#### ✅ Option 4: Optimistic Locking on `latestVersion` (SELECTED)
-```typescript
-const hunt = await HuntModel.findOne({ huntId });
-const currentVersion = hunt.latestVersion;
+#### ✅ Option 4: Dual-Lock Strategy (SELECTED)
 
-// Later in transaction...
-const result = await HuntModel.findOneAndUpdate(
-  {
-    huntId,
-    latestVersion: currentVersion,  // ← Only if version unchanged
-  },
-  {
-    latestVersion: currentVersion + 1,
-    liveVersion: currentVersion,
-  },
-  { new: true, session }
-);
-
-if (!result) {
-  throw new ConflictError('Hunt was modified during publishing');
-}
-```
-
-**Why Selected:**
-- ✅ **Precise** - Only blocks conflicting version changes
-- ✅ **Simple** - No lock management overhead
-- ✅ **Atomic** - Works within transaction
-- ✅ **Fast** - No additional queries or locks
-- ✅ **Scalable** - No lock contention
-- ✅ **Clear error** - User knows exactly what happened
-
-**How It Works:**
-1. Read `latestVersion` at start
-2. Do all preparation work
-3. Update Hunt ONLY if `latestVersion` hasn't changed
-4. If changed → someone else published → fail with clear message
-
-**Race Condition Resolution:**
-```
-Time  | User A (Request 1)              | User B (Request 2)
-------|----------------------------------|----------------------------------
-T1    | Read: latestVersion = 1         | Read: latestVersion = 1
-T2    | Validate, prepare v2            | Validate, prepare v2
-T3    | Update Hunt WHERE latestVersion=1 → SUCCESS (now = 2)
-T4    |                                 | Update Hunt WHERE latestVersion=1 → FAIL!
-T5    |                                 | Throw ConflictError
-```
-
-**Result:** Clean conflict detection, first wins, second gets clear error.
+**Key Insight:** We have TWO distinct operations, each needs appropriate locking.
 
 ---
 
-#### 🔐 Additional Protection: `isPublished` Check
+## 🎯 Final Locking Strategy: Two Approaches
 
-**Layered Defense:**
+After careful analysis, we implement **TWO distinct locking approaches** based on operation type:
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│ APPROACH 1: Hunt Update (Edit)                                  │
+├──────────────────────────────────────────────────────────────────┤
+│ Lock: updatedAt ONLY                                             │
+│                                                                  │
+│ HuntVersionModel.findOneAndUpdate({                              │
+│   huntId,                                                        │
+│   version: latestVersion,                                        │
+│   updatedAt: expectedUpdatedAt,  ← SINGLE LOCK                  │
+│   isPublished: false             ← Validation (not a lock)      │
+│ }, {                                                             │
+│   name: "New Name",                                              │
+│   description: "New Description"                                 │
+│ })                                                               │
+│                                                                  │
+│ Protects Against:                                                │
+│ ✅ Edit vs Edit    - updatedAt catches concurrent edits         │
+│ ✅ Edit vs Publish - isPublished blocks after freeze            │
+└──────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────┐
+│ APPROACH 2: Hunt Publish                                        │
+├──────────────────────────────────────────────────────────────────┤
+│ Lock: updatedAt + latestVersion (DUAL LOCK - Defense in Depth)  │
+│                                                                  │
+│ Step 1: Mark version published                                  │
+│ HuntVersionModel.findOneAndUpdate({                              │
+│   huntId,                                                        │
+│   version: currentVersion,                                       │
+│   updatedAt: expectedUpdatedAt,  ← LOCK 1 (Primary)            │
+│   isPublished: false                                             │
+│ }, {                                                             │
+│   isPublished: true,                                             │
+│   publishedAt: new Date()                                        │
+│ })                                                               │
+│                                                                  │
+│ Step 2: Update Hunt pointers                                    │
+│ HuntModel.findOneAndUpdate({                                     │
+│   huntId,                                                        │
+│   latestVersion: currentVersion  ← LOCK 2 (Backup)             │
+│ }, {                                                             │
+│   latestVersion: currentVersion + 1,                             │
+│   liveVersion: currentVersion                                    │
+│ })                                                               │
+│                                                                  │
+│ Protects Against:                                                │
+│ ✅ Publish vs Publish - BOTH locks catch it                     │
+│ ✅ Publish vs Edit    - updatedAt lock catches it               │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🔍 Why Dual Lock in Publishing? Defense in Depth
+
+### The Question: Is `latestVersion` check redundant?
+
+**Short Answer:** Technically yes, practically NO.
+
+The `updatedAt` lock alone would catch most conflicts. But production systems use **defense in depth** - multiple layers of protection.
+
+### Four Reasons for Dual Lock:
+
+**1. Defense in Depth**
+- Multiple layers of protection
+- If one fails, another catches it
+- Standard in banking, aviation, medical systems
+- Belt-and-suspenders engineering
+
+**2. Data Integrity Check**
+- Even without concurrency, validates Hunt is in expected state
+- Catches bugs in other parts of system
+- Example: What if something else modified latestVersion incorrectly?
+- Fail fast on corrupted state
+
+**3. Clear Intent (Self-Documenting)**
+- Code explicitly states: "latestVersion should be X"
+- Future developers understand the invariant
+- Documents expected state transitions
+- No guessing required
+
+**4. Protection Against Edge Cases**
+- Handles time-based bugs (clock skew)
+- Guards against ORM bugs (Mongoose not updating timestamps)
+- Protects from replication lag
+- Shields from unexpected failure modes
+
+---
+
+## 📊 Conflict Detection Matrix
+
+**Who detects what conflict:**
+
+| Conflict Scenario | Primary Detection | Backup Detection | Result |
+|-------------------|-------------------|------------------|--------|
+| **Publish vs Publish** | `updatedAt` on HuntVersion | `latestVersion` on Hunt | Both catch it ✅ |
+| **Publish vs Edit** | `updatedAt` on HuntVersion | - | updatedAt catches ✅ |
+| **Edit vs Edit** | `updatedAt` on HuntVersion | - | updatedAt catches ✅ |
+| **Edit vs Publish** | `isPublished` flag | `updatedAt` mismatch | Either catches ✅ |
+
+---
+
+## 🚨 Real-World Production Scenarios
+
+### Why BOTH locks matter in production:
+
+#### **Scenario 1: Database Replication Lag**
+```
+Problem: Replica read shows stale data
+────────────────────────────────────────────────────────
+T1: Publish A writes to primary
+    - Updates HuntVersion: updatedAt = T2
+    - Primary database has latest state
+
+T2: Publish B reads from replica (replication lag!)
+    - Replica still shows: updatedAt = T1 (stale!)
+    - Publish B thinks version hasn't changed
+
+T3: Publish B marks version published
+    - updatedAt check: T1 == T1 → PASSES (wrong!)
+
+T4: Publish B updates Hunt pointers
+    - latestVersion check: expects 1, now 2 → FAILS ✅
+
+Result: latestVersion backup lock SAVED US!
+```
+
+#### **Scenario 2: Clock Skew / Time-Based Bug**
+```
+Problem: Server clocks drift, timestamps unreliable
+────────────────────────────────────────────────────────
+T1: Server A clock: 10:00:00.000
+    Server B clock: 10:00:01.500 (1.5 seconds ahead!)
+
+T2: Publish A (Server A) updates: updatedAt = 10:00:00.500
+
+T3: Publish B (Server B) reads: updatedAt = 10:00:00.500
+    Compares with local time 10:00:01.500
+    Due to clock skew, comparison logic fails
+
+T4: updatedAt check unreliable due to time drift
+    latestVersion check: integer comparison, no time involved → WORKS ✅
+
+Result: Integer-based lock is time-independent, reliable!
+```
+
+#### **Scenario 3: Mongoose Bug / ORM Issue**
+```
+Problem: ORM doesn't update timestamp properly
+────────────────────────────────────────────────────────
+T1: Publish A marks version published
+    - BUG: Mongoose hook doesn't fire
+    - updatedAt stays as T1 (should be T2)
+
+T2: Publish B reads: updatedAt = T1
+
+T3: Publish B marks version published
+    - updatedAt check: T1 == T1 → PASSES (bug allowed it!)
+
+T4: Publish B updates Hunt pointers
+    - latestVersion check: expects 1, now 2 → FAILS ✅
+
+Result: latestVersion backup lock caught the ORM bug!
+```
+
+#### **Scenario 4: Manual Database Modification**
+```
+Problem: DBA or migration script modifies data
+────────────────────────────────────────────────────────
+T1: DBA runs manual update (hotfix in production)
+    - Updates HuntVersion directly
+    - Forgets to update updatedAt timestamp
+
+T2: Publish attempts to publish
+    - updatedAt check passes (timestamp unchanged)
+    - latestVersion check: detects inconsistent state → FAILS ✅
+
+Result: Catches manual modifications that bypass ORM!
+```
+
+---
+
+## ✅ Production Cost-Benefit Analysis
+
+**Cost of Dual Lock:**
+```
+Performance Impact:
+- One extra WHERE clause in query
+- ~0.01ms additional check time
+- Negligible database load
+- No blocking or waiting
+
+Code Complexity:
+- One extra line: latestVersion: currentVersion
+- Easy to understand
+- Well-documented pattern
+
+Total Cost: Minimal
+```
+
+**Benefit of Dual Lock:**
+```
+Protection Gained:
+- Catches edge cases
+- Handles ORM bugs
+- Guards against replication issues
+- Protects from clock skew
+- Detects data corruption
+- Self-documenting invariants
+
+Debugging Value:
+- Clear error: "Version mismatch detected"
+- Indicates data corruption vs concurrency
+- Faster root cause analysis
+
+Total Benefit: Massive
+```
+
+**Verdict:** Use BOTH locks ✅ (Industry best practice)
+
+---
+
+## 🎯 How Dual Lock Works in Practice
+
+### Timeline: Publish vs Publish with Dual Lock
+
+```
+Time  | Publish A                          | Publish B
+------|------------------------------------|---------------------------------
+T1    | Read: updatedAt=T1, version=1     | Read: updatedAt=T1, version=1
+T2    | Prepare: Clone steps, create v2   | Prepare: Clone steps, create v2
+      |                                    |
+T3    | LOCK 1: Mark published             |
+      | WHERE updatedAt=T1 → ✅ SUCCESS    |
+      | (Mongoose sets updatedAt=T2)       |
+      |                                    |
+T4    | LOCK 2: Update Hunt pointers       |
+      | WHERE latestVersion=1 → ✅ SUCCESS |
+      | (Now latestVersion=2)              |
+      |                                    |
+T5    |                                    | LOCK 1: Mark published
+      |                                    | WHERE updatedAt=T1 → ❌ FAIL
+      |                                    | (updatedAt is now T2, not T1)
+      |                                    | → Throw ConflictError
+      |                                    | → Transaction aborts
+      |                                    | → LOCK 2 never executes
+
+Result: First publish wins, second fails with clear error ✅
+```
+
+### Timeline: Publish vs Edit with Single Lock
+
+```
+Time  | Publish A                          | Edit B
+------|------------------------------------|---------------------------------
+T1    | Read: updatedAt=T1, version=1     |
+T2    | Prepare: Clone steps...           | Read: updatedAt=T1
+      |                                    |
+T3    |                                    | Update hunt name
+      |                                    | WHERE updatedAt=T1 → ✅ SUCCESS
+      |                                    | (Mongoose sets updatedAt=T2)
+      |                                    |
+T4    | LOCK 1: Mark published             |
+      | WHERE updatedAt=T1 → ❌ FAIL       |
+      | (updatedAt is now T2, not T1)      |
+      | → Throw ConflictError              |
+      | → "Hunt was modified during publishing"
+
+Result: Edit wins, publish fails with clear error ✅
+User gets message: "Hunt was modified. Please review changes and publish again."
+```
+
+---
+
+## 🧩 Why Two Approaches? Different Needs
+
+### Edit Operation: Light Protection
 ```typescript
-// 1. Check version is still draft
-const draftVersion = await HuntVersionModel.findOne({
-  huntId,
-  version: currentVersion,
-  isPublished: false,  // ← Fail if already published
-}).session(session);
-
-if (!draftVersion) {
-  throw new ValidationError('Version already published');
-}
-
-// 2. Optimistic lock on Hunt
-const updatedHunt = await HuntModel.findOneAndUpdate(
-  { huntId, latestVersion: currentVersion },
-  { latestVersion: currentVersion + 1, liveVersion: currentVersion },
-  { new: true, session }
+// Editing is frequent, needs to be fast
+// Single lock is sufficient
+await HuntVersionModel.findOneAndUpdate(
+  { updatedAt: expectedUpdatedAt },  // ← One check
+  { name: "New Name" }
 );
 ```
 
-**Why Both:**
-- `isPublished` check → Prevents publishing same version twice
-- `latestVersion` lock → Prevents concurrent version creation
-- Together → Complete protection
+**Philosophy:** Edits are **reversible**, lower stakes.
+
+### Publish Operation: Heavy Protection
+```typescript
+// Publishing is rare, critical, irreversible
+// Dual lock for maximum safety
+await HuntVersionModel.findOneAndUpdate(
+  { updatedAt: expectedUpdatedAt },  // ← Check 1
+  { isPublished: true }
+);
+
+await HuntModel.findOneAndUpdate(
+  { latestVersion: currentVersion },  // ← Check 2
+  { latestVersion: currentVersion + 1 }
+);
+```
+
+**Philosophy:** Publishing is **permanent**, QR codes distributed, players mid-game. Higher stakes demand stronger protection.
 
 ---
 

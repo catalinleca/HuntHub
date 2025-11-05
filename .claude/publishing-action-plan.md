@@ -290,26 +290,48 @@ import { ConflictError } from '@/shared/errors';
  * Responsible for:
  * - Marking version as published (isPublished flag + metadata)
  * - Updating Hunt pointers (liveVersion, latestVersion) with optimistic locking
+ *
+ * IMPORTANT: Uses DUAL-LOCK strategy for defense in depth:
+ * - PRIMARY LOCK: updatedAt timestamp (catches concurrent edits)
+ * - BACKUP LOCK: latestVersion integer (catches edge cases)
  */
 export class VersionPublisherHelper {
   /**
-   * Mark a HuntVersion as published
+   * Mark a HuntVersion as published with optimistic locking
    *
    * Sets isPublished=true, publishedAt, publishedBy
+   *
+   * LOCK: Uses updatedAt for optimistic concurrency control
+   * - Protects against Publish vs Publish conflicts
+   * - Protects against Edit vs Publish conflicts (updatedAt changes on edit)
    *
    * @param huntId - Hunt ID
    * @param version - Version to mark published
    * @param userId - User performing publish
+   * @param expectedUpdatedAt - Expected updatedAt for optimistic lock
    * @param session - MongoDB session for transaction
+   * @throws ConflictError if updatedAt doesn't match (concurrent modification)
    */
   static async markVersionPublished(
     huntId: number,
     version: number,
     userId: string,
+    expectedUpdatedAt: Date,
     session: ClientSession,
   ): Promise<void> {
-    await HuntVersionModel.updateOne(
-      { huntId, version },
+    // ┌──────────────────────────────────────────────────────────────┐
+    // │ APPROACH 2: Publish (DUAL LOCK - Defense in Depth)          │
+    // ├──────────────────────────────────────────────────────────────┤
+    // │ LOCK 1 (Primary): updatedAt timestamp                       │
+    // │ LOCK 2 (Backup): latestVersion integer (in updateHuntPointers) │
+    // └──────────────────────────────────────────────────────────────┘
+    const result = await HuntVersionModel.updateOne(
+      {
+        huntId,
+        version,
+        updatedAt: expectedUpdatedAt, // ← PRIMARY LOCK: Optimistic concurrency
+        isPublished: false, // ← Validation (not a lock)
+      },
       {
         isPublished: true,
         publishedAt: new Date(),
@@ -317,6 +339,16 @@ export class VersionPublisherHelper {
       },
       { session },
     );
+
+    if (result.matchedCount === 0) {
+      throw new ConflictError(
+        'Hunt version was modified during publishing. This can happen if:\n' +
+          '- Another publish request is in progress\n' +
+          '- Hunt was edited by another user\n' +
+          '- Version was already published\n' +
+          'Please refresh and try again.',
+      );
+    }
   }
 
   /**
@@ -324,6 +356,14 @@ export class VersionPublisherHelper {
    *
    * Updates liveVersion and latestVersion atomically.
    * Uses optimistic lock on latestVersion to prevent race conditions.
+   *
+   * LOCK: Uses latestVersion for optimistic concurrency control (BACKUP LOCK)
+   * - This is the SECOND lock in our dual-lock strategy
+   * - Catches edge cases where updatedAt might fail:
+   *   * Database replication lag
+   *   * Clock skew / time-based bugs
+   *   * Mongoose bugs (hook doesn't fire)
+   *   * Manual database modifications
    *
    * @param huntId - Hunt ID
    * @param currentVersion - Expected current latestVersion (for lock)
@@ -338,11 +378,16 @@ export class VersionPublisherHelper {
     newVersion: number,
     session: ClientSession,
   ): Promise<HydratedDocument<IHunt>> {
-    // Optimistic lock: Only update if latestVersion hasn't changed
+    // ┌──────────────────────────────────────────────────────────────┐
+    // │ BACKUP LOCK: latestVersion integer                          │
+    // │ - Catches concurrent publishes if updatedAt fails            │
+    // │ - Integer comparison is always reliable                     │
+    // │ - Defense in depth: "belt and suspenders"                   │
+    // └──────────────────────────────────────────────────────────────┘
     const updatedHunt = await HuntModel.findOneAndUpdate(
       {
         huntId,
-        latestVersion: currentVersion, // ← Optimistic lock condition
+        latestVersion: currentVersion, // ← BACKUP LOCK: Integer check
       },
       {
         liveVersion: currentVersion, // Published version becomes live
@@ -462,7 +507,24 @@ export class PublishingService implements IPublishingService {
           session,
         );
 
-        // Step 2: Clone steps to new version (heavy operation first)
+        // Step 2: Read current version document (used for cloning + locking)
+        // ┌──────────────────────────────────────────────────────────┐
+        // │ DUAL-LOCK SETUP: Capture updatedAt for PRIMARY LOCK      │
+        // │ - Read once, use for both cloning and locking            │
+        // │ - Ensures we only publish if version wasn't modified     │
+        // └──────────────────────────────────────────────────────────┘
+        const currentVersionDoc = await HuntVersionModel.findOne({
+          huntId,
+          version: currentVersion,
+        }).session(session);
+
+        if (!currentVersionDoc) {
+          throw new Error('Current version not found');
+        }
+
+        const versionUpdatedAt = currentVersionDoc.updatedAt;
+
+        // Step 3: Clone steps to new version (heavy operation first)
         await StepClonerHelper.cloneSteps(
           huntId,
           currentVersion,
@@ -470,10 +532,10 @@ export class PublishingService implements IPublishingService {
           session,
         );
 
-        // Step 3: Create new draft HuntVersion
+        // Step 4: Create new draft HuntVersion (reuses currentVersionDoc)
         const newVersionDoc = await this.createNewDraftVersion(
-          huntDoc,
-          currentVersion,
+          currentVersionDoc, // Pass doc instead of re-reading
+          huntDoc.huntId,
           newVersion,
           session,
         );
@@ -482,23 +544,24 @@ export class PublishingService implements IPublishingService {
         // PHASE 2: COMMIT (state changes, should not fail)
         // ────────────────────────────────────────────────────────────
 
-        // Step 4: Mark old version as published
+        // Step 5: Mark old version as published (PRIMARY LOCK)
         await VersionPublisherHelper.markVersionPublished(
           huntId,
           currentVersion,
           userId,
+          versionUpdatedAt, // ← PRIMARY LOCK: updatedAt timestamp
           session,
         );
 
-        // Step 5: Update Hunt pointers with optimistic lock
+        // Step 6: Update Hunt pointers with optimistic lock (BACKUP LOCK)
         const updatedHunt = await VersionPublisherHelper.updateHuntPointers(
           huntId,
-          currentVersion,
+          currentVersion, // ← BACKUP LOCK: latestVersion integer
           newVersion,
           session,
         );
 
-        // Step 6: Return merged DTO
+        // Step 7: Return merged DTO
         result = HuntMapper.fromDocuments(updatedHunt, newVersionDoc);
       });
     } finally {
@@ -513,32 +576,21 @@ export class PublishingService implements IPublishingService {
    * Create new draft HuntVersion by cloning current version
    *
    * @private
-   * @param huntDoc - Hunt document
-   * @param currentVersion - Version being published
+   * @param currentVersionDoc - Current HuntVersion document to clone
+   * @param huntId - Hunt ID
    * @param newVersion - New draft version number
    * @param session - MongoDB session
    * @returns New HuntVersion document
    */
   private async createNewDraftVersion(
-    huntDoc: HydratedDocument<IHunt>,
-    currentVersion: number,
+    currentVersionDoc: HydratedDocument<IHuntVersion>,
+    huntId: number,
     newVersion: number,
     session: ClientSession,
   ): Promise<HydratedDocument<IHuntVersion>> {
-    // Get current version to clone from
-    const currentVersionDoc = await HuntVersionModel.findOne({
-      huntId: huntDoc.huntId,
-      version: currentVersion,
-    }).session(session);
-
-    if (!currentVersionDoc) {
-      // Should never happen (validated earlier), but guard anyway
-      throw new Error('Current version not found during cloning');
-    }
-
-    // Clone version data
+    // Clone version data (doc already passed in, no need to re-read)
     const newVersionData: Partial<IHuntVersion> = {
-      huntId: huntDoc.huntId,
+      huntId, // Use parameter instead of huntDoc.huntId
       version: newVersion,
       name: currentVersionDoc.name,
       description: currentVersionDoc.description,
@@ -604,6 +656,93 @@ container.bind<IPublishingService>(TYPES.PublishingService).to(PublishingService
 - [ ] Import added to inversify.ts
 - [ ] Binding registered
 - [ ] Container compiles
+
+---
+
+### 📝 Note: Hunt Update Protection (Optional Enhancement)
+
+**Context:** We've implemented dual-lock for publishing (updatedAt + latestVersion). For hunt edits, we should also add single-lock protection.
+
+**Current State:**
+- `HuntService.updateHunt()` updates HuntVersion without optimistic locking
+- Vulnerable to Edit vs Edit conflicts (two users editing simultaneously)
+
+**Recommended Enhancement (separate from publishing implementation):**
+
+```typescript
+// In HuntService.updateHunt()
+async updateHunt(
+  huntId: number,
+  updates: HuntUpdate,
+  userId: string,
+  expectedUpdatedAt?: Date, // ← Optional lock parameter
+): Promise<Hunt> {
+  const huntDoc = await this.verifyOwnership(huntId, userId);
+
+  const session = await mongoose.startSession();
+  let result: Hunt;
+
+  await session.withTransaction(async () => {
+    // Build query with optional lock
+    const query: any = {
+      huntId,
+      version: huntDoc.latestVersion,
+      isPublished: false,
+    };
+
+    if (expectedUpdatedAt) {
+      // ┌──────────────────────────────────────────────────────────┐
+      // │ APPROACH 1: Edit (SINGLE LOCK on updatedAt)             │
+      // │ - Protects Edit vs Edit conflicts                       │
+      // │ - isPublished: false blocks Edit vs Publish conflicts   │
+      // └──────────────────────────────────────────────────────────┘
+      query.updatedAt = expectedUpdatedAt;
+    }
+
+    const updatedVersion = await HuntVersionModel.findOneAndUpdate(
+      query,
+      { ...updates },
+      { new: true, session },
+    ).exec();
+
+    if (!updatedVersion) {
+      if (expectedUpdatedAt) {
+        throw new ConflictError(
+          'Hunt was modified by another user. Please refresh and try again.',
+        );
+      }
+      throw new NotFoundError('Hunt version not found');
+    }
+
+    result = HuntMapper.fromDocuments(huntDoc, updatedVersion);
+  });
+
+  await session.endSession();
+  return result!;
+}
+```
+
+**Why Optional?**
+- Publishing is high-risk (permanent, can't be undone) → MUST have lock
+- Editing is low-risk (reversible, can fix mistakes) → Lock is NICE to have
+
+**When to Implement:**
+- After publishing works (Phase 3 complete)
+- When building frontend editor (user needs to pass updatedAt)
+- Not required for MVP, but production-recommended
+
+**Frontend Integration:**
+```typescript
+// Frontend sends expectedUpdatedAt when updating
+const response = await api.put(`/hunts/${id}`, {
+  name: 'New Name',
+  expectedUpdatedAt: currentHunt.updatedAt, // ← Lock parameter
+});
+
+// If 409 Conflict, show: "Hunt was updated by another user. Refresh to get latest."
+```
+
+**See:** `publishing-implementation-analysis.md` for detailed explanation of APPROACH 1 (Edit).
 
 ---
 
