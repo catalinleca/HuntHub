@@ -1,16 +1,17 @@
-import mongoose from 'mongoose';
-
 /**
- * ILiveHunt - Database interface for LiveHunt documents
+ * ILiveHunt - Runtime operational state for published hunts
  *
- * Tracks which published version of a hunt is currently "live" (playable).
- * Each hunt can only have ONE live version at a time (enforced by unique index).
- *
- * Used by player API to determine which hunt version to serve.
+ * Tracks which version is live + runtime metrics.
+ * One document per hunt (unique index on huntId).
  */
 export interface ILiveHunt {
-  id: string;
-  versionId: mongoose.Types.ObjectId;
-  createdAt?: string;
-  updatedAt?: string;
+  huntId: number;                 // FK to Hunt (unique)
+  huntVersion: number;            // Which hunt version is live (FK to HuntVersion)
+
+  // Runtime metrics (mutable)
+  activePlayerCount: number;
+  lastPlayedAt?: Date;
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }

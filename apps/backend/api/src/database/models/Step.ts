@@ -14,6 +14,10 @@ const stepSchema: Schema<IStep> = new Schema<IStep>(
       type: Number,
       required: true,
     },
+    huntVersion: {
+      type: Number,
+      required: true,
+    },
     type: {
       type: String,
       enum: Object.values(ChallengeType),
@@ -43,34 +47,45 @@ stepSchema.pre('save', async function () {
   }
 });
 
-stepSchema.index({ stepId: 1 }, { unique: true });
-stepSchema.index({ huntId: 1, createdAt: 1 }); // Get steps for hunt, ordered
-stepSchema.index({ huntId: 1, type: 1 }); // Filter steps by type
+// Compound unique index: same stepId can exist across versions
+stepSchema.index({ stepId: 1, huntId: 1, huntVersion: 1 }, { unique: true });
+stepSchema.index({ huntId: 1, huntVersion: 1 }); // Query steps for a specific version
 
 interface IStepModel extends Model<IStep> {
-  findByHunt(huntId: number): Promise<HydratedDocument<IStep>[]>;
+  findByHuntVersion(huntId: number, version: number): Promise<HydratedDocument<IStep>[]>;
 
-  findByHuntAndType(huntId: number, type: ChallengeType): Promise<HydratedDocument<IStep>[]>;
+  findByHuntVersionAndType(
+    huntId: number,
+    version: number,
+    type: ChallengeType,
+  ): Promise<HydratedDocument<IStep>[]>;
 
-  countByHunt(huntId: number): Promise<number>;
+  countByHuntVersion(huntId: number, version: number): Promise<number>;
 
-  hasSteps(huntId: number): Promise<boolean>;
+  hasSteps(huntId: number, version: number): Promise<boolean>;
 }
 
-stepSchema.statics.findByHunt = function (huntId: number) {
-  return this.find({ huntId }).sort({ createdAt: 1 }).exec();
+stepSchema.statics.findByHuntVersion = function (huntId: number, version: number) {
+  return this.find({ huntId, huntVersion: version }).sort({ createdAt: 1 }).exec();
 };
 
-stepSchema.statics.findByHuntAndType = function (huntId: number, type: ChallengeType) {
-  return this.find({ huntId, type }).sort({ createdAt: 1 }).exec();
+stepSchema.statics.findByHuntVersionAndType = function (
+  huntId: number,
+  version: number,
+  type: ChallengeType,
+) {
+  return this.find({ huntId, huntVersion: version, type }).sort({ createdAt: 1 }).exec();
 };
 
-stepSchema.statics.countByHunt = async function (huntId: number): Promise<number> {
-  return this.countDocuments({ huntId });
+stepSchema.statics.countByHuntVersion = async function (
+  huntId: number,
+  version: number,
+): Promise<number> {
+  return this.countDocuments({ huntId, huntVersion: version });
 };
 
-stepSchema.statics.hasSteps = async function (huntId: number): Promise<boolean> {
-  const count = await this.countDocuments({ huntId }).limit(1);
+stepSchema.statics.hasSteps = async function (huntId: number, version: number): Promise<boolean> {
+  const count = await this.countDocuments({ huntId, huntVersion: version }).limit(1);
   return count > 0;
 };
 

@@ -3,41 +3,51 @@ import { ILiveHunt } from '../types/LiveHunt';
 
 const liveHuntSchema: Schema<ILiveHunt> = new Schema<ILiveHunt>(
   {
-    versionId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Hunt',
+    huntId: {
+      type: Number,
+      required: true,
+      unique: true, // One live version per hunt
+    },
+    huntVersion: {
+      type: Number,
       required: true,
     },
+    activePlayerCount: {
+      type: Number,
+      default: 0,
+    },
+    lastPlayedAt: Date,
   },
   {
     timestamps: true,
   },
 );
 
-liveHuntSchema.index({ versionId: 1 }, { unique: true }); // Ensure only one live version
+liveHuntSchema.index({ huntId: 1 }, { unique: true }); // Ensure only one live version per hunt
+liveHuntSchema.index({ huntId: 1, huntVersion: 1 }); // FK to HuntVersion
 
 interface ILiveHuntModel extends Model<ILiveHunt> {
-  findByHunt(huntId: string): Promise<HydratedDocument<ILiveHunt> | null>;
+  findByHunt(huntId: number): Promise<HydratedDocument<ILiveHunt> | null>;
 
-  setLiveVersion(versionId: string): Promise<HydratedDocument<ILiveHunt>>;
+  setLiveVersion(huntId: number, version: number): Promise<HydratedDocument<ILiveHunt>>;
 
-  isLive(versionId: string): Promise<boolean>;
+  isLive(huntId: number): Promise<boolean>;
 }
 
-liveHuntSchema.statics.findByHunt = function (huntId: string) {
+liveHuntSchema.statics.findByHunt = function (huntId: number) {
   return this.findOne({ huntId }).exec();
 };
 
-liveHuntSchema.statics.setLiveVersion = async function (versionId: string) {
+liveHuntSchema.statics.setLiveVersion = async function (huntId: number, version: number) {
   return this.findOneAndUpdate(
-    {}, // Match any (since there's only one per hunt)
-    { versionId },
+    { huntId },
+    { huntId, huntVersion: version, activePlayerCount: 0, lastPlayedAt: new Date() },
     { upsert: true, new: true },
   ).exec();
 };
 
-liveHuntSchema.statics.isLive = async function (versionId: string): Promise<boolean> {
-  const count = await this.countDocuments({ versionId }).limit(1);
+liveHuntSchema.statics.isLive = async function (huntId: number): Promise<boolean> {
+  const count = await this.countDocuments({ huntId }).limit(1);
   return count > 0;
 };
 

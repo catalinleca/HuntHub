@@ -1,0 +1,418 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'HuntHub Asset Storage Infrastructure - S3 + CloudFront CDN'
+
+################################################################################
+# Parameters
+################################################################################
+
+Parameters:
+  Environment:
+    Type: String
+    Description: Environment name (dev, staging, production)
+    AllowedValues:
+      - dev
+      - staging
+      - production
+    Default: dev
+
+  BucketName:
+    Type: String
+    Description: S3 bucket name for asset storage (must be globally unique)
+    MinLength: 3
+    MaxLength: 63
+    AllowedPattern: '^[a-z0-9][a-z0-9-]*[a-z0-9]$'
+    ConstraintDescription: Bucket name must be lowercase, alphanumeric, and hyphens only
+
+################################################################################
+# Resources
+################################################################################
+
+Resources:
+
+  # ============================================================================
+  # S3 Bucket for Asset Storage
+  # ============================================================================
+
+  AssetBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain  # Prevent accidental deletion
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Ref BucketName
+
+      # Block all public access (CloudFront will access via OAI)
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+      # Enable versioning for accidental deletion recovery
+      VersioningConfiguration:
+        Status: Enabled
+
+      # Enable server-side encryption
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+            BucketKeyEnabled: true  # Reduces encryption costs
+
+      # CORS configuration for browser uploads
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - '*'
+            AllowedMethods:
+              - PUT
+              - POST
+              - GET
+              - HEAD
+            AllowedOrigins:
+              - 'http://localhost:3000'
+              - 'http://localhost:5173'
+              - 'https://hunthub.com'
+              - 'https://www.hunthub.com'
+            ExposedHeaders:
+              - ETag
+              - x-amz-server-side-encryption
+              - x-amz-request-id
+            MaxAge: 3000
+
+      # Lifecycle rules for cost optimization
+      LifecycleConfiguration:
+        Rules:
+          # Move old test files to cheaper storage
+          - Id: ArchiveOldTestUploads
+            Status: Enabled
+            Prefix: test-uploads/
+            Transitions:
+              - TransitionInDays: 30
+                StorageClass: STANDARD_IA  # Infrequent Access
+              - TransitionInDays: 90
+                StorageClass: GLACIER_FLEXIBLE_RETRIEVAL
+            ExpirationInDays: 180  # Delete after 6 months
+
+          # Delete incomplete multipart uploads
+          - Id: CleanupIncompleteMultipartUploads
+            Status: Enabled
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 7
+
+      # Tags for organization
+      Tags:
+        - Key: Project
+          Value: HuntHub
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # ============================================================================
+  # CloudFront Origin Access Identity (OAI)
+  # ============================================================================
+
+  CloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub 'OAI for HuntHub assets bucket - ${Environment}'
+
+  # ============================================================================
+  # S3 Bucket Policy (Allow CloudFront OAI access only)
+  # ============================================================================
+
+  AssetBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AssetBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          # Allow CloudFront OAI to read objects
+          - Sid: AllowCloudFrontOAIReadAccess
+            Effect: Allow
+            Principal:
+              CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
+            Action:
+              - s3:GetObject
+              - s3:GetObjectVersion
+            Resource: !Sub '${AssetBucket.Arn}/*'
+
+          # Allow CloudFront OAI to list bucket
+          - Sid: AllowCloudFrontOAIListBucket
+            Effect: Allow
+            Principal:
+              CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
+            Action:
+              - s3:ListBucket
+              - s3:GetBucketLocation
+            Resource: !GetAtt AssetBucket.Arn
+
+  # ============================================================================
+  # CloudFront Distribution (CDN)
+  # ============================================================================
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    DependsOn:
+      - AssetBucket
+      - AssetBucketPolicy
+    Properties:
+      DistributionConfig:
+        Comment: !Sub 'HuntHub Asset CDN - ${Environment}'
+        Enabled: true
+        HttpVersion: http2and3
+        IPV6Enabled: true
+
+        # Origin configuration (S3 bucket)
+        Origins:
+          - Id: S3Origin
+            DomainName: !GetAtt AssetBucket.RegionalDomainName
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}'
+
+            # Connection settings
+            ConnectionAttempts: 3
+            ConnectionTimeout: 10
+
+            # Custom headers (optional)
+            OriginCustomHeaders: []
+
+        # Default cache behavior
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+
+          # Viewer protocol
+          ViewerProtocolPolicy: redirect-to-https
+
+          # Allowed HTTP methods
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            - PUT
+            - POST
+            - PATCH
+            - DELETE
+          CachedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+
+          # Compression
+          Compress: true
+
+          # Cache settings (using managed policies)
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6  # CachingOptimized
+          OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf  # CORS-CustomOrigin
+          ResponseHeadersPolicyId: 60669652-455b-4ae9-85a4-c4c02393f86c  # SimpleCORS
+
+          # Real-time logs (disabled for cost savings)
+          # RealtimeLogConfigArn: !GetAtt CloudFrontRealtimeLogConfig.Arn  # Optional
+
+        # Price class (use all edge locations for best performance)
+        PriceClass: PriceClass_All  # Or PriceClass_100 for North America + Europe only
+
+        # Error pages (optional - return custom error pages)
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 404
+            ResponsePagePath: /404.html
+            ErrorCachingMinTTL: 300
+          - ErrorCode: 404
+            ResponseCode: 404
+            ResponsePagePath: /404.html
+            ErrorCachingMinTTL: 300
+
+        # Geographic restrictions (optional)
+        # Restrictions:
+        #   GeoRestriction:
+        #     RestrictionType: none
+
+        # SSL/TLS certificate
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+          MinimumProtocolVersion: TLSv1.2_2021
+          # For custom domain (requires ACM certificate):
+          # AcmCertificateArn: !Ref SSLCertificate
+          # SslSupportMethod: sni-only
+
+        # Logging (disabled for cost savings - enable for debugging)
+        Logging:
+          Bucket: ''  # Add logging bucket domain name if needed
+          IncludeCookies: false
+          Prefix: 'cloudfront-logs/'
+
+      Tags:
+        - Key: Project
+          Value: HuntHub
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # ============================================================================
+  # IAM Role for Backend Application (Optional - if using EC2/ECS)
+  # ============================================================================
+
+  # This role would be attached to your backend EC2 instance or ECS task
+  # Allows backend to generate presigned URLs and upload to S3
+
+  BackendAssetRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'hunthub-backend-asset-role-${Environment}'
+      Description: !Sub 'IAM role for HuntHub backend to access assets bucket - ${Environment}'
+
+      # Trust policy (who can assume this role)
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+                - ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+
+      # Permissions
+      Policies:
+        - PolicyName: S3AssetBucketAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # Allow presigned URL generation
+              - Sid: AllowPresignedURLGeneration
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:PutObjectAcl
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:DeleteObject
+                Resource: !Sub '${AssetBucket.Arn}/*'
+
+              # Allow bucket listing
+              - Sid: AllowListBucket
+                Effect: Allow
+                Action:
+                  - s3:ListBucket
+                  - s3:GetBucketLocation
+                Resource: !GetAtt AssetBucket.Arn
+
+              # Allow CloudFront invalidation (optional)
+              - Sid: AllowCloudFrontInvalidation
+                Effect: Allow
+                Action:
+                  - cloudfront:CreateInvalidation
+                  - cloudfront:GetInvalidation
+                  - cloudfront:ListInvalidations
+                Resource: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
+
+      Tags:
+        - Key: Project
+          Value: HuntHub
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # ============================================================================
+  # IAM Instance Profile (for EC2)
+  # ============================================================================
+
+  BackendInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub 'hunthub-backend-instance-profile-${Environment}'
+      Roles:
+        - !Ref BackendAssetRole
+
+################################################################################
+# Outputs
+################################################################################
+
+Outputs:
+
+  S3BucketName:
+    Description: Name of the S3 bucket for asset storage
+    Value: !Ref AssetBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-S3BucketName'
+
+  S3BucketArn:
+    Description: ARN of the S3 bucket
+    Value: !GetAtt AssetBucket.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-S3BucketArn'
+
+  S3BucketRegionalDomainName:
+    Description: Regional domain name of the S3 bucket
+    Value: !GetAtt AssetBucket.RegionalDomainName
+    Export:
+      Name: !Sub '${AWS::StackName}-S3BucketRegionalDomainName'
+
+  CDNDomain:
+    Description: CloudFront distribution domain name (use this in your backend CDN_DOMAIN)
+    Value: !GetAtt CloudFrontDistribution.DomainName
+    Export:
+      Name: !Sub '${AWS::StackName}-CDNDomain'
+
+  CDNDistributionId:
+    Description: CloudFront distribution ID (for cache invalidation)
+    Value: !Ref CloudFrontDistribution
+    Export:
+      Name: !Sub '${AWS::StackName}-CDNDistributionId'
+
+  CloudFrontOriginAccessIdentityId:
+    Description: CloudFront Origin Access Identity ID
+    Value: !Ref CloudFrontOriginAccessIdentity
+    Export:
+      Name: !Sub '${AWS::StackName}-OAI-Id'
+
+  BackendRoleArn:
+    Description: ARN of the IAM role for backend (attach to EC2/ECS)
+    Value: !GetAtt BackendAssetRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-BackendRoleArn'
+
+  BackendInstanceProfileArn:
+    Description: ARN of the instance profile for EC2 (attach to EC2 instances)
+    Value: !GetAtt BackendInstanceProfile.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-InstanceProfileArn'
+
+  StackName:
+    Description: Name of this CloudFormation stack
+    Value: !Ref AWS::StackName
+    Export:
+      Name: !Sub '${AWS::StackName}-StackName'
+
+  Environment:
+    Description: Environment name
+    Value: !Ref Environment
+    Export:
+      Name: !Sub '${AWS::StackName}-Environment'
+
+################################################################################
+# Metadata
+################################################################################
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Environment Configuration
+        Parameters:
+          - Environment
+      - Label:
+          default: S3 Configuration
+        Parameters:
+          - BucketName
+
+    ParameterLabels:
+      Environment:
+        default: Environment Name
+      BucketName:
+        default: S3 Bucket Name

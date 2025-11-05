@@ -1,7 +1,5 @@
 import { Schema, model, Model, HydratedDocument } from 'mongoose';
 import { IHunt } from '../types/Hunt';
-import { locationSchema } from '@/database/schemas/location.schema';
-import { HuntStatus } from '@hunthub/shared';
 import { getNextSequence } from './Counter';
 
 const huntSchema: Schema<IHunt> = new Schema<IHunt>(
@@ -15,25 +13,20 @@ const huntSchema: Schema<IHunt> = new Schema<IHunt>(
       ref: 'User',
       required: true,
     },
-    status: {
-      type: String,
-      enum: Object.values(HuntStatus),
-      default: HuntStatus.Draft,
-    },
-    name: {
-      type: String,
+    latestVersion: {
+      type: Number,
       required: true,
-      minLength: [1, 'Hunt name cannot be empty'],
-      maxLength: [100, 'Hunt name cannot exceed 100 characters'],
-      trim: true,
+      default: 1,
     },
-    description: {
-      type: String,
-      maxLength: [500, 'Hunt description cannot exceed 500 characters'],
+    liveVersion: {
+      type: Number,
+      default: null,
     },
-    currentVersion: { type: Number, default: 1 },
-    stepOrder: { type: [Number], default: [] },
-    startLocation: locationSchema,
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: Date,
   },
   {
     timestamps: true,
@@ -48,8 +41,8 @@ huntSchema.pre('save', async function () {
 
 huntSchema.index({ huntId: 1 }, { unique: true });
 huntSchema.index({ creatorId: 1 });
-huntSchema.index({ status: 1 });
-huntSchema.index({ creatorId: 1, status: 1 });
+huntSchema.index({ liveVersion: 1 });
+huntSchema.index({ creatorId: 1, isDeleted: 1 }); // For user's active hunts
 
 interface IHuntModel extends Model<IHunt> {
   findUserHunts(userId: string): Promise<HydratedDocument<IHunt>[]>;
@@ -62,23 +55,26 @@ interface IHuntModel extends Model<IHunt> {
 }
 
 huntSchema.statics.findUserHunts = function (userId: string) {
-  return this.find({ creatorId: userId }).sort({ updatedAt: -1 }).exec();
+  return this.find({ creatorId: userId, isDeleted: false }).sort({ updatedAt: -1 }).exec();
 };
 
 huntSchema.statics.findByHuntIdAndCreator = function (huntId: number, userId: string) {
   return this.findOne({
     huntId: huntId,
     creatorId: userId,
+    isDeleted: false,
   }).exec();
 };
 
 huntSchema.statics.hasHunts = async function (userId: string): Promise<boolean> {
-  const count = await this.countDocuments({ creatorId: userId }).limit(1);
+  const count = await this.countDocuments({ creatorId: userId, isDeleted: false }).limit(1);
   return count > 0;
 };
 
 huntSchema.statics.findPublished = function () {
-  return this.find({ status: HuntStatus.Published }).sort({ createdAt: -1 }).exec();
+  return this.find({ liveVersion: { $ne: null }, isDeleted: false })
+    .sort({ createdAt: -1 })
+    .exec();
 };
 
 const HuntModel = model<IHunt, IHuntModel>('Hunt', huntSchema);

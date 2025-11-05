@@ -30,7 +30,7 @@ export const {
   Task,
   Challenge,
 
-  // Hunt
+  // Hunt (DTO for frontend - merges Hunt + HuntVersion internally)
   Hunt,
   HuntCreate,
   HuntUpdate,

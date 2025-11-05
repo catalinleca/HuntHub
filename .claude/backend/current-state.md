@@ -1,10 +1,49 @@
 # Backend Current State
 
-**Last updated:** 2025-11-03
+**Last updated:** 2025-11-05
 
-**🎉 Asset Management Complete! (2025-11-03)**
+**🎉 Publishing Workflow Complete! (2025-11-05)**
 
-**Recent work (2025-11-03):**
+**Most Recent Work (2025-11-05):**
+- ✅ **Publishing API Fully Implemented** - POST /api/hunts/:id/publish
+- ✅ **Hunt DTO Updated** - Version metadata (version, latestVersion, liveVersion, isPublished, publishedAt, publishedBy)
+- ✅ **Optimistic Locking** - Concurrent edit detection in Hunt + Step services
+- ✅ **Transaction Safety** - All multi-operation methods wrapped in transactions (StepService)
+- ✅ **Helper Modules** - Clean separation of concerns (VersionValidator, VersionPublisher, StepCloner)
+- ✅ **DI Container Fixed** - Critical bug in inversify.ts binding corrected
+
+**Previous Work (2025-11-04):**
+- ✅ **Hunt Versioning Architecture** - Hunt (master) + HuntVersion (content) separation
+- ✅ **Phase 1 Complete** - All tests fixed for new schema (43/43 tests passing)
+- ✅ **Phase 2 Complete** - Data integrity fixes:
+  - ✅ Cascade delete includes HuntVersions
+  - ✅ huntVersion validation in reorderSteps (security fix)
+  - ✅ Atomic transactions in createHunt (production-grade)
+- ✅ **Test Infrastructure Upgrade** - MongoDB Memory Server → Replica Set for transaction support
+- ✅ **All 69 tests passing** with full transaction safety
+
+**Architecture Summary:**
+```
+Hunt (master record)
+├─ huntId: number (PK)
+├─ creatorId: string
+├─ latestVersion: number (always draft)
+├─ liveVersion: number (published)
+└─ isDeleted: boolean
+
+HuntVersion (content snapshots)
+├─ huntId + version (compound PK)
+├─ name, description, startLocation
+├─ stepOrder: number[]
+├─ isPublished: boolean
+└─ publishedAt, publishedBy
+
+Step
+├─ huntId + huntVersion (FK to HuntVersion)
+└─ challenge data
+```
+
+**Previous work (2025-11-03):**
 - ✅ **Asset Service Complete** - Full implementation with AWS S3 integration
 - ✅ **StorageService** - Presigned URL generation for S3 uploads
 - ✅ **Asset CRUD endpoints** (5/5) - Request upload, Create, Read, List, Delete
@@ -73,32 +112,37 @@
 - [x] Firebase UID mapping to internal user ID
 - [x] User profile fields (name, email, bio, picture)
 
-### Hunt Management (COMPLETE - Week 1)
-- [x] Hunt model (Mongoose schema)
-- [x] Hunt types/interfaces (IHunt, HuntStatus enum)
-- [x] Hunt mapper (toDocument, toDocumentUpdate, fromDocument)
-- [x] Hunt service (full CRUD):
-  - createHunt()
+### Hunt Management with Versioning (COMPLETE - Week 1 + Versioning 2025-11-04 + Publishing 2025-11-05)
+- [x] Hunt model (Mongoose schema) - Master record with version pointers
+- [x] HuntVersion model (Mongoose schema) - Content snapshots
+- [x] Hunt types/interfaces (IHunt, IHuntVersion, HuntStatus enum)
+- [x] Hunt mapper (toDocument, toVersionDocument, fromDocuments with version metadata)
+- [x] Hunt service (full CRUD with versioning):
+  - createHunt() - **Atomic transaction** (Hunt + HuntVersion)
   - getAllHunts()
   - getUserHunts()
   - getHuntById()
   - getUserHuntById()
-  - updateHunt() (metadata only)
-  - deleteHunt() (cascade delete steps)
-  - reorderSteps()
-  - verifyOwnership() (reusable authorization)
+  - updateHunt() - Updates draft HuntVersion only
+  - deleteHunt() - **Cascade deletes HuntVersions + Steps**
+  - reorderSteps() - **Validates huntVersion** (security fix)
+  - verifyOwnership() - Returns HuntDoc for efficient authorization
+  - addStepToVersion() - **Session parameter support** for transactions
+  - removeStepFromVersion() - **Session parameter support** for transactions
 - [x] Hunt controller (all endpoints)
 - [x] Hunt routes (all CRUD + reorder)
 - [x] Hunt validation schemas (create, update, reorder)
+- [x] Hunt DTO with version metadata (version, latestVersion, liveVersion, isPublished, publishedAt, publishedBy)
 
-### Step Management (COMPLETE - Week 1)
+### Step Management (COMPLETE - Week 1 + Transaction Safety 2025-11-05)
 - [x] Step model (Mongoose schema)
 - [x] Step types/interfaces (IStep, ChallengeType enum)
 - [x] Step mapper (toDocument, toDocumentUpdate, fromDocument)
-- [x] Step service (full CRUD):
-  - createStep() (auto-append to stepOrder)
-  - updateStep()
-  - deleteStep() (remove from stepOrder)
+- [x] Step service (full CRUD with **production-grade patterns**):
+  - createStep() - **Atomic transaction** (create step + update stepOrder)
+  - updateStep() - **Optimistic locking** with updatedAt timestamp
+  - deleteStep() - **Atomic transaction** (remove from stepOrder + delete document)
+  - All methods wrapped in session.withTransaction() for data integrity
 - [x] Step controller (all endpoints)
 - [x] Step routes (RESTful nested: /api/hunts/:huntId/steps/...)
 - [x] Step validation schemas (create, update)
@@ -123,15 +167,32 @@
 - [x] Hunt validation schemas (imported from @hunthub/shared/schemas)
 - [x] User validation schemas (imported from @hunthub/shared/schemas)
 
-### Testing Infrastructure (NEW - 2025-10-26)
+### Testing Infrastructure (UPGRADED - 2025-11-04)
 - [x] Jest configuration with TypeScript support
-- [x] Integration test setup (supertest + MongoDB Memory Server)
-- [x] Test factories for creating test data (User, Hunt)
+- [x] **MongoDB Memory Replica Set** (upgraded from standalone for transaction support)
+- [x] Integration test setup (supertest + in-memory replica set)
+- [x] Test factories for creating test data (User, Hunt with HuntVersion, Step with huntVersion)
 - [x] Firebase auth mocking helpers
 - [x] Test database setup and cleanup utilities
-- [x] Hunt CRUD integration tests (create, read, list)
+- [x] Hunt CRUD integration tests (23/23 passing)
+- [x] Step CRUD integration tests (20/20 passing)
+- [x] Asset CRUD integration tests (26/26 passing)
+- [x] **Total: 69/69 tests passing** with transaction safety
 - [x] Validation testing (required fields, error responses)
 - [x] Authentication testing (401 unauthorized cases)
+
+### Publishing Workflow (COMPLETE - 2025-11-05)
+- [x] Publishing service (orchestrates workflow)
+  - publishHunt() - **Complete publishing workflow with optimistic locking**
+- [x] Publishing controller (POST /api/hunts/:id/publish)
+- [x] Publishing routes (/api/publishing/...)
+- [x] Helper modules:
+  - VersionValidator - Validates can publish (has steps, not already published)
+  - VersionPublisher - Marks versions published, updates Hunt pointers with optimistic locking
+  - StepCloner - Clones steps across versions
+- [x] Optimistic locking for concurrent edit detection
+- [x] Transaction safety throughout publishing workflow
+- [x] Architecture decision: Single Hunt DTO (no HuntCompact yet - YAGNI)
 
 ### Tooling
 - [x] TypeScript configuration (strict mode)
@@ -150,9 +211,7 @@
   - Status: Ready to implement (next task)
 
 ### Hunt Features (Pending)
-- [ ] Hunt publishing workflow (status transitions)
 - [ ] Hunt sharing/access control (HuntAccess model exists but not wired up)
-- [ ] Hunt versioning logic (currentVersion field exists but not used)
 
 ### Challenge Types
 - [x] Types defined in OpenAPI (Clue, Quiz, Mission, Task)
@@ -162,10 +221,8 @@
 - [ ] Scoring/completion logic (Player API - Week 5-6)
 
 ### Data Models (Defined but Not Used)
-- [ ] Asset service/controller/routes (for media uploads - Week 3)
 - [ ] Progress service/controller/routes (tracking user progress - Week 5-6)
 - [ ] LiveHunt service (active hunt instances - Week 5-6)
-- [ ] PublishedHunt service (hunt versions - Week 4-5)
 
 ## ❌ Not Yet Implemented
 
@@ -240,6 +297,9 @@ POST   /api/assets                         # Create asset record after upload
 GET    /api/assets                         # List user's assets
 GET    /api/assets/:id                     # Get asset by ID
 DELETE /api/assets/:id                     # Delete asset
+
+# Publishing (1/1) - Week 4-5 ✅
+POST   /api/publishing/hunts/:id/publish   # Publish hunt (clone steps, mark published, create new draft)
 ```
 
 **📋 Needed - Week 2 (Tree VIEW API):**
@@ -250,10 +310,8 @@ GET    /api/steps/:id                      # Get full step details
 # + Database indexes
 ```
 
-**Needed - Publishing & Playing:**
+**Needed - Playing:**
 ```
-POST   /api/hunts/:id/publish  # Publish hunt
-GET    /api/hunts/:id/live     # Get live version
 GET    /api/play/:huntId       # Get live hunt for playing
 POST   /api/play/:huntId/steps/:stepId/complete  # Submit step completion
 GET    /api/play/:huntId/progress  # Get user progress
@@ -271,51 +329,43 @@ GET    /api/play/:huntId/progress  # Get user progress
 
 ---
 
-## 🎯 Current Priority: Tree VIEW API or Publishing Workflow
+## 🎯 Current Priority: Player API
 
-**Option A: Tree VIEW API** (Week 2 - Better UX)
-- GET /api/hunts/:id/tree (compact step list for lazy loading)
-- GET /api/steps/:id (full step details endpoint)
-- Add stepCount to GET /api/hunts response
-- Database indexes for performance
-- Challenge type validation (Strategy pattern)
+**🎉 Publishing Workflow COMPLETE!**
 
-**Option B: Publishing Workflow** (Week 4-5 - Faster to MVP)
-- POST /api/hunts/:id/publish (clone hunt + steps)
-- PublishedHunt and LiveHunt models
-- Version management system
-- QR code generation support
+**Publishing is done, now enable hunt playing!**
 
-**See:** `.claude/tree-and-branching-strategy.md` for Tree VIEW details
+**NEXT: Player API** (~1-2 weeks) - **RECOMMENDED**
+- GET /api/play/:huntId/start (create session)
+- POST /api/play/sessions/:sessionId/submit (validate answers)
+- POST /api/play/sessions/:sessionId/hint (request hints)
+- Progress tracking with PlaySession model
+- **Estimated:** 1-2 weeks
+
+**See:** `.claude/player-api-design.md` for complete design
 
 ---
 
 ## Next Steps (Priority Order)
 
-1. **🔥 Tree VIEW API** (~1 week) - **RECOMMENDED NEXT**
+1. **🔥 Player API** (~1-2 weeks) - **RECOMMENDED NEXT**
+   - Start hunt session (anonymous + authenticated)
+   - Submit challenge completions by type
+   - Validate challenges
+   - Track progress
+   - **See:** `.claude/player-api-design.md`
+
+2. **Tree VIEW API** (~1 week) - **Better Editor UX**
    - GET /api/hunts/:id/tree (compact step list)
    - GET /api/steps/:id (full details, lazy loading)
    - Add stepCount to hunt list
    - Database indexes
-   - Better editor UX before publishing
 
-2. **Challenge Validation** (~2 days) - **Week 2**
+3. **Challenge Validation** (~2 days) - **Week 2**
    - Strategy pattern for validators
    - ClueValidator, QuizValidator, MissionValidator, TaskValidator
 
-3. **Publishing Workflow** (~1-2 weeks) - **Week 4-5**
-   - Simplified: Draft → Published
-   - Clone hunt + steps
-   - PublishedHunt + LiveHunt records
-   - Enables QR code generation
-
-4. **Player API** (~1-2 weeks) - **Week 5-6**
-   - Get live hunt for playing
-   - Submit challenge completions
-   - Track progress
-   - Validate challenges
-
-5. **Testing** - **Ongoing**
+4. **Testing** - **Ongoing**
+   - Add publishing integration tests
    - Add Step CRUD integration tests
    - Add Tree VIEW tests
-   - Test publishing workflow

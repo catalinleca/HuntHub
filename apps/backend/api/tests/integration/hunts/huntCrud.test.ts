@@ -9,6 +9,7 @@ import { IHunt } from '@/database/types/Hunt';
 import { IStep } from '@/database/types/Step';
 import { Hunt, HuntStatus } from '@hunthub/shared';
 import StepModel from '@/database/models/Step';
+import HuntVersionModel from '@/database/models/HuntVersion';
 
 describe('Hunt CRUD Integration Tests', () => {
   let app: Express;
@@ -54,7 +55,6 @@ describe('Hunt CRUD Integration Tests', () => {
         description: 'Explore the beautiful city of Barcelona',
         status: HuntStatus.Draft,
         creatorId: testUser.id,
-        currentVersion: 1,
       });
 
       expect(response.body).toHaveProperty('huntId');
@@ -286,11 +286,13 @@ describe('Hunt CRUD Integration Tests', () => {
       // Create steps directly in database
       const step1 = await StepModel.create({
         huntId: hunt.huntId,
+        huntVersion: 1,
         type: 'clue',
         challenge: { clue: { title: 'Step 1' } },
       });
       const step2 = await StepModel.create({
         huntId: hunt.huntId,
+        huntVersion: 1,
         type: 'clue',
         challenge: { clue: { title: 'Step 2' } },
       });
@@ -322,18 +324,21 @@ describe('Hunt CRUD Integration Tests', () => {
       // Create steps
       step1 = (await StepModel.create({
         huntId: createdHunt.huntId,
+        huntVersion: 1,
         type: 'clue',
         challenge: { clue: { title: 'Step 1' } },
       })).toJSON() as IStep;
 
       step2 = (await StepModel.create({
         huntId: createdHunt.huntId,
+        huntVersion: 1,
         type: 'clue',
         challenge: { clue: { title: 'Step 2' } },
       })).toJSON() as IStep;
 
       step3 = (await StepModel.create({
         huntId: createdHunt.huntId,
+        huntVersion: 1,
         type: 'clue',
         challenge: { clue: { title: 'Step 3' } },
       })).toJSON() as IStep;

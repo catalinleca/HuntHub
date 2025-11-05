@@ -8,6 +8,8 @@ import { createHuntSchema, updateHuntSchema, reorderStepsSchema } from './hunt.v
 const huntRouter = express.Router();
 const controller = container.get<IHuntController>(TYPES.HuntController);
 
+// TODO: validateRequest schema has passthrough so you let random props come in
+
 huntRouter.post('/', validateRequest(createHuntSchema), (req, res, next) => {
   controller.createHunt(req, res).catch(next);
 });

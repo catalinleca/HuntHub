@@ -1,79 +1,53 @@
 import { HydratedDocument } from 'mongoose';
-import { IProgress } from '@/database/types/Progress';
-
-// TODO: Move ProgressDTO to @hunthub/shared when Progress API is implemented
-export interface ProgressDTO {
-  id: string;
-  userId?: string;
-  sessionId: string;
-  isAnonymous: boolean;
-  huntId: string;
-  version: number;
-  status: string;
-  startedAt: string;
-  completedAt?: string;
-  duration?: number;
-  currentStepId: string;
-  steps?: Array<{
-    stepId: string;
-    attempts?: number;
-    completed?: boolean;
-    responses?: Array<{
-      timestamp: string;
-      content: unknown;
-      isCorrect: boolean;
-      score?: number;
-      feedback?: string;
-      metadata?: Record<string, any>;
-    }>;
-    startedAt?: string;
-    completedAt?: string;
-    duration?: number;
-  }>;
-  playerName: string;
-  rating?: number;
-  createdAt?: string;
-  updatedAt?: string;
-}
+import { IProgress, IStepProgress, ISubmission } from '@/database/types/Progress';
+import { Progress, Submission, StepProgress } from '@hunthub/shared';
 
 export class ProgressMapper {
-  static fromDocument(doc: HydratedDocument<IProgress>): ProgressDTO {
+  static fromDocument(doc: HydratedDocument<IProgress>): Progress {
     return {
       id: doc._id.toString(),
       userId: doc.userId?.toString(),
       sessionId: doc.sessionId,
       isAnonymous: doc.isAnonymous,
-      huntId: doc.huntId.toString(),
+      huntId: doc.huntId,
       version: doc.version,
       status: doc.status,
-      startedAt: doc.startedAt.toString(),
-      completedAt: doc.completedAt?.toString(),
+      startedAt: doc.startedAt.toISOString(),
+      completedAt: doc.completedAt?.toISOString(),
       duration: doc.duration,
       currentStepId: doc.currentStepId,
-      steps: doc.steps?.map((step) => ({
-        stepId: step.stepId.toString(),
-        attempts: step.attempts,
-        completed: step.completed,
-        responses: step.responses?.map((response) => ({
-          timestamp: response.timestamp.toString(),
-          content: response.content,
-          isCorrect: response.isCorrect,
-          score: response.score,
-          feedback: response.feedback,
-          metadata: response.metadata,
-        })),
-        startedAt: step.startedAt?.toString(),
-        completedAt: step.completedAt?.toString(),
-        duration: step.duration,
-      })),
+      steps: doc.steps?.map((step) => this.mapStepProgress(step)),
       playerName: doc.playerName,
       rating: doc.rating,
-      createdAt: doc.createdAt?.toString(),
-      updatedAt: doc.updatedAt?.toString(),
+      createdAt: doc.createdAt?.toISOString(),
+      updatedAt: doc.updatedAt?.toISOString(),
     };
   }
 
-  static fromDocuments(docs: HydratedDocument<IProgress>[]): ProgressDTO[] {
+  private static mapStepProgress(step: IStepProgress): StepProgress {
+    return {
+      stepId: step.stepId,
+      attempts: step.attempts,
+      completed: step.completed,
+      responses: step.responses?.map((response) => this.mapSubmission(response)),
+      startedAt: step.startedAt?.toISOString(),
+      completedAt: step.completedAt?.toISOString(),
+      duration: step.duration,
+    };
+  }
+
+  private static mapSubmission(submission: ISubmission): Submission {
+    return {
+      timestamp: submission.timestamp.toISOString(),
+      content: submission.content,
+      isCorrect: submission.isCorrect,
+      score: submission.score,
+      feedback: submission.feedback,
+      metadata: submission.metadata,
+    };
+  }
+
+  static fromDocuments(docs: HydratedDocument<IProgress>[]): Progress[] {
     return docs.map((doc) => this.fromDocument(doc));
   }
 }

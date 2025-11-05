@@ -15,7 +15,7 @@ const SubmissionSchema = new Schema<ISubmission>(
 
 const StepProgressSchema = new Schema<IStepProgress>(
   {
-    stepId: { type: Schema.Types.ObjectId, required: true, ref: 'Step' },
+    stepId: { type: Number, required: true },
     attempts: { type: Number, default: 0 },
     completed: { type: Boolean, default: false },
     responses: [SubmissionSchema],
@@ -36,7 +36,7 @@ const progressSchema: Schema<IProgress> = new Schema<IProgress>(
     sessionId: { type: String, required: true },
     isAnonymous: { type: Boolean, required: true, default: true },
 
-    huntId: { type: Schema.Types.ObjectId, required: true, ref: 'Hunt', index: true },
+    huntId: { type: Number, required: true, index: true },
     version: { type: Number, default: 1 },
 
     status: {
@@ -51,7 +51,7 @@ const progressSchema: Schema<IProgress> = new Schema<IProgress>(
     completedAt: Date,
     duration: { type: Number, default: 0 },
 
-    currentStepId: { type: String, required: true },
+    currentStepId: { type: Number, required: true },
     steps: [StepProgressSchema],
 
     playerName: {
@@ -92,11 +92,11 @@ interface IProgressModel extends Model<IProgress> {
 
   findByUser(userId: string): Promise<HydratedDocument<IProgress>[]>;
 
-  findByHunt(huntId: string): Promise<HydratedDocument<IProgress>[]>;
+  findByHunt(huntId: number): Promise<HydratedDocument<IProgress>[]>;
 
-  findCompletedByHunt(huntId: string): Promise<HydratedDocument<IProgress>[]>;
+  findCompletedByHunt(huntId: number): Promise<HydratedDocument<IProgress>[]>;
 
-  countActiveByHunt(huntId: string): Promise<number>;
+  countActiveByHunt(huntId: number): Promise<number>;
 }
 
 progressSchema.statics.findBySession = function (sessionId: string) {
@@ -107,15 +107,15 @@ progressSchema.statics.findByUser = function (userId: string) {
   return this.find({ userId }).sort({ startedAt: -1 }).exec();
 };
 
-progressSchema.statics.findByHunt = function (huntId: string) {
+progressSchema.statics.findByHunt = function (huntId: number) {
   return this.find({ huntId }).sort({ startedAt: -1 }).exec();
 };
 
-progressSchema.statics.findCompletedByHunt = function (huntId: string) {
+progressSchema.statics.findCompletedByHunt = function (huntId: number) {
   return this.find({ huntId, status: HuntProgressStatus.Completed }).sort({ completedAt: -1 }).exec();
 };
 
-progressSchema.statics.countActiveByHunt = async function (huntId: string): Promise<number> {
+progressSchema.statics.countActiveByHunt = async function (huntId: number): Promise<number> {
   return this.countDocuments({
     huntId,
     status: HuntProgressStatus.InProgress,

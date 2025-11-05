@@ -1,44 +1,69 @@
 # HuntHub Development Roadmap
 
-**Last updated:** 2025-10-28 (Week 1 COMPLETE!)
+**Last updated:** 2025-11-05 (Publishing Workflow COMPLETE!)
 
 **Product vision:** Portfolio-quality treasure hunt platform with location-based challenges, built production-ready in 2 months.
 
 **Timeline:** MVP → V1.1 → V1.2 (phased delivery)
 
-**🎉 Week 1 Completed (2025-10-28):**
+**🎉 Major Achievements:**
+
+**Week 1 (2025-10-28):**
 - ✅ Hunt CRUD Complete (6/6 endpoints)
 - ✅ Step CRUD Complete (3/3 endpoints)
 - ✅ Reorder Steps (bonus from Week 2)
-- ✅ OpenAPI schema fixes (type/challengeType inconsistencies)
+- ✅ OpenAPI schema fixes
 - ✅ Production patterns documented
 
-**⚠️ CRITICAL NEXT: UUID Migration**
-- Problem: Exposing MongoDB ObjectIds (security issue)
-- Solution: Dual ID system (internal ObjectId + external UUID)
-- Priority: HIGH - Must complete before continuing features
-- Time: 2-3 hours
+**Week 2-3 (2025-11-03):**
+- ✅ Asset Management Complete (5/5 endpoints)
+- ✅ AWS S3 integration with presigned URLs
+- ✅ 26/26 asset tests passing
+
+**Week 3-4 (2025-11-04):**
+- ✅ **Hunt Versioning System Complete!**
+- ✅ Hunt (master) + HuntVersion (content) architecture
+- ✅ Atomic transactions (MongoDB replica set)
+- ✅ Data integrity fixes (cascade delete, validation)
+- ✅ All 69 tests passing
+
+**Week 4-5 (2025-11-05):**
+- ✅ **Publishing Workflow Complete!**
+- ✅ Publishing API fully implemented (POST /api/hunts/:id/publish)
+- ✅ Hunt DTO updated with version metadata
+- ✅ Optimistic locking for concurrent edits
+- ✅ Transaction safety throughout
+- ✅ Helper modules with clean separation of concerns
+
+**📍 NEXT: Player API**
+- Start hunt session endpoints
+- Challenge validation by type
+- Progress tracking
+- Time: 1-2 weeks
 
 ---
 
 ## 📊 Progress Overview
 
-**Current Phase:** UUID Migration (Critical Architecture Fix)
-**Previous Sprint:** ✅ Week 1 Complete - Hunt CRUD + Step CRUD
-**Overall Progress:** ~30% to MVP completion
+**Current Phase:** Player API Implementation
+**Previous Sprint:** ✅ Publishing Workflow Complete - Full publishing system with optimistic locking
+**Overall Progress:** ~50% to MVP completion
 
 **Key Metrics:**
-- Backend Epics: 2/6 complete (33%) - Epic 1 Complete, Epic 3 Complete
+- Backend Epics: 4/6 complete (67%)
+  - ✅ Epic 1: Hunt Management (100%)
+  - ✅ Epic 3: Step Management (100%)
+  - ✅ Epic 4: Publishing Workflow (100%) ⭐ **NEW!**
+  - ✅ Epic 6: Asset Management (100%)
 - Frontend Epics: 0/4 started (0%)
 - Integration Epics: 0/2 started (0%)
 
-**Updated Timeline:**
+**Completed Work:**
 - ✅ Week 1: Hunt CRUD + Step CRUD (COMPLETE)
-- 🔥 UUID Migration: 2-3 hours (CRITICAL - before Week 2)
-- Week 2: Tree VIEW + Challenge Validation
-- Week 3: Asset Management (CRITICAL - blocks Publishing)
-- Week 4: Publishing Workflow
-- Week 5-6: Player API
+- ✅ Week 2-3: Asset Management (COMPLETE)
+- ✅ Week 3-4: Versioning System (COMPLETE)
+- ✅ Week 4-5: Publishing Workflow (COMPLETE) ⭐ **NEW!**
+- 📍 Week 5-6: Player API (NEXT)
 
 ---
 
@@ -197,41 +222,40 @@
 
 ---
 
-## Epic 4: Publishing Workflow (Not Started - 0%)
+## Epic 4: Publishing Workflow ✅ (Complete - 100%)
 
 **Goal:** Publish hunts with versioning (simplified MVP)
 **Timeline:** Week 4-5
-**Status:** 0/4 stories complete
+**Status:** Complete
+**Completed:** 2025-11-05
 
 ### Stories
 
-- [ ] **BE-4.1:** Publish hunt (POST /api/hunts/:id/publish)
-  - Clone hunt document
-  - Clone all steps
-  - Create PublishedHunt record
-  - Create LiveHunt record (auto-set as live)
-  - Time: 3 days
+- [x] **BE-4.1:** Publish hunt (POST /api/hunts/:id/publish)
+  - ✅ Implemented publishHunt() with atomic transactions
+  - ✅ Clone steps across versions (StepCloner helper)
+  - ✅ Mark version as published (VersionPublisher helper)
+  - ✅ Create new draft version
+  - ✅ Update Hunt pointers (latestVersion, liveVersion)
+  - ✅ Optimistic locking for concurrent edits
+  - ✅ Transaction safety throughout
+  - ✅ Complete
 
-- [ ] **BE-4.2:** Get live version (GET /api/hunts/:id/live)
-  - Query LiveHunt collection
-  - Return published hunt + steps
-  - Time: 1 day
+**Architecture Implemented:**
+- Hunt (master) + HuntVersion (content) separation (versioning system)
+- Helper modules: VersionValidator, VersionPublisher, StepCloner
+- Single Hunt DTO with all version metadata
+- Optimistic locking using updatedAt timestamps
+- Compare-and-set pattern for concurrent updates
+- Full transaction support
 
-- [ ] **BE-4.3:** List published versions (GET /api/hunts/:id/versions)
-  - Query PublishedHunt collection
-  - Return metadata only (not full hunts)
-  - Time: 1 day
+**Notes:**
+- Simplified workflow for MVP: Draft → Published
+- No separate PublishedHunt or LiveHunt collections (HuntVersion tracks publishing)
+- Skip "Review" status for MVP
 
-- [ ] **BE-4.4:** Set live version (PUT /api/hunts/:id/live)
-  - Update LiveHunt record
-  - Validate version exists
-  - Time: 1 day
-
-**Dependencies:**
-- Hunt + Step CRUD complete
-- Asset Management (Epic 6) - Can't publish missions without file upload support
+**Dependencies:** ✅ All met
 **Blockers:** None
-**Notes:** Skip "Review" status for MVP
 **See:** `.claude/publishing-workflow.md`
 
 ---

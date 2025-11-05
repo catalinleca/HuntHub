@@ -1,15 +1,16 @@
-import { Step, StepCreate, StepUpdate } from '@hunthub/shared';
+import { Step, StepCreate } from '@hunthub/shared';
 import { inject, injectable } from 'inversify';
+import mongoose from 'mongoose';
 import StepModel from '@/database/models/Step';
-import HuntModel from '@/database/models/Hunt';
 import { StepMapper } from '@/shared/mappers';
 import { IHuntService } from '@/modules/hunts/hunt.service';
 import { TYPES } from '@/shared/types';
-import { NotFoundError } from '@/shared/errors';
+import { NotFoundError, ValidationError } from '@/shared/errors';
+import { ConflictError } from '@/shared/errors/ConflictError';
 
 export interface IStepService {
   createStep(stepData: StepCreate, huntId: number, userId: string): Promise<Step>;
-  updateStep(stepId: number, huntId: number, stepData: StepUpdate, userId: string): Promise<Step>;
+  updateStep(stepId: number, huntId: number, stepData: Step, userId: string): Promise<Step>;
   deleteStep(stepId: number, huntId: number, userId: string): Promise<void>;
 }
 
@@ -18,49 +19,89 @@ export class StepService implements IStepService {
   constructor(@inject(TYPES.HuntService) private huntService: IHuntService) {}
 
   async createStep(stepData: StepCreate, huntId: number, userId: string): Promise<Step> {
-    await this.huntService.verifyOwnership(huntId, userId);
+    const huntDoc = await this.huntService.verifyOwnership(huntId, userId);
+    const huntVersion = huntDoc.latestVersion;
 
-    const docData = StepMapper.toDocument(stepData, huntId);
-    const createdStep = await StepModel.create(docData);
+    const session = await mongoose.startSession();
 
-    await HuntModel.findOneAndUpdate({ huntId }, { $push: { stepOrder: createdStep.stepId } });
+    try {
+      return session.withTransaction(async () => {
+        const docData = StepMapper.toDocument(stepData, huntId, huntVersion);
+        const [createdStep] = await StepModel.create([docData], { session });
 
-    return StepMapper.fromDocument(createdStep);
+        await this.huntService.addStepToVersion(huntId, huntVersion, createdStep.stepId, session);
+
+        return StepMapper.fromDocument(createdStep);
+      });
+    } finally {
+      await session.endSession();
+    }
   }
 
-  async updateStep(stepId: number, huntId: number, stepData: StepUpdate, userId: string): Promise<Step> {
-    await this.huntService.verifyOwnership(huntId, userId);
+  async updateStep(stepId: number, huntId: number, stepData: Step, userId: string): Promise<Step> {
+    const huntDoc = await this.huntService.verifyOwnership(huntId, userId);
+    const huntVersion = huntDoc.latestVersion;
+    const stepUpdateData = StepMapper.toDocumentUpdate(stepData);
 
-    const step = await StepModel.findOne({ stepId });
-    if (!step) {
-      throw new NotFoundError();
+    const session = await mongoose.startSession();
+
+    try {
+      return session.withTransaction(async () => {
+        const updatedStep = await StepModel.findOneAndUpdate(
+          {
+            stepId,
+            huntId,
+            huntVersion,
+            ...(stepData.updatedAt && { updatedAt: new Date(stepData.updatedAt) }),
+          },
+          stepUpdateData,
+          { new: true, session },
+        ).exec();
+
+        if (!updatedStep) {
+          const step = await StepModel.findOne({
+            stepId,
+            huntId,
+            huntVersion,
+          }).session(session);
+
+          if (!step) {
+            throw new NotFoundError('Step not found');
+          }
+
+          if (stepData.updatedAt) {
+            throw new ConflictError('Step was modified by another user. Please refresh and try again.');
+          }
+
+          throw new Error('Update failed for unknown reason');
+        }
+
+        return StepMapper.fromDocument(updatedStep);
+      });
+    } finally {
+      await session.endSession();
     }
-
-    if (step.huntId !== huntId) {
-      throw new NotFoundError();
-    }
-
-    const updateData = StepMapper.toDocumentUpdate(stepData);
-    step.set(updateData);
-    await step.save();
-
-    return StepMapper.fromDocument(step);
   }
 
   async deleteStep(stepId: number, huntId: number, userId: string): Promise<void> {
-    await this.huntService.verifyOwnership(huntId, userId);
+    const huntDoc = await this.huntService.verifyOwnership(huntId, userId);
+    const huntVersion = huntDoc.latestVersion;
 
-    const step = await StepModel.findOne({ stepId });
-    if (!step) {
-      throw new NotFoundError();
+    const session = await mongoose.startSession();
+
+    try {
+      await session.withTransaction(async () => {
+        const step = await StepModel.findOne({ stepId, huntId, huntVersion }).session(session);
+        if (!step) {
+          throw new NotFoundError('Step not found');
+        }
+
+        await this.huntService.removeStepFromVersion(huntId, huntVersion, stepId, session);
+
+        await step.deleteOne({ session });
+      });
+    } finally {
+      await session.endSession();
     }
-
-    if (step.huntId !== huntId) {
-      throw new NotFoundError();
-    }
-
-    await HuntModel.findOneAndUpdate({ huntId }, { $pull: { stepOrder: stepId } });
-
-    await step.deleteOne();
   }
 }

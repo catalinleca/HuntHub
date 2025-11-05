@@ -15,6 +15,7 @@ import huntRouter from '@/modules/hunts/hunt.routes';
 import stepRouter from '@/modules/steps/step.routes';
 import authRouter from '@/modules/auth/auth.routes';
 import assetRouter from '@/modules/assets/asset.routes';
+import publishingRouter from '@/features/publishing/publishing.routes';
 
 import { errorHandler, authMiddleware } from '@/shared/middlewares';
 
@@ -31,8 +32,8 @@ async function bootstrap() {
   app.use('/api', authMiddleware);
   app.use('/api/hunts', huntRouter);
   app.use('/api/hunts', stepRouter);
+  app.use('/api/hunts', publishingRouter);
   app.use('/api/assets', assetRouter);
-
 
   app.use(errorHandler);
 
