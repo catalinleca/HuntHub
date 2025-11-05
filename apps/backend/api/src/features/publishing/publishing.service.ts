@@ -46,7 +46,7 @@ export class PublishingService implements IPublishingService {
 
         await VersionValidator.validateCanPublish(huntId, currentVersion, session);
 
-        const currentVersionDoc = await HuntVersionModel.findDraftByVersion(huntId, currentVersion); // TODO: steps just use without isPublish: true
+        const currentVersionDoc = await HuntVersionModel.findDraftByVersion(huntId, currentVersion);
         if (!currentVersionDoc) {
           throw new Error('Current version not found');
         }

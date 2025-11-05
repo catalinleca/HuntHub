@@ -1,18 +1,9 @@
 import { HydratedDocument } from 'mongoose';
 import { ILiveHunt } from '@/database/types/LiveHunt';
-
-// TODO: Move LiveHuntDTO to @hunthub/shared when Publishing API is implemented
-export interface LiveHuntDTO {
-  huntId: number;
-  huntVersion: number;
-  activePlayerCount: number;
-  lastPlayedAt?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
+import { LiveHunt } from '@hunthub/shared';
 
 export class LiveHuntMapper {
-  static fromDocument(doc: HydratedDocument<ILiveHunt>): LiveHuntDTO {
+  static fromDocument(doc: HydratedDocument<ILiveHunt>): LiveHunt {
     return {
       huntId: doc.huntId,
       huntVersion: doc.huntVersion,
@@ -23,7 +14,7 @@ export class LiveHuntMapper {
     };
   }
 
-  static fromDocuments(docs: HydratedDocument<ILiveHunt>[]): LiveHuntDTO[] {
+  static fromDocuments(docs: HydratedDocument<ILiveHunt>[]): LiveHunt[] {
     return docs.map((doc) => this.fromDocument(doc));
   }
 }

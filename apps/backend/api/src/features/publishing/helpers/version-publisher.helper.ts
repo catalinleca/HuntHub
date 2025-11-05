@@ -1,7 +1,6 @@
-import { ClientSession, HydratedDocument, Types } from 'mongoose';
+import { ClientSession, Types } from 'mongoose';
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
-import { IHunt } from '@/database/types/Hunt';
 import { ConflictError } from '@/shared/errors/ConflictError';
 
 export class VersionPublisher {
@@ -12,7 +11,6 @@ export class VersionPublisher {
     expectedUpdatedAt: Date,
     session: ClientSession,
   ) {
-    // TODO: userID or we validate before?
     const result = await HuntVersionModel.updateOne(
       {
         huntId,

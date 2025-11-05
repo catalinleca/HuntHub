@@ -101,9 +101,9 @@ export class HuntMapper {
 
   static toCloneDocument(sourceDoc: HydratedDocument<IHuntVersion>, huntId: number, targetVersion: number): Partial<IHuntVersion> {
     return {
+      huntId,
       version: targetVersion,
 
-      huntId, // TODO: or use sourceDoc.huntId?
       name: sourceDoc.name,
       description: sourceDoc.description,
       startLocation: sourceDoc.startLocation,

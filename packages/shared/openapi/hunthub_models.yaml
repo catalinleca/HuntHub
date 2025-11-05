@@ -453,3 +453,185 @@ components:
         - sizeBytes
         - url
         - s3Key
+
+    PublishResult:
+      type: object
+      description: Response from publishing a hunt
+      properties:
+        publishedVersion:
+          type: integer
+          description: Version number that was published
+          example: 1
+        newDraftVersion:
+          type: integer
+          description: New draft version number created
+          example: 2
+        publishedAt:
+          type: string
+          format: date-time
+          example: "2024-02-01T10:12:45Z"
+        hunt:
+          $ref: '#/components/schemas/Hunt'
+          description: Full hunt data with published version content
+      required:
+        - publishedVersion
+        - newDraftVersion
+        - publishedAt
+        - hunt
+
+    HuntProgressStatus:
+      type: string
+      enum: [in_progress, completed, abandoned]
+      description: Player's progress status through a hunt
+
+    Submission:
+      type: object
+      description: Player's submission for a step challenge
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        content:
+          description: Flexible submission content (answer text, asset ID, coordinates, etc.)
+        isCorrect:
+          type: boolean
+        score:
+          type: number
+          description: Quality/confidence score (0-1 or 0-10)
+        feedback:
+          type: string
+          description: Player guidance message from AI or system
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Extensibility (e.g., branchTaken, AI model used)
+      required:
+        - timestamp
+        - content
+        - isCorrect
+
+    StepProgress:
+      type: object
+      description: Progress for a single step
+      properties:
+        stepId:
+          type: integer
+          example: 10000
+        attempts:
+          type: integer
+          default: 0
+        completed:
+          type: boolean
+          default: false
+        responses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Submission'
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        duration:
+          type: number
+          description: Time spent on step in seconds
+      required:
+        - stepId
+
+    Progress:
+      type: object
+      description: Player's progress through a hunt (supports anonymous players)
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+          description: Optional - only for authenticated players
+        sessionId:
+          type: string
+          description: UUID for localStorage-based sessions
+        isAnonymous:
+          type: boolean
+        huntId:
+          type: integer
+          example: 1332
+        version:
+          type: integer
+          description: Which published hunt version player is playing
+          example: 1
+        status:
+          $ref: '#/components/schemas/HuntProgressStatus'
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        duration:
+          type: number
+          description: Total time in seconds
+        currentStepId:
+          type: integer
+          description: Current step player is on
+          example: 10000
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/StepProgress'
+        playerName:
+          type: string
+          minLength: 1
+          maxLength: 50
+        rating:
+          type: number
+          minimum: 0
+          maximum: 5
+          description: Player's rating of the hunt (0-5 stars)
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - sessionId
+        - isAnonymous
+        - huntId
+        - version
+        - status
+        - startedAt
+        - currentStepId
+        - playerName
+
+    LiveHunt:
+      type: object
+      description: Runtime operational state for published hunts (tracks which version is live + metrics)
+      properties:
+        huntId:
+          type: integer
+          example: 1332
+          description: FK to Hunt (unique - one live version per hunt)
+        huntVersion:
+          type: integer
+          example: 1
+          description: Which hunt version is currently live (FK to HuntVersion)
+        activePlayerCount:
+          type: integer
+          default: 0
+          description: Number of players currently playing this hunt
+        lastPlayedAt:
+          type: string
+          format: date-time
+          description: When someone last played this hunt
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - huntId
+        - huntVersion
+        - activePlayerCount

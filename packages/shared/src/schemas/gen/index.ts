@@ -172,6 +172,66 @@ const AssetCreate = z
     s3Key: z.string().min(1),
   })
   .passthrough();
+const PublishResult = z
+  .object({
+    publishedVersion: z.number().int(),
+    newDraftVersion: z.number().int(),
+    publishedAt: z.string().datetime({ offset: true }),
+    hunt: Hunt,
+  })
+  .passthrough();
+const HuntProgressStatus = z.enum(['in_progress', 'completed', 'abandoned']);
+const Submission = z
+  .object({
+    timestamp: z.string().datetime({ offset: true }),
+    content: z.unknown(),
+    isCorrect: z.boolean(),
+    score: z.number().optional(),
+    feedback: z.string().optional(),
+    metadata: z.object({}).partial().passthrough().optional(),
+  })
+  .passthrough();
+const StepProgress = z
+  .object({
+    stepId: z.number().int(),
+    attempts: z.number().int().optional().default(0),
+    completed: z.boolean().optional().default(false),
+    responses: z.array(Submission).optional(),
+    startedAt: z.string().datetime({ offset: true }).optional(),
+    completedAt: z.string().datetime({ offset: true }).optional(),
+    duration: z.number().optional(),
+  })
+  .passthrough();
+const Progress = z
+  .object({
+    id: z.string(),
+    userId: z.string().optional(),
+    sessionId: z.string(),
+    isAnonymous: z.boolean(),
+    huntId: z.number().int(),
+    version: z.number().int(),
+    status: HuntProgressStatus,
+    startedAt: z.string().datetime({ offset: true }),
+    completedAt: z.string().datetime({ offset: true }).optional(),
+    duration: z.number().optional(),
+    currentStepId: z.number().int(),
+    steps: z.array(StepProgress).optional(),
+    playerName: z.string().min(1).max(50),
+    rating: z.number().gte(0).lte(5).optional(),
+    createdAt: z.string().datetime({ offset: true }).optional(),
+    updatedAt: z.string().datetime({ offset: true }).optional(),
+  })
+  .passthrough();
+const LiveHunt = z
+  .object({
+    huntId: z.number().int(),
+    huntVersion: z.number().int(),
+    activePlayerCount: z.number().int().default(0),
+    lastPlayedAt: z.string().datetime({ offset: true }).optional(),
+    createdAt: z.string().datetime({ offset: true }).optional(),
+    updatedAt: z.string().datetime({ offset: true }).optional(),
+  })
+  .passthrough();
 
 export const schemas: Record<string, z.ZodTypeAny> = {
   HuntStatus,
@@ -200,6 +260,12 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   StorageLocation,
   Asset,
   AssetCreate,
+  PublishResult,
+  HuntProgressStatus,
+  Submission,
+  StepProgress,
+  Progress,
+  LiveHunt,
 };
 
 const endpoints = makeApi([]);

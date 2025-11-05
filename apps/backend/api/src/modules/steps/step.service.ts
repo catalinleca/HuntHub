@@ -17,11 +17,9 @@ export class StepService implements IStepService {
   constructor(@inject(TYPES.HuntService) private huntService: IHuntService) {}
 
   async createStep(stepData: StepCreate, huntId: number, userId: string): Promise<Step> {
-    // Verify ownership and get Hunt master document
     const huntDoc = await this.huntService.verifyOwnership(huntId, userId);
     const huntVersion = huntDoc.latestVersion;
 
-    // Create Step with huntVersion
     const docData = StepMapper.toDocument(stepData, huntId, huntVersion);
     const createdStep = await StepModel.create(docData);
 

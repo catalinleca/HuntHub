@@ -18,7 +18,7 @@ export interface ISubmission {
 }
 
 export interface IStepProgress {
-  stepId: mongoose.Types.ObjectId;
+  stepId: number;
   attempts?: number;
   completed?: boolean;
   responses?: ISubmission[];
@@ -39,7 +39,7 @@ export interface IProgress {
   sessionId: string; // UUID for localStorage-based sessions
   isAnonymous: boolean;
 
-  huntId: mongoose.Types.ObjectId;
+  huntId: number;
   version: number; // Which published version they're playing
 
   startedAt: Date;
@@ -47,12 +47,12 @@ export interface IProgress {
   duration?: number; // Total time in seconds
   status: HuntProgressStatus;
 
-  currentStepId: string;
+  currentStepId: number;
   steps?: IStepProgress[];
 
   playerName: string;
   rating?: number;
 
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
