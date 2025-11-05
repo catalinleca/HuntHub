@@ -1,8 +1,41 @@
 # 🚀 START HERE - Next Session Quick Guide
 
-**Last updated:** 2025-11-04
+**Last updated:** 2025-11-05
 
 **When you open Claude Code next time, I'll auto-load all context.**
+
+---
+
+## 🎉 Publishing Workflow COMPLETE! (2025-11-05)
+
+**Major Achievement: Production-Grade Publishing System**
+- ✅ **Publishing API fully implemented** (POST /api/hunts/:id/publish)
+- ✅ **Hunt DTO updated** with version metadata (version, latestVersion, liveVersion, isPublished, publishedAt, publishedBy)
+- ✅ **Optimistic locking** for concurrent edit detection (Hunt + Step services)
+- ✅ **Transaction safety** for all multi-operation methods (StepService)
+- ✅ **Helper modules** with clean separation of concerns:
+  - `VersionValidator` - Business rule validation
+  - `VersionPublisher` - Publishing with optimistic locking
+  - `StepCloner` - Clones steps across versions
+- ✅ **DI container** properly configured
+
+**Publishing Workflow:**
+1. Verify ownership (fail fast)
+2. Validate can publish (has steps, not already published)
+3. Clone steps to new version (v1 → v2)
+4. Create new draft HuntVersion (v2)
+5. Mark current version as published (v1)
+6. Update Hunt pointers (latestVersion++)
+7. Return complete Hunt DTO with all version metadata
+
+**Architecture Pattern Used:**
+- Single `Hunt` DTO for all contexts (create, read, publish)
+- Future optimization: Add `HuntCompact` for list views (when needed)
+- Follows production standards while keeping simple for MVP
+
+**See:**
+- `.claude/backend/current-state.md` for complete implementation status
+- `apps/backend/api/src/features/publishing/` for implementation
 
 ---
 
@@ -15,20 +48,20 @@
   - ✅ Cascade delete includes HuntVersions
   - ✅ huntVersion validation in reorderSteps
   - ✅ **Atomic transactions in createHunt** (MongoDB replica set)
+- ✅ Phase 3: Publishing workflow ✅ **COMPLETE**
 - ✅ Test infrastructure upgraded to replica set for transaction support
 - ✅ All 69 tests passing with transaction safety
 
 **Architecture:**
 - Hunt (master): huntId, creatorId, latestVersion, liveVersion
-- HuntVersion (content): huntId + version (compound key), name, description, stepOrder, isPublished
+- HuntVersion (content): huntId + version (compound key), name, description, stepOrder, isPublished, publishedAt, publishedBy
 - Steps: huntId + huntVersion (FK to HuntVersion)
 
-**Next:** Phase 3 - Implement Publishing Workflow (publishHunt() method)
+**Next:** Player API or Tree VIEW API
 
 **See:**
 - `.claude/versioning-architecture.md` for architecture decisions
 - `.claude/implementation-guide-versioning.md` for implementation details
-- `apps/backend/api/FIXES_REQUIRED.md` for Phase 3 plan
 
 ---
 
@@ -90,24 +123,27 @@ You just finished the NOW sprint with **100% completion**:
 
 ---
 
-## 🚀 CURRENT PRIORITY: Tree VIEW API or Publishing Workflow
+## 🚀 CURRENT PRIORITY: Player API or Tree VIEW API
 
 **Two paths forward:**
 
-### Option A: Tree VIEW API (Week 2 work)
+### Option A: Player API (Week 5-6 work) **← RECOMMENDED**
+- Publishing is DONE, now enable hunt playing!
+- GET /api/play/:huntId/start (create session)
+- POST /api/play/sessions/:sessionId/submit (validate answers)
+- POST /api/play/sessions/:sessionId/hint (request hints)
+- Progress tracking with PlaySession model
+- **Estimated:** 1-2 weeks
+
+### Option B: Tree VIEW API (Week 2 work)
+- Better editor UX for managing steps
 - GET /api/hunts/:id/tree (compact step list for lazy loading)
 - GET /api/steps/:id (full step details)
 - Add stepCount to hunt list
 - Database indexes for performance
-- Challenge type validation (Strategy pattern)
+- **Estimated:** 3-5 days
 
-### Option B: Publishing Workflow (Week 4-5 work)
-- Publish hunt endpoint (clone hunt + steps)
-- Create PublishedHunt and LiveHunt records
-- Version management
-- QR code generation support
-
-**Recommended:** Start with Tree VIEW API for better editor UX before tackling publishing
+**Recommended:** Player API - You can now publish hunts, let's make them playable!
 
 ---
 
@@ -122,27 +158,25 @@ You just finished the NOW sprint with **100% completion**:
 - Asset CRUD with AWS S3 (5/5 endpoints)
 - 26/26 tests passing
 
-### 📍 Week 2: Tree VIEW + Challenge Validation (NEXT)
+### ✅ Week 4-5: Publishing Workflow - COMPLETE!
+- ✅ Publish hunt (clone hunt + steps)
+- ✅ Hunt DTO with version metadata
+- ✅ Optimistic locking for concurrent edits
+- ✅ Transaction safety throughout
+
+### 📍 Week 5-6: Player API (NEXT)
+- Start hunt session (anonymous + authenticated)
+- Submit challenge completions
+- Validate challenges by type
+- Track progress
+- **See:** `.claude/player-api-design.md` for complete design
+
+### Week 2: Tree VIEW + Challenge Validation (LATER)
 - GET /api/hunts/:id/tree (compact step list, lazy loading)
 - GET /api/steps/:id (full details)
 - Add stepCount to hunt list
 - Database indexes
 - Challenge type validation (Strategy pattern)
-
-### Week 3: ✅ Asset Management - COMPLETE!
-- ✅ File upload with presigned S3 URLs
-- ✅ Asset CRUD endpoints
-- ✅ All 26 integration tests passing
-
-### Week 4-5: Publishing Workflow
-- Publish hunt (clone hunt + steps)
-- PublishedHunt + LiveHunt records
-- Version management
-
-### Week 5-6: Player API
-- Get live hunt
-- Submit completions
-- Track progress
 
 **See:** `.claude/ROADMAP.md` for full 14-week timeline
 
@@ -156,6 +190,7 @@ You just finished the NOW sprint with **100% completion**:
 - ✅ Separate steps collection (better for progress tracking)
 - ✅ Skip Review state for MVP (add later with OCP)
 - ✅ Simplified publishing workflow (MVP)
+- ✅ Single Hunt DTO with full metadata (optimize later with HuntCompact if needed)
 
 **All decisions:** See `.claude/reference/decisions-needed.md`
 
@@ -193,10 +228,11 @@ You just finished the NOW sprint with **100% completion**:
 - 14-week roadmap
 - MongoDB best practices
 - Monorepo strategy
-- Publishing workflow design
+- Publishing workflow design ✅ **NOW COMPLETE**
 - **Week 1 completion status** (Hunt + Step CRUD ✅)
 - **Numeric ID migration** (COMPLETE ✅ for all active models)
 - **Asset Management** (COMPLETE ✅ with full AWS S3 integration)
+- **Publishing Workflow** (COMPLETE ✅ with optimistic locking + transactions)
 - Production patterns and reasoning
 
 **You don't need to remind me of anything.** Just say what you want to work on.
@@ -206,13 +242,13 @@ You just finished the NOW sprint with **100% completion**:
 ## 💬 How to Start Next Session
 
 **Recommended:**
-✅ "Let's implement the Tree VIEW API"
-✅ "Start with GET /api/hunts/:id/tree endpoint"
-✅ "Work on Publishing Workflow"
+✅ "Let's implement the Player API"
+✅ "Start with PlaySession model and start hunt endpoint"
+✅ "Work on challenge validation by type"
 
 **You can also:**
 - Ask me to summarize what's been completed
-- Ask about Tree VIEW vs Publishing priority
+- Ask about Player API vs Tree VIEW priority
 - Ask what's the fastest path to MVP
 - Jump straight to implementation
 
@@ -223,17 +259,17 @@ You just finished the NOW sprint with **100% completion**:
 **If you want a refresh before starting:**
 
 ```bash
-# See Week 1 decisions and reasoning
-cat .claude/backend/hunt-step-implementation-decisions.md
-
 # See current backend state
 cat .claude/backend/current-state.md | head -100
+
+# See player API design
+cat .claude/player-api-design.md
 
 # See full roadmap
 cat .claude/ROADMAP.md | grep -A 20 "NOW (CRITICAL"
 
 # See completed endpoints
-cat .claude/backend/current-state.md | grep "Implemented (Week 1"
+cat .claude/backend/current-state.md | grep "Implemented"
 ```
 
 ---
@@ -249,43 +285,42 @@ cat .claude/backend/current-state.md | grep "Implemented (Week 1"
 - [x] AWS infrastructure deployed (S3, CloudFront, IAM) ✅
 - [x] Test infrastructure (in-memory MongoDB, mocking) ✅
 - [x] Mongoose index warnings fixed ✅
+- [x] **Hunt Versioning System** (Hunt + HuntVersion architecture) ✅
+- [x] **Publishing Workflow** (POST /api/hunts/:id/publish) ✅
+- [x] **Optimistic Locking** (Hunt + Step services) ✅
+- [x] **Transaction Safety** (StepService create/update/delete) ✅
+- [x] **Hunt DTO with version metadata** (version, latestVersion, liveVersion, etc.) ✅
 
 **Backend API Progress:**
 - Hunt API: ✅ COMPLETE
 - Step API: ✅ COMPLETE
 - Asset API: ✅ COMPLETE
-- Tree VIEW API: 📍 NEXT
-- Publishing API: 📋 FUTURE
-- Player API: 📋 FUTURE
+- Publishing API: ✅ COMPLETE ⭐ **NEW!**
+- Player API: 📍 NEXT
+- Tree VIEW API: 📋 FUTURE
 
 ---
 
 ## 🎯 Next Goals
 
-**Short Term (Week 2):**
+**Short Term (Week 5-6):**
+- Player API implementation
+- Challenge validation by type (Clue, Quiz, Mission, Task)
+- PlaySession model and progress tracking
+- Anonymous player support
+
+**Medium Term (Week 7-8):**
 - Tree VIEW API for efficient step loading
 - Challenge type validation with Strategy pattern
 - Database indexes for performance
-
-**Medium Term (Weeks 4-5):**
-- Publishing workflow implementation
-- Hunt versioning system
-- QR code generation support
 
 **This is a portfolio project - keep showing production-quality patterns!**
 
 ---
 
-**🔥 READY FOR: Tree VIEW API or Publishing Workflow**
+**🔥 READY FOR: Player API Implementation**
 
-**Two solid options:**
+Publishing is complete - let's make hunts playable! The Player API is the next critical piece to enable end-to-end hunt gameplay.
 
-**Option A - Tree VIEW (Recommended for UX):**
-- Better editor experience with lazy loading
-- Follows original roadmap order
-- ~1 week of work
-
-**Option B - Publishing (Faster to MVP):**
-- Get hunts playable sooner
-- Enables QR code generation
-- ~1-2 weeks of work
+**Estimated time:** 1-2 weeks
+**See:** `.claude/player-api-design.md` for complete design

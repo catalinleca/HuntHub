@@ -1,17 +1,25 @@
 # Project State & Context
 
-**Last updated:** 2025-11-04
+**Last updated:** 2025-11-05
 
 ## Current Focus
 
-🎯 **Publishing Workflow Implementation** - Core versioning system complete, ready for Phase 3
+🎯 **Player API Implementation** - Publishing workflow complete, ready for hunt playing
 
-**Recent Achievement (2025-11-04):**
+**Recent Achievement (2025-11-05):**
+✅ **Publishing Workflow Complete!**
+- Publishing API fully implemented (POST /api/hunts/:id/publish)
+- Hunt DTO updated with version metadata
+- Optimistic locking for concurrent edits (Hunt + Step services)
+- Transaction safety throughout all multi-operation methods
+- Helper modules with clean separation of concerns
+- Single Hunt DTO architecture pattern decided
+
+**Previous Achievement (2025-11-04):**
 ✅ **Hunt Versioning System Complete!**
 - Hunt (master) + HuntVersion (content) architecture fully implemented
 - All 69 tests passing with atomic transaction safety
 - Production-grade data integrity fixes complete
-- Ready for publishing workflow (Phase 3)
 
 ## Project Meta-Goal
 
@@ -33,13 +41,23 @@
 
 ## Recent Work (Last 1-2 Commits)
 
+**2025-11-05: Publishing Workflow Complete** ✅
+- ✅ **Publishing API Implemented:** POST /api/hunts/:id/publish endpoint
+- ✅ **Publishing Service:** publishHunt() with atomic transactions and optimistic locking
+- ✅ **Helper Modules:** VersionValidator, VersionPublisher, StepCloner
+- ✅ **Hunt DTO Updated:** Added version metadata (version, latestVersion, liveVersion, isPublished, publishedAt, publishedBy)
+- ✅ **Optimistic Locking:** Concurrent edit detection in updateStep() using updatedAt
+- ✅ **Transaction Safety:** StepService wrapped in transactions (createStep, updateStep, deleteStep)
+- ✅ **Session Parameter Support:** HuntService helpers accept optional session parameter
+- ✅ **DI Container Fixed:** Critical bug in inversify.ts binding corrected
+- ✅ **Architecture Decision:** Single Hunt DTO approach (no HuntCompact yet - YAGNI)
+
 **2025-11-04: Hunt Versioning System Complete** ✅
 - ✅ **Phase 1 Complete:** All models updated for Hunt (master) + HuntVersion (content) separation
 - ✅ **Phase 2 Complete:** All services updated with versioning logic
 - ✅ **Data Integrity Fixes:** Cascade delete, huntVersion validation, atomic transactions
 - ✅ **Test Infrastructure Upgrade:** MongoDB Memory Replica Set for transaction support
 - ✅ **All 69 tests passing** with full transaction safety
-- 📍 **Next:** Phase 3 - Publishing Workflow (publishHunt() method)
 
 **2025-11-03: Asset Management Complete** ✅
 - Full asset service implementation with AWS S3 integration
@@ -81,16 +99,23 @@
 ✅ Runtime module resolution with tsconfig-paths
 ✅ Backend server with production-grade patterns
 ✅ Firebase authentication
-✅ **Hunt Versioning System (NEW):**
+✅ **Hunt Versioning System:**
   - Hunt (master) + HuntVersion (content) separation
   - Atomic transaction support (MongoDB replica set)
   - Draft version editing with protection
   - Cascade delete for data integrity
   - Cross-version validation
+✅ **Publishing Workflow:** ⭐ **NEW!**
+  - Full publishing system with optimistic locking
+  - POST /api/hunts/:id/publish endpoint
+  - Helper modules (VersionValidator, VersionPublisher, StepCloner)
+  - Hunt DTO with version metadata
+  - Transaction safety throughout
 ✅ **Complete CRUD Operations:**
   - Hunt CRUD (6/6 endpoints)
-  - Step CRUD (3/3 endpoints)
+  - Step CRUD (3/3 endpoints) with optimistic locking
   - Asset CRUD (5/5 endpoints)
+  - Publishing (1/1 endpoint)
 ✅ **Testing Infrastructure:**
   - MongoDB Memory Replica Set
   - 69/69 tests passing
@@ -98,7 +123,7 @@
 
 ## Immediate Next Steps
 
-**Updated: 2025-11-04 after versioning system completion**
+**Updated: 2025-11-05 after publishing workflow completion**
 
 **Priority 1: ~~Hunt Versioning System~~** ✅ **COMPLETE**
 - ✅ Phase 1: Database Models & Types
@@ -107,56 +132,39 @@
 - ✅ Test Infrastructure: MongoDB replica set for transactions
 - ✅ All 69 tests passing
 
-**Priority 2: Publishing Workflow** **← CURRENT PRIORITY**
+**Priority 2: ~~Publishing Workflow~~** ✅ **COMPLETE**
+- ✅ Publishing API fully implemented (POST /api/hunts/:id/publish)
+- ✅ Hunt DTO updated with version metadata
+- ✅ Optimistic locking for concurrent edits
+- ✅ Transaction safety throughout
+- ✅ Helper modules with clean separation of concerns
+- ✅ DI container fixed
 
-**Phase 3: Publishing (4-5 hours estimated):**
-1. Implement `HuntService.publishHunt()` method
-   - Mark HuntVersion as published (isPublished=true, publishedAt, publishedBy)
-   - Clone all steps from latestVersion → latestVersion+1
-   - Create new draft HuntVersion (latestVersion+1)
-   - Update Hunt.liveVersion to latestVersion
-   - Update Hunt.latestVersion to latestVersion+1
-   - Use transaction for atomicity
-2. Add controller endpoint: `POST /api/hunts/:id/publish`
-3. Add route configuration
-4. Implement validation rules
+**Priority 3: Player API** (Weeks 5-6) **← CURRENT PRIORITY**
 
-**Phase 4: Publishing Tests (3-4 hours estimated):**
-1. Basic publishing test (publish v1, verify v2 created)
-2. Full workflow test (edit-publish-edit-publish cycle)
-3. Edge case tests
+**Why this is priority:** Publishing is done, now enable hunt playing!
 
-**Why this is priority:** Core missing functionality blocking QR code generation and hunt playing
+1. **PlaySession model** - Track active gameplay sessions
+2. **Start hunt endpoint** - POST /api/play/:huntId/start (create session)
+3. **Submit answer endpoint** - POST /api/play/sessions/:sessionId/submit (validate answers)
+4. **Hint endpoint** - POST /api/play/sessions/:sessionId/hint (request hints)
+5. **Challenge validation by type** - Clue, Quiz, Mission, Task validators
+6. **Progress tracking** - Update Progress model with session tracking
 
-**Priority 3: Step Management + Tree VIEW** (Weeks 2-4) **← NEXT**
-1. Reorder steps (PUT /api/hunts/:id/step-order)
-2. Challenge type validation (Strategy pattern)
-3. Get hunt tree (GET /api/hunts/:id/tree)
-4. Add stepCount to hunt list
-5. Get step details (GET /api/steps/:id)
-6. Database indexes
-
+**See:** `.claude/player-api-design.md` for complete design
 **See:** `.claude/ROADMAP.md` for complete timeline
 
-**Priority 4: Asset Management** (Weeks 2-4)
-1. Upload asset (POST /api/assets)
-2. Attach asset to step
-3. Get asset (GET /api/assets/:id)
+**Priority 4: Tree VIEW API** (Weeks 2-4) **← LATER**
+1. GET /api/hunts/:id/tree (compact step list)
+2. GET /api/steps/:id (full step details)
+3. Add stepCount to hunt list
+4. Database indexes
+5. Challenge type validation (Strategy pattern)
 
-**Note:** Assets must be done before Player API (missions need file uploads)
-
-**Priority 5: Publishing MVP** (Weeks 4-5)
-1. Publish hunt (POST /api/hunts/:id/publish)
-2. Get live version (GET /api/hunts/:id/live)
-3. Simplified workflow: Draft → Published (skip Review for MVP)
-
-**Priority 6: Hunt Player API** (Weeks 5-6)
-1. Get live hunt for playing
-2. Submit step completion
-3. Validate challenges
-4. Track progress
-
-**Note:** Player API structure needs discussion before implementation
+**Priority 5: Testing** - **Ongoing**
+1. Add publishing integration tests
+2. Add Step CRUD integration tests (optimistic locking)
+3. Add Tree VIEW tests when implemented
 
 ## Blockers
 

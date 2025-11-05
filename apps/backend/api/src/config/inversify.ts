@@ -28,6 +28,6 @@ container.bind<IHuntService>(TYPES.HuntService).to(HuntService);
 container.bind<IStepService>(TYPES.StepService).to(StepService);
 container.bind<IAssetService>(TYPES.AssetService).to(AssetService);
 container.bind<IStorageService>(TYPES.StorageService).to(StorageService);
-container.bind<IPublishingService>(TYPES.StorageService).to(PublishingService);
+container.bind<IPublishingService>(TYPES.PublishingService).to(PublishingService);
 
 export { container };
