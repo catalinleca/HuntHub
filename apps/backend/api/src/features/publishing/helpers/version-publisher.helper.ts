@@ -2,6 +2,7 @@ import { ClientSession, HydratedDocument, Types } from 'mongoose';
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import { IHunt } from '@/database/types/Hunt';
+import { ConflictError } from '@/shared/errors/ConflictError';
 
 export class VersionPublisher {
   static async markVersionPublished(
@@ -28,7 +29,7 @@ export class VersionPublisher {
     );
 
     if (result.matchedCount === 0) {
-      throw new Error( // TODO: Conflict error
+      throw new ConflictError(
         'Hunt version was modified during publishing. This can happen if:\n' +
           '- Another publish request is in progress\n' +
           '- Hunt was edited by another user\n' +
@@ -39,22 +40,27 @@ export class VersionPublisher {
   }
 
   static async updateHuntPointers(huntId: number, currentVersion: number, newVersion: number, session: ClientSession) {
-    const updatedHunt = await HuntModel.findOneAndUpdate({
-      huntId,
-      latestVersion: currentVersion,
-    }, {
-      // liveVersion: newVersion, TODO: not sure if we wanna make a published version live on publish
-      latestVersion: newVersion,
-    }, {
-      new: true, session
-    })
+    const updatedHunt = await HuntModel.findOneAndUpdate(
+      {
+        huntId,
+        latestVersion: currentVersion,
+      },
+      {
+        // liveVersion: newVersion, TODO: not sure if we wanna make a published version live on publish
+        latestVersion: newVersion,
+      },
+      {
+        new: true,
+        session,
+      },
+    );
 
     if (!updatedHunt) {
-      throw new Error( // TODO: Conflict error
+      throw new ConflictError(
         'Hunt was modified during publishing. This can happen if:\n' +
-        '- Another publish request is in progress\n' +
-        '- Hunt was edited by another user\n' +
-        'Please refresh and try again.',
+          '- Another publish request is in progress\n' +
+          '- Hunt was edited by another user\n' +
+          'Please refresh and try again.',
       );
     }
 

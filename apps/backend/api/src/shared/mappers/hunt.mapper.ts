@@ -91,7 +91,7 @@ export class HuntMapper {
    * @param dto - HuntUpdate from API request
    * @returns Partial IHuntVersion document data
    */
-  static toVersionUpdate(dto: HuntUpdate): Partial<IHuntVersion> {
+  static toVersionUpdate(dto: Hunt): Partial<IHuntVersion> {
     return {
       name: dto.name,
       description: dto.description,

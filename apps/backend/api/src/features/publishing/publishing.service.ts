@@ -38,10 +38,9 @@ export class PublishingService implements IPublishingService {
     const huntDoc = await this.huntService.verifyOwnership(huntId, userId);
 
     const session = await mongoose.startSession();
-    let result: Hunt;
 
     try {
-      await session.withTransaction(async () => {
+      return session.withTransaction(async () => {
         const currentVersion = huntDoc.latestVersion;
         const newVersion = currentVersion + 1;
 
@@ -65,15 +64,11 @@ export class PublishingService implements IPublishingService {
 
         const updatedHunt = await VersionPublisher.updateHuntPointers(huntId, currentVersion, newVersion, session);
 
-        result = HuntMapper.fromDocuments(updatedHunt, newVersionDoc);
+        return HuntMapper.fromDocuments(updatedHunt, newVersionDoc);
       });
-    } catch (err: any) {
-      console.error(err); // TODO: handle error
     } finally {
       await session.endSession();
     }
-
-    return result!; // TODO: why !
   }
 
   private async createNewDraftVersion(

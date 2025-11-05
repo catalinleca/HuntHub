@@ -8,6 +8,7 @@ import { IHunt } from '@/database/types/Hunt';
 import { HuntMapper } from '@/shared/mappers';
 import { NotFoundError, ForbiddenError } from '@/shared/errors';
 import { ValidationError } from '@/shared/errors';
+import { ConflictError } from '@/shared/errors/ConflictError';
 
 export interface IHuntService {
   createHunt(hunt: HuntCreate, creatorId: string): Promise<Hunt>;
@@ -27,7 +28,7 @@ export interface IHuntService {
 export class HuntService implements IHuntService {
   /**
    * Private helper: Fetch Hunt + HuntVersion and merge into DTO
-   * Returns null if version not found (data integrity issue)
+   * Returns null if the version not found (data integrity issue)
    */
   private async fetchHuntWithVersion(huntDoc: HydratedDocument<IHunt>): Promise<Hunt | null> {
     const versionDoc = await HuntVersionModel.findDraftByVersion(huntDoc.huntId, huntDoc.latestVersion);
@@ -40,25 +41,22 @@ export class HuntService implements IHuntService {
   }
 
   async createHunt(hunt: HuntCreate, creatorId: string): Promise<Hunt> {
-    // Use transaction to ensure atomicity (Hunt + HuntVersion created together)
     const session = await mongoose.startSession();
-    let result: Hunt;
 
-    await session.withTransaction(async () => {
-      // Create Hunt master record using mapper
-      const huntData = HuntMapper.toHuntDocument(creatorId);
-      const [createdHunt] = await HuntModel.create([huntData], { session });
+    try {
+      return session.withTransaction(async () => {
+        const huntData = HuntMapper.toHuntDocument(creatorId);
+        const [createdHunt] = await HuntModel.create([huntData], { session });
 
-      // Create first HuntVersion (v1) using mapper
-      const versionData = HuntMapper.toVersionDocument(hunt, createdHunt.huntId, 1);
-      const [createdVersion] = await HuntVersionModel.create([versionData], { session });
+        // Create first HuntVersion (v1) using mapper
+        const versionData = HuntMapper.toVersionDocument(hunt, createdHunt.huntId, 1);
+        const [createdVersion] = await HuntVersionModel.create([versionData], { session });
 
-      // Return merged DTO using mapper
-      result = HuntMapper.fromDocuments(createdHunt, createdVersion);
-    });
-
-    await session.endSession();
-    return result!;
+        return HuntMapper.fromDocuments(createdHunt, createdVersion);
+      });
+    } finally {
+      await session.endSession();
+    }
   }
 
   async getAllHunts(): Promise<Hunt[]> {
@@ -105,25 +103,55 @@ export class HuntService implements IHuntService {
     return HuntMapper.fromDocuments(huntDoc, versionDoc);
   }
 
-  async updateHunt(huntId: number, huntData: HuntUpdate, userId: string): Promise<Hunt> {
-    const huntDoc = await HuntModel.findByHuntIdAndCreator(huntId, userId);
-    if (!huntDoc) {
-      throw new NotFoundError();
+  async updateHunt(huntId: number, huntData: Hunt, userId: string): Promise<Hunt> {
+    const huntDoc = await this.verifyOwnership(huntId, userId);
+
+    const session = await mongoose.startSession();
+
+    try {
+      return session.withTransaction(async () => {
+        const huntUpdateData = HuntMapper.toVersionUpdate(huntData);
+
+        const updatedVersionDoc = await HuntVersionModel.findOneAndUpdate(
+          {
+            huntId: huntDoc.huntId,
+            version: huntDoc.latestVersion,
+            isPublished: false,
+            ...(huntData.updatedAt && { updatedAt: new Date(huntData.updatedAt) }),
+          },
+          huntUpdateData,
+          { new: true, session },
+        ).exec();
+
+        if (!updatedVersionDoc) {
+          const versionDoc = await HuntVersionModel.findOne({
+            huntId: huntDoc.huntId,
+            version: huntDoc.latestVersion,
+          }).session(session);
+
+          if (!versionDoc) {
+            throw new NotFoundError('Hunt version not found');
+          }
+
+          if (versionDoc.isPublished) {
+            throw new ValidationError(
+              'Cannot edit published version. Please create a new version or unpublish first.',
+              [],
+            );
+          }
+
+          if (huntData.updatedAt) {
+            throw new ConflictError('Hunt was modified by another user. Please refresh and try again.');
+          }
+
+          throw new Error('Update failed for unknown reason');
+        }
+
+        return HuntMapper.fromDocuments(huntDoc, updatedVersionDoc);
+      });
+    } finally {
+      await session.endSession();
     }
-
-    // Update the draft version content using mapper
-    const updateData = HuntMapper.toVersionUpdate(huntData);
-    const versionDoc = await HuntVersionModel.findOneAndUpdate(
-      { huntId: huntDoc.huntId, version: huntDoc.latestVersion, isPublished: false },
-      updateData,
-      { new: true },
-    ).exec();
-
-    if (!versionDoc) {
-      throw new NotFoundError();
-    }
-
-    return HuntMapper.fromDocuments(huntDoc, versionDoc);
   }
 
   async deleteHunt(huntId: number, userId: string): Promise<void> {
@@ -132,13 +160,10 @@ export class HuntService implements IHuntService {
       throw new NotFoundError();
     }
 
-    // Delete ALL HuntVersions for this hunt
     await HuntVersionModel.deleteMany({ huntId });
 
-    // Delete ALL steps across all versions
     await StepModel.deleteMany({ huntId: huntId });
 
-    // Delete Hunt master
     await existingHunt.deleteOne();
   }
 
