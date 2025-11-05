@@ -26,8 +26,12 @@ export class PublishingController implements IPublishingController {
       throw new ValidationError('Invalid hunt ID', []);
     }
 
-    const publishedHunt = await this.publishingService.publishHunt(huntId, req.user.id);
-
-    return res.status(200).json(publishedHunt);
+    const result = await this.publishingService.publishHunt(huntId, req.user.id);
+    return res.status(200).json({
+      success: true,
+      publishedVersion: result.version,
+      newDraftVersion: result.latestVersion,
+      hunt: result,
+    });
   }
 }

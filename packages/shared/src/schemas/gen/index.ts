@@ -81,12 +81,18 @@ const Hunt = z
   .object({
     huntId: z.number().int(),
     creatorId: z.string(),
+    version: z.number().int(),
+    latestVersion: z.number().int(),
+    liveVersion: z.number().int().nullish(),
     name: z.string(),
     description: z.string().optional(),
     status: HuntStatus,
     startLocation: Location.optional(),
     stepOrder: z.array(z.number().int()),
     steps: z.array(Step).optional(),
+    isPublished: z.boolean(),
+    publishedAt: z.string().datetime({ offset: true }).optional(),
+    publishedBy: z.string().optional(),
     createdAt: z.string().datetime({ offset: true }).optional(),
     updatedAt: z.string().datetime({ offset: true }).optional(),
   })

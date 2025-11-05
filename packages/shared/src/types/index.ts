@@ -69,6 +69,21 @@ export interface Hunt {
   /** @example 1332 */
   huntId: number;
   creatorId: string;
+  /**
+   * Which version is this? (1, 2, 3, etc.)
+   * @example 1
+   */
+  version: number;
+  /**
+   * Latest draft version number
+   * @example 2
+   */
+  latestVersion: number;
+  /**
+   * Currently published version number (null if never published)
+   * @example 1
+   */
+  liveVersion?: number | null;
   name: string;
   description?: string;
   /** Hunt status: draft (editable) or published (read-only) */
@@ -81,6 +96,19 @@ export interface Hunt {
   stepOrder: number[];
   /** Optional: Full step details (when populated) */
   steps?: Step[];
+  /**
+   * Is THIS version published?
+   * @example false
+   */
+  isPublished: boolean;
+  /**
+   * When this version was published
+   * @format date-time
+   * @example "2024-02-01T10:12:45Z"
+   */
+  publishedAt?: string;
+  /** User ID who published this version */
+  publishedBy?: string;
   /**
    * @format date-time
    * @example "2024-02-01T10:12:45Z"

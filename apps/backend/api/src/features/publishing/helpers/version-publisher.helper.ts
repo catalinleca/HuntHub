@@ -1,4 +1,4 @@
-import { ClientSession, Types } from 'mongoose';
+import { ClientSession } from 'mongoose';
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import { ConflictError } from '@/shared/errors/ConflictError';
@@ -21,7 +21,7 @@ export class VersionPublisher {
       {
         isPublished: true,
         publishedAt: new Date(),
-        publishedBy: new Types.ObjectId(userId),
+        publishedBy: userId,
       },
       { session },
     );

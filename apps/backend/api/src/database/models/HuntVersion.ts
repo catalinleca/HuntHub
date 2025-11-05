@@ -1,4 +1,4 @@
-import { Schema, model, Model, HydratedDocument } from 'mongoose';
+import { Schema, model, Model, HydratedDocument, ClientSession } from 'mongoose';
 import { IHuntVersion } from '../types/HuntVersion';
 import { locationSchema } from '@/database/schemas/location.schema';
 
@@ -47,7 +47,11 @@ huntVersionSchema.index({ huntId: 1, isPublished: 1 });
 interface IHuntVersionModel extends Model<IHuntVersion> {
   findByHuntAndVersion(huntId: number, version: number): Promise<HydratedDocument<IHuntVersion> | null>;
 
-  findDraftByVersion(huntId: number, version: number): Promise<HydratedDocument<IHuntVersion> | null>;
+  findDraftByVersion(
+    huntId: number,
+    version: number,
+    session?: ClientSession,
+  ): Promise<HydratedDocument<IHuntVersion> | null>;
 
   findPublishedVersions(huntId: number): Promise<HydratedDocument<IHuntVersion>[]>;
 }
@@ -56,8 +60,10 @@ huntVersionSchema.statics.findByHuntAndVersion = function (huntId: number, versi
   return this.findOne({ huntId, version }).exec();
 };
 
-huntVersionSchema.statics.findDraftByVersion = function (huntId: number, version: number) {
-  return this.findOne({ huntId, version, isPublished: false }).exec();
+huntVersionSchema.statics.findDraftByVersion = function (huntId: number, version: number, session?: ClientSession) {
+  const query = this.findOne({ huntId, version, isPublished: false });
+
+  return session ? query.session(session) : query.exec();
 };
 
 huntVersionSchema.statics.findPublishedVersions = function (huntId: number) {

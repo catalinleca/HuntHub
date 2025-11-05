@@ -56,6 +56,11 @@ export class HuntMapper {
       huntId: huntDoc.huntId,
       creatorId: huntDoc.creatorId.toString(),
 
+      // Version metadata from Hunt master
+      version: versionDoc.version,
+      latestVersion: huntDoc.latestVersion,
+      liveVersion: huntDoc.liveVersion,
+
       // Content from HuntVersion
       name: versionDoc.name,
       description: versionDoc.description,
@@ -67,6 +72,11 @@ export class HuntMapper {
           }
         : undefined,
       stepOrder: versionDoc.stepOrder,
+
+      // Publishing metadata from HuntVersion
+      isPublished: versionDoc.isPublished,
+      publishedAt: versionDoc.publishedAt?.toISOString(),
+      publishedBy: versionDoc.publishedBy,
 
       // Computed status
       status: versionDoc.isPublished ? HuntStatus.Published : HuntStatus.Draft,

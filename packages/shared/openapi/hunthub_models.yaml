@@ -55,6 +55,19 @@ components:
           example: 1332
         creatorId:
           type: string
+        version:
+          type: integer
+          description: "Which version is this? (1, 2, 3, etc.)"
+          example: 1
+        latestVersion:
+          type: integer
+          description: "Latest draft version number"
+          example: 2
+        liveVersion:
+          type: integer
+          nullable: true
+          description: "Currently published version number (null if never published)"
+          example: 1
         name:
           type: string
         description:
@@ -74,6 +87,18 @@ components:
           description: "Optional: Full step details (when populated)"
           items:
               $ref: '#/components/schemas/Step'
+        isPublished:
+          type: boolean
+          description: "Is THIS version published?"
+          example: false
+        publishedAt:
+          type: string
+          format: date-time
+          description: "When this version was published"
+          example: "2024-02-01T10:12:45Z"
+        publishedBy:
+          type: string
+          description: "User ID who published this version"
         createdAt:
           type: string
           example: "2024-02-01T10:12:45Z"
@@ -85,8 +110,11 @@ components:
       required:
         - huntId
         - creatorId
+        - version
+        - latestVersion
         - name
         - status
+        - isPublished
         - stepOrder
 
     HuntCreate:

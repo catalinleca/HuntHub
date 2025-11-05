@@ -7,6 +7,7 @@ import { IHuntVersion } from '@/database/types/HuntVersion';
 import { HuntMapper } from '@/shared/mappers';
 import { IHuntService } from '@/modules/hunts/hunt.service';
 import { TYPES } from '@/shared/types';
+import { ValidationError } from '@/shared/errors';
 import { VersionValidator } from '@/features/publishing/helpers/version-validator.helper';
 import { StepCloner } from '@/features/publishing/helpers/step-cloner.helper';
 import { VersionPublisher } from '@/features/publishing/helpers/version-publisher.helper';
@@ -46,7 +47,7 @@ export class PublishingService implements IPublishingService {
 
         await VersionValidator.validateCanPublish(huntId, currentVersion, session);
 
-        const currentVersionDoc = await HuntVersionModel.findDraftByVersion(huntId, currentVersion);
+        const currentVersionDoc = await HuntVersionModel.findDraftByVersion(huntId, currentVersion, session);
         if (!currentVersionDoc) {
           throw new Error('Current version not found');
         }
