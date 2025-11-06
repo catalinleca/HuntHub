@@ -1,10 +1,18 @@
 # Backend Current State
 
-**Last updated:** 2025-11-05
+**Last updated:** 2025-11-06
 
-**🎉 Publishing Workflow Complete! (2025-11-05)**
+**🎉 Publishing & Release Workflow Complete! (2025-11-06)**
 
-**Most Recent Work (2025-11-05):**
+**Most Recent Work (2025-11-06):**
+- ✅ **Release API Fully Implemented** - PUT /api/publishing/:id/release, DELETE /api/publishing/:id/release
+- ✅ **Release Manager Helper** - Optimistic locking for release/takeOffline operations
+- ✅ **Hunt DTO Enhanced** - Added isLive (computed), releasedAt, releasedBy fields
+- ✅ **Race Condition Prevention** - Atomic operations prevent concurrent release/delete conflicts
+- ✅ **Delete Protection** - Cannot delete hunts while live (liveVersion must be null)
+- ✅ **Complete Release Workflow** - Publish → Release → Players can play → Rollback/TakeOffline
+
+**Previous Work (2025-11-05):**
 - ✅ **Publishing API Fully Implemented** - POST /api/hunts/:id/publish
 - ✅ **Hunt DTO Updated** - Version metadata (version, latestVersion, liveVersion, isPublished, publishedAt, publishedBy)
 - ✅ **Optimistic Locking** - Concurrent edit detection in Hunt + Step services
@@ -181,18 +189,23 @@ Step
 - [x] Validation testing (required fields, error responses)
 - [x] Authentication testing (401 unauthorized cases)
 
-### Publishing Workflow (COMPLETE - 2025-11-05)
+### Publishing & Release Workflow (COMPLETE - 2025-11-06)
 - [x] Publishing service (orchestrates workflow)
   - publishHunt() - **Complete publishing workflow with optimistic locking**
-- [x] Publishing controller (POST /api/hunts/:id/publish)
+  - releaseHunt() - **Release version to players with race condition prevention**
+  - takeOffline() - **Remove hunt from player discovery**
+- [x] Publishing controller (POST /api/hunts/:id/publish, PUT /release, DELETE /release)
 - [x] Publishing routes (/api/publishing/...)
 - [x] Helper modules:
   - VersionValidator - Validates can publish (has steps, not already published)
   - VersionPublisher - Marks versions published, updates Hunt pointers with optimistic locking
   - StepCloner - Clones steps across versions
+  - ReleaseManager - Handles release/takeOffline with optimistic locking
 - [x] Optimistic locking for concurrent edit detection
 - [x] Transaction safety throughout publishing workflow
+- [x] Race condition prevention (concurrent release, delete while live, release during publish)
 - [x] Architecture decision: Single Hunt DTO (no HuntCompact yet - YAGNI)
+- [x] Complete workflow: Draft → Publish → Release → Live for players
 
 ### Tooling
 - [x] TypeScript configuration (strict mode)
@@ -298,8 +311,10 @@ GET    /api/assets                         # List user's assets
 GET    /api/assets/:id                     # Get asset by ID
 DELETE /api/assets/:id                     # Delete asset
 
-# Publishing (1/1) - Week 4-5 ✅
+# Publishing & Release (3/3) - Week 4-5 ✅
 POST   /api/publishing/hunts/:id/publish   # Publish hunt (clone steps, mark published, create new draft)
+PUT    /api/publishing/hunts/:id/release   # Release hunt (make version live for players)
+DELETE /api/publishing/hunts/:id/release   # Take hunt offline (remove from discovery)
 ```
 
 **📋 Needed - Week 2 (Tree VIEW API):**
@@ -331,9 +346,9 @@ GET    /api/play/:huntId/progress  # Get user progress
 
 ## 🎯 Current Priority: Player API
 
-**🎉 Publishing Workflow COMPLETE!**
+**🎉 Publishing & Release Workflow COMPLETE!**
 
-**Publishing is done, now enable hunt playing!**
+**Publishing and release are done, now enable hunt playing!**
 
 **NEXT: Player API** (~1-2 weeks) - **RECOMMENDED**
 - GET /api/play/:huntId/start (create session)
@@ -342,7 +357,10 @@ GET    /api/play/:huntId/progress  # Get user progress
 - Progress tracking with PlaySession model
 - **Estimated:** 1-2 weeks
 
-**See:** `.claude/player-api-design.md` for complete design
+**See:**
+- `.claude/player-api-design.md` for complete design
+- `.claude/features/release-hunt-completed.md` for release implementation details
+- `.claude/RELEASE-CONCEPT.md` for publish vs release explanation
 
 ---
 
