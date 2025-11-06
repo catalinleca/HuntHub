@@ -183,7 +183,7 @@ export class HuntService implements IHuntService {
 
         await HuntVersionModel.deleteMany({ huntId }, { session });
         await StepModel.deleteMany({ huntId }, { session });
-      })
+      });
     } finally {
       await session.endSession();
     }
