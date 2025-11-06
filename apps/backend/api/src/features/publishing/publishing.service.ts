@@ -111,12 +111,16 @@ export class PublishingService implements IPublishingService {
           session,
         );
 
+        if (!updatedHunt.liveVersion || !updatedHunt.releasedAt || !updatedHunt.releasedBy) {
+          throw new Error('Release operation failed to set required fields');
+        }
+
         return {
           huntId: updatedHunt.huntId,
-          liveVersion: updatedHunt.liveVersion!,
+          liveVersion: updatedHunt.liveVersion,
           previousLiveVersion,
-          releasedAt: updatedHunt.releasedAt!.toISOString(),
-          releasedBy: updatedHunt.releasedBy!,
+          releasedAt: updatedHunt.releasedAt.toISOString(),
+          releasedBy: updatedHunt.releasedBy,
         };
       });
     } finally {

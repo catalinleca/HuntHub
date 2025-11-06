@@ -46,16 +46,11 @@ export class PublishingController implements IPublishingController {
 
     const { version, currentLiveVersion } = req.body;
 
-    const result = await this.publishingService.releaseHunt(
-      huntId,
-      version,
-      req.user.id,
-      currentLiveVersion,
-    );
+    const result = await this.publishingService.releaseHunt(huntId, version, req.user.id, currentLiveVersion);
 
     return res.status(200).json({
       success: true,
-       message: `Version ${result.liveVersion} is now live`,
+      message: `Version ${result.liveVersion} is now live`,
       ...result,
     });
   }

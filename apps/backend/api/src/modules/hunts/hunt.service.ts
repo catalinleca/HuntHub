@@ -162,26 +162,28 @@ export class HuntService implements IHuntService {
     const session = await mongoose.startSession();
 
     try {
-      const result = await HuntModel.findOneAndUpdate(
-        {
-          huntId,
-          creatorId: new Types.ObjectId(userId),
-          liveVersion: null,
-          isDeleted: false,
-        },
-        {
-          isDeleted: true,
-          deletedAt: new Date(),
-        },
-        { new: true, session },
-      );
+      await session.withTransaction(async () => {
+        const result = await HuntModel.findOneAndUpdate(
+          {
+            huntId,
+            creatorId: new Types.ObjectId(userId),
+            liveVersion: null,
+            isDeleted: false,
+          },
+          {
+            isDeleted: true,
+            deletedAt: new Date(),
+          },
+          { new: true, session },
+        );
 
-      if (!result) {
-        throw new ConflictError('Cannot delete hunt: it may be live or was modified by another operation.');
-      }
+        if (!result) {
+          throw new ConflictError('Cannot delete hunt: it may be live or was modified by another operation.');
+        }
 
-      await HuntVersionModel.deleteMany({ huntId }, { session });
-      await StepModel.deleteMany({ huntId }, { session });
+        await HuntVersionModel.deleteMany({ huntId }, { session });
+        await StepModel.deleteMany({ huntId }, { session });
+      })
     } finally {
       await session.endSession();
     }
