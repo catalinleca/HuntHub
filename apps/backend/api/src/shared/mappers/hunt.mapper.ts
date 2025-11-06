@@ -78,6 +78,11 @@ export class HuntMapper {
       publishedAt: versionDoc.publishedAt?.toISOString(),
       publishedBy: versionDoc.publishedBy,
 
+      // Release metadata from Hunt master
+      isLive: versionDoc.version === huntDoc.liveVersion,
+      releasedAt: huntDoc.releasedAt?.toISOString(),
+      releasedBy: huntDoc.releasedBy,
+
       // Computed status
       status: versionDoc.isPublished ? HuntStatus.Published : HuntStatus.Draft,
 

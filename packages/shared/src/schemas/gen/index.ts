@@ -93,6 +93,9 @@ const Hunt = z
     isPublished: z.boolean(),
     publishedAt: z.string().datetime({ offset: true }).optional(),
     publishedBy: z.string().optional(),
+    isLive: z.boolean().optional(),
+    releasedAt: z.string().datetime({ offset: true }).optional(),
+    releasedBy: z.string().optional(),
     createdAt: z.string().datetime({ offset: true }).optional(),
     updatedAt: z.string().datetime({ offset: true }).optional(),
   })
@@ -238,6 +241,22 @@ const LiveHunt = z
     updatedAt: z.string().datetime({ offset: true }).optional(),
   })
   .passthrough();
+const ReleaseResult = z
+  .object({
+    huntId: z.number().int(),
+    liveVersion: z.number().int(),
+    previousLiveVersion: z.number().int().nullable(),
+    releasedAt: z.string().datetime({ offset: true }),
+    releasedBy: z.string(),
+  })
+  .passthrough();
+const TakeOfflineResult = z
+  .object({
+    huntId: z.number().int(),
+    previousLiveVersion: z.number().int(),
+    takenOfflineAt: z.string().datetime({ offset: true }),
+  })
+  .passthrough();
 
 export const schemas: Record<string, z.ZodTypeAny> = {
   HuntStatus,
@@ -272,6 +291,8 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   StepProgress,
   Progress,
   LiveHunt,
+  ReleaseResult,
+  TakeOfflineResult,
 };
 
 const endpoints = makeApi([]);

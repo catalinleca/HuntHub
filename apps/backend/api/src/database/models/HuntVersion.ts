@@ -45,7 +45,7 @@ huntVersionSchema.index({ huntId: 1, version: 1 }, { unique: true });
 huntVersionSchema.index({ huntId: 1, isPublished: 1 });
 
 interface IHuntVersionModel extends Model<IHuntVersion> {
-  findByHuntAndVersion(huntId: number, version: number): Promise<HydratedDocument<IHuntVersion> | null>;
+  findByHuntIdAndVersion(huntId: number, version: number): Promise<HydratedDocument<IHuntVersion> | null>;
 
   findDraftByVersion(
     huntId: number,
@@ -54,9 +54,20 @@ interface IHuntVersionModel extends Model<IHuntVersion> {
   ): Promise<HydratedDocument<IHuntVersion> | null>;
 
   findPublishedVersions(huntId: number): Promise<HydratedDocument<IHuntVersion>[]>;
+
+  findLatestPublished(
+    huntId: number,
+    session?: ClientSession,
+  ): Promise<HydratedDocument<IHuntVersion> | null>;
+
+  findPublishedVersion(
+    huntId: number,
+    version: number,
+    session?: ClientSession,
+  ): Promise<HydratedDocument<IHuntVersion> | null>;
 }
 
-huntVersionSchema.statics.findByHuntAndVersion = function (huntId: number, version: number) {
+huntVersionSchema.statics.findByHuntIdAndVersion = function (huntId: number, version: number) {
   return this.findOne({ huntId, version }).exec();
 };
 
@@ -68,6 +79,18 @@ huntVersionSchema.statics.findDraftByVersion = function (huntId: number, version
 
 huntVersionSchema.statics.findPublishedVersions = function (huntId: number) {
   return this.find({ huntId, isPublished: true }).sort({ version: -1 }).exec();
+};
+
+huntVersionSchema.statics.findLatestPublished = function (huntId: number, session?: ClientSession) {
+  const query = this.findOne({ huntId, isPublished: true }).sort({ version: -1 }).limit(1);
+
+  return session ? query.session(session) : query.exec();
+};
+
+huntVersionSchema.statics.findPublishedVersion = function (huntId: number, version: number, session?: ClientSession) {
+  const query = this.findOne({ huntId, version, isPublished: true });
+
+  return session ? query.session(session) : query.exec();
 };
 
 const HuntVersionModel = model<IHuntVersion, IHuntVersionModel>('HuntVersion', huntVersionSchema);

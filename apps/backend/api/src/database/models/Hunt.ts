@@ -22,6 +22,8 @@ const huntSchema: Schema<IHunt> = new Schema<IHunt>(
       type: Number,
       default: null,
     },
+    releasedAt: Date,
+    releasedBy: String,
     isDeleted: {
       type: Boolean,
       default: false,

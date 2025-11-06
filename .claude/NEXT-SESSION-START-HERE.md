@@ -1,40 +1,52 @@
 # 🚀 START HERE - Next Session Quick Guide
 
-**Last updated:** 2025-11-05
+**Last updated:** 2025-11-06
 
 **When you open Claude Code next time, I'll auto-load all context.**
 
 ---
 
-## 🎉 Publishing Workflow COMPLETE! (2025-11-05)
+## 🎉 Publishing & Release Workflow COMPLETE! (2025-11-06)
 
-**Major Achievement: Production-Grade Publishing System**
-- ✅ **Publishing API fully implemented** (POST /api/hunts/:id/publish)
-- ✅ **Hunt DTO updated** with version metadata (version, latestVersion, liveVersion, isPublished, publishedAt, publishedBy)
-- ✅ **Optimistic locking** for concurrent edit detection (Hunt + Step services)
-- ✅ **Transaction safety** for all multi-operation methods (StepService)
-- ✅ **Helper modules** with clean separation of concerns:
-  - `VersionValidator` - Business rule validation
-  - `VersionPublisher` - Publishing with optimistic locking
-  - `StepCloner` - Clones steps across versions
-- ✅ **DI container** properly configured
+**Major Achievement: Production-Grade Publishing & Release System**
 
-**Publishing Workflow:**
-1. Verify ownership (fail fast)
-2. Validate can publish (has steps, not already published)
-3. Clone steps to new version (v1 → v2)
-4. Create new draft HuntVersion (v2)
-5. Mark current version as published (v1)
-6. Update Hunt pointers (latestVersion++)
-7. Return complete Hunt DTO with all version metadata
+**Publishing (2025-11-05):**
+- ✅ **Publishing API** (POST /api/hunts/:id/publish)
+- ✅ **Hunt DTO updated** with version metadata
+- ✅ **Helper modules:** VersionValidator, VersionPublisher, StepCloner
+- ✅ **Workflow:** Draft → Publish → Creates immutable version snapshot
 
-**Architecture Pattern Used:**
-- Single `Hunt` DTO for all contexts (create, read, publish)
-- Future optimization: Add `HuntCompact` for list views (when needed)
-- Follows production standards while keeping simple for MVP
+**Release (2025-11-06):**
+- ✅ **Release API** (PUT /api/hunts/:id/release, DELETE /api/hunts/:id/release)
+- ✅ **Release Manager helper** with optimistic locking
+- ✅ **Race condition prevention** for concurrent release/delete/takeOffline operations
+- ✅ **Delete protection** - Cannot delete hunts while live
+- ✅ **Hunt DTO enhanced** with isLive, releasedAt, releasedBy
+- ✅ **Workflow:** Publish → Release → Players can discover and play
+
+**Complete Workflow:**
+1. **Draft** - Create and edit hunt
+2. **Publish** - Create immutable version snapshot (v1, v2, v3...)
+3. **Release** - Make a version "live" for players (instant, reversible)
+4. **Rollback** - Switch to any published version instantly
+5. **Take Offline** - Remove from player discovery
+
+**Race Conditions Prevented:**
+1. **Concurrent Release** - Optimistic locking with currentLiveVersion parameter
+2. **Delete While Live** - Atomic check ensures liveVersion = null before delete
+3. **Release During Publish** - Transaction isolation prevents conflicts
+4. **Concurrent TakeOffline + Release** - Both use optimistic locking
+
+**Key Concepts:**
+- **Publish** creates permanent version snapshots (immutable)
+- **Release** makes a version discoverable to players (reversible pointer)
+- **Separation** enables zero-downtime updates and instant rollback
+- **liveVersion** is a pointer, not a copy (fast switching)
 
 **See:**
 - `.claude/backend/current-state.md` for complete implementation status
+- `.claude/features/release-hunt-completed.md` for release implementation details
+- `.claude/RELEASE-CONCEPT.md` for publish vs release explanation
 - `apps/backend/api/src/features/publishing/` for implementation
 
 ---
@@ -128,7 +140,8 @@ You just finished the NOW sprint with **100% completion**:
 **Two paths forward:**
 
 ### Option A: Player API (Week 5-6 work) **← RECOMMENDED**
-- Publishing is DONE, now enable hunt playing!
+- Publishing & Release are DONE, now enable hunt playing!
+- Hunts can now be published and released to players
 - GET /api/play/:huntId/start (create session)
 - POST /api/play/sessions/:sessionId/submit (validate answers)
 - POST /api/play/sessions/:sessionId/hint (request hints)
@@ -143,7 +156,7 @@ You just finished the NOW sprint with **100% completion**:
 - Database indexes for performance
 - **Estimated:** 3-5 days
 
-**Recommended:** Player API - You can now publish hunts, let's make them playable!
+**Recommended:** Player API - You can now publish AND release hunts, let's make them playable!
 
 ---
 
@@ -158,10 +171,13 @@ You just finished the NOW sprint with **100% completion**:
 - Asset CRUD with AWS S3 (5/5 endpoints)
 - 26/26 tests passing
 
-### ✅ Week 4-5: Publishing Workflow - COMPLETE!
+### ✅ Week 4-5: Publishing & Release Workflow - COMPLETE!
 - ✅ Publish hunt (clone hunt + steps)
+- ✅ Release hunt (make version live for players)
+- ✅ Take offline (remove from discovery)
 - ✅ Hunt DTO with version metadata
 - ✅ Optimistic locking for concurrent edits
+- ✅ Race condition prevention
 - ✅ Transaction safety throughout
 
 ### 📍 Week 5-6: Player API (NEXT)
@@ -287,15 +303,17 @@ cat .claude/backend/current-state.md | grep "Implemented"
 - [x] Mongoose index warnings fixed ✅
 - [x] **Hunt Versioning System** (Hunt + HuntVersion architecture) ✅
 - [x] **Publishing Workflow** (POST /api/hunts/:id/publish) ✅
+- [x] **Release Workflow** (PUT /release, DELETE /release) ✅ ⭐ **NEW!**
+- [x] **Race Condition Prevention** (optimistic locking, delete protection) ✅ ⭐ **NEW!**
 - [x] **Optimistic Locking** (Hunt + Step services) ✅
 - [x] **Transaction Safety** (StepService create/update/delete) ✅
-- [x] **Hunt DTO with version metadata** (version, latestVersion, liveVersion, etc.) ✅
+- [x] **Hunt DTO with version metadata** (version, latestVersion, liveVersion, isLive, etc.) ✅
 
 **Backend API Progress:**
 - Hunt API: ✅ COMPLETE
 - Step API: ✅ COMPLETE
 - Asset API: ✅ COMPLETE
-- Publishing API: ✅ COMPLETE ⭐ **NEW!**
+- Publishing & Release API: ✅ COMPLETE ⭐ **UPDATED!**
 - Player API: 📍 NEXT
 - Tree VIEW API: 📋 FUTURE
 
@@ -320,7 +338,15 @@ cat .claude/backend/current-state.md | grep "Implemented"
 
 **🔥 READY FOR: Player API Implementation**
 
-Publishing is complete - let's make hunts playable! The Player API is the next critical piece to enable end-to-end hunt gameplay.
+Publishing & Release are complete - let's make hunts playable!
+
+**Complete Workflow Now Available:**
+- ✅ Create hunts (Draft)
+- ✅ Publish versions (Immutable snapshots)
+- ✅ Release to players (Make discoverable)
+- ✅ Rollback or take offline instantly
+
+The Player API is the next critical piece to enable end-to-end hunt gameplay.
 
 **Estimated time:** 1-2 weeks
 **See:** `.claude/player-api-design.md` for complete design

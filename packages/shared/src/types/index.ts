@@ -110,6 +110,19 @@ export interface Hunt {
   /** User ID who published this version */
   publishedBy?: string;
   /**
+   * Is this version currently live/active for players? (computed: version === liveVersion)
+   * @example false
+   */
+  isLive?: boolean;
+  /**
+   * When hunt was last released/made live
+   * @format date-time
+   * @example "2024-02-01T10:30:00Z"
+   */
+  releasedAt?: string;
+  /** User ID who released/made the hunt live */
+  releasedBy?: string;
+  /**
    * @format date-time
    * @example "2024-02-01T10:12:45Z"
    */
@@ -458,4 +471,43 @@ export interface LiveHunt {
   createdAt?: string;
   /** @format date-time */
   updatedAt?: string;
+}
+
+/** Lightweight response for hunt release operations */
+export interface ReleaseResult {
+  /** @example 1332 */
+  huntId: number;
+  /**
+   * Version that is now live
+   * @example 2
+   */
+  liveVersion: number;
+  /**
+   * Version that was live before (null if first release)
+   * @example 1
+   */
+  previousLiveVersion: number | null;
+  /**
+   * When the version was released
+   * @format date-time
+   */
+  releasedAt: string;
+  /** User ID who released the version */
+  releasedBy: string;
+}
+
+/** Lightweight response for taking hunt offline */
+export interface TakeOfflineResult {
+  /** @example 1332 */
+  huntId: number;
+  /**
+   * Version that was live before taking offline
+   * @example 2
+   */
+  previousLiveVersion: number;
+  /**
+   * When the hunt was taken offline
+   * @format date-time
+   */
+  takenOfflineAt: string;
 }

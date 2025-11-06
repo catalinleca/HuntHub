@@ -44,7 +44,6 @@ export class VersionPublisher {
         latestVersion: currentVersion,
       },
       {
-        // liveVersion: newVersion, TODO: not sure if we wanna make a published version live on publish
         latestVersion: newVersion,
       },
       {

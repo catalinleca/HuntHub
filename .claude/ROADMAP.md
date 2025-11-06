@@ -1,6 +1,6 @@
 # HuntHub Development Roadmap
 
-**Last updated:** 2025-11-05 (Publishing Workflow COMPLETE!)
+**Last updated:** 2025-11-06 (Publishing & Release Workflow COMPLETE!)
 
 **Product vision:** Portfolio-quality treasure hunt platform with location-based challenges, built production-ready in 2 months.
 
@@ -35,6 +35,15 @@
 - ✅ Transaction safety throughout
 - ✅ Helper modules with clean separation of concerns
 
+**Week 5 (2025-11-06):**
+- ✅ **Release Workflow Complete!**
+- ✅ Release API fully implemented (PUT /release, DELETE /release)
+- ✅ Release Manager helper with optimistic locking
+- ✅ Race condition prevention (4 scenarios handled)
+- ✅ Delete protection (cannot delete live hunts)
+- ✅ Hunt DTO enhanced (isLive, releasedAt, releasedBy)
+- ✅ Complete workflow: Draft → Publish → Release → Players
+
 **📍 NEXT: Player API**
 - Start hunt session endpoints
 - Challenge validation by type
@@ -62,7 +71,8 @@
 - ✅ Week 1: Hunt CRUD + Step CRUD (COMPLETE)
 - ✅ Week 2-3: Asset Management (COMPLETE)
 - ✅ Week 3-4: Versioning System (COMPLETE)
-- ✅ Week 4-5: Publishing Workflow (COMPLETE) ⭐ **NEW!**
+- ✅ Week 4-5: Publishing Workflow (COMPLETE)
+- ✅ Week 5: Release Workflow (COMPLETE) ⭐ **NEW!**
 - 📍 Week 5-6: Player API (NEXT)
 
 ---
@@ -222,12 +232,12 @@
 
 ---
 
-## Epic 4: Publishing Workflow ✅ (Complete - 100%)
+## Epic 4: Publishing & Release Workflow ✅ (Complete - 100%)
 
-**Goal:** Publish hunts with versioning (simplified MVP)
+**Goal:** Publish hunts with versioning and release to players (simplified MVP)
 **Timeline:** Week 4-5
 **Status:** Complete
-**Completed:** 2025-11-05
+**Completed:** 2025-11-06
 
 ### Stories
 
@@ -241,22 +251,53 @@
   - ✅ Transaction safety throughout
   - ✅ Complete
 
+- [x] **BE-4.2:** Release hunt (PUT /api/publishing/:id/release)
+  - ✅ Implemented releaseHunt() with optimistic locking
+  - ✅ ReleaseManager helper for atomic release operations
+  - ✅ Make published version live for players
+  - ✅ Auto-detect latest published version if not specified
+  - ✅ Rollback support (switch to any published version)
+  - ✅ Race condition prevention
+  - ✅ Complete
+
+- [x] **BE-4.3:** Take hunt offline (DELETE /api/publishing/:id/release)
+  - ✅ Implemented takeOffline() with optimistic locking
+  - ✅ Remove hunt from player discovery
+  - ✅ Reversible operation (can re-release)
+  - ✅ Complete
+
 **Architecture Implemented:**
 - Hunt (master) + HuntVersion (content) separation (versioning system)
-- Helper modules: VersionValidator, VersionPublisher, StepCloner
-- Single Hunt DTO with all version metadata
-- Optimistic locking using updatedAt timestamps
+- Helper modules: VersionValidator, VersionPublisher, StepCloner, ReleaseManager
+- Single Hunt DTO with all version metadata (isLive, releasedAt, releasedBy)
+- Optimistic locking using currentLiveVersion parameter
 - Compare-and-set pattern for concurrent updates
 - Full transaction support
+- Delete protection (cannot delete live hunts)
+
+**Race Conditions Prevented:**
+1. Concurrent Release Operations - Optimistic locking with currentLiveVersion
+2. Delete While Live - Atomic check ensures liveVersion = null
+3. Release During Publish - Transaction isolation
+4. Concurrent TakeOffline + Release - Both use optimistic locking
+
+**Complete Workflow:**
+- Draft → Publish (immutable snapshot) → Release (make live) → Players can play
+- Rollback: Switch to any published version instantly
+- Take Offline: Remove from discovery, can re-release later
 
 **Notes:**
-- Simplified workflow for MVP: Draft → Published
+- Simplified workflow for MVP: Draft → Published → Released
 - No separate PublishedHunt or LiveHunt collections (HuntVersion tracks publishing)
 - Skip "Review" status for MVP
+- liveVersion is a pointer, not a copy (instant switching)
 
 **Dependencies:** ✅ All met
 **Blockers:** None
-**See:** `.claude/publishing-workflow.md`
+**See:**
+- `.claude/publishing-workflow.md`
+- `.claude/features/release-hunt-completed.md`
+- `.claude/RELEASE-CONCEPT.md`
 
 ---
 

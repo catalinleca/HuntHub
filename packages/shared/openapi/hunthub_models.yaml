@@ -99,6 +99,18 @@ components:
         publishedBy:
           type: string
           description: "User ID who published this version"
+        isLive:
+          type: boolean
+          description: "Is this version currently live/active for players? (computed: version === liveVersion)"
+          example: false
+        releasedAt:
+          type: string
+          format: date-time
+          description: "When hunt was last released/made live"
+          example: "2024-02-01T10:30:00Z"
+        releasedBy:
+          type: string
+          description: "User ID who released/made the hunt live"
         createdAt:
           type: string
           example: "2024-02-01T10:12:45Z"
@@ -663,3 +675,53 @@ components:
         - huntId
         - huntVersion
         - activePlayerCount
+
+    ReleaseResult:
+      type: object
+      description: Lightweight response for hunt release operations
+      properties:
+        huntId:
+          type: integer
+          example: 1332
+        liveVersion:
+          type: integer
+          example: 2
+          description: Version that is now live
+        previousLiveVersion:
+          type: integer
+          nullable: true
+          example: 1
+          description: Version that was live before (null if first release)
+        releasedAt:
+          type: string
+          format: date-time
+          description: When the version was released
+        releasedBy:
+          type: string
+          description: User ID who released the version
+      required:
+        - huntId
+        - liveVersion
+        - previousLiveVersion
+        - releasedAt
+        - releasedBy
+
+    TakeOfflineResult:
+      type: object
+      description: Lightweight response for taking hunt offline
+      properties:
+        huntId:
+          type: integer
+          example: 1332
+        previousLiveVersion:
+          type: integer
+          example: 2
+          description: Version that was live before taking offline
+        takenOfflineAt:
+          type: string
+          format: date-time
+          description: When the hunt was taken offline
+      required:
+        - huntId
+        - previousLiveVersion
+        - takenOfflineAt

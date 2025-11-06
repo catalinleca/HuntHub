@@ -8,6 +8,10 @@ export interface IHunt {
   latestVersion: number;          // Current draft version (e.g., 3)
   liveVersion: number | null;     // Live version (e.g., 2), null if never published
 
+  // Release metadata
+  releasedAt?: Date;              
+  releasedBy?: string;           
+
   isDeleted: boolean;
   deletedAt?: Date;
 

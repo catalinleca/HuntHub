@@ -1,8 +1,7 @@
 import { injectable, inject } from 'inversify';
 import mongoose, { ClientSession, HydratedDocument } from 'mongoose';
-import { Hunt } from '@hunthub/shared';
+import { Hunt, ReleaseResult, TakeOfflineResult } from '@hunthub/shared';
 import HuntVersionModel from '@/database/models/HuntVersion';
-import { IHunt } from '@/database/types/Hunt';
 import { IHuntVersion } from '@/database/types/HuntVersion';
 import { HuntMapper } from '@/shared/mappers';
 import { IHuntService } from '@/modules/hunts/hunt.service';
@@ -11,9 +10,17 @@ import { ValidationError } from '@/shared/errors';
 import { VersionValidator } from '@/features/publishing/helpers/version-validator.helper';
 import { StepCloner } from '@/features/publishing/helpers/step-cloner.helper';
 import { VersionPublisher } from '@/features/publishing/helpers/version-publisher.helper';
+import { ReleaseManager } from '@/features/publishing/helpers/release-manager.helper';
 
 export interface IPublishingService {
   publishHunt(huntId: number, userId: string): Promise<Hunt>;
+  releaseHunt(
+    huntId: number,
+    version: number | undefined,
+    userId: string,
+    currentLiveVersion: number | null | undefined,
+  ): Promise<ReleaseResult>;
+  takeOffline(huntId: number, userId: string, currentLiveVersion: number): Promise<TakeOfflineResult>;
 }
 
 /**
@@ -66,6 +73,80 @@ export class PublishingService implements IPublishingService {
         const updatedHunt = await VersionPublisher.updateHuntPointers(huntId, currentVersion, newVersion, session);
 
         return HuntMapper.fromDocuments(updatedHunt, newVersionDoc);
+      });
+    } finally {
+      await session.endSession();
+    }
+  }
+
+  async releaseHunt(
+    huntId: number,
+    version: number | undefined,
+    userId: string,
+    currentLiveVersion: number | null | undefined,
+  ): Promise<ReleaseResult> {
+    const huntDoc = await this.huntService.verifyOwnership(huntId, userId);
+    const previousLiveVersion = huntDoc.liveVersion;
+
+    const session = await mongoose.startSession();
+
+    try {
+      return await session.withTransaction(async () => {
+        const targetVersion = version ?? (await HuntVersionModel.findLatestPublished(huntId, session))?.version;
+
+        if (!targetVersion) {
+          throw new ValidationError('No published versions available to release. Publish a version first.', []);
+        }
+
+        const publishedVersion = await HuntVersionModel.findPublishedVersion(huntId, targetVersion, session);
+        if (!publishedVersion) {
+          throw new ValidationError(`Version ${targetVersion} not found or not published`, []);
+        }
+
+        const updatedHunt = await ReleaseManager.releaseVersion(
+          huntDoc.huntId,
+          targetVersion,
+          userId,
+          currentLiveVersion ?? null,
+          session,
+        );
+
+        if (!updatedHunt.liveVersion || !updatedHunt.releasedAt || !updatedHunt.releasedBy) {
+          throw new Error('Release operation failed to set required fields');
+        }
+
+        return {
+          huntId: updatedHunt.huntId,
+          liveVersion: updatedHunt.liveVersion,
+          previousLiveVersion,
+          releasedAt: updatedHunt.releasedAt.toISOString(),
+          releasedBy: updatedHunt.releasedBy,
+        };
+      });
+    } finally {
+      await session.endSession();
+    }
+  }
+
+  async takeOffline(huntId: number, userId: string, currentLiveVersion: number): Promise<TakeOfflineResult> {
+    const huntDoc = await this.huntService.verifyOwnership(huntId, userId);
+
+    if (huntDoc.liveVersion === null) {
+      throw new ValidationError('Hunt is not currently live', []);
+    }
+
+    const previousLiveVersion = huntDoc.liveVersion;
+    const session = await mongoose.startSession();
+
+    try {
+      return await session.withTransaction(async () => {
+        await ReleaseManager.takeOffline(huntDoc.huntId, currentLiveVersion, session);
+
+        return {
+          huntId: huntDoc.huntId,
+          previousLiveVersion,
+          takenOfflineAt: new Date().toISOString(),
+        };
       });
     } finally {
       await session.endSession();

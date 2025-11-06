@@ -1,6 +1,6 @@
 import { Hunt, HuntCreate } from '@hunthub/shared';
 import { injectable } from 'inversify';
-import mongoose, { ClientSession, HydratedDocument } from 'mongoose';
+import mongoose, { ClientSession, HydratedDocument, Types } from 'mongoose';
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import StepModel from '@/database/models/Step';
@@ -159,11 +159,34 @@ export class HuntService implements IHuntService {
       throw new NotFoundError();
     }
 
-    await HuntVersionModel.deleteMany({ huntId });
+    const session = await mongoose.startSession();
 
-    await StepModel.deleteMany({ huntId: huntId });
+    try {
+      await session.withTransaction(async () => {
+        const result = await HuntModel.findOneAndUpdate(
+          {
+            huntId,
+            creatorId: new Types.ObjectId(userId),
+            liveVersion: null,
+            isDeleted: false,
+          },
+          {
+            isDeleted: true,
+            deletedAt: new Date(),
+          },
+          { new: true, session },
+        );
 
-    await existingHunt.deleteOne();
+        if (!result) {
+          throw new ConflictError('Cannot delete hunt: it may be live or was modified by another operation.');
+        }
+
+        await HuntVersionModel.deleteMany({ huntId }, { session });
+        await StepModel.deleteMany({ huntId }, { session });
+      });
+    } finally {
+      await session.endSession();
+    }
   }
 
   async reorderSteps(huntId: number, stepOrder: number[], userId: string): Promise<Hunt> {
@@ -198,7 +221,7 @@ export class HuntService implements IHuntService {
   }
 
   async verifyOwnership(huntId: number, userId: string): Promise<HydratedDocument<IHunt>> {
-    const huntDoc = await HuntModel.findOne({ huntId }).exec();
+    const huntDoc = await HuntModel.findOne({ huntId, isDeleted: false }).exec();
     if (!huntDoc) {
       throw new NotFoundError();
     }
@@ -210,12 +233,7 @@ export class HuntService implements IHuntService {
     return huntDoc;
   }
 
-  async addStepToVersion(
-    huntId: number,
-    huntVersion: number,
-    stepId: number,
-    session?: ClientSession,
-  ): Promise<void> {
+  async addStepToVersion(huntId: number, huntVersion: number, stepId: number, session?: ClientSession): Promise<void> {
     const query = HuntVersionModel.findOneAndUpdate(
       { huntId, version: huntVersion, isPublished: false },
       { $push: { stepOrder: stepId } },
