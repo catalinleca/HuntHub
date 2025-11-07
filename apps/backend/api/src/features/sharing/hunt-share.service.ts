@@ -103,7 +103,7 @@ export class HuntShareService implements IHuntShareService {
       throw new ForbiddenError('Insufficient permission to revoke access');
     }
 
-    await this.validateShareTarget(sharedWithId, userId, access.huntDoc.creatorId.toString());
+    await this.validateShareTarget(sharedWithId, userId, access.huntDoc.creatorId.toString(), false);
 
     const revokedShare = await HuntAccessModel.revokeAccess(huntId, sharedWithId);
     if (!revokedShare) {
