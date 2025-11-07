@@ -7,6 +7,7 @@ import { IHuntService } from '@/modules/hunts/hunt.service';
 import { TYPES } from '@/shared/types';
 import { NotFoundError, ValidationError } from '@/shared/errors';
 import { ConflictError } from '@/shared/errors/ConflictError';
+import { IAuthorizationService } from '@/services/authorization/authorization.service';
 
 export interface IStepService {
   createStep(stepData: StepCreate, huntId: number, userId: string): Promise<Step>;
@@ -16,10 +17,13 @@ export interface IStepService {
 
 @injectable()
 export class StepService implements IStepService {
-  constructor(@inject(TYPES.HuntService) private huntService: IHuntService) {}
+  constructor(
+    @inject(TYPES.HuntService) private huntService: IHuntService,
+    @inject(TYPES.AuthorizationService) private authService: IAuthorizationService,
+  ) {}
 
   async createStep(stepData: StepCreate, huntId: number, userId: string): Promise<Step> {
-    const huntDoc = await this.huntService.verifyOwnership(huntId, userId);
+    const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
     const huntVersion = huntDoc.latestVersion;
 
     const session = await mongoose.startSession();
@@ -39,7 +43,7 @@ export class StepService implements IStepService {
   }
 
   async updateStep(stepId: number, huntId: number, stepData: Step, userId: string): Promise<Step> {
-    const huntDoc = await this.huntService.verifyOwnership(huntId, userId);
+    const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
     const huntVersion = huntDoc.latestVersion;
     const stepUpdateData = StepMapper.toDocumentUpdate(stepData);
 
@@ -84,7 +88,7 @@ export class StepService implements IStepService {
   }
 
   async deleteStep(stepId: number, huntId: number, userId: string): Promise<void> {
-    const huntDoc = await this.huntService.verifyOwnership(huntId, userId);
+    const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
     const huntVersion = huntDoc.latestVersion;
 
     const session = await mongoose.startSession();

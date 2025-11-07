@@ -54,6 +54,8 @@ interface IHuntModel extends Model<IHunt> {
   hasHunts(userId: string): Promise<boolean>;
 
   findPublished(): Promise<HydratedDocument<IHunt>[]>;
+
+  findHuntsByIds(ids: number[]): Promise<HydratedDocument<IHunt>[]>;
 }
 
 huntSchema.statics.findUserHunts = function (userId: string) {
@@ -77,6 +79,10 @@ huntSchema.statics.findPublished = function () {
   return this.find({ liveVersion: { $ne: null }, isDeleted: false })
     .sort({ createdAt: -1 })
     .exec();
+};
+
+huntSchema.statics.findHuntsByIds = function (ids: number[]) {
+  return this.find({ huntId: { $in: ids }, isDeleted: false }).exec();
 };
 
 const HuntModel = model<IHunt, IHuntModel>('Hunt', huntSchema);

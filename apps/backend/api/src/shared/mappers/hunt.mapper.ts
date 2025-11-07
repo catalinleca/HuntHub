@@ -114,7 +114,11 @@ export class HuntMapper {
     };
   }
 
-  static toCloneDocument(sourceDoc: HydratedDocument<IHuntVersion>, huntId: number, targetVersion: number): Partial<IHuntVersion> {
+  static toCloneDocument(
+    sourceDoc: HydratedDocument<IHuntVersion>,
+    huntId: number,
+    targetVersion: number,
+  ): Partial<IHuntVersion> {
     return {
       huntId,
       version: targetVersion,
@@ -124,6 +128,6 @@ export class HuntMapper {
       startLocation: sourceDoc.startLocation,
       stepOrder: [...sourceDoc.stepOrder], // Clone array
       isPublished: false,
-    }
+    };
   }
 }

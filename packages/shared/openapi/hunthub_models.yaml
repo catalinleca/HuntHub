@@ -111,6 +111,11 @@ components:
         releasedBy:
           type: string
           description: "User ID who released/made the hunt live"
+        permission:
+          type: string
+          enum: [owner, admin, view]
+          description: "Authenticated user's permission level for this hunt (included in user-specific contexts like dashboard)"
+          example: "owner"
         createdAt:
           type: string
           example: "2024-02-01T10:12:45Z"
@@ -725,3 +730,68 @@ components:
         - huntId
         - previousLiveVersion
         - takenOfflineAt
+
+    Collaborator:
+      type: object
+      description: Represents a user who has access to a hunt (for GET /hunts/:huntId/access endpoint)
+      properties:
+        userId:
+          type: string
+          description: User's ID
+        displayName:
+          type: string
+          description: User's display name
+        email:
+          type: string
+          format: email
+          description: User's email address
+        profilePicture:
+          type: string
+          description: User's profile picture URL
+        permission:
+          type: string
+          enum: [admin, view]
+          description: User's permission level (owner is not listed as collaborator)
+        sharedAt:
+          type: string
+          format: date-time
+          description: When access was granted
+          example: "2024-02-01T10:30:00Z"
+        sharedBy:
+          type: string
+          description: Display name of user who granted access
+      required:
+        - userId
+        - displayName
+        - permission
+        - sharedAt
+
+    ShareResult:
+      type: object
+      description: Response from sharing a hunt with another user
+      properties:
+        huntId:
+          type: integer
+          example: 1332
+          description: ID of the hunt that was shared
+        sharedWithId:
+          type: string
+          description: User ID of the person the hunt was shared with
+        permission:
+          type: string
+          enum: [admin, view]
+          description: Permission level granted
+        sharedAt:
+          type: string
+          format: date-time
+          description: When the hunt was shared
+          example: "2024-02-01T10:30:00Z"
+        sharedBy:
+          type: string
+          description: User ID who granted the access
+      required:
+        - huntId
+        - sharedWithId
+        - permission
+        - sharedAt
+        - sharedBy

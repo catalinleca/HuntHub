@@ -1,5 +1,5 @@
 import { Hunt, HuntCreate } from '@hunthub/shared';
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import mongoose, { ClientSession, HydratedDocument, Types } from 'mongoose';
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
@@ -9,32 +9,32 @@ import { HuntMapper } from '@/shared/mappers';
 import { NotFoundError, ForbiddenError } from '@/shared/errors';
 import { ValidationError } from '@/shared/errors';
 import { ConflictError } from '@/shared/errors/ConflictError';
+import { TYPES } from '@/shared/types';
+import { IAuthorizationService } from '@/services/authorization/authorization.service';
+import { HuntAccessModel } from '@/database/models';
+import { HuntPermission } from '@/database/types';
 
 export interface IHuntService {
   createHunt(hunt: HuntCreate, creatorId: string): Promise<Hunt>;
-  getAllHunts(): Promise<Hunt[]>;
   getUserHunts(userId: string): Promise<Hunt[]>;
   getHuntById(huntId: number): Promise<Hunt>;
   getUserHuntById(huntId: number, userId: string): Promise<Hunt>;
   updateHunt(huntId: number, huntData: Hunt, userId: string): Promise<Hunt>;
   deleteHunt(huntId: number, userId: string): Promise<void>;
   reorderSteps(huntId: number, stepOrder: number[], userId: string): Promise<Hunt>;
-  verifyOwnership(huntId: number, userId: string): Promise<HydratedDocument<IHunt>>;
   addStepToVersion(huntId: number, huntVersion: number, stepId: number, session?: ClientSession): Promise<void>;
   removeStepFromVersion(huntId: number, huntVersion: number, stepId: number, session?: ClientSession): Promise<void>;
 }
 
 @injectable()
 export class HuntService implements IHuntService {
-  /**
-   * Private helper: Fetch Hunt + HuntVersion and merge into DTO
-   * Returns null if the version not found (data integrity issue)
-   */
+  constructor(@inject(TYPES.AuthorizationService) private authService: IAuthorizationService) {}
+
   private async fetchHuntWithVersion(huntDoc: HydratedDocument<IHunt>): Promise<Hunt | null> {
     const versionDoc = await HuntVersionModel.findDraftByVersion(huntDoc.huntId, huntDoc.latestVersion);
 
     if (!versionDoc) {
-      return null; // Skip hunts without versions
+      return null;
     }
 
     return HuntMapper.fromDocuments(huntDoc, versionDoc);
@@ -48,7 +48,6 @@ export class HuntService implements IHuntService {
         const huntData = HuntMapper.toHuntDocument(creatorId);
         const [createdHunt] = await HuntModel.create([huntData], { session });
 
-        // Create first HuntVersion (v1) using mapper
         const versionData = HuntMapper.toVersionDocument(hunt, createdHunt.huntId, 1);
         const [createdVersion] = await HuntVersionModel.create([versionData], { session });
 
@@ -59,18 +58,45 @@ export class HuntService implements IHuntService {
     }
   }
 
-  async getAllHunts(): Promise<Hunt[]> {
-    const huntDocs = await HuntModel.find().exec();
-
-    const huntsOrNull = await Promise.all(huntDocs.map((doc) => this.fetchHuntWithVersion(doc)));
-
-    return huntsOrNull.filter((hunt): hunt is Hunt => hunt !== null);
-  }
-
   async getUserHunts(userId: string): Promise<Hunt[]> {
-    const huntDocs = await HuntModel.findUserHunts(userId);
+    const [ownedHuntIds, sharedAccess] = await Promise.all([
+      HuntModel.find({ creatorId: userId, isDeleted: false }).select('huntId').lean().exec(),
+      HuntAccessModel.find({ sharedWithId: userId }).select('huntId permission').lean().exec(),
+    ]);
 
-    const huntsOrNull = await Promise.all(huntDocs.map((doc) => this.fetchHuntWithVersion(doc)));
+    const permissionMap = new Map<number, HuntPermission | 'owner'>();
+
+    ownedHuntIds.forEach((hunt) => {
+      permissionMap.set(hunt.huntId, 'owner');
+    });
+    sharedAccess.forEach((shareHunt) => {
+      if (!permissionMap.has(shareHunt.huntId)) {
+        permissionMap.set(shareHunt.huntId, shareHunt.permission);
+      }
+    });
+
+    const allHuntIds = [...ownedHuntIds.map((h) => h.huntId), ...sharedAccess.map((s) => s.huntId)];
+
+    const hundDocs = await HuntModel.findHuntsByIds(allHuntIds);
+
+    const huntsOrNull = await Promise.all(
+      hundDocs.map(async (doc) => {
+        const permission = permissionMap.get(doc.huntId);
+        if (!permission) {
+          return null;
+        }
+
+        const huntDTO = await this.fetchHuntWithVersion(doc);
+        if (!huntDTO) {
+          return null;
+        }
+
+        return {
+          ...huntDTO,
+          permission,
+        } as Hunt;
+      }),
+    );
 
     return huntsOrNull.filter((hunt): hunt is Hunt => hunt !== null);
   }
@@ -104,7 +130,7 @@ export class HuntService implements IHuntService {
   }
 
   async updateHunt(huntId: number, huntData: Hunt, userId: string): Promise<Hunt> {
-    const huntDoc = await this.verifyOwnership(huntId, userId);
+    const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
     const huntUpdateData = HuntMapper.toVersionUpdate(huntData);
 
     const session = await mongoose.startSession();
@@ -154,7 +180,7 @@ export class HuntService implements IHuntService {
   }
 
   async deleteHunt(huntId: number, userId: string): Promise<void> {
-    const existingHunt = await HuntModel.findByHuntIdAndCreator(huntId, userId);
+    const { huntDoc: existingHunt } = await this.authService.requireAccess(huntId, userId, 'owner');
     if (!existingHunt) {
       throw new NotFoundError();
     }
@@ -190,12 +216,11 @@ export class HuntService implements IHuntService {
   }
 
   async reorderSteps(huntId: number, stepOrder: number[], userId: string): Promise<Hunt> {
-    const huntDoc = await HuntModel.findByHuntIdAndCreator(huntId, userId);
+    const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
     if (!huntDoc) {
       throw new NotFoundError();
     }
 
-    // Validate all steps belong to this hunt AND the current draft version
     const stepsCount = await StepModel.countDocuments({
       stepId: { $in: stepOrder },
       huntId: huntId,
@@ -218,19 +243,6 @@ export class HuntService implements IHuntService {
     }
 
     return HuntMapper.fromDocuments(huntDoc, versionDoc);
-  }
-
-  async verifyOwnership(huntId: number, userId: string): Promise<HydratedDocument<IHunt>> {
-    const huntDoc = await HuntModel.findOne({ huntId, isDeleted: false }).exec();
-    if (!huntDoc) {
-      throw new NotFoundError();
-    }
-
-    if (huntDoc.creatorId.toString() !== userId) {
-      throw new ForbiddenError();
-    }
-
-    return huntDoc;
   }
 
   async addStepToVersion(huntId: number, huntVersion: number, stepId: number, session?: ClientSession): Promise<void> {

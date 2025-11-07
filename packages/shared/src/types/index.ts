@@ -123,6 +123,11 @@ export interface Hunt {
   /** User ID who released/made the hunt live */
   releasedBy?: string;
   /**
+   * Authenticated user's permission level for this hunt (included in user-specific contexts like dashboard)
+   * @example "owner"
+   */
+  permission?: "owner" | "admin" | "view";
+  /**
    * @format date-time
    * @example "2024-02-01T10:12:45Z"
    */
@@ -510,4 +515,50 @@ export interface TakeOfflineResult {
    * @format date-time
    */
   takenOfflineAt: string;
+}
+
+/** Represents a user who has access to a hunt (for GET /hunts/:huntId/access endpoint) */
+export interface Collaborator {
+  /** User's ID */
+  userId: string;
+  /** User's display name */
+  displayName: string;
+  /**
+   * User's email address
+   * @format email
+   */
+  email?: string;
+  /** User's profile picture URL */
+  profilePicture?: string;
+  /** User's permission level (owner is not listed as collaborator) */
+  permission: "admin" | "view";
+  /**
+   * When access was granted
+   * @format date-time
+   * @example "2024-02-01T10:30:00Z"
+   */
+  sharedAt: string;
+  /** Display name of user who granted access */
+  sharedBy?: string;
+}
+
+/** Response from sharing a hunt with another user */
+export interface ShareResult {
+  /**
+   * ID of the hunt that was shared
+   * @example 1332
+   */
+  huntId: number;
+  /** User ID of the person the hunt was shared with */
+  sharedWithId: string;
+  /** Permission level granted */
+  permission: "admin" | "view";
+  /**
+   * When the hunt was shared
+   * @format date-time
+   * @example "2024-02-01T10:30:00Z"
+   */
+  sharedAt: string;
+  /** User ID who granted the access */
+  sharedBy: string;
 }
