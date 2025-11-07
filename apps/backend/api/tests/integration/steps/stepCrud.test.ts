@@ -101,7 +101,7 @@ describe('Step CRUD Integration Tests', () => {
         .expect(401);
     });
 
-    it('should return 403 when trying to create step in another user\'s hunt', async () => {
+    it('should return 404 when trying to create step in another user\'s hunt (access denied)', async () => {
       const otherUser = await createTestUser({ email: 'other@example.com' });
       const otherHunt = await createTestHunt({ creatorId: otherUser.id });
 
@@ -111,7 +111,7 @@ describe('Step CRUD Integration Tests', () => {
         .post(`/api/hunts/${otherHunt.huntId}/steps`)
         .set('Authorization', `Bearer ${authToken}`)
         .send(stepData)
-        .expect(403);
+        .expect(404);
     });
 
     it('should return 404 when hunt does not exist', async () => {
@@ -181,7 +181,7 @@ describe('Step CRUD Integration Tests', () => {
       expect(response.body.challenge.clue.title).toBe('Updated Title');
     });
 
-    it('should return 403 when trying to update step in another user\'s hunt', async () => {
+    it('should return 404 when trying to update step in another user\'s hunt (access denied)', async () => {
       const otherUser = await createTestUser({ email: 'other@example.com' });
       const otherHunt = await createTestHunt({ creatorId: otherUser.id });
       const otherStep = await createTestStep({ huntId: otherHunt.huntId });
@@ -192,7 +192,7 @@ describe('Step CRUD Integration Tests', () => {
         .put(`/api/hunts/${otherHunt.huntId}/steps/${otherStep.stepId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .send(updateData)
-        .expect(403);
+        .expect(404);
     });
 
     it('should return 404 when step does not exist', async () => {
@@ -271,7 +271,7 @@ describe('Step CRUD Integration Tests', () => {
       expect(huntVersion?.stepOrder).not.toContain(testStep.stepId);
     });
 
-    it('should return 403 when trying to delete step from another user\'s hunt', async () => {
+    it('should return 404 when trying to delete step from another user\'s hunt (access denied)', async () => {
       const otherUser = await createTestUser({ email: 'other@example.com' });
       const otherHunt = await createTestHunt({ creatorId: otherUser.id });
       const otherStep = await createTestStep({ huntId: otherHunt.huntId });
@@ -279,7 +279,7 @@ describe('Step CRUD Integration Tests', () => {
       await request(app)
         .delete(`/api/hunts/${otherHunt.huntId}/steps/${otherStep.stepId}`)
         .set('Authorization', `Bearer ${authToken}`)
-        .expect(403);
+        .expect(404);
     });
 
     it('should return 404 when step does not exist', async () => {

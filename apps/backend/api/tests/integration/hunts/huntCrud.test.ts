@@ -10,6 +10,8 @@ import { IStep } from '@/database/types/Step';
 import { Hunt, HuntStatus } from '@hunthub/shared';
 import StepModel from '@/database/models/Step';
 import HuntVersionModel from '@/database/models/HuntVersion';
+import HuntAccessModel from '@/database/models/HuntAccess';
+import HuntModel from '@/database/models/Hunt';
 
 describe('Hunt CRUD Integration Tests', () => {
   let app: Express;
@@ -393,6 +395,327 @@ describe('Hunt CRUD Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({ stepOrder: [1, 2] })
         .expect(404);
+    });
+  });
+
+  describe('Authorization - Shared Hunt Access', () => {
+    let huntOwner: IUser;
+    let adminUser: IUser;
+    let viewUser: IUser;
+    let sharedHunt: IHunt;
+    let ownerToken: string;
+    let adminToken: string;
+    let viewToken: string;
+
+    beforeEach(async () => {
+      // Create users
+      huntOwner = await createTestUser({ email: 'owner@example.com' });
+      adminUser = await createTestUser({ email: 'admin@example.com' });
+      viewUser = await createTestUser({ email: 'viewer@example.com' });
+
+      // Create tokens
+      mockFirebaseAuth(huntOwner);
+      ownerToken = createTestAuthToken(huntOwner);
+
+      // Create hunt owned by huntOwner
+      sharedHunt = await createTestHunt({
+        creatorId: huntOwner.id,
+        name: 'Shared Hunt',
+      });
+
+      // Share hunt with different permissions
+      await HuntAccessModel.create({
+        huntId: sharedHunt.huntId,
+        ownerId: huntOwner.id,
+        sharedWithId: adminUser.id,
+        sharedBy: huntOwner.id,
+        permission: 'admin',
+      });
+
+      await HuntAccessModel.create({
+        huntId: sharedHunt.huntId,
+        ownerId: huntOwner.id,
+        sharedWithId: viewUser.id,
+        sharedBy: huntOwner.id,
+        permission: 'view',
+      });
+    });
+
+    it('should allow admin user to view shared hunt', async () => {
+      mockFirebaseAuth(adminUser);
+      adminToken = createTestAuthToken(adminUser);
+
+      const response = await request(app)
+        .get(`/api/hunts/${sharedHunt.huntId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      expect(response.body.huntId).toBe(sharedHunt.huntId);
+      expect(response.body.permission).toBe('admin'); // admin permission
+    });
+
+    it('should allow view user to view shared hunt', async () => {
+      mockFirebaseAuth(viewUser);
+      viewToken = createTestAuthToken(viewUser);
+
+      const response = await request(app)
+        .get(`/api/hunts/${sharedHunt.huntId}`)
+        .set('Authorization', `Bearer ${viewToken}`)
+        .expect(200);
+
+      expect(response.body.huntId).toBe(sharedHunt.huntId);
+      expect(response.body.permission).toBe('view'); // view permission
+    });
+
+    it('should allow admin user to update shared hunt', async () => {
+      mockFirebaseAuth(adminUser);
+      adminToken = createTestAuthToken(adminUser);
+
+      const response = await request(app)
+        .put(`/api/hunts/${sharedHunt.huntId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ name: 'Updated by Admin' })
+        .expect(200);
+
+      expect(response.body.name).toBe('Updated by Admin');
+    });
+
+    it('should NOT allow view user to update shared hunt', async () => {
+      mockFirebaseAuth(viewUser);
+      viewToken = createTestAuthToken(viewUser);
+
+      await request(app)
+        .put(`/api/hunts/${sharedHunt.huntId}`)
+        .set('Authorization', `Bearer ${viewToken}`)
+        .send({ name: 'Attempted Update' })
+        .expect(403);
+    });
+
+    it('should NOT allow admin user to delete shared hunt (only owner can)', async () => {
+      mockFirebaseAuth(adminUser);
+      adminToken = createTestAuthToken(adminUser);
+
+      await request(app)
+        .delete(`/api/hunts/${sharedHunt.huntId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(403);
+    });
+
+    it('should allow owner to delete hunt', async () => {
+      await request(app)
+        .delete(`/api/hunts/${sharedHunt.huntId}`)
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .expect(204);
+    });
+
+    it('should include shared hunts in user hunt list', async () => {
+      mockFirebaseAuth(adminUser);
+      adminToken = createTestAuthToken(adminUser);
+
+      const response = await request(app)
+        .get('/api/hunts')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      expect(response.body.length).toBeGreaterThan(0);
+      const foundSharedHunt = response.body.find((h: Hunt) => h.huntId === sharedHunt.huntId);
+      expect(foundSharedHunt).toBeDefined();
+      expect(foundSharedHunt.permission).toBe('admin');
+    });
+  });
+
+  describe('Versioning - Hunt and HuntVersion Cascade Delete', () => {
+    it('should delete HuntVersion documents when hunt is deleted', async () => {
+      const hunt = await createTestHunt({
+        creatorId: testUser.id,
+        name: 'Hunt to Delete with Versions',
+      });
+
+      // Verify HuntVersion was created (version 1 is draft)
+      const versionBefore = await HuntVersionModel.findOne({
+        huntId: hunt.huntId,
+        version: 1,
+      });
+      expect(versionBefore).toBeDefined();
+
+      // Delete hunt
+      await request(app)
+        .delete(`/api/hunts/${hunt.huntId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(204);
+
+      // Verify HuntVersion is also deleted
+      const versionsAfter = await HuntVersionModel.find({ huntId: hunt.huntId });
+      expect(versionsAfter).toHaveLength(0);
+    });
+
+    it('should update draft HuntVersion when updating hunt', async () => {
+      const hunt = await createTestHunt({
+        creatorId: testUser.id,
+        name: 'Original Name',
+        description: 'Original Description',
+      });
+
+      // Update hunt
+      await request(app)
+        .put(`/api/hunts/${hunt.huntId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          name: 'Updated Name',
+          description: 'Updated Description',
+        })
+        .expect(200);
+
+      // Verify HuntVersion was updated (draft version)
+      const updatedVersion = await HuntVersionModel.findOne({
+        huntId: hunt.huntId,
+        version: hunt.latestVersion,
+      });
+
+      expect(updatedVersion?.name).toBe('Updated Name');
+      expect(updatedVersion?.description).toBe('Updated Description');
+    });
+
+    it('should maintain version number when updating hunt', async () => {
+      const hunt = await createTestHunt({
+        creatorId: testUser.id,
+        name: 'Test Hunt',
+      });
+
+      const initialVersion = hunt.latestVersion;
+
+      // Update hunt multiple times
+      await request(app)
+        .put(`/api/hunts/${hunt.huntId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ name: 'Update 1' })
+        .expect(200);
+
+      await request(app)
+        .put(`/api/hunts/${hunt.huntId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ name: 'Update 2' })
+        .expect(200);
+
+      // Verify version hasn't changed (still editing draft)
+      const updatedHunt = await HuntModel.findOne({ huntId: hunt.huntId });
+      expect(updatedHunt?.latestVersion).toBe(initialVersion);
+    });
+
+    it('should validate reorder only affects current version steps', async () => {
+      const hunt = await createTestHunt({
+        creatorId: testUser.id,
+        name: 'Version Test Hunt',
+      });
+
+      // Create steps for version 1
+      const step1 = await StepModel.create({
+        huntId: hunt.huntId,
+        huntVersion: 1,
+        type: 'clue',
+        challenge: { clue: { title: 'Step 1' } },
+      });
+
+      const step2 = await StepModel.create({
+        huntId: hunt.huntId,
+        huntVersion: 1,
+        type: 'clue',
+        challenge: { clue: { title: 'Step 2' } },
+      });
+
+      // Reorder steps
+      const newOrder = [step2.stepId, step1.stepId];
+
+      await request(app)
+        .put(`/api/hunts/${hunt.huntId}/step-order`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ stepOrder: newOrder })
+        .expect(200);
+
+      // Verify only version 1 was affected
+      const updatedVersion = await HuntVersionModel.findOne({
+        huntId: hunt.huntId,
+        version: 1,
+      });
+
+      expect(updatedVersion?.stepOrder).toEqual(newOrder);
+    });
+  });
+
+  describe('Optimistic Locking - Concurrent Updates', () => {
+    it('should detect concurrent hunt updates', async () => {
+      const hunt = await createTestHunt({
+        creatorId: testUser.id,
+        name: 'Concurrent Test',
+      });
+
+      // First user gets hunt with updatedAt timestamp
+      const firstGet = await request(app)
+        .get(`/api/hunts/${hunt.huntId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200);
+
+      const originalUpdatedAt = firstGet.body.updatedAt;
+
+      // Simulate another user updating the hunt
+      await request(app)
+        .put(`/api/hunts/${hunt.huntId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          name: 'Concurrent Update 1',
+        })
+        .expect(200);
+
+      // Original user tries to update with stale updatedAt
+      const conflictResponse = await request(app)
+        .put(`/api/hunts/${hunt.huntId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          name: 'Concurrent Update 2',
+          updatedAt: originalUpdatedAt, // Stale timestamp
+        })
+        .expect(409);
+
+      expect(conflictResponse.body.message).toContain('modified by another user');
+    });
+
+    it('should allow update when updatedAt matches', async () => {
+      const hunt = await createTestHunt({
+        creatorId: testUser.id,
+        name: 'Valid Update Test',
+      });
+
+      // Get current hunt state
+      const currentState = await request(app)
+        .get(`/api/hunts/${hunt.huntId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200);
+
+      // Update with correct updatedAt
+      await request(app)
+        .put(`/api/hunts/${hunt.huntId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          name: 'Valid Update',
+          updatedAt: currentState.body.updatedAt,
+        })
+        .expect(200);
+    });
+
+    it('should work without updatedAt (no locking check)', async () => {
+      const hunt = await createTestHunt({
+        creatorId: testUser.id,
+        name: 'No Lock Test',
+      });
+
+      // Update without updatedAt (skips optimistic locking)
+      await request(app)
+        .put(`/api/hunts/${hunt.huntId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          name: 'Update Without Lock',
+        })
+        .expect(200);
     });
   });
 });

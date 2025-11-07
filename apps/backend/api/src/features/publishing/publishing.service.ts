@@ -49,34 +49,41 @@ export class PublishingService implements IPublishingService {
     const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
 
     const session = await mongoose.startSession();
+    session.startTransaction();
 
     try {
-      return session.withTransaction(async () => {
-        const currentVersion = huntDoc.latestVersion;
-        const newVersion = currentVersion + 1;
+      // FIX: Changed from withTransaction() to manual transaction management
+      // REASON: withTransaction() automatically ends the session, but our helper methods
+      // (VersionValidator, StepCloner, etc.) need to use the session throughout the workflow.
+      // Manual transaction management gives us full control over session lifecycle.
+      const currentVersion = huntDoc.latestVersion;
+      const newVersion = currentVersion + 1;
 
-        await VersionValidator.validateCanPublish(huntId, currentVersion, session);
+      await VersionValidator.validateCanPublish(huntId, currentVersion, session);
 
-        const currentVersionDoc = await HuntVersionModel.findDraftByVersion(huntId, currentVersion, session);
-        if (!currentVersionDoc) {
-          throw new Error('Current version not found');
-        }
+      const currentVersionDoc = await HuntVersionModel.findDraftByVersion(huntId, currentVersion, session);
+      if (!currentVersionDoc) {
+        throw new Error('Current version not found');
+      }
 
-        const versionUpdatedAt = currentVersionDoc.updatedAt;
-        if (!versionUpdatedAt) {
-          throw new Error('Version updatedAt not found');
-        }
+      const versionUpdatedAt = currentVersionDoc.updatedAt;
+      if (!versionUpdatedAt) {
+        throw new Error('Version updatedAt not found');
+      }
 
-        await StepCloner.cloneSteps(huntId, currentVersion, newVersion, session);
+      await StepCloner.cloneSteps(huntId, currentVersion, newVersion, session);
 
-        const newVersionDoc = await this.createNewDraftVersion(currentVersionDoc, huntDoc.huntId, newVersion, session);
+      const newVersionDoc = await this.createNewDraftVersion(currentVersionDoc, huntDoc.huntId, newVersion, session);
 
-        await VersionPublisher.markVersionPublished(huntId, currentVersion, userId, versionUpdatedAt, session);
+      await VersionPublisher.markVersionPublished(huntId, currentVersion, userId, versionUpdatedAt, session);
 
-        const updatedHunt = await VersionPublisher.updateHuntPointers(huntId, currentVersion, newVersion, session);
+      const updatedHunt = await VersionPublisher.updateHuntPointers(huntId, currentVersion, newVersion, session);
 
-        return HuntMapper.fromDocuments(updatedHunt, newVersionDoc);
-      });
+      await session.commitTransaction();
+      return HuntMapper.fromDocuments(updatedHunt, newVersionDoc);
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
     } finally {
       await session.endSession();
     }
@@ -92,40 +99,45 @@ export class PublishingService implements IPublishingService {
     const previousLiveVersion = huntDoc.liveVersion;
 
     const session = await mongoose.startSession();
+    session.startTransaction();
 
     try {
-      return await session.withTransaction(async () => {
-        const targetVersion = version ?? (await HuntVersionModel.findLatestPublished(huntId, session))?.version;
+      // FIX: Changed from withTransaction() to manual transaction management
+      // REASON: Same as publishHunt() - ReleaseManager helper needs active session
+      const targetVersion = version ?? (await HuntVersionModel.findLatestPublished(huntId, session))?.version;
 
-        if (!targetVersion) {
-          throw new ValidationError('No published versions available to release. Publish a version first.', []);
-        }
+      if (!targetVersion) {
+        throw new ValidationError('No published versions available to release. Publish a version first.', []);
+      }
 
-        const publishedVersion = await HuntVersionModel.findPublishedVersion(huntId, targetVersion, session);
-        if (!publishedVersion) {
-          throw new ValidationError(`Version ${targetVersion} not found or not published`, []);
-        }
+      const publishedVersion = await HuntVersionModel.findPublishedVersion(huntId, targetVersion, session);
+      if (!publishedVersion) {
+        throw new ValidationError(`Version ${targetVersion} not found or not published`, []);
+      }
 
-        const updatedHunt = await ReleaseManager.releaseVersion(
-          huntDoc.huntId,
-          targetVersion,
-          userId,
-          currentLiveVersion ?? null,
-          session,
-        );
+      const updatedHunt = await ReleaseManager.releaseVersion(
+        huntDoc.huntId,
+        targetVersion,
+        userId,
+        currentLiveVersion ?? null,
+        session,
+      );
 
-        if (!updatedHunt.liveVersion || !updatedHunt.releasedAt || !updatedHunt.releasedBy) {
-          throw new Error('Release operation failed to set required fields');
-        }
+      if (!updatedHunt.liveVersion || !updatedHunt.releasedAt || !updatedHunt.releasedBy) {
+        throw new Error('Release operation failed to set required fields');
+      }
 
-        return {
-          huntId: updatedHunt.huntId,
-          liveVersion: updatedHunt.liveVersion,
-          previousLiveVersion,
-          releasedAt: updatedHunt.releasedAt.toISOString(),
-          releasedBy: updatedHunt.releasedBy,
-        };
-      });
+      await session.commitTransaction();
+      return {
+        huntId: updatedHunt.huntId,
+        liveVersion: updatedHunt.liveVersion,
+        previousLiveVersion,
+        releasedAt: updatedHunt.releasedAt.toISOString(),
+        releasedBy: updatedHunt.releasedBy,
+      };
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
     } finally {
       await session.endSession();
     }

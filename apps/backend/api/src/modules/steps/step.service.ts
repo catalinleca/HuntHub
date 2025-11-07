@@ -27,16 +27,19 @@ export class StepService implements IStepService {
     const huntVersion = huntDoc.latestVersion;
 
     const session = await mongoose.startSession();
+    session.startTransaction();
 
     try {
-      return session.withTransaction(async () => {
-        const docData = StepMapper.toDocument(stepData, huntId, huntVersion);
-        const [createdStep] = await StepModel.create([docData], { session });
+      const docData = StepMapper.toDocument(stepData, huntId, huntVersion);
+      const [createdStep] = await StepModel.create([docData], { session });
 
-        await this.huntService.addStepToVersion(huntId, huntVersion, createdStep.stepId, session);
+      await this.huntService.addStepToVersion(huntId, huntVersion, createdStep.stepId, session);
 
-        return StepMapper.fromDocument(createdStep);
-      });
+      await session.commitTransaction();
+      return StepMapper.fromDocument(createdStep);
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
     } finally {
       await session.endSession();
     }
@@ -48,40 +51,43 @@ export class StepService implements IStepService {
     const stepUpdateData = StepMapper.toDocumentUpdate(stepData);
 
     const session = await mongoose.startSession();
+    session.startTransaction();
 
     try {
-      return session.withTransaction(async () => {
-        const updatedStep = await StepModel.findOneAndUpdate(
-          {
-            stepId,
-            huntId,
-            huntVersion,
-            ...(stepData.updatedAt && { updatedAt: new Date(stepData.updatedAt) }),
-          },
-          stepUpdateData,
-          { new: true, session },
-        ).exec();
+      const updatedStep = await StepModel.findOneAndUpdate(
+        {
+          stepId,
+          huntId,
+          huntVersion,
+          ...(stepData.updatedAt && { updatedAt: new Date(stepData.updatedAt) }),
+        },
+        stepUpdateData,
+        { new: true, session },
+      ).exec();
 
-        if (!updatedStep) {
-          const step = await StepModel.findOne({
-            stepId,
-            huntId,
-            huntVersion,
-          }).session(session);
+      if (!updatedStep) {
+        const step = await StepModel.findOne({
+          stepId,
+          huntId,
+          huntVersion,
+        }).session(session);
 
-          if (!step) {
-            throw new NotFoundError('Step not found');
-          }
-
-          if (stepData.updatedAt) {
-            throw new ConflictError('Step was modified by another user. Please refresh and try again.');
-          }
-
-          throw new Error('Update failed for unknown reason');
+        if (!step) {
+          throw new NotFoundError('Step not found');
         }
 
-        return StepMapper.fromDocument(updatedStep);
-      });
+        if (stepData.updatedAt) {
+          throw new ConflictError('Step was modified by another user. Please refresh and try again.');
+        }
+
+        throw new Error('Update failed for unknown reason');
+      }
+
+      await session.commitTransaction();
+      return StepMapper.fromDocument(updatedStep);
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
     } finally {
       await session.endSession();
     }
@@ -92,18 +98,22 @@ export class StepService implements IStepService {
     const huntVersion = huntDoc.latestVersion;
 
     const session = await mongoose.startSession();
+    session.startTransaction();
 
     try {
-      await session.withTransaction(async () => {
-        const step = await StepModel.findOne({ stepId, huntId, huntVersion }).session(session);
-        if (!step) {
-          throw new NotFoundError('Step not found');
-        }
+      const step = await StepModel.findOne({ stepId, huntId, huntVersion }).session(session);
+      if (!step) {
+        throw new NotFoundError('Step not found');
+      }
 
-        await this.huntService.removeStepFromVersion(huntId, huntVersion, stepId, session);
+      await this.huntService.removeStepFromVersion(huntId, huntVersion, stepId, session);
 
-        await step.deleteOne({ session });
-      });
+      await step.deleteOne({ session });
+
+      await session.commitTransaction();
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
     } finally {
       await session.endSession();
     }
