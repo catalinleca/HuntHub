@@ -11,6 +11,7 @@ import { VersionValidator } from '@/features/publishing/helpers/version-validato
 import { StepCloner } from '@/features/publishing/helpers/step-cloner.helper';
 import { VersionPublisher } from '@/features/publishing/helpers/version-publisher.helper';
 import { ReleaseManager } from '@/features/publishing/helpers/release-manager.helper';
+import { IAuthorizationService } from '@/services/authorization/authorization.service';
 
 export interface IPublishingService {
   publishHunt(huntId: number, userId: string): Promise<Hunt>;
@@ -40,10 +41,12 @@ export interface IPublishingService {
  */
 @injectable()
 export class PublishingService implements IPublishingService {
-  constructor(@inject(TYPES.HuntService) private huntService: IHuntService) {}
+  constructor(@inject(TYPES.HuntService) private huntService: IHuntService,
+              @inject(TYPES.AuthorizationService) private authService: IAuthorizationService,
+              ) {}
 
   async publishHunt(huntId: number, userId: string): Promise<Hunt> {
-    const huntDoc = await this.huntService.verifyOwnership(huntId, userId);
+    const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
 
     const session = await mongoose.startSession();
 
@@ -85,7 +88,7 @@ export class PublishingService implements IPublishingService {
     userId: string,
     currentLiveVersion: number | null | undefined,
   ): Promise<ReleaseResult> {
-    const huntDoc = await this.huntService.verifyOwnership(huntId, userId);
+    const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
     const previousLiveVersion = huntDoc.liveVersion;
 
     const session = await mongoose.startSession();
@@ -129,7 +132,7 @@ export class PublishingService implements IPublishingService {
   }
 
   async takeOffline(huntId: number, userId: string, currentLiveVersion: number): Promise<TakeOfflineResult> {
-    const huntDoc = await this.huntService.verifyOwnership(huntId, userId);
+    const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
 
     if (huntDoc.liveVersion === null) {
       throw new ValidationError('Hunt is not currently live', []);

@@ -96,6 +96,7 @@ const Hunt = z
     isLive: z.boolean().optional(),
     releasedAt: z.string().datetime({ offset: true }).optional(),
     releasedBy: z.string().optional(),
+    permission: z.enum(['owner', 'admin', 'view']).optional(),
     createdAt: z.string().datetime({ offset: true }).optional(),
     updatedAt: z.string().datetime({ offset: true }).optional(),
   })
@@ -257,8 +258,19 @@ const TakeOfflineResult = z
     takenOfflineAt: z.string().datetime({ offset: true }),
   })
   .passthrough();
+const Collaborator = z
+  .object({
+    userId: z.string(),
+    displayName: z.string(),
+    email: z.string().email().optional(),
+    profilePicture: z.string().optional(),
+    permission: z.enum(['admin', 'view']),
+    sharedAt: z.string().datetime({ offset: true }),
+    sharedBy: z.string().optional(),
+  })
+  .passthrough();
 
-export const schemas: Record<string, z.ZodTypeAny> = {
+export const schemas: Record<string, z.ZodType<any>> = {
   HuntStatus,
   Location,
   HuntAccessType,
@@ -293,6 +305,7 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   LiveHunt,
   ReleaseResult,
   TakeOfflineResult,
+  Collaborator,
 };
 
 const endpoints = makeApi([]);

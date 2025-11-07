@@ -56,7 +56,7 @@ export class AuthorizationService implements IAuthorizationService {
   ): Promise<AccessContext> {
     const access = await this.getAccess(huntId, userId);
     if (!access) {
-      throw new ForbiddenError('User does not have access to this hunt');
+      throw new NotFoundError('Hunt not found or access denied');
     }
 
     if (!this.hasPermission(access.permission, requiredPermission)) {
