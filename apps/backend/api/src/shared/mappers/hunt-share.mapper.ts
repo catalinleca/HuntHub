@@ -19,8 +19,12 @@ export class HuntShareMapper {
     userDoc: HydratedDocument<IUser>,
     sharedByUser?: HydratedDocument<IUser>,
   ): Collaborator {
+    // FIX: Extract _id from populated user document and convert to string
+    // REASON: shareDoc.sharedWithId is populated with full user document,
+    // calling .toString() on document returns entire object as string.
+    // We need userDoc._id.toString() to get the actual ID string.
     return {
-      userId: shareDoc.sharedWithId.toString(),
+      userId: userDoc._id.toString(),
       displayName: userDoc.displayName || userDoc.email,
       email: userDoc.email,
       profilePicture: userDoc.profilePicture,

@@ -25,7 +25,7 @@ export class VersionValidator {
 
     const hasSteps = await StepModel.hasSteps(huntId, version);
     if (!hasSteps) {
-      throw new ValidationError('Cannot publish hunt without steps', []);
+      throw new ValidationError('Cannot publish hunt without at least one step', []);
     }
 
     if (huntVersionDoc.stepOrder.length === 0) {

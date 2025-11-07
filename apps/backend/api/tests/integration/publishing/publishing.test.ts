@@ -10,6 +10,7 @@ import { IHunt } from '@/database/types/Hunt';
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import StepModel from '@/database/models/Step';
+import HuntAccessModel from '@/database/models/HuntAccess';
 import { ChallengeType } from '@hunthub/shared';
 
 describe('Publishing Workflow Integration Tests', () => {
@@ -141,7 +142,15 @@ describe('Publishing Workflow Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      // Second publish of same version should fail
+      // FIX: Manually mark the new draft (version 2) as published to simulate edge case
+      // REASON: After publishing, the system creates version 2 as a new draft.
+      // To test "already published" error, we need to artificially mark it as published.
+      await HuntVersionModel.updateOne(
+        { huntId: testHunt.huntId, version: 2 },
+        { isPublished: true, publishedAt: new Date(), publishedBy: owner.id },
+      );
+
+      // Second publish should fail because current draft is marked as published
       const response = await request(app)
         .post(`/api/hunts/${testHunt.huntId}/publish`)
         .set('Authorization', `Bearer ${authToken}`)
@@ -182,7 +191,6 @@ describe('Publishing Workflow Integration Tests', () => {
       mockFirebaseAuth(adminUser);
 
       // Share hunt with admin permission
-      const { HuntAccessModel } = await import('@/database/models');
       await HuntAccessModel.create({
         huntId: testHunt.huntId,
         ownerId: owner.id,
@@ -196,7 +204,8 @@ describe('Publishing Workflow Integration Tests', () => {
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
-      expect(response.body.publishedBy).toBe(adminUser.id); // Admin published it
+      expect(response.body.publishedBy
+      ).toBe(adminUser.id); // Admin published it
     });
 
     it('should return 403 when view user tries to publish', async () => {
@@ -205,7 +214,6 @@ describe('Publishing Workflow Integration Tests', () => {
       mockFirebaseAuth(viewUser);
 
       // Share hunt with view permission
-      const { HuntAccessModel } = await import('@/database/models');
       await HuntAccessModel.create({
         huntId: testHunt.huntId,
         ownerId: owner.id,

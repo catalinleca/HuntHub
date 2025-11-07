@@ -79,8 +79,22 @@ export class PublishingService implements IPublishingService {
 
       const updatedHunt = await VersionPublisher.updateHuntPointers(huntId, currentVersion, newVersion, session);
 
+      // FIX: Return published version (not new draft) in the response
+      // REASON: API consumers need to see the version that was just published,
+      // with isPublished: true, publishedAt, publishedBy fields.
+      // Fetch the now-published version from DB to get updated fields.
+      const publishedVersionDoc = await HuntVersionModel.findOne(
+        { huntId, version: currentVersion },
+        null,
+        { session },
+      );
+
+      if (!publishedVersionDoc) {
+        throw new Error('Published version not found after publishing');
+      }
+
       await session.commitTransaction();
-      return HuntMapper.fromDocuments(updatedHunt, newVersionDoc);
+      return HuntMapper.fromDocuments(updatedHunt, publishedVersionDoc);
     } catch (error) {
       await session.abortTransaction();
       throw error;
@@ -152,17 +166,24 @@ export class PublishingService implements IPublishingService {
 
     const previousLiveVersion = huntDoc.liveVersion;
     const session = await mongoose.startSession();
+    session.startTransaction();
 
     try {
-      return await session.withTransaction(async () => {
-        await ReleaseManager.takeOffline(huntDoc.huntId, currentLiveVersion, session);
+      // FIX: Changed from withTransaction() to manual transaction management
+      // REASON: Same as publishHunt() and releaseHunt() - ReleaseManager helper needs active session
+      // throughout the takeOffline operation. withTransaction() automatically ends the session,
+      // but ReleaseManager.takeOffline() requires an active session to perform atomic updates.
+      await ReleaseManager.takeOffline(huntDoc.huntId, currentLiveVersion, session);
 
-        return {
-          huntId: huntDoc.huntId,
-          previousLiveVersion,
-          takenOfflineAt: new Date().toISOString(),
-        };
-      });
+      await session.commitTransaction();
+      return {
+        huntId: huntDoc.huntId,
+        previousLiveVersion,
+        takenOfflineAt: new Date().toISOString(),
+      };
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
     } finally {
       await session.endSession();
     }

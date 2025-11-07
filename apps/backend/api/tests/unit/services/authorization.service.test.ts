@@ -1,5 +1,6 @@
 import { AuthorizationService } from '@/services/authorization/authorization.service';
-import { HuntModel, HuntAccessModel } from '@/database/models';
+import HuntModel from '@/database/models/Hunt';
+import HuntAccessModel from '@/database/models/HuntAccess';
 import { NotFoundError, ForbiddenError } from '@/shared/errors';
 import { createTestHunt } from '../../setup/factories/hunt.factory';
 import { createTestUser } from '../../setup/factories/user.factory';

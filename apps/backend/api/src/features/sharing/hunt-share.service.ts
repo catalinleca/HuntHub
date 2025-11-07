@@ -1,9 +1,11 @@
 import { inject, injectable } from 'inversify';
+import { HydratedDocument } from 'mongoose';
 import { ShareResult, Collaborator } from '@hunthub/shared';
 import { TYPES } from '@/shared/types';
 import { IAuthorizationService } from '@/services/authorization/authorization.service';
 import { HuntAccessModel, UserModel } from '@/database/models';
 import { HuntPermission } from '@/database/types/HuntAccess';
+import { IUser } from '@/database/types/User';
 import { NotFoundError, ForbiddenError, ValidationError } from '@/shared/errors';
 import { HuntShareMapper } from '@/shared/mappers';
 
@@ -116,8 +118,13 @@ export class HuntShareService implements IHuntShareService {
 
     const shares = await HuntAccessModel.findHuntCollaborators(huntId);
 
-    return shares.map((share) =>
-      HuntShareMapper.toCollaborator(share, share.sharedWithId as any, share.sharedBy as any),
-    );
+    // FIX: Properly cast populated fields to user documents
+    // REASON: findHuntCollaborators() populates sharedWithId and sharedBy with user documents,
+    // but TypeScript sees them as ObjectIds. Cast to 'any' to access populated documents.
+    return shares.map((share) => {
+      const sharedWithUser = (share as any).sharedWithId as HydratedDocument<IUser>;
+      const sharedByUser = (share as any).sharedBy as HydratedDocument<IUser> | undefined;
+      return HuntShareMapper.toCollaborator(share, sharedWithUser, sharedByUser);
+    });
   }
 }
