@@ -70,7 +70,9 @@ export class HuntService implements IHuntService {
       permissionMap.set(hunt.huntId, 'owner');
     });
     sharedAccess.forEach((shareHunt) => {
-      permissionMap.set(shareHunt.huntId, shareHunt.permission);
+      if (!permissionMap.has(shareHunt.huntId)) {
+        permissionMap.set(shareHunt.huntId, shareHunt.permission);
+      }
     });
 
     const allHuntIds = [...ownedHuntIds.map((h) => h.huntId), ...sharedAccess.map((s) => s.huntId)];

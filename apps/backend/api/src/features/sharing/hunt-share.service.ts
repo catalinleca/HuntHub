@@ -23,10 +23,17 @@ export interface IHuntShareService {
 export class HuntShareService implements IHuntShareService {
   constructor(@inject(TYPES.AuthorizationService) private authService: IAuthorizationService) {}
 
-  private async validateShareTarget(sharedWithId: string, userId: string, creatorId: string): Promise<void> {
-    const targetUser = await UserModel.findById(sharedWithId);
-    if (!targetUser) {
-      throw new NotFoundError('User not found');
+  private async validateShareTarget(
+    sharedWithId: string,
+    userId: string,
+    creatorId: string,
+    requireUserExists = true,
+  ): Promise<void> {
+    if (requireUserExists) {
+      const targetUser = await UserModel.findById(sharedWithId);
+      if (!targetUser) {
+        throw new NotFoundError('User not found');
+      }
     }
 
     if (sharedWithId === userId) {
@@ -110,11 +117,7 @@ export class HuntShareService implements IHuntShareService {
     const shares = await HuntAccessModel.findHuntCollaborators(huntId);
 
     return shares.map((share) =>
-      HuntShareMapper.toCollaborator(
-        share,
-        share.sharedWithId as any,
-        share.sharedBy as any,
-      ),
+      HuntShareMapper.toCollaborator(share, share.sharedWithId as any, share.sharedBy as any),
     );
   }
 }

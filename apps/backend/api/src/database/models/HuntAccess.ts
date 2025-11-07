@@ -129,12 +129,12 @@ huntShareSchema.statics.shareHunt = function (
       permission,
       sharedAt: new Date(),
     },
-    { upsert: true, new: true },
+    { upsert: true, new: true, runValidators: true, setDefaultsOnInsert: true },
   ).exec();
 };
 
 huntShareSchema.statics.updatePermission = function (huntId: number, sharedWithId: string, permission: HuntPermission) {
-  return this.findOneAndUpdate({ huntId, sharedWithId }, { permission }, { new: true }).exec();
+  return this.findOneAndUpdate({ huntId, sharedWithId }, { permission }, { new: true, runValidators: true }).exec();
 };
 
 huntShareSchema.statics.revokeAccess = async function (huntId: number, userId: string): Promise<boolean> {
