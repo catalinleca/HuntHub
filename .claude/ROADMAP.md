@@ -1,6 +1,6 @@
 # HuntHub Development Roadmap
 
-**Last updated:** 2025-11-06 (Publishing & Release Workflow COMPLETE!)
+**Last updated:** 2025-11-07 (Testing & Documentation COMPLETE!)
 
 **Product vision:** Portfolio-quality treasure hunt platform with location-based challenges, built production-ready in 2 months.
 
@@ -25,7 +25,7 @@
 - ✅ Hunt (master) + HuntVersion (content) architecture
 - ✅ Atomic transactions (MongoDB replica set)
 - ✅ Data integrity fixes (cascade delete, validation)
-- ✅ All 69 tests passing
+- ✅ Test infrastructure upgraded (replica set)
 
 **Week 4-5 (2025-11-05):**
 - ✅ **Publishing Workflow Complete!**
@@ -44,6 +44,16 @@
 - ✅ Hunt DTO enhanced (isLive, releasedAt, releasedBy)
 - ✅ Complete workflow: Draft → Publish → Release → Players
 
+**Week 5 (2025-11-07):**
+- ✅ **Hunt Sharing & Collaboration Complete!**
+- ✅ HuntAccess model with three-tier permissions (Owner > Admin > View)
+- ✅ AuthorizationService with rich AccessContext
+- ✅ Hunt sharing endpoints (4/4): Share, Update, Revoke, List
+- ✅ Query optimization (N+1 prevention)
+- ✅ Security guarantees (permission escalation prevention)
+- ✅ **Testing Complete: 185/185 tests passing**
+- ✅ **Documentation Cleanup:** Merged guides into conceptual overviews
+
 **📍 NEXT: Player API**
 - Start hunt session endpoints
 - Challenge validation by type
@@ -55,14 +65,14 @@
 ## 📊 Progress Overview
 
 **Current Phase:** Player API Implementation
-**Previous Sprint:** ✅ Publishing Workflow Complete - Full publishing system with optimistic locking
-**Overall Progress:** ~50% to MVP completion
+**Previous Sprint:** ✅ Hunt Sharing & Testing Complete - 185/185 tests passing
+**Overall Progress:** ~55% to MVP completion
 
 **Key Metrics:**
 - Backend Epics: 4/6 complete (67%)
-  - ✅ Epic 1: Hunt Management (100%)
+  - ✅ Epic 1: Hunt Management (100%) + Hunt Sharing (100%)
   - ✅ Epic 3: Step Management (100%)
-  - ✅ Epic 4: Publishing Workflow (100%) ⭐ **NEW!**
+  - ✅ Epic 4: Publishing & Release Workflow (100%)
   - ✅ Epic 6: Asset Management (100%)
 - Frontend Epics: 0/4 started (0%)
 - Integration Epics: 0/2 started (0%)
@@ -72,7 +82,9 @@
 - ✅ Week 2-3: Asset Management (COMPLETE)
 - ✅ Week 3-4: Versioning System (COMPLETE)
 - ✅ Week 4-5: Publishing Workflow (COMPLETE)
-- ✅ Week 5: Release Workflow (COMPLETE) ⭐ **NEW!**
+- ✅ Week 5: Release Workflow (COMPLETE)
+- ✅ Week 5: Hunt Sharing & Collaboration (COMPLETE)
+- ✅ Week 5: Complete Test Coverage - 185/185 tests (COMPLETE)
 - 📍 Week 5-6: Player API (NEXT)
 
 ---
@@ -96,10 +108,10 @@
 
 ## Epic 1: Hunt Management ✅ (Complete - 100%)
 
-**Goal:** Complete CRUD operations for hunts
-**Timeline:** Week 1
-**Status:** 6/6 stories complete
-**Completed:** 2025-10-28
+**Goal:** Complete CRUD operations for hunts with sharing & collaboration
+**Timeline:** Week 1 + Week 5 (Hunt Sharing)
+**Status:** 7/7 stories complete
+**Completed:** 2025-11-07 (Hunt Sharing added)
 
 ### Stories
 
@@ -135,13 +147,31 @@
   - ✅ Validate steps belong to hunt
   - ✅ Bonus from Week 2
 
+- [x] **BE-1.7:** Hunt Sharing & Collaboration (POST/PATCH/DELETE/GET /api/hunts/:id/collaborators)
+  - ✅ HuntAccess model with separate table design
+  - ✅ AuthorizationService with rich AccessContext
+  - ✅ Three-tier permission hierarchy (Owner > Admin > View)
+  - ✅ Share hunt with user by email
+  - ✅ Update permission level
+  - ✅ Revoke access
+  - ✅ List all collaborators
+  - ✅ Query optimization (N+1 prevention)
+  - ✅ Security guarantees (permission escalation prevention)
+  - ✅ 36/36 integration tests passing
+  - ✅ Complete
+
 **Dependencies:** None
 **Blockers:** None
 **Patterns Established:**
 - Reusable `verifyOwnership()` authorization
 - Clean DTO separation
 - Mapper pattern
-**See:** `.claude/backend/hunt-step-implementation-decisions.md`
+- Centralized AuthorizationService with AccessContext
+- Separate table design for many-to-many relationships with metadata
+- N+1 prevention with Map-based permission lookup
+**See:**
+- `.claude/backend/hunt-step-implementation-decisions.md`
+- `.claude/features/hunt-sharing.md`
 
 ---
 
@@ -296,7 +326,7 @@
 **Blockers:** None
 **See:**
 - `.claude/publishing-workflow.md`
-- `.claude/features/release-hunt-completed.md`
+- `.claude/features/hunt-release.md` - Release architecture and design decisions
 - `.claude/RELEASE-CONCEPT.md`
 
 ---

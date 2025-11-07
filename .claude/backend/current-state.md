@@ -1,10 +1,21 @@
 # Backend Current State
 
-**Last updated:** 2025-11-06
+**Last updated:** 2025-11-07
 
-**🎉 Publishing & Release Workflow Complete! (2025-11-06)**
+**🎉 Testing & Documentation Complete! (2025-11-07)**
 
-**Most Recent Work (2025-11-06):**
+**Most Recent Work (2025-11-07):**
+- ✅ **Hunt Sharing Complete** - POST/PATCH/DELETE/GET /api/hunts/:id/collaborators endpoints
+- ✅ **AuthorizationService** - Centralized permission checks with rich AccessContext
+- ✅ **HuntAccess Model** - Separate table design for sharing with three-tier permissions (Owner > Admin > View)
+- ✅ **Query Optimization** - N+1 prevention for getUserHunts() with permission map
+- ✅ **Security Guarantees** - Permission escalation prevention, owner immutability, cascade deletes
+- ✅ **Integration Tests Complete** - 185/185 tests passing across all features
+- ✅ **Test Coverage:** Hunt CRUD (23), Step CRUD (20), Assets (26), Publishing (34), Authorization (46), Sharing (36)
+- ✅ **Documentation Cleanup** - Merged implementation guides into conceptual overviews
+- ✅ **Bug Fixes** - Multi-user Firebase auth, population handling, userId extraction, DELETE status codes
+
+**Previous Work (2025-11-06):**
 - ✅ **Release API Fully Implemented** - PUT /api/publishing/:id/release, DELETE /api/publishing/:id/release
 - ✅ **Release Manager Helper** - Optimistic locking for release/takeOffline operations
 - ✅ **Hunt DTO Enhanced** - Added isLive (computed), releasedAt, releasedBy fields
@@ -156,15 +167,17 @@ Step
 - [x] Step validation schemas (create, update)
 - [x] Dependency injection (StepService injects HuntService for authorization)
 
-### Data Models (Defined)
-- [x] Hunt
-- [x] User
-- [x] Step
-- [x] Asset
-- [x] Progress
-- [x] LiveHunt
-- [x] PublishedHunt
-- [x] Location (schema)
+### Data Models
+- [x] Hunt - Active (full CRUD with versioning)
+- [x] HuntVersion - Active (content snapshots)
+- [x] User - Active (full CRUD)
+- [x] Step - Active (full CRUD with transactions)
+- [x] Asset - Active (full CRUD with S3 integration)
+- [x] HuntAccess - Active (hunt sharing and collaboration)
+- [x] Location (schema) - Active (used in hunts and steps)
+- [ ] Progress - Defined, not yet implemented (Week 5-6)
+- [ ] LiveHunt - Defined, not yet implemented (Week 5-6)
+- [ ] PublishedHunt - Defined, not yet implemented
 
 ### OpenAPI & Validation
 - [x] OpenAPI schema definition (hunthub_models.yaml)
@@ -175,19 +188,23 @@ Step
 - [x] Hunt validation schemas (imported from @hunthub/shared/schemas)
 - [x] User validation schemas (imported from @hunthub/shared/schemas)
 
-### Testing Infrastructure (UPGRADED - 2025-11-04)
+### Testing Infrastructure (COMPLETE - 2025-11-07)
 - [x] Jest configuration with TypeScript support
 - [x] **MongoDB Memory Replica Set** (upgraded from standalone for transaction support)
 - [x] Integration test setup (supertest + in-memory replica set)
 - [x] Test factories for creating test data (User, Hunt with HuntVersion, Step with huntVersion)
-- [x] Firebase auth mocking helpers
+- [x] Firebase auth mocking helpers (multi-user support)
 - [x] Test database setup and cleanup utilities
 - [x] Hunt CRUD integration tests (23/23 passing)
 - [x] Step CRUD integration tests (20/20 passing)
 - [x] Asset CRUD integration tests (26/26 passing)
-- [x] **Total: 69/69 tests passing** with transaction safety
+- [x] Publishing Workflow integration tests (34/34 passing)
+- [x] Authorization Service integration tests (46/46 passing)
+- [x] Hunt Sharing integration tests (36/36 passing)
+- [x] **Total: 185/185 tests passing** with transaction safety
 - [x] Validation testing (required fields, error responses)
 - [x] Authentication testing (401 unauthorized cases)
+- [x] Multi-user testing scenarios
 
 ### Publishing & Release Workflow (COMPLETE - 2025-11-06)
 - [x] Publishing service (orchestrates workflow)
@@ -207,6 +224,44 @@ Step
 - [x] Architecture decision: Single Hunt DTO (no HuntCompact yet - YAGNI)
 - [x] Complete workflow: Draft → Publish → Release → Live for players
 
+### Hunt Sharing & Collaboration (COMPLETE - 2025-11-07)
+- [x] HuntAccess model (Mongoose schema) - Separate table design
+- [x] HuntAccess types/interfaces (Permission enum: 'view' | 'admin')
+- [x] AuthorizationService - Centralized permission checks
+  - requireAccess() - **Returns rich AccessContext with huntDoc and permissions**
+  - getPermission() - Query user's permission level
+  - canDelete() - Check if user can delete hunt
+- [x] Three-tier permission hierarchy:
+  - Owner (creator) - Full control, immutable
+  - Admin (collaborator) - Edit, publish, release, share (cannot delete)
+  - View (collaborator) - Read-only access
+- [x] Hunt sharing endpoints (4/4):
+  - POST /api/hunts/:id/collaborators - Share hunt with user by email
+  - PATCH /api/hunts/:id/collaborators/:userId - Update permission level
+  - DELETE /api/hunts/:id/collaborators/:userId - Revoke access
+  - GET /api/hunts/:id/collaborators - List all collaborators
+- [x] Security features:
+  - Cannot share with self or owner
+  - Cannot escalate permissions (view user can't grant admin)
+  - Owner is immutable (cannot be changed or removed)
+  - Only owner can delete hunts
+  - Cascade delete shares when hunt is deleted
+- [x] Query optimization:
+  - N+1 prevention in getUserHunts() with Map-based permission lookup
+  - Parallel queries with Promise.all
+  - Lean queries for permission data
+- [x] Static methods on HuntAccess model:
+  - shareHunt() - Upsert share with validation
+  - updatePermission() - Change permission level
+  - revokeAccess() - Remove collaborator
+  - getCollaborators() - List with permission filter
+  - getPermission() - Get user's permission for hunt
+- [x] Integration with existing services:
+  - HuntService.getUserHunts() returns owned + shared hunts
+  - All CRUD operations use AuthorizationService for access checks
+  - Cascade delete removes shares when hunt is deleted
+- [x] 36/36 integration tests passing
+
 ### Tooling
 - [x] TypeScript configuration (strict mode)
 - [x] ESLint + Prettier setup
@@ -216,15 +271,8 @@ Step
 
 ## 🚧 Known Issues & Technical Debt
 
-### CRITICAL: Security Issue
-- ⚠️ **Exposing MongoDB ObjectIds in API** - Must migrate to UUID before production
-  - Problem: ObjectIds contain timestamp, reveal DB implementation, predictable
-  - Solution: Dual ID system (internal ObjectId + external UUID v4)
-  - Impact: All models, mappers, services need updating
-  - Status: Ready to implement (next task)
-
-### Hunt Features (Pending)
-- [ ] Hunt sharing/access control (HuntAccess model exists but not wired up)
+### Hunt Features
+- [x] Hunt sharing/access control - **COMPLETE** (HuntAccess model + AuthorizationService)
 
 ### Challenge Types
 - [x] Types defined in OpenAPI (Clue, Quiz, Mission, Task)
@@ -277,12 +325,14 @@ Step
 
 **Collections in use:**
 - `users` - Active (full CRUD)
-- `hunts` - Active (full CRUD)
-- `steps` - Active (full CRUD - Week 1 complete)
-- `assets` - Defined, not used (Week 3)
-- `progress` - Defined, not used (Week 5-6)
-- `livehunts` - Defined, not used (Week 5-6)
-- `publishedhunts` - Defined, not used
+- `hunts` - Active (full CRUD with versioning)
+- `huntversions` - Active (content snapshots)
+- `steps` - Active (full CRUD with transactions)
+- `assets` - Active (full CRUD with S3 integration)
+- `huntaccess` - Active (hunt sharing and collaboration)
+- `progress` - Defined, not yet implemented (Week 5-6)
+- `livehunts` - Defined, not yet implemented (Week 5-6)
+- `publishedhunts` - Defined, not yet implemented
 
 ## API Endpoints
 
@@ -293,7 +343,7 @@ POST   /auth/login
 
 # Hunt CRUD (6/6) - Week 1 ✅
 POST   /api/hunts                          # Create hunt
-GET    /api/hunts                          # List user's hunts
+GET    /api/hunts                          # List user's hunts (owned + shared)
 GET    /api/hunts/:id                      # Get hunt by ID
 PUT    /api/hunts/:id                      # Update hunt (metadata only)
 DELETE /api/hunts/:id                      # Delete hunt (cascade delete steps)
@@ -315,6 +365,12 @@ DELETE /api/assets/:id                     # Delete asset
 POST   /api/publishing/hunts/:id/publish   # Publish hunt (clone steps, mark published, create new draft)
 PUT    /api/publishing/hunts/:id/release   # Release hunt (make version live for players)
 DELETE /api/publishing/hunts/:id/release   # Take hunt offline (remove from discovery)
+
+# Hunt Sharing (4/4) - Week 5 ✅
+POST   /api/hunts/:id/collaborators        # Share hunt with user by email
+PATCH  /api/hunts/:id/collaborators/:userId # Update permission level
+DELETE /api/hunts/:id/collaborators/:userId # Revoke access
+GET    /api/hunts/:id/collaborators        # List all collaborators
 ```
 
 **📋 Needed - Week 2 (Tree VIEW API):**
@@ -338,17 +394,20 @@ GET    /api/play/:huntId/progress  # Get user progress
 2. ✅ **Validation schemas** - Domain-organized structure complete
 3. ✅ **OpenAPI schema inconsistencies** - Fixed type/challengeType mismatches
 4. ⚠️ **Error messages** - Some errors lack descriptive messages
-5. ✅ **Testing** - Integration tests implemented (26/26 asset tests passing)
+5. ✅ **Testing** - COMPLETE (185/185 integration tests passing)
 6. ⚠️ **Documentation** - No API docs yet (Swagger UI installed but not configured)
-7. ⚠️ **Step CRUD tests** - Need integration tests for step endpoints
+7. ✅ **Step CRUD tests** - COMPLETE (20/20 step tests passing)
+8. ✅ **Publishing tests** - COMPLETE (34/34 publishing tests passing)
+9. ✅ **Authorization tests** - COMPLETE (46/46 authorization tests passing)
+10. ✅ **Hunt Sharing tests** - COMPLETE (36/36 sharing tests passing)
 
 ---
 
 ## 🎯 Current Priority: Player API
 
-**🎉 Publishing & Release Workflow COMPLETE!**
+**🎉 Publishing, Release & Sharing Workflows COMPLETE!**
 
-**Publishing and release are done, now enable hunt playing!**
+**All backend features for hunt creation and collaboration are done - now enable hunt playing!**
 
 **NEXT: Player API** (~1-2 weeks) - **RECOMMENDED**
 - GET /api/play/:huntId/start (create session)
@@ -359,8 +418,9 @@ GET    /api/play/:huntId/progress  # Get user progress
 
 **See:**
 - `.claude/player-api-design.md` for complete design
-- `.claude/features/release-hunt-completed.md` for release implementation details
-- `.claude/RELEASE-CONCEPT.md` for publish vs release explanation
+- `.claude/features/hunt-release.md` for release architecture and design decisions
+- `.claude/features/hunt-sharing.md` for sharing architecture and design decisions
+- `.claude/features/numeric-id-strategy.md` for ID design and counter pattern
 
 ---
 
