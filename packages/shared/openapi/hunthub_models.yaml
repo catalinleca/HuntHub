@@ -765,3 +765,33 @@ components:
         - displayName
         - permission
         - sharedAt
+
+    ShareResult:
+      type: object
+      description: Response from sharing a hunt with another user
+      properties:
+        huntId:
+          type: integer
+          example: 1332
+          description: ID of the hunt that was shared
+        sharedWithId:
+          type: string
+          description: User ID of the person the hunt was shared with
+        permission:
+          type: string
+          enum: [admin, view]
+          description: Permission level granted
+        sharedAt:
+          type: string
+          format: date-time
+          description: When the hunt was shared
+          example: "2024-02-01T10:30:00Z"
+        sharedBy:
+          type: string
+          description: User ID who granted the access
+      required:
+        - huntId
+        - sharedWithId
+        - permission
+        - sharedAt
+        - sharedBy

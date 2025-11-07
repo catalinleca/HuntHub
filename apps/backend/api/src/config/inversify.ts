@@ -14,6 +14,8 @@ import { IStorageService, StorageService } from '@/services/storage/storage.serv
 import { IPublishingController, PublishingController } from '@/features/publishing/publishing.controller';
 import { IPublishingService, PublishingService } from '@/features/publishing/publishing.service';
 import { AuthorizationService, IAuthorizationService } from '@/services/authorization/authorization.service';
+import { HuntShareController, IHuntShareController } from '@/features/sharing/hunt-share.controller';
+import { HuntShareService, IHuntShareService } from '@/features/sharing/hunt-share.service';
 
 const container = new Container();
 
@@ -22,6 +24,7 @@ container.bind<IHuntController>(TYPES.HuntController).to(HuntController);
 container.bind<IStepController>(TYPES.StepController).to(StepController);
 container.bind<IAssetController>(TYPES.AssetController).to(AssetController);
 container.bind<IPublishingController>(TYPES.PublishingController).to(PublishingController);
+container.bind<IHuntShareController>(TYPES.HuntShareController).to(HuntShareController);
 
 container.bind<IAuthService>(TYPES.AuthService).to(AuthService);
 container.bind<IUserService>(TYPES.UserService).to(UserService);
@@ -31,5 +34,6 @@ container.bind<IAssetService>(TYPES.AssetService).to(AssetService);
 container.bind<IStorageService>(TYPES.StorageService).to(StorageService);
 container.bind<IPublishingService>(TYPES.PublishingService).to(PublishingService);
 container.bind<IAuthorizationService>(TYPES.AuthorizationService).to(AuthorizationService);
+container.bind<IHuntShareService>(TYPES.HuntShareService).to(HuntShareService);
 
 export { container };

@@ -4,6 +4,7 @@ export const TYPES = {
   StepController: Symbol.for('StepController'),
   AssetController: Symbol.for('AssetController'),
   PublishingController: Symbol.for('PublishingController'),
+  HuntShareController: Symbol.for('HuntShareController'),
 
   AuthService: Symbol.for('AuthService'),
   UserService: Symbol.for('UserService'),
@@ -13,6 +14,7 @@ export const TYPES = {
   StorageService: Symbol.for('StorageService'),
   PublishingService: Symbol.for('PublishingService'),
   AuthorizationService: Symbol.for('AuthorizationService'),
+  HuntShareService: Symbol.for('HuntShareService'),
 };
 
 export interface ISerializer<TModel, TDTO> {

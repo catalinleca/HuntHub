@@ -541,3 +541,24 @@ export interface Collaborator {
   /** Display name of user who granted access */
   sharedBy?: string;
 }
+
+/** Response from sharing a hunt with another user */
+export interface ShareResult {
+  /**
+   * ID of the hunt that was shared
+   * @example 1332
+   */
+  huntId: number;
+  /** User ID of the person the hunt was shared with */
+  sharedWithId: string;
+  /** Permission level granted */
+  permission: "admin" | "view";
+  /**
+   * When the hunt was shared
+   * @format date-time
+   * @example "2024-02-01T10:30:00Z"
+   */
+  sharedAt: string;
+  /** User ID who granted the access */
+  sharedBy: string;
+}

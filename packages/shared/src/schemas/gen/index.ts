@@ -269,6 +269,15 @@ const Collaborator = z
     sharedBy: z.string().optional(),
   })
   .passthrough();
+const ShareResult = z
+  .object({
+    huntId: z.number().int(),
+    sharedWithId: z.string(),
+    permission: z.enum(['admin', 'view']),
+    sharedAt: z.string().datetime({ offset: true }),
+    sharedBy: z.string(),
+  })
+  .passthrough();
 
 export const schemas: Record<string, z.ZodType<any>> = {
   HuntStatus,
@@ -306,6 +315,7 @@ export const schemas: Record<string, z.ZodType<any>> = {
   ReleaseResult,
   TakeOfflineResult,
   Collaborator,
+  ShareResult,
 };
 
 const endpoints = makeApi([]);
