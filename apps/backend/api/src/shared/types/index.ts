@@ -12,7 +12,7 @@ export const TYPES = {
   AssetService: Symbol.for('AssetService'),
   StorageService: Symbol.for('StorageService'),
   PublishingService: Symbol.for('PublishingService'),
-
+  AuthorizationService: Symbol.for('AuthorizationService'),
 };
 
 export interface ISerializer<TModel, TDTO> {

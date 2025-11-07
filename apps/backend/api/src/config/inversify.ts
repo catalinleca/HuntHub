@@ -13,6 +13,7 @@ import { AssetService, IAssetService } from '@/modules/assets/asset.service';
 import { IStorageService, StorageService } from '@/services/storage/storage.service';
 import { IPublishingController, PublishingController } from '@/features/publishing/publishing.controller';
 import { IPublishingService, PublishingService } from '@/features/publishing/publishing.service';
+import { AuthorizationService, IAuthorizationService } from '@/services/authorization/authorization.service';
 
 const container = new Container();
 
@@ -29,5 +30,6 @@ container.bind<IStepService>(TYPES.StepService).to(StepService);
 container.bind<IAssetService>(TYPES.AssetService).to(AssetService);
 container.bind<IStorageService>(TYPES.StorageService).to(StorageService);
 container.bind<IPublishingService>(TYPES.PublishingService).to(PublishingService);
+container.bind<IAuthorizationService>(TYPES.AuthorizationService).to(AuthorizationService);
 
 export { container };
