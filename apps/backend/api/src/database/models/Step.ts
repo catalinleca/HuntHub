@@ -38,6 +38,7 @@ const stepSchema: Schema<IStep> = new Schema<IStep>(
   },
   {
     timestamps: true,
+    collection: 'Step',
   },
 );
 

@@ -19,6 +19,7 @@ const liveHuntSchema: Schema<ILiveHunt> = new Schema<ILiveHunt>(
   },
   {
     timestamps: true,
+    collection: 'LiveHunt',
   },
 );
 

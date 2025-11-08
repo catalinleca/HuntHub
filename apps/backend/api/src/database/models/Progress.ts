@@ -68,6 +68,7 @@ const progressSchema: Schema<IProgress> = new Schema<IProgress>(
   },
   {
     timestamps: true,
+    collection: 'Progress',
   },
 );
 

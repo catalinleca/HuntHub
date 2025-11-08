@@ -5,7 +5,7 @@ import { getNextSequence } from '@/database/models/Counter';
 const assetSchema: Schema<IAsset> = new Schema<IAsset>(
   {
     assetId: {
-      type: Number, // numeric ids should be used for API responses
+      type: Number,
       unique: true,
       required: false,
     },
@@ -40,6 +40,7 @@ const assetSchema: Schema<IAsset> = new Schema<IAsset>(
   },
   {
     timestamps: true,
+    collection: 'Asset',
   },
 );
 

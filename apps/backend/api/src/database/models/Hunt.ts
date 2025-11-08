@@ -32,6 +32,7 @@ const huntSchema: Schema<IHunt> = new Schema<IHunt>(
   },
   {
     timestamps: true,
+    collection: 'Hunt',
   },
 );
 
