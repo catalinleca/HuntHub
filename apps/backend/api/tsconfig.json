@@ -5,8 +5,8 @@
     "rootDir": "./src",
     "module": "Node16",
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "moduleResolution": "node16",
+    "isolatedModules": true,
     "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"],

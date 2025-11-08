@@ -2,21 +2,21 @@ import { Router } from 'express';
 import { TYPES } from '@/shared/types';
 import { container } from '@/config/inversify';
 import { IPublishingController } from './publishing.controller';
+import { validateRequest } from '@/shared/middlewares';
+import { releaseHuntSchema, takeOfflineSchema } from './publishing.validation';
 
 const router = Router();
 const controller = container.get<IPublishingController>(TYPES.PublishingController);
-
-// TODO: zod schemas
 
 router.post('/:id/publish', (req, res, next) => {
   controller.publishHunt(req, res).catch(next);
 });
 
-router.put('/:id/release', (req, res, next) => {
+router.put('/:id/release', validateRequest(releaseHuntSchema), (req, res, next) => {
   controller.releaseHunt(req, res).catch(next);
 });
 
-router.delete('/:id/release', (req, res, next) => {
+router.delete('/:id/release', validateRequest(takeOfflineSchema), (req, res, next) => {
   controller.takeOffline(req, res).catch(next);
 });
 

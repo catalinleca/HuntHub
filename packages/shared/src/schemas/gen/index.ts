@@ -2,7 +2,7 @@ import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
 const HuntStatus = z.enum(['draft', 'published']);
-const Location = z.object({ lat: z.number(), lng: z.number(), radius: z.number() }).passthrough();
+const Location = z.object({ lat: z.number(), lng: z.number(), radius: z.number() }).strict();
 const HuntAccessType = z.enum(['creator', 'viewer', 'editor']);
 const ChallengeType = z.enum(['clue', 'quiz', 'mission', 'task']);
 const OptionType = z.enum(['choice', 'input']);
@@ -18,17 +18,17 @@ const MimeTypes = z.enum([
   'audio/wav',
   'audio/ogg',
 ]);
-const Clue = z.object({ title: z.string(), description: z.string() }).partial().passthrough();
-const Option = z.object({ id: z.string(), text: z.string() }).passthrough();
+const Clue = z.object({ title: z.string(), description: z.string() }).partial().strict();
+const Option = z.object({ id: z.string(), text: z.string() }).strict();
 const QuizValidation = z
   .object({
     mode: z.enum(['exact', 'fuzzy', 'contains', 'numeric-range']),
     caseSensitive: z.boolean(),
-    range: z.object({ min: z.number(), max: z.number() }).partial().passthrough(),
+    range: z.object({ min: z.number(), max: z.number() }).partial().strict().passthrough(),
     acceptableAnswers: z.array(z.string()),
   })
   .partial()
-  .passthrough();
+  .strict();
 const Quiz = z
   .object({
     title: z.string(),
@@ -39,7 +39,7 @@ const Quiz = z
     validation: QuizValidation,
   })
   .partial()
-  .passthrough();
+  .strict();
 const Mission = z
   .object({
     title: z.string(),
@@ -51,7 +51,7 @@ const Mission = z
     aiModel: z.enum(['gpt-4-vision', 'claude-vision', 'gemini-vision']),
   })
   .partial()
-  .passthrough();
+  .strict();
 const Task = z
   .object({
     title: z.string(),
@@ -60,8 +60,8 @@ const Task = z
     aiModel: z.enum(['gpt-4', 'claude', 'gemini']),
   })
   .partial()
-  .passthrough();
-const Challenge = z.object({ clue: Clue, quiz: Quiz, mission: Mission, task: Task }).partial().passthrough();
+  .strict();
+const Challenge = z.object({ clue: Clue, quiz: Quiz, mission: Mission, task: Task }).partial().strict();
 const Step = z
   .object({
     stepId: z.number().int(),
@@ -72,11 +72,11 @@ const Step = z
     hint: z.string().optional(),
     timeLimit: z.number().optional(),
     maxAttempts: z.number().optional(),
-    metadata: z.object({}).partial().passthrough().optional(),
+    metadata: z.object({}).partial().strict().passthrough().optional(),
     createdAt: z.string().datetime({ offset: true }).optional(),
     updatedAt: z.string().datetime({ offset: true }).optional(),
   })
-  .passthrough();
+  .strict();
 const Hunt = z
   .object({
     huntId: z.number().int(),
@@ -100,7 +100,7 @@ const Hunt = z
     createdAt: z.string().datetime({ offset: true }).optional(),
     updatedAt: z.string().datetime({ offset: true }).optional(),
   })
-  .passthrough();
+  .strict();
 const StepCreate = z
   .object({
     type: ChallengeType,
@@ -110,7 +110,7 @@ const StepCreate = z
     timeLimit: z.number().optional(),
     maxAttempts: z.number().optional(),
   })
-  .passthrough();
+  .strict();
 const HuntCreate = z
   .object({
     name: z.string().min(1).max(100),
@@ -118,11 +118,16 @@ const HuntCreate = z
     startLocation: Location.optional(),
     steps: z.array(StepCreate).optional(),
   })
-  .passthrough();
+  .strict();
 const HuntUpdate = z
-  .object({ name: z.string().min(1).max(100), description: z.string().max(500), startLocation: Location })
+  .object({
+    name: z.string().min(1).max(100),
+    description: z.string().max(500),
+    startLocation: Location,
+    updatedAt: z.string().datetime({ offset: true }),
+  })
   .partial()
-  .passthrough();
+  .strict();
 const StepUpdate = z
   .object({
     type: ChallengeType,
@@ -132,7 +137,7 @@ const StepUpdate = z
     timeLimit: z.number().optional(),
     maxAttempts: z.number().optional(),
   })
-  .passthrough();
+  .strict();
 const User = z
   .object({
     id: z.string(),
@@ -146,7 +151,7 @@ const User = z
     createdAt: z.string().datetime({ offset: true }).optional(),
     updatedAt: z.string().datetime({ offset: true }).optional(),
   })
-  .passthrough();
+  .strict();
 const HuntAccess = z
   .object({
     huntId: z.string(),
@@ -154,9 +159,9 @@ const HuntAccess = z
     accessType: HuntAccessType,
     sharedAt: z.string().datetime({ offset: true }),
   })
-  .passthrough();
-const AssetUsage = z.object({ model: z.string(), field: z.string(), documentId: z.string() }).passthrough();
-const StorageLocation = z.object({ bucket: z.string(), path: z.string() }).partial().passthrough();
+  .strict();
+const AssetUsage = z.object({ model: z.string(), field: z.string(), documentId: z.string() }).strict();
+const StorageLocation = z.object({ bucket: z.string(), path: z.string() }).partial().strict();
 const Asset = z
   .object({
     id: z.string(),
@@ -172,7 +177,7 @@ const Asset = z
     createdAt: z.string().datetime({ offset: true }).optional(),
     updatedAt: z.string().datetime({ offset: true }).optional(),
   })
-  .passthrough();
+  .strict();
 const AssetCreate = z
   .object({
     name: z.string().min(1),
@@ -181,14 +186,14 @@ const AssetCreate = z
     url: z.string().min(1),
     s3Key: z.string().min(1),
   })
-  .passthrough();
+  .strict();
 const PublishResult = z
   .object({
     publishedVersion: z.number().int(),
     newDraftVersion: z.number().int(),
     publishedAt: z.string().datetime({ offset: true }),
   })
-  .passthrough();
+  .strict();
 const HuntProgressStatus = z.enum(['in_progress', 'completed', 'abandoned']);
 const Submission = z
   .object({
@@ -197,9 +202,9 @@ const Submission = z
     isCorrect: z.boolean(),
     score: z.number().optional(),
     feedback: z.string().optional(),
-    metadata: z.object({}).partial().passthrough().optional(),
+    metadata: z.object({}).partial().strict().passthrough().optional(),
   })
-  .passthrough();
+  .strict();
 const StepProgress = z
   .object({
     stepId: z.number().int(),
@@ -210,7 +215,7 @@ const StepProgress = z
     completedAt: z.string().datetime({ offset: true }).optional(),
     duration: z.number().optional(),
   })
-  .passthrough();
+  .strict();
 const Progress = z
   .object({
     id: z.string(),
@@ -230,7 +235,7 @@ const Progress = z
     createdAt: z.string().datetime({ offset: true }).optional(),
     updatedAt: z.string().datetime({ offset: true }).optional(),
   })
-  .passthrough();
+  .strict();
 const LiveHunt = z
   .object({
     huntId: z.number().int(),
@@ -240,7 +245,7 @@ const LiveHunt = z
     createdAt: z.string().datetime({ offset: true }).optional(),
     updatedAt: z.string().datetime({ offset: true }).optional(),
   })
-  .passthrough();
+  .strict();
 const ReleaseResult = z
   .object({
     huntId: z.number().int(),
@@ -249,14 +254,14 @@ const ReleaseResult = z
     releasedAt: z.string().datetime({ offset: true }),
     releasedBy: z.string(),
   })
-  .passthrough();
+  .strict();
 const TakeOfflineResult = z
   .object({
     huntId: z.number().int(),
     previousLiveVersion: z.number().int(),
     takenOfflineAt: z.string().datetime({ offset: true }),
   })
-  .passthrough();
+  .strict();
 const Collaborator = z
   .object({
     userId: z.string(),
@@ -267,7 +272,7 @@ const Collaborator = z
     sharedAt: z.string().datetime({ offset: true }),
     sharedBy: z.string().optional(),
   })
-  .passthrough();
+  .strict();
 const ShareResult = z
   .object({
     huntId: z.number().int(),
@@ -276,7 +281,14 @@ const ShareResult = z
     sharedAt: z.string().datetime({ offset: true }),
     sharedBy: z.string(),
   })
-  .passthrough();
+  .strict();
+const ReleaseHuntRequest = z
+  .object({ version: z.number().int(), currentLiveVersion: z.number().int().nullable() })
+  .partial()
+  .strict();
+const TakeOfflineRequest = z.object({ currentLiveVersion: z.number().int().nullable() }).strict();
+const ShareHuntRequest = z.object({ email: z.string().email(), permission: z.enum(['admin', 'view']) }).strict();
+const UpdatePermissionRequest = z.object({ permission: z.enum(['admin', 'view']) }).strict();
 
 export const schemas: Record<string, z.ZodTypeAny> = {
   HuntStatus,
@@ -315,6 +327,10 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   TakeOfflineResult,
   Collaborator,
   ShareResult,
+  ReleaseHuntRequest,
+  TakeOfflineRequest,
+  ShareHuntRequest,
+  UpdatePermissionRequest,
 };
 
 const endpoints = makeApi([]);

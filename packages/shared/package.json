@@ -18,7 +18,7 @@
     "build": "tsc",
     "generate": "npm run generate:types && npm run generate:zod",
     "generate:types": "ts-node scripts/generate.ts",
-    "generate:zod": "openapi-zod-client ./openapi/hunthub_models.yaml -o ./src/schemas/gen/index.ts --export-schemas && node scripts/fix-schemas.js",
+    "generate:zod": "openapi-zod-client ./openapi/hunthub_models.yaml -o ./src/schemas/gen/index.ts --export-schemas --strict-objects && node scripts/fix-schemas.js",
     "watch": "tsc --watch"
   },
   "dependencies": {

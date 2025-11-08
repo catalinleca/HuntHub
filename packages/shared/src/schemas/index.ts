@@ -51,6 +51,19 @@ export const {
   StorageLocation,
   Asset,
   AssetCreate,
+
+  // Publishing & Release
+  PublishResult,
+  ReleaseResult,
+  TakeOfflineResult,
+  ReleaseHuntRequest,
+  TakeOfflineRequest,
+
+  // Sharing
+  Collaborator,
+  ShareResult,
+  ShareHuntRequest,
+  UpdatePermissionRequest,
 } = schemas;
 
 // Also export the schemas object for bulk imports if needed

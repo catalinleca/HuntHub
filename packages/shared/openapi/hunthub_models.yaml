@@ -26,6 +26,7 @@ components:
         - lat
         - lng
         - radius
+      additionalProperties: false
 
     HuntAccessType:
       type: string
@@ -134,6 +135,7 @@ components:
         - status
         - isPublished
         - stepOrder
+      additionalProperties: false
 
     HuntCreate:
       type: object
@@ -153,6 +155,7 @@ components:
               $ref: '#/components/schemas/StepCreate'
       required:
         - name
+      additionalProperties: false
 
     HuntUpdate:
       type: object
@@ -167,6 +170,11 @@ components:
           maxLength: 500
         startLocation:
           $ref: '#/components/schemas/Location'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp for optimistic locking (optional)
+      additionalProperties: false
 
     Step:
       type: object
@@ -206,6 +214,7 @@ components:
         - huntId
         - type
         - challenge
+      additionalProperties: false
 
     StepCreate:
       type: object
@@ -226,6 +235,7 @@ components:
       required:
         - type
         - challenge
+      additionalProperties: false
 
     StepUpdate:
       type: object
@@ -246,6 +256,7 @@ components:
       required:
         - type
         - challenge
+      additionalProperties: false
 
     Challenge:
       type: object
@@ -258,6 +269,7 @@ components:
           $ref: '#/components/schemas/Mission'
         task:
           $ref: '#/components/schemas/Task'
+      additionalProperties: false
 
     Clue:
       type: object
@@ -266,6 +278,7 @@ components:
           type: string
         description:
           type: string
+      additionalProperties: false
 
     Option:
       type: object
@@ -277,6 +290,7 @@ components:
       required:
         - id
         - text
+      additionalProperties: false
 
     QuizValidation:
       type: object
@@ -298,6 +312,7 @@ components:
           type: array
           items:
             type: string
+      additionalProperties: false
 
     Quiz:
       type: object
@@ -317,6 +332,7 @@ components:
         validation:
           $ref: '#/components/schemas/QuizValidation'
           description: Optional validation rules (future feature)
+      additionalProperties: false
 
     Mission:
       type: object
@@ -341,6 +357,7 @@ components:
           type: string
           enum: [gpt-4-vision, claude-vision, gemini-vision]
           description: Which AI model to use for validation (future feature)
+      additionalProperties: false
 
     Task:
       type: object
@@ -357,6 +374,7 @@ components:
           type: string
           enum: [gpt-4, claude, gemini]
           description: Which AI model to use for validation (future feature)
+      additionalProperties: false
 
 
     User:
@@ -390,6 +408,7 @@ components:
         - id
         - firebaseUid
         - email
+      additionalProperties: false
 
     HuntAccess:
       type: object
@@ -409,6 +428,7 @@ components:
         - userId
         - accessType
         - sharedAt
+      additionalProperties: false
 
     AssetUsage:
       type: object
@@ -423,6 +443,7 @@ components:
         - model
         - field
         - documentId
+      additionalProperties: false
 
     StorageLocation:
       type: object
@@ -431,6 +452,7 @@ components:
           type: string
         path:
           type: string
+      additionalProperties: false
 
     Asset:
       type: object
@@ -474,6 +496,7 @@ components:
         - ownerId
         - url
         - mimeType
+      additionalProperties: false
 
     AssetCreate:
       type: object
@@ -499,6 +522,7 @@ components:
         - sizeBytes
         - url
         - s3Key
+      additionalProperties: false
 
     PublishResult:
       type: object
@@ -520,6 +544,7 @@ components:
         - publishedVersion
         - newDraftVersion
         - publishedAt
+      additionalProperties: false
 
     HuntProgressStatus:
       type: string
@@ -551,6 +576,7 @@ components:
         - timestamp
         - content
         - isCorrect
+      additionalProperties: false
 
     StepProgress:
       type: object
@@ -580,6 +606,7 @@ components:
           description: Time spent on step in seconds
       required:
         - stepId
+      additionalProperties: false
 
     Progress:
       type: object
@@ -646,6 +673,7 @@ components:
         - startedAt
         - currentStepId
         - playerName
+      additionalProperties: false
 
     LiveHunt:
       type: object
@@ -677,6 +705,7 @@ components:
         - huntId
         - huntVersion
         - activePlayerCount
+      additionalProperties: false
 
     ReleaseResult:
       type: object
@@ -707,6 +736,7 @@ components:
         - previousLiveVersion
         - releasedAt
         - releasedBy
+      additionalProperties: false
 
     TakeOfflineResult:
       type: object
@@ -727,6 +757,7 @@ components:
         - huntId
         - previousLiveVersion
         - takenOfflineAt
+      additionalProperties: false
 
     Collaborator:
       type: object
@@ -762,6 +793,7 @@ components:
         - displayName
         - permission
         - sharedAt
+      additionalProperties: false
 
     ShareResult:
       type: object
@@ -792,3 +824,61 @@ components:
         - permission
         - sharedAt
         - sharedBy
+      additionalProperties: false
+
+    ReleaseHuntRequest:
+      type: object
+      description: Request body for releasing a hunt version (optimistic locking)
+      properties:
+        version:
+          type: integer
+          description: Version number to release (optional - auto-detects latest published if not provided)
+          example: 1
+        currentLiveVersion:
+          type: integer
+          nullable: true
+          description: Current live version number for optimistic locking (null if never released)
+          example: 1
+      additionalProperties: false
+
+    TakeOfflineRequest:
+      type: object
+      description: Request body for taking a hunt offline (optimistic locking)
+      properties:
+        currentLiveVersion:
+          type: integer
+          nullable: true
+          description: Current live version number for optimistic locking
+          example: 2
+      required:
+        - currentLiveVersion
+      additionalProperties: false
+
+    ShareHuntRequest:
+      type: object
+      description: Request body for sharing a hunt with another user
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email of the user to share with
+        permission:
+          type: string
+          enum: [admin, view]
+          description: Permission level to grant
+      required:
+        - email
+        - permission
+      additionalProperties: false
+
+    UpdatePermissionRequest:
+      type: object
+      description: Request body for updating a collaborator's permission level
+      properties:
+        permission:
+          type: string
+          enum: [admin, view]
+          description: New permission level
+      required:
+        - permission
+      additionalProperties: false
