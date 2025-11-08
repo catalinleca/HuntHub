@@ -161,6 +161,11 @@ export interface HuntUpdate {
   /** @maxLength 500 */
   description?: string;
   startLocation?: Location;
+  /**
+   * Timestamp for optimistic locking (optional)
+   * @format date-time
+   */
+  updatedAt?: string;
 }
 
 export interface Step {
@@ -559,4 +564,44 @@ export interface ShareResult {
   sharedAt: string;
   /** User ID who granted the access */
   sharedBy: string;
+}
+
+/** Request body for releasing a hunt version (optimistic locking) */
+export interface ReleaseHuntRequest {
+  /**
+   * Version number to release (optional - auto-detects latest published if not provided)
+   * @example 1
+   */
+  version?: number;
+  /**
+   * Current live version number for optimistic locking (null if never released)
+   * @example 1
+   */
+  currentLiveVersion?: number | null;
+}
+
+/** Request body for taking a hunt offline (optimistic locking) */
+export interface TakeOfflineRequest {
+  /**
+   * Current live version number for optimistic locking
+   * @example 2
+   */
+  currentLiveVersion: number | null;
+}
+
+/** Request body for sharing a hunt with another user */
+export interface ShareHuntRequest {
+  /**
+   * Email of the user to share with
+   * @format email
+   */
+  email: string;
+  /** Permission level to grant */
+  permission: "admin" | "view";
+}
+
+/** Request body for updating a collaborator's permission level */
+export interface UpdatePermissionRequest {
+  /** New permission level */
+  permission: "admin" | "view";
 }

@@ -5,4 +5,4 @@ export * from './Asset';
 export * from './Progress';
 export * from './LiveHunt';
 export * from './HuntAccess';
-export { ILocation } from '../schemas/location.schema';
+export type { ILocation } from '../schemas/location.schema';
