@@ -194,7 +194,7 @@ describe('Publishing Workflow Integration Tests', () => {
         permission: 'admin',
       });
 
-      const response = await request(app)
+       await request(app)
         .post(`/api/hunts/${testHunt.huntId}/publish`)
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);

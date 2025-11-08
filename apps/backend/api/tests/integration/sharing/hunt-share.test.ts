@@ -374,7 +374,7 @@ describe('Hunt Sharing Integration Tests', () => {
     });
 
     it('should update permission from admin to view successfully', async () => {
-      const response = await request(app)
+      await request(app)
         .put(`/api/hunts/${testHunt.huntId}/collaborators/${targetUser.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .send({ permission: 'admin' })

@@ -280,13 +280,13 @@ describe('Hunt CRUD Integration Tests', () => {
         name: 'Hunt with Steps',
       });
 
-      const step1 = await StepModel.create({
+      await StepModel.create({
         huntId: hunt.huntId,
         huntVersion: 1,
         type: 'clue',
         challenge: { clue: { title: 'Step 1' } },
       });
-      const step2 = await StepModel.create({
+      await StepModel.create({
         huntId: hunt.huntId,
         huntVersion: 1,
         type: 'clue',
