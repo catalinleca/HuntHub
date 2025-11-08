@@ -1,4 +1,4 @@
-import { Schema, model, Model, HydratedDocument } from 'mongoose';
+import { Schema, model, Model, HydratedDocument, ClientSession } from 'mongoose';
 import { ILiveHunt } from '@/database/types';
 
 const liveHuntSchema: Schema<ILiveHunt> = new Schema<ILiveHunt>(
@@ -29,7 +29,7 @@ liveHuntSchema.index({ huntId: 1, huntVersion: 1 }); // FK to HuntVersion
 interface ILiveHuntModel extends Model<ILiveHunt> {
   findByHunt(huntId: number): Promise<HydratedDocument<ILiveHunt> | null>;
 
-  setLiveVersion(huntId: number, version: number): Promise<HydratedDocument<ILiveHunt>>;
+  setLiveVersion(huntId: number, version: number, session?: ClientSession): Promise<HydratedDocument<ILiveHunt>>;
 
   isLive(huntId: number): Promise<boolean>;
 }
@@ -38,12 +38,13 @@ liveHuntSchema.statics.findByHunt = function (huntId: number) {
   return this.findOne({ huntId }).exec();
 };
 
-liveHuntSchema.statics.setLiveVersion = async function (huntId: number, version: number) {
-  return this.findOneAndUpdate(
+liveHuntSchema.statics.setLiveVersion = async function (huntId: number, version: number, session?: ClientSession) {
+  const query = this.findOneAndUpdate(
     { huntId },
     { huntId, huntVersion: version, activePlayerCount: 0, lastPlayedAt: new Date() },
-    { upsert: true, new: true },
-  ).exec();
+    { upsert: true, new: true, session },
+  );
+  return query.exec();
 };
 
 liveHuntSchema.statics.isLive = async function (huntId: number): Promise<boolean> {

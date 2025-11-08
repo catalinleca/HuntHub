@@ -2,6 +2,7 @@ import { ClientSession, HydratedDocument } from 'mongoose';
 import { IHunt } from '@/database/types/Hunt';
 import { ConflictError } from '@/shared/errors/ConflictError';
 import Hunt from '@/database/models/Hunt';
+import LiveHuntModel from '@/database/models/LiveHunt';
 
 export class ReleaseManager {
   static async releaseVersion(
@@ -14,7 +15,7 @@ export class ReleaseManager {
     const updateResult = await Hunt.findOneAndUpdate(
       {
         huntId: huntId,
-        liveVersion: currentLiveVersion, // Must match current state (optimistic locking)
+        liveVersion: currentLiveVersion,
       },
       {
         liveVersion: version,
@@ -31,6 +32,8 @@ export class ReleaseManager {
       throw new ConflictError('Hunt was modified by another operation. Please retry with the current liveVersion.');
     }
 
+    await LiveHuntModel.setLiveVersion(huntId, version, session);
+
     return updateResult as HydratedDocument<IHunt>;
   }
 
@@ -42,7 +45,7 @@ export class ReleaseManager {
     const updateResult = await Hunt.findOneAndUpdate(
       {
         huntId: huntId,
-        liveVersion: currentLiveVersion, // Must match current state (optimistic locking)
+        liveVersion: currentLiveVersion,
       },
       {
         liveVersion: null,
@@ -58,6 +61,8 @@ export class ReleaseManager {
     if (!updateResult) {
       throw new ConflictError('Hunt was modified by another operation. Please retry with the current liveVersion.');
     }
+
+    await LiveHuntModel.deleteOne({ huntId }).session(session);
 
     return updateResult as HydratedDocument<IHunt>;
   }
