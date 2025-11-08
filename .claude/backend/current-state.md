@@ -5,7 +5,7 @@
 **🎉 Testing & Documentation Complete! (2025-11-07)**
 
 **Most Recent Work (2025-11-07):**
-- ✅ **Hunt Sharing Complete** - POST/PATCH/DELETE/GET /api/hunts/:id/collaborators endpoints
+- ✅ **Hunt Sharing Complete** - POST/PATCH/DELETE/GET /api/hunts/:id/access endpoints
 - ✅ **AuthorizationService** - Centralized permission checks with rich AccessContext
 - ✅ **HuntAccess Model** - Separate table design for sharing with three-tier permissions (Owner > Admin > View)
 - ✅ **Query Optimization** - N+1 prevention for getUserHunts() with permission map
@@ -236,10 +236,10 @@ Step
   - Admin (collaborator) - Edit, publish, release, share (cannot delete)
   - View (collaborator) - Read-only access
 - [x] Hunt sharing endpoints (4/4):
-  - POST /api/hunts/:id/collaborators - Share hunt with user by email
-  - PATCH /api/hunts/:id/collaborators/:userId - Update permission level
-  - DELETE /api/hunts/:id/collaborators/:userId - Revoke access
-  - GET /api/hunts/:id/collaborators - List all collaborators
+  - POST /api/hunts/:id/access - Share hunt with user by email
+  - PATCH /api/hunts/:id/access/:userId - Update permission level
+  - DELETE /api/hunts/:id/access/:userId - Revoke access
+  - GET /api/hunts/:id/access - List all collaborators
 - [x] Security features:
   - Cannot share with self or owner
   - Cannot escalate permissions (view user can't grant admin)
@@ -367,10 +367,10 @@ PUT    /api/publishing/hunts/:id/release   # Release hunt (make version live for
 DELETE /api/publishing/hunts/:id/release   # Take hunt offline (remove from discovery)
 
 # Hunt Sharing (4/4) - Week 5 ✅
-POST   /api/hunts/:id/collaborators        # Share hunt with user by email
-PATCH  /api/hunts/:id/collaborators/:userId # Update permission level
-DELETE /api/hunts/:id/collaborators/:userId # Revoke access
-GET    /api/hunts/:id/collaborators        # List all collaborators
+POST   /api/hunts/:id/access        # Share hunt with user by email
+PATCH  /api/hunts/:id/access/:userId # Update permission level
+DELETE /api/hunts/:id/access/:userId # Revoke access
+GET    /api/hunts/:id/access        # List all collaborators
 ```
 
 **📋 Needed - Week 2 (Tree VIEW API):**

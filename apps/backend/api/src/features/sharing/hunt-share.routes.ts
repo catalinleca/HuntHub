@@ -12,15 +12,15 @@ router.post('/:id/share', validateRequest(shareHuntSchema), (req, res, next) => 
   controller.shareHunt(req, res).catch(next);
 });
 
-router.get('/:id/collaborators', (req, res, next) => {
+router.get('/:id/access', (req, res, next) => {
   controller.listCollaborators(req, res).catch(next);
 });
 
-router.put('/:id/collaborators/:userId', validateRequest(updatePermissionSchema), (req, res, next) => {
+router.put('/:id/access/:userId', validateRequest(updatePermissionSchema), (req, res, next) => {
   controller.updatePermission(req, res).catch(next);
 });
 
-router.delete('/:id/collaborators/:userId', (req, res, next) => {
+router.delete('/:id/access/:userId', (req, res, next) => {
   controller.revokeAccess(req, res).catch(next);
 });
 

@@ -493,10 +493,10 @@ huntShareSchema.statics.shareHunt = function(huntId, ownerId, sharedWithId, ...)
 ### API Endpoints
 
 ```
-POST   /api/hunts/:id/collaborators        - Share hunt with user by email
-PATCH  /api/hunts/:id/collaborators/:userId - Update permission
-DELETE /api/hunts/:id/collaborators/:userId - Revoke access
-GET    /api/hunts/:id/collaborators        - List all collaborators
+POST   /api/hunts/:id/access        - Share hunt with user by email
+PATCH  /api/hunts/:id/access/:userId - Update permission
+DELETE /api/hunts/:id/access/:userId - Revoke access
+GET    /api/hunts/:id/access        - List all collaborators
 ```
 
 **Design:** RESTful, nested under hunts (collaborators are sub-resource)

@@ -147,7 +147,7 @@
   - ✅ Validate steps belong to hunt
   - ✅ Bonus from Week 2
 
-- [x] **BE-1.7:** Hunt Sharing & Collaboration (POST/PATCH/DELETE/GET /api/hunts/:id/collaborators)
+- [x] **BE-1.7:** Hunt Sharing & Collaboration (POST/PATCH/DELETE/GET /api/hunts/:id/access)
   - ✅ HuntAccess model with separate table design
   - ✅ AuthorizationService with rich AccessContext
   - ✅ Three-tier permission hierarchy (Owner > Admin > View)
