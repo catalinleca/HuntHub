@@ -33,10 +33,14 @@ export const createTestStep = async (options: CreateStepOptions = {}): Promise<I
   const step = await StepModel.create(stepData);
 
   // Add step to HuntVersion's stepOrder array. This mimics what StepService.createStep() does in production.
-  await HuntVersionModel.findOneAndUpdate(
+  const updated = await HuntVersionModel.findOneAndUpdate(
     { huntId: stepData.huntId, version: stepData.huntVersion },
     { $push: { stepOrder: step.stepId } },
   );
+
+  if (!updated) {
+    throw new Error(`HuntVersion not found for huntId=${stepData.huntId}, version=${stepData.huntVersion}`);
+  }
 
   return step.toJSON() as IStep;
 };

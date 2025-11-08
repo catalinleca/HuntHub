@@ -230,11 +230,15 @@ export class HuntService implements IHuntService {
   }
 
   async addStepToVersion(huntId: number, huntVersion: number, stepId: number, session?: ClientSession): Promise<void> {
-    await HuntVersionModel.findOneAndUpdate(
+    const versionDoc = await HuntVersionModel.findOneAndUpdate(
       { huntId, version: huntVersion, isPublished: false },
       { $push: { stepOrder: stepId } },
       { session },
     ).exec();
+
+    if (!versionDoc) {
+      throw new ValidationError('Cannot modify steps on a published or missing draft version.', []);
+    }
   }
 
   async removeStepFromVersion(
@@ -243,10 +247,14 @@ export class HuntService implements IHuntService {
     stepId: number,
     session?: ClientSession,
   ): Promise<void> {
-    await HuntVersionModel.findOneAndUpdate(
+    const versionDoc = await HuntVersionModel.findOneAndUpdate(
       { huntId, version: huntVersion, isPublished: false },
       { $pull: { stepOrder: stepId } },
       { session },
     ).exec();
+
+    if (!versionDoc) {
+      throw new ValidationError('Cannot modify steps on a published or missing draft version.', []);
+    }
   }
 }
