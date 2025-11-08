@@ -1,12 +1,17 @@
-import 'dotenv/config';
+import { config } from 'dotenv';
+import path from 'path';
+
+config({ path: path.resolve(__dirname, '../.env.local') });
+
 import mongoose from 'mongoose';
 import CounterModel from '../src/database/models/Counter';
+import { databaseUrl } from '../src/config/env.config';
 
 async function initializeCounters() {
   try {
-    const mongoUri = process.env.MONGO_URI;
+    const mongoUri = databaseUrl;
     if (!mongoUri) {
-      throw new Error('MONGO_URI environment variable is not defined');
+      throw new Error('databaseUrl environment variable is not defined');
     }
 
     console.log('Connecting to MongoDB...');
@@ -16,6 +21,7 @@ async function initializeCounters() {
     const counters = [
       { name: 'hunt', seq: 999 },
       { name: 'step', seq: 9999 },
+      { name: 'asset', seq: 99999 },
     ];
 
     for (const counter of counters) {

@@ -12,5 +12,12 @@ process.env.FIREBASE_MESSAGING_SENDER_ID = '123456789';
 process.env.FIREBASE_APP_ID = 'test-app-id';
 process.env.FIREBASE_MEASUREMENT_ID = 'test-measurement-id';
 
+// Set dummy MongoDB URI (tests use in-memory MongoDB)
+process.env.MONGODB_URI = 'mongodb://localhost:27017/test';
+
+// Set dummy AWS credentials for testing
+process.env.AWS_REGION = 'eu-west-1';
+process.env.AWS_S3_BUCKET = 'test-bucket';
+
 // Set other test environment variables
 process.env.NODE_ENV = 'test';

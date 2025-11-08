@@ -1,18 +1,23 @@
 import { Schema, model } from 'mongoose';
 import { ICounter } from '../types/Counter';
 
-const counterSchema = new Schema<ICounter>({
-  name: {
-    type: String,
-    required: true,
-    unique: true,
-    index: true,
+const counterSchema = new Schema<ICounter>(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+    },
+    seq: {
+      type: Number,
+      required: true,
+    },
   },
-  seq: {
-    type: Number,
-    required: true,
+  {
+    collection: 'Counter',
   },
-});
+);
 
 export async function getNextSequence(counterName: string): Promise<number> {
   const counter = await CounterModel.findOneAndUpdate(

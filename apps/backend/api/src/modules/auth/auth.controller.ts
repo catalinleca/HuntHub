@@ -3,7 +3,7 @@ import { inject, injectable } from 'inversify';
 import { TYPES } from '@/shared/types';
 import { IAuthService } from './auth.service';
 import { loginSchema, signUpSchema } from './auth.validation';
-import { AuthResponse } from './auth.types';
+import { UnauthorizedError } from '@/shared/errors';
 
 export interface IAuthController {
   login(req: Request, res: Response): Promise<void>;
@@ -18,70 +18,47 @@ export class AuthController implements IAuthController {
 
   async login(req: Request, res: Response) {
     const credentials = loginSchema.parse(req.body);
-
     const authResponse = await this.authService.login(credentials);
-
-    this.setCookies(res, authResponse);
 
     res.status(200).json({
       message: 'Login successful',
       accessToken: authResponse.accessToken,
+      refreshToken: authResponse.refreshToken,
     });
   }
 
   async logout(req: Request, res: Response) {
     await this.authService.logout();
 
-    res.clearCookie('access_token');
-    res.clearCookie('refresh_token');
-
-    res.status(200).json({ message: 'Logout successful' });
+    res.status(200).json({
+      message: 'Logout successful',
+    });
   }
 
   async refresh(req: Request, res: Response) {
-    const refreshToken = req.cookies.refreshToken;
+    const authHeader = req.headers.authorization;
+    const refreshToken = authHeader?.split(' ')[1];
 
     if (!refreshToken) {
-      throw new Error('Refresh token not found');
+      throw new UnauthorizedError('Refresh token not provided');
     }
 
     const authResponse = await this.authService.refreshToken(refreshToken);
 
-    this.setCookies(res, authResponse);
-
     res.status(200).json({
-      message: 'Tokens refreshed',
+      message: 'Token refreshed',
+      accessToken: authResponse.accessToken,
     });
   }
 
   async signUp(req: Request, res: Response) {
     const credentials = signUpSchema.parse(req.body);
-
     const authResponse = await this.authService.signUp(credentials);
-
-    this.setCookies(res, authResponse);
 
     res.status(201).json({
       message: 'User created',
-      response: authResponse,
+      accessToken: authResponse.accessToken,
+      refreshToken: authResponse.refreshToken,
     });
-  }
-
-  private setCookies(res: Response, authTokens: AuthResponse) {
-    res.cookie('access_token', authTokens.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      // sameSite: 'strict',
-      maxAge: 15 * 60 * 1000, // 15 minutes
-    });
-
-    if (authTokens.refreshToken) {
-      res.cookie('refresk_token', authTokens.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        // sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      });
-    }
   }
 }

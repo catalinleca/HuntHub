@@ -37,6 +37,7 @@ const huntShareSchema: Schema<IHuntShare> = new Schema<IHuntShare>(
   },
   {
     timestamps: true,
+    collection: 'HuntAccess',
   },
 );
 

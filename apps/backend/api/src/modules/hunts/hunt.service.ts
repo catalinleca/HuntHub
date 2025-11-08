@@ -5,7 +5,7 @@ import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import StepModel from '@/database/models/Step';
 import { IHunt } from '@/database/types/Hunt';
-import { HuntMapper } from '@/shared/mappers';
+import { HuntMapper, StepMapper } from '@/shared/mappers';
 import { NotFoundError } from '@/shared/errors';
 import { ValidationError } from '@/shared/errors';
 import { ConflictError } from '@/shared/errors/ConflictError';
@@ -118,9 +118,17 @@ export class HuntService implements IHuntService {
       throw new NotFoundError();
     }
 
+    const stepDocs = await StepModel.find({
+      huntId: huntDoc.huntId,
+      huntVersion: huntDoc.latestVersion,
+    })
+      .sort({ stepId: 1 })
+      .exec();
+
     const hunt = HuntMapper.fromDocuments(huntDoc, versionDoc);
     return {
       ...hunt,
+      steps: StepMapper.fromDocuments(stepDocs),
       permission,
     };
   }

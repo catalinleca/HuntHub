@@ -155,10 +155,10 @@
   - Three-tier permission model (Owner > Admin > View)
   - HuntAccess model with separate table design
   - AuthorizationService with rich AccessContext
-  - POST /api/hunts/:id/collaborators - Share hunt
-  - PATCH /api/hunts/:id/collaborators/:userId - Update permission
-  - DELETE /api/hunts/:id/collaborators/:userId - Revoke access
-  - GET /api/hunts/:id/collaborators - List collaborators
+  - POST /api/hunts/:id/access - Share hunt
+  - PATCH /api/hunts/:id/access/:userId - Update permission
+  - DELETE /api/hunts/:id/access/:userId - Revoke access
+  - GET /api/hunts/:id/access - List collaborators
   - Query optimization (N+1 prevention)
   - Security guarantees (cannot escalate permissions, owner immutable)
 ✅ **Complete CRUD Operations:**

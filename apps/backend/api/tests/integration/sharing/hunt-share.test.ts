@@ -231,7 +231,7 @@ describe('Hunt Sharing Integration Tests', () => {
     });
   });
 
-  describe('GET /api/hunts/:id/collaborators - List Collaborators', () => {
+  describe('GET /api/hunts/:id/access - List Collaborators', () => {
     let testHunt: IHunt;
 
     beforeEach(async () => {
@@ -260,7 +260,7 @@ describe('Hunt Sharing Integration Tests', () => {
 
     it('should list all collaborators for owner', async () => {
       const response = await request(app)
-        .get(`/api/hunts/${testHunt.huntId}/collaborators`)
+        .get(`/api/hunts/${testHunt.huntId}/access`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .expect(200);
 
@@ -283,7 +283,7 @@ describe('Hunt Sharing Integration Tests', () => {
 
     it('should allow admin user to list collaborators', async () => {
       const response = await request(app)
-        .get(`/api/hunts/${testHunt.huntId}/collaborators`)
+        .get(`/api/hunts/${testHunt.huntId}/access`)
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
@@ -292,7 +292,7 @@ describe('Hunt Sharing Integration Tests', () => {
 
     it('should allow view user to list collaborators', async () => {
       const response = await request(app)
-        .get(`/api/hunts/${testHunt.huntId}/collaborators`)
+        .get(`/api/hunts/${testHunt.huntId}/access`)
         .set('Authorization', `Bearer ${viewToken}`)
         .expect(200);
 
@@ -306,7 +306,7 @@ describe('Hunt Sharing Integration Tests', () => {
       });
 
       const response = await request(app)
-        .get(`/api/hunts/${soloHunt.huntId}/collaborators`)
+        .get(`/api/hunts/${soloHunt.huntId}/access`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .expect(200);
 
@@ -315,24 +315,24 @@ describe('Hunt Sharing Integration Tests', () => {
 
     it('should return 404 when user has no access', async () => {
       await request(app)
-        .get(`/api/hunts/${testHunt.huntId}/collaborators`)
+        .get(`/api/hunts/${testHunt.huntId}/access`)
         .set('Authorization', `Bearer ${noAccessToken}`)
         .expect(404);
     });
 
     it('should return 401 when no auth token provided', async () => {
-      await request(app).get(`/api/hunts/${testHunt.huntId}/collaborators`).expect(401);
+      await request(app).get(`/api/hunts/${testHunt.huntId}/access`).expect(401);
     });
 
     it('should return 404 when hunt does not exist', async () => {
       await request(app)
-        .get('/api/hunts/99999/collaborators')
+        .get('/api/hunts/99999/access')
         .set('Authorization', `Bearer ${ownerToken}`)
         .expect(404);
     });
   });
 
-  describe('PUT /api/hunts/:id/collaborators/:userId - Update Permission', () => {
+  describe('PUT /api/hunts/:id/access/:userId - Update Permission', () => {
     let testHunt: IHunt;
 
     beforeEach(async () => {
@@ -361,7 +361,7 @@ describe('Hunt Sharing Integration Tests', () => {
 
     it('should update permission from view to admin successfully', async () => {
       const response = await request(app)
-        .put(`/api/hunts/${testHunt.huntId}/collaborators/${targetUser.id}`)
+        .put(`/api/hunts/${testHunt.huntId}/access/${targetUser.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .send({ permission: 'admin' })
         .expect(200);
@@ -375,14 +375,14 @@ describe('Hunt Sharing Integration Tests', () => {
 
     it('should update permission from admin to view successfully', async () => {
       await request(app)
-        .put(`/api/hunts/${testHunt.huntId}/collaborators/${targetUser.id}`)
+        .put(`/api/hunts/${testHunt.huntId}/access/${targetUser.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .send({ permission: 'admin' })
         .expect(200);
 
       // Now downgrade to view
       const downgradeResponse = await request(app)
-        .put(`/api/hunts/${testHunt.huntId}/collaborators/${targetUser.id}`)
+        .put(`/api/hunts/${testHunt.huntId}/access/${targetUser.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .send({ permission: 'view' })
         .expect(200);
@@ -392,7 +392,7 @@ describe('Hunt Sharing Integration Tests', () => {
 
     it('should allow admin user to update permissions', async () => {
       const response = await request(app)
-        .put(`/api/hunts/${testHunt.huntId}/collaborators/${targetUser.id}`)
+        .put(`/api/hunts/${testHunt.huntId}/access/${targetUser.id}`)
         .set('Authorization', `Bearer ${adminToken}`)
         .send({ permission: 'admin' })
         .expect(200);
@@ -402,7 +402,7 @@ describe('Hunt Sharing Integration Tests', () => {
 
     it('should return 404 when updating non-existent collaborator', async () => {
       await request(app)
-        .put(`/api/hunts/${testHunt.huntId}/collaborators/${noAccessUser.id}`)
+        .put(`/api/hunts/${testHunt.huntId}/access/${noAccessUser.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .send({ permission: 'admin' })
         .expect(404);
@@ -410,7 +410,7 @@ describe('Hunt Sharing Integration Tests', () => {
 
     it('should return 400 when trying to update own permission', async () => {
       const response = await request(app)
-        .put(`/api/hunts/${testHunt.huntId}/collaborators/${owner.id}`)
+        .put(`/api/hunts/${testHunt.huntId}/access/${owner.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .send({ permission: 'view' })
         .expect(400);
@@ -441,7 +441,7 @@ describe('Hunt Sharing Integration Tests', () => {
       });
 
       await request(app)
-        .put(`/api/hunts/${viewHunt.huntId}/collaborators/${targetUser.id}`)
+        .put(`/api/hunts/${viewHunt.huntId}/access/${targetUser.id}`)
         .set('Authorization', `Bearer ${viewToken}`)
         .send({ permission: 'admin' })
         .expect(403);
@@ -449,21 +449,21 @@ describe('Hunt Sharing Integration Tests', () => {
 
     it('should return 401 when no auth token provided', async () => {
       await request(app)
-        .put(`/api/hunts/${testHunt.huntId}/collaborators/${targetUser.id}`)
+        .put(`/api/hunts/${testHunt.huntId}/access/${targetUser.id}`)
         .send({ permission: 'admin' })
         .expect(401);
     });
 
     it('should return 404 when hunt does not exist', async () => {
       await request(app)
-        .put(`/api/hunts/99999/collaborators/${targetUser.id}`)
+        .put(`/api/hunts/99999/access/${targetUser.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .send({ permission: 'admin' })
         .expect(404);
     });
   });
 
-  describe('DELETE /api/hunts/:id/collaborators/:userId - Revoke Access', () => {
+  describe('DELETE /api/hunts/:id/access/:userId - Revoke Access', () => {
     let testHunt: IHunt;
 
     beforeEach(async () => {
@@ -492,7 +492,7 @@ describe('Hunt Sharing Integration Tests', () => {
 
     it('should revoke access successfully', async () => {
       await request(app)
-        .delete(`/api/hunts/${testHunt.huntId}/collaborators/${targetUser.id}`)
+        .delete(`/api/hunts/${testHunt.huntId}/access/${targetUser.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .expect(204);
 
@@ -506,7 +506,7 @@ describe('Hunt Sharing Integration Tests', () => {
 
     it('should allow admin user to revoke access', async () => {
       await request(app)
-        .delete(`/api/hunts/${testHunt.huntId}/collaborators/${targetUser.id}`)
+        .delete(`/api/hunts/${testHunt.huntId}/access/${targetUser.id}`)
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(204);
 
@@ -519,14 +519,14 @@ describe('Hunt Sharing Integration Tests', () => {
 
     it('should return 404 when revoking non-existent collaborator', async () => {
       await request(app)
-        .delete(`/api/hunts/${testHunt.huntId}/collaborators/${noAccessUser.id}`)
+        .delete(`/api/hunts/${testHunt.huntId}/access/${noAccessUser.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .expect(404);
     });
 
     it('should return 400 when trying to revoke own access', async () => {
       const response = await request(app)
-        .delete(`/api/hunts/${testHunt.huntId}/collaborators/${owner.id}`)
+        .delete(`/api/hunts/${testHunt.huntId}/access/${owner.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .expect(400);
 
@@ -556,25 +556,25 @@ describe('Hunt Sharing Integration Tests', () => {
       });
 
       await request(app)
-        .delete(`/api/hunts/${viewHunt.huntId}/collaborators/${targetUser.id}`)
+        .delete(`/api/hunts/${viewHunt.huntId}/access/${targetUser.id}`)
         .set('Authorization', `Bearer ${viewToken}`)
         .expect(403);
     });
 
     it('should return 401 when no auth token provided', async () => {
-      await request(app).delete(`/api/hunts/${testHunt.huntId}/collaborators/${targetUser.id}`).expect(401);
+      await request(app).delete(`/api/hunts/${testHunt.huntId}/access/${targetUser.id}`).expect(401);
     });
 
     it('should return 404 when hunt does not exist', async () => {
       await request(app)
-        .delete(`/api/hunts/99999/collaborators/${targetUser.id}`)
+        .delete(`/api/hunts/99999/access/${targetUser.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .expect(404);
     });
 
     it('should allow user to regain access after being revoked', async () => {
       await request(app)
-        .delete(`/api/hunts/${testHunt.huntId}/collaborators/${targetUser.id}`)
+        .delete(`/api/hunts/${testHunt.huntId}/access/${targetUser.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .expect(204);
 
@@ -615,14 +615,14 @@ describe('Hunt Sharing Integration Tests', () => {
       expect(shareResponse.body.permission).toBe('view');
 
       const listResponse = await request(app)
-        .get(`/api/hunts/${testHunt.huntId}/collaborators`)
+        .get(`/api/hunts/${testHunt.huntId}/access`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .expect(200);
 
       expect(listResponse.body.length).toBe(1);
 
       const updateResponse = await request(app)
-        .put(`/api/hunts/${testHunt.huntId}/collaborators/${targetUser.id}`)
+        .put(`/api/hunts/${testHunt.huntId}/access/${targetUser.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .send({ permission: 'admin' })
         .expect(200);
@@ -630,13 +630,13 @@ describe('Hunt Sharing Integration Tests', () => {
       expect(updateResponse.body.permission).toBe('admin');
 
       await request(app)
-        .delete(`/api/hunts/${testHunt.huntId}/collaborators/${targetUser.id}`)
+        .delete(`/api/hunts/${testHunt.huntId}/access/${targetUser.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .expect(204);
 
       // Verify removed from collaborators list
       const finalListResponse = await request(app)
-        .get(`/api/hunts/${testHunt.huntId}/collaborators`)
+        .get(`/api/hunts/${testHunt.huntId}/access`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .expect(200);
 
@@ -668,7 +668,7 @@ describe('Hunt Sharing Integration Tests', () => {
         .expect(403);
 
       await request(app)
-        .put(`/api/hunts/${testHunt.huntId}/collaborators/${targetUser.id}`)
+        .put(`/api/hunts/${testHunt.huntId}/access/${targetUser.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .send({ permission: 'admin' })
         .expect(200);

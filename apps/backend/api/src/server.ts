@@ -4,8 +4,12 @@ import express from 'express';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 
-dotenv.config({ path: '.env.local' });
-dotenv.config({ path: '.env' });
+const result = dotenv.config({ path: '.env.local' });
+if (!result.error) {
+  console.log('Environment loaded from .env.local');
+} else {
+  console.error('.env.local not found');
+}
 
 import mustConnectDb from './database';
 import { databaseUrl } from './config/env.config';

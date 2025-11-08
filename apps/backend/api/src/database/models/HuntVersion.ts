@@ -37,6 +37,7 @@ const huntVersionSchema: Schema<IHuntVersion> = new Schema<IHuntVersion>(
   },
   {
     timestamps: true,
+    collection: 'HuntVersion',
   },
 );
 
@@ -55,10 +56,7 @@ interface IHuntVersionModel extends Model<IHuntVersion> {
 
   findPublishedVersions(huntId: number): Promise<HydratedDocument<IHuntVersion>[]>;
 
-  findLatestPublished(
-    huntId: number,
-    session?: ClientSession,
-  ): Promise<HydratedDocument<IHuntVersion> | null>;
+  findLatestPublished(huntId: number, session?: ClientSession): Promise<HydratedDocument<IHuntVersion> | null>;
 
   findPublishedVersion(
     huntId: number,
