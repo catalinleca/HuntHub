@@ -41,7 +41,6 @@ describe('Publishing Workflow Integration Tests', () => {
         name: 'Publish Test Hunt',
       });
 
-      // Add steps to make hunt publishable
       await createTestStep({
         huntId: testHunt.huntId,
         huntVersion: 1,
@@ -61,13 +60,10 @@ describe('Publishing Workflow Integration Tests', () => {
         .expect(200);
 
       expect(response.body).toMatchObject({
-        huntId: testHunt.huntId,
-        version: 1, // Current version (published)
-        latestVersion: 2, // New draft version
-        isPublished: true,
+        publishedVersion: 1,
+        newDraftVersion: 2,
       });
       expect(response.body).toHaveProperty('publishedAt');
-      expect(response.body.publishedBy).toBe(owner.id);
     });
 
     it('should create new draft version (version 2) after publishing version 1', async () => {
@@ -142,8 +138,8 @@ describe('Publishing Workflow Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      // FIX: Manually mark the new draft (version 2) as published to simulate edge case
-      // REASON: After publishing, the system creates version 2 as a new draft.
+      // Manually mark the new draft (version 2) as published to simulate edge case
+      // After publishing, the system creates version 2 as a new draft.
       // To test "already published" error, we need to artificially mark it as published.
       await HuntVersionModel.updateOne(
         { huntId: testHunt.huntId, version: 2 },
@@ -190,7 +186,6 @@ describe('Publishing Workflow Integration Tests', () => {
       const adminToken = createTestAuthToken(adminUser);
       mockFirebaseAuth(adminUser);
 
-      // Share hunt with admin permission
       await HuntAccessModel.create({
         huntId: testHunt.huntId,
         ownerId: owner.id,
@@ -199,13 +194,13 @@ describe('Publishing Workflow Integration Tests', () => {
         permission: 'admin',
       });
 
-      const response = await request(app)
+       await request(app)
         .post(`/api/hunts/${testHunt.huntId}/publish`)
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
-      expect(response.body.publishedBy
-      ).toBe(adminUser.id); // Admin published it
+      const version1 = await HuntVersionModel.findOne({ huntId: testHunt.huntId, version: 1 });
+      expect(version1?.publishedBy).toBe(adminUser.id);
     });
 
     it('should return 403 when view user tries to publish', async () => {
@@ -213,7 +208,6 @@ describe('Publishing Workflow Integration Tests', () => {
       const viewToken = createTestAuthToken(viewUser);
       mockFirebaseAuth(viewUser);
 
-      // Share hunt with view permission
       await HuntAccessModel.create({
         huntId: testHunt.huntId,
         ownerId: owner.id,
@@ -238,7 +232,6 @@ describe('Publishing Workflow Integration Tests', () => {
         name: 'Release Test Hunt',
       });
 
-      // Add steps and publish version 1
       await createTestStep({
         huntId: testHunt.huntId,
         huntVersion: 1,
@@ -291,7 +284,6 @@ describe('Publishing Workflow Integration Tests', () => {
     });
 
     it('should rollback to previous version when releasing older version', async () => {
-      // Publish version 2
       await createTestStep({
         huntId: testHunt.huntId,
         huntVersion: 2, // New draft from first publish
@@ -407,7 +399,6 @@ describe('Publishing Workflow Integration Tests', () => {
         name: 'Offline Test Hunt',
       });
 
-      // Add steps, publish, and release
       await createTestStep({
         huntId: testHunt.huntId,
         huntVersion: 1,
@@ -462,14 +453,12 @@ describe('Publishing Workflow Integration Tests', () => {
     });
 
     it('should return 400 when hunt is already offline', async () => {
-      // Take offline first time
       await request(app)
         .delete(`/api/hunts/${testHunt.huntId}/release`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({ currentLiveVersion: 1 })
         .expect(200);
 
-      // Try taking offline again
       const response = await request(app)
         .delete(`/api/hunts/${testHunt.huntId}/release`)
         .set('Authorization', `Bearer ${authToken}`)
@@ -492,14 +481,12 @@ describe('Publishing Workflow Integration Tests', () => {
     });
 
     it('should allow re-releasing hunt after taking offline', async () => {
-      // Take offline
       await request(app)
         .delete(`/api/hunts/${testHunt.huntId}/release`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({ currentLiveVersion: 1 })
         .expect(200);
 
-      // Re-release
       const response = await request(app)
         .put(`/api/hunts/${testHunt.huntId}/release`)
         .set('Authorization', `Bearer ${authToken}`)
@@ -528,7 +515,6 @@ describe('Publishing Workflow Integration Tests', () => {
     });
 
     it('should prevent deleting hunt while live', async () => {
-      // Publish and release
       await request(app)
         .post(`/api/hunts/${testHunt.huntId}/publish`)
         .set('Authorization', `Bearer ${authToken}`)
@@ -540,7 +526,6 @@ describe('Publishing Workflow Integration Tests', () => {
         .send({ version: 1 })
         .expect(200);
 
-      // Try to delete while live
       const response = await request(app)
         .delete(`/api/hunts/${testHunt.huntId}`)
         .set('Authorization', `Bearer ${authToken}`)
@@ -550,7 +535,6 @@ describe('Publishing Workflow Integration Tests', () => {
     });
 
     it('should manage multiple published versions correctly', async () => {
-      // Publish version 1
       await request(app)
         .post(`/api/hunts/${testHunt.huntId}/publish`)
         .set('Authorization', `Bearer ${authToken}`)
@@ -568,7 +552,6 @@ describe('Publishing Workflow Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      // Check both versions are published
       const version1 = await HuntVersionModel.findOne({ huntId: testHunt.huntId, version: 1 });
       const version2 = await HuntVersionModel.findOne({ huntId: testHunt.huntId, version: 2 });
 

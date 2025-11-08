@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/schemas/v3.0/schema.json
 openapi: 3.0.0
 info:
   title: HuntHub API
@@ -501,7 +502,7 @@ components:
 
     PublishResult:
       type: object
-      description: Response from publishing a hunt
+      description: Response from publishing a hunt (minimal metadata - frontend refetches hunt data)
       properties:
         publishedVersion:
           type: integer
@@ -515,14 +516,10 @@ components:
           type: string
           format: date-time
           example: "2024-02-01T10:12:45Z"
-        hunt:
-          $ref: '#/components/schemas/Hunt'
-          description: Full hunt data with published version content
       required:
         - publishedVersion
         - newDraftVersion
         - publishedAt
-        - hunt
 
     HuntProgressStatus:
       type: string

@@ -187,7 +187,6 @@ const PublishResult = z
     publishedVersion: z.number().int(),
     newDraftVersion: z.number().int(),
     publishedAt: z.string().datetime({ offset: true }),
-    hunt: Hunt,
   })
   .passthrough();
 const HuntProgressStatus = z.enum(['in_progress', 'completed', 'abandoned']);
@@ -279,7 +278,7 @@ const ShareResult = z
   })
   .passthrough();
 
-export const schemas: Record<string, z.ZodType<any>> = {
+export const schemas: Record<string, z.ZodTypeAny> = {
   HuntStatus,
   Location,
   HuntAccessType,

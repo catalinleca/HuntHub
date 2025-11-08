@@ -1,12 +1,11 @@
 import { Schema, model, Model, HydratedDocument } from 'mongoose';
-import { ILiveHunt } from '../types/LiveHunt';
+import { ILiveHunt } from '@/database/types';
 
 const liveHuntSchema: Schema<ILiveHunt> = new Schema<ILiveHunt>(
   {
     huntId: {
       type: Number,
       required: true,
-      unique: true, // One live version per hunt
     },
     huntVersion: {
       type: Number,

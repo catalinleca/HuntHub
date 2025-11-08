@@ -7,6 +7,10 @@ dist/
 build/
 *.tsbuildinfo
 
+# Generated files
+**/gen/
+**/*.gen.ts
+
 # Environment
 .env
 .env.local

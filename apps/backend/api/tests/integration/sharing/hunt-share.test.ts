@@ -13,7 +13,7 @@ describe('Hunt Sharing Integration Tests', () => {
   let owner: IUser;
   let adminUser: IUser;
   let viewUser: IUser;
-  let targetUser: IUser; // User to share with
+  let targetUser: IUser;
   let noAccessUser: IUser;
   let ownerToken: string;
   let adminToken: string;
@@ -25,14 +25,12 @@ describe('Hunt Sharing Integration Tests', () => {
   });
 
   beforeEach(async () => {
-    // Create test users
     owner = await createTestUser({ email: 'owner@example.com', firstName: 'Owner' });
     adminUser = await createTestUser({ email: 'admin@example.com', firstName: 'Admin' });
     viewUser = await createTestUser({ email: 'viewer@example.com', firstName: 'Viewer' });
     targetUser = await createTestUser({ email: 'target@example.com', firstName: 'Target' });
     noAccessUser = await createTestUser({ email: 'noaccess@example.com', firstName: 'NoAccess' });
 
-    // Setup auth tokens
     mockFirebaseAuth(owner);
     ownerToken = createTestAuthToken(owner);
     mockFirebaseAuth(adminUser);
@@ -376,7 +374,7 @@ describe('Hunt Sharing Integration Tests', () => {
     });
 
     it('should update permission from admin to view successfully', async () => {
-      const response = await request(app)
+      await request(app)
         .put(`/api/hunts/${testHunt.huntId}/collaborators/${targetUser.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .send({ permission: 'admin' })
@@ -575,7 +573,6 @@ describe('Hunt Sharing Integration Tests', () => {
     });
 
     it('should allow user to regain access after being revoked', async () => {
-      // Revoke access
       await request(app)
         .delete(`/api/hunts/${testHunt.huntId}/collaborators/${targetUser.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
@@ -606,7 +603,6 @@ describe('Hunt Sharing Integration Tests', () => {
     });
 
     it('should handle complete sharing workflow (share → update → revoke)', async () => {
-      // Share with view permission
       const shareResponse = await request(app)
         .post(`/api/hunts/${testHunt.huntId}/share`)
         .set('Authorization', `Bearer ${ownerToken}`)
@@ -618,7 +614,6 @@ describe('Hunt Sharing Integration Tests', () => {
 
       expect(shareResponse.body.permission).toBe('view');
 
-      // List collaborators
       const listResponse = await request(app)
         .get(`/api/hunts/${testHunt.huntId}/collaborators`)
         .set('Authorization', `Bearer ${ownerToken}`)
@@ -626,7 +621,6 @@ describe('Hunt Sharing Integration Tests', () => {
 
       expect(listResponse.body.length).toBe(1);
 
-      // Update to admin permission
       const updateResponse = await request(app)
         .put(`/api/hunts/${testHunt.huntId}/collaborators/${targetUser.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
@@ -635,7 +629,6 @@ describe('Hunt Sharing Integration Tests', () => {
 
       expect(updateResponse.body.permission).toBe('admin');
 
-      // Revoke access
       await request(app)
         .delete(`/api/hunts/${testHunt.huntId}/collaborators/${targetUser.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
@@ -651,7 +644,6 @@ describe('Hunt Sharing Integration Tests', () => {
     });
 
     it('should reflect permission changes in authorization checks', async () => {
-      // Share with view permission
       await request(app)
         .post(`/api/hunts/${testHunt.huntId}/share`)
         .set('Authorization', `Bearer ${ownerToken}`)
@@ -675,7 +667,6 @@ describe('Hunt Sharing Integration Tests', () => {
         })
         .expect(403);
 
-      // Upgrade to admin
       await request(app)
         .put(`/api/hunts/${testHunt.huntId}/collaborators/${targetUser.id}`)
         .set('Authorization', `Bearer ${ownerToken}`)

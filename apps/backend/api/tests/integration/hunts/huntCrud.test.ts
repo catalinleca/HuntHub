@@ -23,14 +23,12 @@ describe('Hunt CRUD Integration Tests', () => {
   });
 
   beforeEach(async () => {
-    // Create test user
     testUser = await createTestUser({
       email: 'test@example.com',
       firstName: 'Test',
       lastName: 'User',
     });
 
-    // Mock Firebase auth for this user
     mockFirebaseAuth(testUser);
     authToken = createTestAuthToken(testUser);
   });
@@ -78,7 +76,7 @@ describe('Hunt CRUD Integration Tests', () => {
       const response = await request(app)
         .post('/api/hunts')
         .set('Authorization', `Bearer ${authToken}`)
-        .send({}) // Empty body
+        .send({})
         .expect(400);
 
       expect(response.body).toHaveProperty('message');
@@ -136,7 +134,6 @@ describe('Hunt CRUD Integration Tests', () => {
 
   describe('GET /api/hunts - Get User Hunts', () => {
     beforeEach(async () => {
-      // Create multiple hunts for the user
       await createTestHunt({ creatorId: testUser.id, name: 'Hunt 1' });
       await createTestHunt({ creatorId: testUser.id, name: 'Hunt 2' });
       await createTestHunt({ creatorId: testUser.id, name: 'Hunt 3' });
@@ -247,7 +244,6 @@ describe('Hunt CRUD Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(204);
 
-      // Verify hunt is deleted
       await request(app)
         .get(`/api/hunts/${createdHunt.huntId}`)
         .set('Authorization', `Bearer ${authToken}`)
@@ -279,33 +275,29 @@ describe('Hunt CRUD Integration Tests', () => {
     });
 
     it('should cascade delete all steps when hunt is deleted', async () => {
-      // Create hunt with steps
       const hunt = await createTestHunt({
         creatorId: testUser.id,
         name: 'Hunt with Steps',
       });
 
-      // Create steps directly in database
-      const step1 = await StepModel.create({
+      await StepModel.create({
         huntId: hunt.huntId,
         huntVersion: 1,
         type: 'clue',
         challenge: { clue: { title: 'Step 1' } },
       });
-      const step2 = await StepModel.create({
+      await StepModel.create({
         huntId: hunt.huntId,
         huntVersion: 1,
         type: 'clue',
         challenge: { clue: { title: 'Step 2' } },
       });
 
-      // Delete hunt
       await request(app)
         .delete(`/api/hunts/${hunt.huntId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(204);
 
-      // Verify steps are also deleted
       const remainingSteps = await StepModel.find({ huntId: hunt.huntId });
       expect(remainingSteps).toHaveLength(0);
     });
@@ -323,7 +315,6 @@ describe('Hunt CRUD Integration Tests', () => {
         name: 'Hunt for Reordering',
       });
 
-      // Create steps
       step1 = (await StepModel.create({
         huntId: createdHunt.huntId,
         huntVersion: 1,
@@ -408,22 +399,18 @@ describe('Hunt CRUD Integration Tests', () => {
     let viewToken: string;
 
     beforeEach(async () => {
-      // Create users
       huntOwner = await createTestUser({ email: 'owner@example.com' });
       adminUser = await createTestUser({ email: 'admin@example.com' });
       viewUser = await createTestUser({ email: 'viewer@example.com' });
 
-      // Create tokens
       mockFirebaseAuth(huntOwner);
       ownerToken = createTestAuthToken(huntOwner);
 
-      // Create hunt owned by huntOwner
       sharedHunt = await createTestHunt({
         creatorId: huntOwner.id,
         name: 'Shared Hunt',
       });
 
-      // Share hunt with different permissions
       await HuntAccessModel.create({
         huntId: sharedHunt.huntId,
         ownerId: huntOwner.id,
@@ -451,7 +438,7 @@ describe('Hunt CRUD Integration Tests', () => {
         .expect(200);
 
       expect(response.body.huntId).toBe(sharedHunt.huntId);
-      expect(response.body.permission).toBe('admin'); // admin permission
+      expect(response.body.permission).toBe('admin');
     });
 
     it('should allow view user to view shared hunt', async () => {
@@ -464,7 +451,7 @@ describe('Hunt CRUD Integration Tests', () => {
         .expect(200);
 
       expect(response.body.huntId).toBe(sharedHunt.huntId);
-      expect(response.body.permission).toBe('view'); // view permission
+      expect(response.body.permission).toBe('view');
     });
 
     it('should allow admin user to update shared hunt', async () => {
@@ -538,13 +525,11 @@ describe('Hunt CRUD Integration Tests', () => {
       });
       expect(versionBefore).toBeDefined();
 
-      // Delete hunt
       await request(app)
         .delete(`/api/hunts/${hunt.huntId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(204);
 
-      // Verify HuntVersion is also deleted
       const versionsAfter = await HuntVersionModel.find({ huntId: hunt.huntId });
       expect(versionsAfter).toHaveLength(0);
     });
@@ -556,7 +541,6 @@ describe('Hunt CRUD Integration Tests', () => {
         description: 'Original Description',
       });
 
-      // Update hunt
       await request(app)
         .put(`/api/hunts/${hunt.huntId}`)
         .set('Authorization', `Bearer ${authToken}`)
@@ -584,7 +568,6 @@ describe('Hunt CRUD Integration Tests', () => {
 
       const initialVersion = hunt.latestVersion;
 
-      // Update hunt multiple times
       await request(app)
         .put(`/api/hunts/${hunt.huntId}`)
         .set('Authorization', `Bearer ${authToken}`)
@@ -608,7 +591,6 @@ describe('Hunt CRUD Integration Tests', () => {
         name: 'Version Test Hunt',
       });
 
-      // Create steps for version 1
       const step1 = await StepModel.create({
         huntId: hunt.huntId,
         huntVersion: 1,
@@ -623,7 +605,6 @@ describe('Hunt CRUD Integration Tests', () => {
         challenge: { clue: { title: 'Step 2' } },
       });
 
-      // Reorder steps
       const newOrder = [step2.stepId, step1.stepId];
 
       await request(app)
@@ -685,13 +666,11 @@ describe('Hunt CRUD Integration Tests', () => {
         name: 'Valid Update Test',
       });
 
-      // Get current hunt state
       const currentState = await request(app)
         .get(`/api/hunts/${hunt.huntId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      // Update with correct updatedAt
       await request(app)
         .put(`/api/hunts/${hunt.huntId}`)
         .set('Authorization', `Bearer ${authToken}`)

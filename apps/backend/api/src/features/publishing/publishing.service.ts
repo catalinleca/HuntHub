@@ -1,6 +1,6 @@
 import { injectable, inject } from 'inversify';
-import mongoose, { ClientSession, HydratedDocument } from 'mongoose';
-import { Hunt, ReleaseResult, TakeOfflineResult } from '@hunthub/shared';
+import { ClientSession, HydratedDocument } from 'mongoose';
+import { PublishResult, ReleaseResult, TakeOfflineResult } from '@hunthub/shared';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import { IHuntVersion } from '@/database/types/HuntVersion';
 import { HuntMapper } from '@/shared/mappers';
@@ -12,9 +12,10 @@ import { StepCloner } from '@/features/publishing/helpers/step-cloner.helper';
 import { VersionPublisher } from '@/features/publishing/helpers/version-publisher.helper';
 import { ReleaseManager } from '@/features/publishing/helpers/release-manager.helper';
 import { IAuthorizationService } from '@/services/authorization/authorization.service';
+import { withTransaction } from '@/shared/utils/transaction';
 
 export interface IPublishingService {
-  publishHunt(huntId: number, userId: string): Promise<Hunt>;
+  publishHunt(huntId: number, userId: string): Promise<PublishResult>;
   releaseHunt(
     huntId: number,
     version: number | undefined,
@@ -45,17 +46,10 @@ export class PublishingService implements IPublishingService {
               @inject(TYPES.AuthorizationService) private authService: IAuthorizationService,
               ) {}
 
-  async publishHunt(huntId: number, userId: string): Promise<Hunt> {
+  async publishHunt(huntId: number, userId: string): Promise<PublishResult> {
     const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
-      // FIX: Changed from withTransaction() to manual transaction management
-      // REASON: withTransaction() automatically ends the session, but our helper methods
-      // (VersionValidator, StepCloner, etc.) need to use the session throughout the workflow.
-      // Manual transaction management gives us full control over session lifecycle.
+    return withTransaction(async (session) => {
       const currentVersion = huntDoc.latestVersion;
       const newVersion = currentVersion + 1;
 
@@ -73,34 +67,18 @@ export class PublishingService implements IPublishingService {
 
       await StepCloner.cloneSteps(huntId, currentVersion, newVersion, session);
 
-      const newVersionDoc = await this.createNewDraftVersion(currentVersionDoc, huntDoc.huntId, newVersion, session);
+      await this.createNewDraftVersion(currentVersionDoc, huntDoc.huntId, newVersion, session);
 
-      await VersionPublisher.markVersionPublished(huntId, currentVersion, userId, versionUpdatedAt, session);
+      const publishedAt = await VersionPublisher.markVersionPublished(huntId, currentVersion, userId, versionUpdatedAt, session);
 
-      const updatedHunt = await VersionPublisher.updateHuntPointers(huntId, currentVersion, newVersion, session);
+      await VersionPublisher.updateHuntPointers(huntId, currentVersion, newVersion, session);
 
-      // FIX: Return published version (not new draft) in the response
-      // REASON: API consumers need to see the version that was just published,
-      // with isPublished: true, publishedAt, publishedBy fields.
-      // Fetch the now-published version from DB to get updated fields.
-      const publishedVersionDoc = await HuntVersionModel.findOne(
-        { huntId, version: currentVersion },
-        null,
-        { session },
-      );
-
-      if (!publishedVersionDoc) {
-        throw new Error('Published version not found after publishing');
-      }
-
-      await session.commitTransaction();
-      return HuntMapper.fromDocuments(updatedHunt, publishedVersionDoc);
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      await session.endSession();
-    }
+      return {
+        publishedVersion: currentVersion,
+        newDraftVersion: newVersion,
+        publishedAt: publishedAt.toISOString(),
+      };
+    });
   }
 
   async releaseHunt(
@@ -112,12 +90,7 @@ export class PublishingService implements IPublishingService {
     const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
     const previousLiveVersion = huntDoc.liveVersion;
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
-      // FIX: Changed from withTransaction() to manual transaction management
-      // REASON: Same as publishHunt() - ReleaseManager helper needs active session
+    return withTransaction(async (session) => {
       const targetVersion = version ?? (await HuntVersionModel.findLatestPublished(huntId, session))?.version;
 
       if (!targetVersion) {
@@ -141,7 +114,6 @@ export class PublishingService implements IPublishingService {
         throw new Error('Release operation failed to set required fields');
       }
 
-      await session.commitTransaction();
       return {
         huntId: updatedHunt.huntId,
         liveVersion: updatedHunt.liveVersion,
@@ -149,12 +121,7 @@ export class PublishingService implements IPublishingService {
         releasedAt: updatedHunt.releasedAt.toISOString(),
         releasedBy: updatedHunt.releasedBy,
       };
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      await session.endSession();
-    }
+    });
   }
 
   async takeOffline(huntId: number, userId: string, currentLiveVersion: number): Promise<TakeOfflineResult> {
@@ -165,28 +132,16 @@ export class PublishingService implements IPublishingService {
     }
 
     const previousLiveVersion = huntDoc.liveVersion;
-    const session = await mongoose.startSession();
-    session.startTransaction();
 
-    try {
-      // FIX: Changed from withTransaction() to manual transaction management
-      // REASON: Same as publishHunt() and releaseHunt() - ReleaseManager helper needs active session
-      // throughout the takeOffline operation. withTransaction() automatically ends the session,
-      // but ReleaseManager.takeOffline() requires an active session to perform atomic updates.
+    return withTransaction(async (session) => {
       await ReleaseManager.takeOffline(huntDoc.huntId, currentLiveVersion, session);
 
-      await session.commitTransaction();
       return {
         huntId: huntDoc.huntId,
         previousLiveVersion,
         takenOfflineAt: new Date().toISOString(),
       };
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      await session.endSession();
-    }
+    });
   }
 
   private async createNewDraftVersion(

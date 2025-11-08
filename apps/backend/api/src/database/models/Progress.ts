@@ -1,5 +1,5 @@
 import { model, Schema, Model, HydratedDocument } from 'mongoose';
-import { HuntProgressStatus, IProgress, IStepProgress, ISubmission } from '../types/Progress';
+import { HuntProgressStatus, IProgress, IStepProgress, ISubmission } from '@/database/types';
 
 const SubmissionSchema = new Schema<ISubmission>(
   {
@@ -36,7 +36,7 @@ const progressSchema: Schema<IProgress> = new Schema<IProgress>(
     sessionId: { type: String, required: true },
     isAnonymous: { type: Boolean, required: true, default: true },
 
-    huntId: { type: Number, required: true, index: true },
+    huntId: { type: Number, required: true },
     version: { type: Number, default: 1 },
 
     status: {
@@ -44,7 +44,6 @@ const progressSchema: Schema<IProgress> = new Schema<IProgress>(
       required: true,
       enum: Object.values(HuntProgressStatus),
       default: HuntProgressStatus.InProgress,
-      index: true,
     },
 
     startedAt: { type: Date, required: true },

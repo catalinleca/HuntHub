@@ -10,7 +10,9 @@ export class VersionPublisher {
     userId: string,
     expectedUpdatedAt: Date,
     session: ClientSession,
-  ) {
+  ): Promise<Date> {
+    const publishedAt = new Date();
+
     const result = await HuntVersionModel.updateOne(
       {
         huntId,
@@ -20,7 +22,7 @@ export class VersionPublisher {
       },
       {
         isPublished: true,
-        publishedAt: new Date(),
+        publishedAt,
         publishedBy: userId,
       },
       { session },
@@ -35,6 +37,8 @@ export class VersionPublisher {
           'Please refresh and try again.',
       );
     }
+
+    return publishedAt;
   }
 
   static async updateHuntPointers(huntId: number, currentVersion: number, newVersion: number, session: ClientSession) {

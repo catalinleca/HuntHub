@@ -13,7 +13,6 @@ const assetSchema: Schema<IAsset> = new Schema<IAsset>(
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      index: true,
     },
     url: {
       type: String,
