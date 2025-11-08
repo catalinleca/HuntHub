@@ -1,6 +1,6 @@
 import { Hunt, HuntCreate } from '@hunthub/shared';
 import { inject, injectable } from 'inversify';
-import mongoose, { ClientSession, HydratedDocument, Types } from 'mongoose';
+import { ClientSession, HydratedDocument, Types } from 'mongoose';
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import StepModel from '@/database/models/Step';
@@ -13,6 +13,7 @@ import { TYPES } from '@/shared/types';
 import { IAuthorizationService } from '@/services/authorization/authorization.service';
 import { HuntAccessModel } from '@/database/models';
 import { HuntPermission } from '@/database/types';
+import { withTransaction } from '@/shared/utils/transaction';
 
 export interface IHuntService {
   createHunt(hunt: HuntCreate, creatorId: string): Promise<Hunt>;
@@ -41,24 +42,15 @@ export class HuntService implements IHuntService {
   }
 
   async createHunt(hunt: HuntCreate, creatorId: string): Promise<Hunt> {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
+    return withTransaction(async (session) => {
       const huntData = HuntMapper.toHuntDocument(creatorId);
       const [createdHunt] = await HuntModel.create([huntData], { session });
 
       const versionData = HuntMapper.toVersionDocument(hunt, createdHunt.huntId, 1);
       const [createdVersion] = await HuntVersionModel.create([versionData], { session });
 
-      await session.commitTransaction();
       return HuntMapper.fromDocuments(createdHunt, createdVersion);
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      await session.endSession();
-    }
+    });
   }
 
   async getUserHunts(userId: string): Promise<Hunt[]> {
@@ -137,10 +129,7 @@ export class HuntService implements IHuntService {
     const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
     const huntUpdateData = HuntMapper.toVersionUpdate(huntData);
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
+    return withTransaction(async (session) => {
       const updatedVersionDoc = await HuntVersionModel.findOneAndUpdate(
         {
           huntId: huntDoc.huntId,
@@ -176,14 +165,8 @@ export class HuntService implements IHuntService {
         throw new Error('Update failed for unknown reason');
       }
 
-      await session.commitTransaction();
       return HuntMapper.fromDocuments(huntDoc, updatedVersionDoc);
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      await session.endSession();
-    }
+    });
   }
 
   async deleteHunt(huntId: number, userId: string): Promise<void> {
@@ -192,10 +175,7 @@ export class HuntService implements IHuntService {
       throw new NotFoundError();
     }
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
+    await withTransaction(async (session) => {
       const result = await HuntModel.findOneAndUpdate(
         {
           huntId,
@@ -216,14 +196,7 @@ export class HuntService implements IHuntService {
 
       await HuntVersionModel.deleteMany({ huntId }, { session });
       await StepModel.deleteMany({ huntId }, { session });
-
-      await session.commitTransaction();
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      await session.endSession();
-    }
+    });
   }
 
   async reorderSteps(huntId: number, stepOrder: number[], userId: string): Promise<Hunt> {

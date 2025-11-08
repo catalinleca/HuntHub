@@ -1,5 +1,5 @@
 import { injectable, inject } from 'inversify';
-import mongoose, { ClientSession, HydratedDocument } from 'mongoose';
+import { ClientSession, HydratedDocument } from 'mongoose';
 import { PublishResult, ReleaseResult, TakeOfflineResult } from '@hunthub/shared';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import { IHuntVersion } from '@/database/types/HuntVersion';
@@ -12,6 +12,7 @@ import { StepCloner } from '@/features/publishing/helpers/step-cloner.helper';
 import { VersionPublisher } from '@/features/publishing/helpers/version-publisher.helper';
 import { ReleaseManager } from '@/features/publishing/helpers/release-manager.helper';
 import { IAuthorizationService } from '@/services/authorization/authorization.service';
+import { withTransaction } from '@/shared/utils/transaction';
 
 export interface IPublishingService {
   publishHunt(huntId: number, userId: string): Promise<PublishResult>;
@@ -48,10 +49,7 @@ export class PublishingService implements IPublishingService {
   async publishHunt(huntId: number, userId: string): Promise<PublishResult> {
     const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
+    return withTransaction(async (session) => {
       const currentVersion = huntDoc.latestVersion;
       const newVersion = currentVersion + 1;
 
@@ -75,19 +73,12 @@ export class PublishingService implements IPublishingService {
 
       await VersionPublisher.updateHuntPointers(huntId, currentVersion, newVersion, session);
 
-      await session.commitTransaction();
-
       return {
         publishedVersion: currentVersion,
         newDraftVersion: newVersion,
         publishedAt: publishedAt.toISOString(),
       };
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      await session.endSession();
-    }
+    });
   }
 
   async releaseHunt(
@@ -99,10 +90,7 @@ export class PublishingService implements IPublishingService {
     const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
     const previousLiveVersion = huntDoc.liveVersion;
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
+    return withTransaction(async (session) => {
       const targetVersion = version ?? (await HuntVersionModel.findLatestPublished(huntId, session))?.version;
 
       if (!targetVersion) {
@@ -126,7 +114,6 @@ export class PublishingService implements IPublishingService {
         throw new Error('Release operation failed to set required fields');
       }
 
-      await session.commitTransaction();
       return {
         huntId: updatedHunt.huntId,
         liveVersion: updatedHunt.liveVersion,
@@ -134,12 +121,7 @@ export class PublishingService implements IPublishingService {
         releasedAt: updatedHunt.releasedAt.toISOString(),
         releasedBy: updatedHunt.releasedBy,
       };
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      await session.endSession();
-    }
+    });
   }
 
   async takeOffline(huntId: number, userId: string, currentLiveVersion: number): Promise<TakeOfflineResult> {
@@ -150,24 +132,16 @@ export class PublishingService implements IPublishingService {
     }
 
     const previousLiveVersion = huntDoc.liveVersion;
-    const session = await mongoose.startSession();
-    session.startTransaction();
 
-    try {
+    return withTransaction(async (session) => {
       await ReleaseManager.takeOffline(huntDoc.huntId, currentLiveVersion, session);
 
-      await session.commitTransaction();
       return {
         huntId: huntDoc.huntId,
         previousLiveVersion,
         takenOfflineAt: new Date().toISOString(),
       };
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      await session.endSession();
-    }
+    });
   }
 
   private async createNewDraftVersion(
