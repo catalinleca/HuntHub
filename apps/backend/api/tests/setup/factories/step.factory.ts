@@ -32,9 +32,7 @@ export const createTestStep = async (options: CreateStepOptions = {}): Promise<I
 
   const step = await StepModel.create(stepData);
 
-  // FIX: Add step to HuntVersion's stepOrder array
-  // REASON: Publishing validation checks if stepOrder is not empty.
-  // This mimics what StepService.createStep() does in production.
+  // Add step to HuntVersion's stepOrder array. This mimics what StepService.createStep() does in production.
   await HuntVersionModel.findOneAndUpdate(
     { huntId: stepData.huntId, version: stepData.huntVersion },
     { $push: { stepOrder: step.stepId } },

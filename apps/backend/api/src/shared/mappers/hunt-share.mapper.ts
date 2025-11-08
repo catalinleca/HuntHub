@@ -1,5 +1,5 @@
 import { ShareResult, Collaborator } from '@hunthub/shared';
-import { IHuntShare } from '@/database/types/HuntAccess';
+import { IHuntShare, IHuntSharePopulated } from '@/database/types/HuntAccess';
 import { IUser } from '@/database/types/User';
 import { HydratedDocument } from 'mongoose';
 
@@ -19,10 +19,6 @@ export class HuntShareMapper {
     userDoc: HydratedDocument<IUser>,
     sharedByUser?: HydratedDocument<IUser>,
   ): Collaborator {
-    // FIX: Extract _id from populated user document and convert to string
-    // REASON: shareDoc.sharedWithId is populated with full user document,
-    // calling .toString() on document returns entire object as string.
-    // We need userDoc._id.toString() to get the actual ID string.
     return {
       userId: userDoc._id.toString(),
       displayName: userDoc.displayName || userDoc.email,
@@ -31,6 +27,21 @@ export class HuntShareMapper {
       permission: shareDoc.permission,
       sharedAt: shareDoc.sharedAt.toISOString(),
       sharedBy: sharedByUser?.displayName || sharedByUser?.email,
+    };
+  }
+
+  static toCollaboratorFromPopulated(shareDoc: HydratedDocument<IHuntSharePopulated>): Collaborator {
+    const sharedWithUser = shareDoc.sharedWithId as any as HydratedDocument<IUser>;
+    const sharedByUser = shareDoc.sharedBy as any as HydratedDocument<IUser>;
+
+    return {
+      userId: sharedWithUser._id.toString(),
+      displayName: sharedWithUser.displayName || sharedWithUser.email,
+      email: sharedWithUser.email,
+      profilePicture: sharedWithUser.profilePicture,
+      permission: shareDoc.permission,
+      sharedAt: shareDoc.sharedAt.toISOString(),
+      sharedBy: sharedByUser.displayName || sharedByUser.email,
     };
   }
 }

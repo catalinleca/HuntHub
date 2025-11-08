@@ -119,7 +119,6 @@ export class HuntService implements IHuntService {
   }
 
   async getUserHuntById(huntId: number, userId: string): Promise<Hunt> {
-    // Use authorization service to check access (handles both owned and shared hunts)
     const { huntDoc, permission } = await this.authService.requireAccess(huntId, userId, 'view');
 
     const versionDoc = await HuntVersionModel.findDraftByVersion(huntDoc.huntId, huntDoc.latestVersion);
@@ -130,7 +129,7 @@ export class HuntService implements IHuntService {
     const hunt = HuntMapper.fromDocuments(huntDoc, versionDoc);
     return {
       ...hunt,
-      permission, // Include permission level in response
+      permission,
     };
   }
 

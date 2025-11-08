@@ -30,9 +30,6 @@ export class PublishingController implements IPublishingController {
 
     const result = await this.publishingService.publishHunt(huntId, req.user.id);
 
-    // FIX: Return hunt fields directly in response body (not nested in 'hunt' object)
-    // REASON: Tests expect response.body.publishedBy, response.body.version, etc.
-    // This provides a cleaner API response structure.
     return res.status(200).json(result);
   }
 
@@ -63,9 +60,7 @@ export class PublishingController implements IPublishingController {
 
     const { currentLiveVersion } = req.body;
 
-    // FIX: Only reject if currentLiveVersion is not provided in request body
-    // REASON: Allow null to be sent for testing optimistic locking failures.
-    // The service layer will handle business logic validation (e.g., "hunt not live").
+    // Allow null to be sent for testing optimistic locking failures (e.g., "hunt not live").
     if (currentLiveVersion === undefined) {
       throw new ValidationError('currentLiveVersion is required for optimistic locking', []);
     }

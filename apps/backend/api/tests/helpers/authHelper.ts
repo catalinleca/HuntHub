@@ -3,15 +3,14 @@ import { IUser } from '@/database/types';
 
 /**
  * Map of tokens to users for multi-user testing
- * FIX: Store multiple users so each token can resolve to its correct user
+ * Store multiple users so each token can resolve to its correct user
  */
 const tokenToUserMap = new Map<string, IUser>();
 
 /**
  * Mock Firebase Admin auth for testing
  * This allows us to bypass real Firebase token verification
- *
- * FIX: Changed to support multiple users in the same test.
+ * Supports multiple users in the same test.
  * Each user gets a unique token, and verifyIdToken looks up the correct user.
  */
 export const mockFirebaseAuth = (user: IUser): void => {

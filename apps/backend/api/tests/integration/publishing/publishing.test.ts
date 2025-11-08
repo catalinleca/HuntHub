@@ -60,14 +60,13 @@ describe('Publishing Workflow Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
+      // FIX: Updated to expect minimal PublishResult response
+      // REASON: Production pattern - return only metadata, frontend refetches hunt via React Query
       expect(response.body).toMatchObject({
-        huntId: testHunt.huntId,
-        version: 1, // Current version (published)
-        latestVersion: 2, // New draft version
-        isPublished: true,
+        publishedVersion: 1, // Version that was just published
+        newDraftVersion: 2, // New draft version created
       });
       expect(response.body).toHaveProperty('publishedAt');
-      expect(response.body.publishedBy).toBe(owner.id);
     });
 
     it('should create new draft version (version 2) after publishing version 1', async () => {
@@ -204,8 +203,10 @@ describe('Publishing Workflow Integration Tests', () => {
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
-      expect(response.body.publishedBy
-      ).toBe(adminUser.id); // Admin published it
+      // FIX: Check publishedBy from database, not response (minimal response doesn't include it)
+      // REASON: PublishResult no longer returns full hunt metadata
+      const version1 = await HuntVersionModel.findOne({ huntId: testHunt.huntId, version: 1 });
+      expect(version1?.publishedBy).toBe(adminUser.id); // Admin published it
     });
 
     it('should return 403 when view user tries to publish', async () => {

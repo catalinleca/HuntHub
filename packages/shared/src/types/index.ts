@@ -351,7 +351,7 @@ export interface AssetCreate {
   s3Key: string;
 }
 
-/** Response from publishing a hunt */
+/** Response from publishing a hunt (minimal metadata - frontend refetches hunt data) */
 export interface PublishResult {
   /**
    * Version number that was published
@@ -368,8 +368,6 @@ export interface PublishResult {
    * @example "2024-02-01T10:12:45Z"
    */
   publishedAt: string;
-  /** Full hunt data with published version content */
-  hunt: Hunt;
 }
 
 /** Player's submission for a step challenge */
