@@ -28,7 +28,6 @@ export class AuthService implements IAuthService {
 
       await this.userService.getUserByFirebaseUid(userCredentials.user.uid);
 
-      //TODO: remove
       return {
         accessToken: idToken,
         refreshToken: refreshToken,
