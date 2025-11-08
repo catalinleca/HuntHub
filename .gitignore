@@ -15,6 +15,7 @@ build/
 .env
 .env.local
 .env.*.local
+!.env.example
 
 # Firebase secrets
 **/firebaseService.json
