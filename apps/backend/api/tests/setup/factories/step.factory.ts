@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import StepModel from '@/database/models/Step';
+import HuntVersionModel from '@/database/models/HuntVersion';
 import { IStep } from '@/database/types/Step';
 import { ChallengeType } from '@hunthub/shared';
 
@@ -30,6 +31,17 @@ export const createTestStep = async (options: CreateStepOptions = {}): Promise<I
   };
 
   const step = await StepModel.create(stepData);
+
+  // Add step to HuntVersion's stepOrder array. This mimics what StepService.createStep() does in production.
+  const updated = await HuntVersionModel.findOneAndUpdate(
+    { huntId: stepData.huntId, version: stepData.huntVersion },
+    { $push: { stepOrder: step.stepId } },
+  );
+
+  if (!updated) {
+    throw new Error(`HuntVersion not found for huntId=${stepData.huntId}, version=${stepData.huntVersion}`);
+  }
+
   return step.toJSON() as IStep;
 };
 

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
+import { IUser } from './User';
 
-// TODO Hierarchy: owner > admin > view
-
+// Hierarchy: owner > admin > view
 export type HuntPermission = 'view' | 'admin';
 
 export interface IHuntShare {
@@ -14,4 +14,9 @@ export interface IHuntShare {
 
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+export interface IHuntSharePopulated extends Omit<IHuntShare, 'sharedWithId' | 'sharedBy'> {
+  sharedWithId: IUser;
+  sharedBy: IUser;
 }

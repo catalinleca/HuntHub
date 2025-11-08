@@ -1,6 +1,6 @@
 import { injectable, inject } from 'inversify';
-import mongoose, { ClientSession, HydratedDocument } from 'mongoose';
-import { Hunt, ReleaseResult, TakeOfflineResult } from '@hunthub/shared';
+import { ClientSession, HydratedDocument } from 'mongoose';
+import { PublishResult, ReleaseResult, TakeOfflineResult } from '@hunthub/shared';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import { IHuntVersion } from '@/database/types/HuntVersion';
 import { HuntMapper } from '@/shared/mappers';
@@ -12,9 +12,10 @@ import { StepCloner } from '@/features/publishing/helpers/step-cloner.helper';
 import { VersionPublisher } from '@/features/publishing/helpers/version-publisher.helper';
 import { ReleaseManager } from '@/features/publishing/helpers/release-manager.helper';
 import { IAuthorizationService } from '@/services/authorization/authorization.service';
+import { withTransaction } from '@/shared/utils/transaction';
 
 export interface IPublishingService {
-  publishHunt(huntId: number, userId: string): Promise<Hunt>;
+  publishHunt(huntId: number, userId: string): Promise<PublishResult>;
   releaseHunt(
     huntId: number,
     version: number | undefined,
@@ -45,41 +46,39 @@ export class PublishingService implements IPublishingService {
               @inject(TYPES.AuthorizationService) private authService: IAuthorizationService,
               ) {}
 
-  async publishHunt(huntId: number, userId: string): Promise<Hunt> {
+  async publishHunt(huntId: number, userId: string): Promise<PublishResult> {
     const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
 
-    const session = await mongoose.startSession();
+    return withTransaction(async (session) => {
+      const currentVersion = huntDoc.latestVersion;
+      const newVersion = currentVersion + 1;
 
-    try {
-      return session.withTransaction(async () => {
-        const currentVersion = huntDoc.latestVersion;
-        const newVersion = currentVersion + 1;
+      await VersionValidator.validateCanPublish(huntId, currentVersion, session);
 
-        await VersionValidator.validateCanPublish(huntId, currentVersion, session);
+      const currentVersionDoc = await HuntVersionModel.findDraftByVersion(huntId, currentVersion, session);
+      if (!currentVersionDoc) {
+        throw new Error('Current version not found');
+      }
 
-        const currentVersionDoc = await HuntVersionModel.findDraftByVersion(huntId, currentVersion, session);
-        if (!currentVersionDoc) {
-          throw new Error('Current version not found');
-        }
+      const versionUpdatedAt = currentVersionDoc.updatedAt;
+      if (!versionUpdatedAt) {
+        throw new Error('Version updatedAt not found');
+      }
 
-        const versionUpdatedAt = currentVersionDoc.updatedAt;
-        if (!versionUpdatedAt) {
-          throw new Error('Version updatedAt not found');
-        }
+      await StepCloner.cloneSteps(huntId, currentVersion, newVersion, session);
 
-        await StepCloner.cloneSteps(huntId, currentVersion, newVersion, session);
+      await this.createNewDraftVersion(currentVersionDoc, huntDoc.huntId, newVersion, session);
 
-        const newVersionDoc = await this.createNewDraftVersion(currentVersionDoc, huntDoc.huntId, newVersion, session);
+      const publishedAt = await VersionPublisher.markVersionPublished(huntId, currentVersion, userId, versionUpdatedAt, session);
 
-        await VersionPublisher.markVersionPublished(huntId, currentVersion, userId, versionUpdatedAt, session);
+      await VersionPublisher.updateHuntPointers(huntId, currentVersion, newVersion, session);
 
-        const updatedHunt = await VersionPublisher.updateHuntPointers(huntId, currentVersion, newVersion, session);
-
-        return HuntMapper.fromDocuments(updatedHunt, newVersionDoc);
-      });
-    } finally {
-      await session.endSession();
-    }
+      return {
+        publishedVersion: currentVersion,
+        newDraftVersion: newVersion,
+        publishedAt: publishedAt.toISOString(),
+      };
+    });
   }
 
   async releaseHunt(
@@ -91,44 +90,38 @@ export class PublishingService implements IPublishingService {
     const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
     const previousLiveVersion = huntDoc.liveVersion;
 
-    const session = await mongoose.startSession();
+    return withTransaction(async (session) => {
+      const targetVersion = version ?? (await HuntVersionModel.findLatestPublished(huntId, session))?.version;
 
-    try {
-      return await session.withTransaction(async () => {
-        const targetVersion = version ?? (await HuntVersionModel.findLatestPublished(huntId, session))?.version;
+      if (!targetVersion) {
+        throw new ValidationError('No published versions available to release. Publish a version first.', []);
+      }
 
-        if (!targetVersion) {
-          throw new ValidationError('No published versions available to release. Publish a version first.', []);
-        }
+      const publishedVersion = await HuntVersionModel.findPublishedVersion(huntId, targetVersion, session);
+      if (!publishedVersion) {
+        throw new ValidationError(`Version ${targetVersion} not found or not published`, []);
+      }
 
-        const publishedVersion = await HuntVersionModel.findPublishedVersion(huntId, targetVersion, session);
-        if (!publishedVersion) {
-          throw new ValidationError(`Version ${targetVersion} not found or not published`, []);
-        }
+      const updatedHunt = await ReleaseManager.releaseVersion(
+        huntDoc.huntId,
+        targetVersion,
+        userId,
+        currentLiveVersion ?? null,
+        session,
+      );
 
-        const updatedHunt = await ReleaseManager.releaseVersion(
-          huntDoc.huntId,
-          targetVersion,
-          userId,
-          currentLiveVersion ?? null,
-          session,
-        );
+      if (!updatedHunt.liveVersion || !updatedHunt.releasedAt || !updatedHunt.releasedBy) {
+        throw new Error('Release operation failed to set required fields');
+      }
 
-        if (!updatedHunt.liveVersion || !updatedHunt.releasedAt || !updatedHunt.releasedBy) {
-          throw new Error('Release operation failed to set required fields');
-        }
-
-        return {
-          huntId: updatedHunt.huntId,
-          liveVersion: updatedHunt.liveVersion,
-          previousLiveVersion,
-          releasedAt: updatedHunt.releasedAt.toISOString(),
-          releasedBy: updatedHunt.releasedBy,
-        };
-      });
-    } finally {
-      await session.endSession();
-    }
+      return {
+        huntId: updatedHunt.huntId,
+        liveVersion: updatedHunt.liveVersion,
+        previousLiveVersion,
+        releasedAt: updatedHunt.releasedAt.toISOString(),
+        releasedBy: updatedHunt.releasedBy,
+      };
+    });
   }
 
   async takeOffline(huntId: number, userId: string, currentLiveVersion: number): Promise<TakeOfflineResult> {
@@ -139,21 +132,16 @@ export class PublishingService implements IPublishingService {
     }
 
     const previousLiveVersion = huntDoc.liveVersion;
-    const session = await mongoose.startSession();
 
-    try {
-      return await session.withTransaction(async () => {
-        await ReleaseManager.takeOffline(huntDoc.huntId, currentLiveVersion, session);
+    return withTransaction(async (session) => {
+      await ReleaseManager.takeOffline(huntDoc.huntId, currentLiveVersion, session);
 
-        return {
-          huntId: huntDoc.huntId,
-          previousLiveVersion,
-          takenOfflineAt: new Date().toISOString(),
-        };
-      });
-    } finally {
-      await session.endSession();
-    }
+      return {
+        huntId: huntDoc.huntId,
+        previousLiveVersion,
+        takenOfflineAt: new Date().toISOString(),
+      };
+    });
   }
 
   private async createNewDraftVersion(

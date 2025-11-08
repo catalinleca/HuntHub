@@ -15,6 +15,8 @@ import huntRouter from '@/modules/hunts/hunt.routes';
 import stepRouter from '@/modules/steps/step.routes';
 import authRouter from '@/modules/auth/auth.routes';
 import assetRouter from '@/modules/assets/asset.routes';
+import publishingRouter from '@/features/publishing/publishing.routes';
+import huntShareRouter from '@/features/sharing/hunt-share.routes';
 import { errorHandler } from '@/shared/middlewares/error.middleware';
 import { authMiddleware } from '@/shared/middlewares/auth.middleware';
 
@@ -29,6 +31,8 @@ export const createTestApp = (): Express => {
   app.use('/api', authMiddleware);
   app.use('/api/hunts', huntRouter);
   app.use('/api/hunts', stepRouter);
+  app.use('/api/hunts', publishingRouter);
+  app.use('/api/hunts', huntShareRouter);
   app.use('/api/assets', assetRouter);
 
   // Error handler

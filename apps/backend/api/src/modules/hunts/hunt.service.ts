@@ -1,18 +1,19 @@
 import { Hunt, HuntCreate } from '@hunthub/shared';
 import { inject, injectable } from 'inversify';
-import mongoose, { ClientSession, HydratedDocument, Types } from 'mongoose';
+import { ClientSession, HydratedDocument, Types } from 'mongoose';
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import StepModel from '@/database/models/Step';
 import { IHunt } from '@/database/types/Hunt';
 import { HuntMapper } from '@/shared/mappers';
-import { NotFoundError, ForbiddenError } from '@/shared/errors';
+import { NotFoundError } from '@/shared/errors';
 import { ValidationError } from '@/shared/errors';
 import { ConflictError } from '@/shared/errors/ConflictError';
 import { TYPES } from '@/shared/types';
 import { IAuthorizationService } from '@/services/authorization/authorization.service';
 import { HuntAccessModel } from '@/database/models';
 import { HuntPermission } from '@/database/types';
+import { withTransaction } from '@/shared/utils/transaction';
 
 export interface IHuntService {
   createHunt(hunt: HuntCreate, creatorId: string): Promise<Hunt>;
@@ -41,21 +42,15 @@ export class HuntService implements IHuntService {
   }
 
   async createHunt(hunt: HuntCreate, creatorId: string): Promise<Hunt> {
-    const session = await mongoose.startSession();
+    return withTransaction(async (session) => {
+      const huntData = HuntMapper.toHuntDocument(creatorId);
+      const [createdHunt] = await HuntModel.create([huntData], { session });
 
-    try {
-      return session.withTransaction(async () => {
-        const huntData = HuntMapper.toHuntDocument(creatorId);
-        const [createdHunt] = await HuntModel.create([huntData], { session });
+      const versionData = HuntMapper.toVersionDocument(hunt, createdHunt.huntId, 1);
+      const [createdVersion] = await HuntVersionModel.create([versionData], { session });
 
-        const versionData = HuntMapper.toVersionDocument(hunt, createdHunt.huntId, 1);
-        const [createdVersion] = await HuntVersionModel.create([versionData], { session });
-
-        return HuntMapper.fromDocuments(createdHunt, createdVersion);
-      });
-    } finally {
-      await session.endSession();
-    }
+      return HuntMapper.fromDocuments(createdHunt, createdVersion);
+    });
   }
 
   async getUserHunts(userId: string): Promise<Hunt[]> {
@@ -116,67 +111,62 @@ export class HuntService implements IHuntService {
   }
 
   async getUserHuntById(huntId: number, userId: string): Promise<Hunt> {
-    const huntDoc = await HuntModel.findByHuntIdAndCreator(huntId, userId);
-    if (!huntDoc) {
-      throw new NotFoundError();
-    }
+    const { huntDoc, permission } = await this.authService.requireAccess(huntId, userId, 'view');
 
     const versionDoc = await HuntVersionModel.findDraftByVersion(huntDoc.huntId, huntDoc.latestVersion);
     if (!versionDoc) {
       throw new NotFoundError();
     }
 
-    return HuntMapper.fromDocuments(huntDoc, versionDoc);
+    const hunt = HuntMapper.fromDocuments(huntDoc, versionDoc);
+    return {
+      ...hunt,
+      permission,
+    };
   }
 
   async updateHunt(huntId: number, huntData: Hunt, userId: string): Promise<Hunt> {
     const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
     const huntUpdateData = HuntMapper.toVersionUpdate(huntData);
 
-    const session = await mongoose.startSession();
+    return withTransaction(async (session) => {
+      const updatedVersionDoc = await HuntVersionModel.findOneAndUpdate(
+        {
+          huntId: huntDoc.huntId,
+          version: huntDoc.latestVersion,
+          isPublished: false,
+          ...(huntData.updatedAt && { updatedAt: new Date(huntData.updatedAt) }),
+        },
+        huntUpdateData,
+        { new: true, session },
+      ).exec();
 
-    try {
-      return session.withTransaction(async () => {
-        const updatedVersionDoc = await HuntVersionModel.findOneAndUpdate(
-          {
-            huntId: huntDoc.huntId,
-            version: huntDoc.latestVersion,
-            isPublished: false,
-            ...(huntData.updatedAt && { updatedAt: new Date(huntData.updatedAt) }),
-          },
-          huntUpdateData,
-          { new: true, session },
-        ).exec();
+      if (!updatedVersionDoc) {
+        const versionDoc = await HuntVersionModel.findOne({
+          huntId: huntDoc.huntId,
+          version: huntDoc.latestVersion,
+        }).session(session);
 
-        if (!updatedVersionDoc) {
-          const versionDoc = await HuntVersionModel.findOne({
-            huntId: huntDoc.huntId,
-            version: huntDoc.latestVersion,
-          }).session(session);
-
-          if (!versionDoc) {
-            throw new NotFoundError('Hunt version not found');
-          }
-
-          if (versionDoc.isPublished) {
-            throw new ValidationError(
-              'Cannot edit published version. Please create a new version or unpublish first.',
-              [],
-            );
-          }
-
-          if (huntData.updatedAt) {
-            throw new ConflictError('Hunt was modified by another user. Please refresh and try again.');
-          }
-
-          throw new Error('Update failed for unknown reason');
+        if (!versionDoc) {
+          throw new NotFoundError('Hunt version not found');
         }
 
-        return HuntMapper.fromDocuments(huntDoc, updatedVersionDoc);
-      });
-    } finally {
-      await session.endSession();
-    }
+        if (versionDoc.isPublished) {
+          throw new ValidationError(
+            'Cannot edit published version. Please create a new version or unpublish first.',
+            [],
+          );
+        }
+
+        if (huntData.updatedAt) {
+          throw new ConflictError('Hunt was modified by another user. Please refresh and try again.');
+        }
+
+        throw new Error('Update failed for unknown reason');
+      }
+
+      return HuntMapper.fromDocuments(huntDoc, updatedVersionDoc);
+    });
   }
 
   async deleteHunt(huntId: number, userId: string): Promise<void> {
@@ -185,34 +175,28 @@ export class HuntService implements IHuntService {
       throw new NotFoundError();
     }
 
-    const session = await mongoose.startSession();
+    await withTransaction(async (session) => {
+      const result = await HuntModel.findOneAndUpdate(
+        {
+          huntId,
+          creatorId: new Types.ObjectId(userId),
+          liveVersion: null,
+          isDeleted: false,
+        },
+        {
+          isDeleted: true,
+          deletedAt: new Date(),
+        },
+        { new: true, session },
+      );
 
-    try {
-      await session.withTransaction(async () => {
-        const result = await HuntModel.findOneAndUpdate(
-          {
-            huntId,
-            creatorId: new Types.ObjectId(userId),
-            liveVersion: null,
-            isDeleted: false,
-          },
-          {
-            isDeleted: true,
-            deletedAt: new Date(),
-          },
-          { new: true, session },
-        );
+      if (!result) {
+        throw new ConflictError('Cannot delete hunt: it may be live or was modified by another operation.');
+      }
 
-        if (!result) {
-          throw new ConflictError('Cannot delete hunt: it may be live or was modified by another operation.');
-        }
-
-        await HuntVersionModel.deleteMany({ huntId }, { session });
-        await StepModel.deleteMany({ huntId }, { session });
-      });
-    } finally {
-      await session.endSession();
-    }
+      await HuntVersionModel.deleteMany({ huntId }, { session });
+      await StepModel.deleteMany({ huntId }, { session });
+    });
   }
 
   async reorderSteps(huntId: number, stepOrder: number[], userId: string): Promise<Hunt> {
@@ -246,15 +230,14 @@ export class HuntService implements IHuntService {
   }
 
   async addStepToVersion(huntId: number, huntVersion: number, stepId: number, session?: ClientSession): Promise<void> {
-    const query = HuntVersionModel.findOneAndUpdate(
+    const versionDoc = await HuntVersionModel.findOneAndUpdate(
       { huntId, version: huntVersion, isPublished: false },
       { $push: { stepOrder: stepId } },
-    );
+      { session },
+    ).exec();
 
-    if (session) {
-      await query.session(session).exec();
-    } else {
-      await query.exec();
+    if (!versionDoc) {
+      throw new ValidationError('Cannot modify steps on a published or missing draft version.', []);
     }
   }
 
@@ -264,15 +247,14 @@ export class HuntService implements IHuntService {
     stepId: number,
     session?: ClientSession,
   ): Promise<void> {
-    const query = HuntVersionModel.findOneAndUpdate(
+    const versionDoc = await HuntVersionModel.findOneAndUpdate(
       { huntId, version: huntVersion, isPublished: false },
       { $pull: { stepOrder: stepId } },
-    );
+      { session },
+    ).exec();
 
-    if (session) {
-      await query.session(session).exec();
-    } else {
-      await query.exec();
+    if (!versionDoc) {
+      throw new ValidationError('Cannot modify steps on a published or missing draft version.', []);
     }
   }
 }

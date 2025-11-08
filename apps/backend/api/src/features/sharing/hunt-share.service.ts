@@ -116,8 +116,6 @@ export class HuntShareService implements IHuntShareService {
 
     const shares = await HuntAccessModel.findHuntCollaborators(huntId);
 
-    return shares.map((share) =>
-      HuntShareMapper.toCollaborator(share, share.sharedWithId as any, share.sharedBy as any),
-    );
+    return shares.map((share) => HuntShareMapper.toCollaboratorFromPopulated(share));
   }
 }

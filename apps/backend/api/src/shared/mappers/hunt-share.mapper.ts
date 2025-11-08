@@ -1,5 +1,5 @@
 import { ShareResult, Collaborator } from '@hunthub/shared';
-import { IHuntShare } from '@/database/types/HuntAccess';
+import { IHuntShare, IHuntSharePopulated } from '@/database/types/HuntAccess';
 import { IUser } from '@/database/types/User';
 import { HydratedDocument } from 'mongoose';
 
@@ -20,13 +20,28 @@ export class HuntShareMapper {
     sharedByUser?: HydratedDocument<IUser>,
   ): Collaborator {
     return {
-      userId: shareDoc.sharedWithId.toString(),
+      userId: userDoc._id.toString(),
       displayName: userDoc.displayName || userDoc.email,
       email: userDoc.email,
       profilePicture: userDoc.profilePicture,
       permission: shareDoc.permission,
       sharedAt: shareDoc.sharedAt.toISOString(),
       sharedBy: sharedByUser?.displayName || sharedByUser?.email,
+    };
+  }
+
+  static toCollaboratorFromPopulated(shareDoc: HydratedDocument<IHuntSharePopulated>): Collaborator {
+    const sharedWithUser = shareDoc.sharedWithId as any as HydratedDocument<IUser>;
+    const sharedByUser = shareDoc.sharedBy as any as HydratedDocument<IUser>;
+
+    return {
+      userId: sharedWithUser._id.toString(),
+      displayName: sharedWithUser.displayName || sharedWithUser.email,
+      email: sharedWithUser.email,
+      profilePicture: sharedWithUser.profilePicture,
+      permission: shareDoc.permission,
+      sharedAt: shareDoc.sharedAt.toISOString(),
+      sharedBy: sharedByUser.displayName || sharedByUser.email,
     };
   }
 }

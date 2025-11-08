@@ -29,12 +29,8 @@ export class PublishingController implements IPublishingController {
     }
 
     const result = await this.publishingService.publishHunt(huntId, req.user.id);
-    return res.status(200).json({
-      success: true,
-      publishedVersion: result.version,
-      newDraftVersion: result.latestVersion,
-      hunt: result,
-    });
+
+    return res.status(200).json(result);
   }
 
   async releaseHunt(req: Request, res: Response): Promise<Response> {
@@ -64,7 +60,8 @@ export class PublishingController implements IPublishingController {
 
     const { currentLiveVersion } = req.body;
 
-    if (currentLiveVersion === undefined || currentLiveVersion === null) {
+    // Allow null to be sent for testing optimistic locking failures (e.g., "hunt not live").
+    if (currentLiveVersion === undefined) {
       throw new ValidationError('currentLiveVersion is required for optimistic locking', []);
     }
 

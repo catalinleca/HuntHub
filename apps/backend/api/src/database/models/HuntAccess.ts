@@ -1,5 +1,5 @@
 import { Schema, model, Model, HydratedDocument } from 'mongoose';
-import { HuntPermission, IHuntShare } from '@/database/types';
+import { HuntPermission, IHuntShare, IHuntSharePopulated } from '@/database/types';
 
 const huntShareSchema: Schema<IHuntShare> = new Schema<IHuntShare>(
   {
@@ -66,7 +66,7 @@ huntShareSchema.methods.canView = function (): boolean {
 
 interface IHuntShareModel extends Model<IHuntShare> {
   findSharedWithUser(userId: string): Promise<HydratedDocument<IHuntShare>[]>;
-  findHuntCollaborators(huntId: number): Promise<HydratedDocument<IHuntShare>[]>;
+  findHuntCollaborators(huntId: number): Promise<HydratedDocument<IHuntSharePopulated>[]>;
   hasAccess(huntId: number, userId: string): Promise<boolean>;
   getPermission(huntId: number, userId: string): Promise<HuntPermission | null>;
   shareHunt(
