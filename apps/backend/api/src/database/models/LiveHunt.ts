@@ -6,7 +6,6 @@ const liveHuntSchema: Schema<ILiveHunt> = new Schema<ILiveHunt>(
     huntId: {
       type: Number,
       required: true,
-      unique: true, // One live version per hunt
     },
     huntVersion: {
       type: Number,

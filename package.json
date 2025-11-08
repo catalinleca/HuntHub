@@ -16,6 +16,11 @@
     "dev:api": "npm run dev --workspace=@hunthub/api",
     "dev:backend": "npm run dev:api",
     "generate": "npm run generate --workspace=@hunthub/shared",
+    "test:api": "npm run test --workspace=@hunthub/api",
+    "test:api:verbose": "npm run test:verbose --workspace=@hunthub/api",
+    "test:api:watch": "npm run test:watch --workspace=@hunthub/api",
+    "test:api:coverage": "npm run test:coverage --workspace=@hunthub/api",
+    "test:api:debug": "npm run test:debug --workspace=@hunthub/api",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"**/*.{ts,json,md}\"",
     "type-check": "tsc --noEmit --workspaces"
