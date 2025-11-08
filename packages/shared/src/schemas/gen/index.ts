@@ -278,7 +278,7 @@ const ShareResult = z
   })
   .passthrough();
 
-export const schemas: Record<string, any> = {
+export const schemas: Record<string, z.ZodTypeAny> = {
   HuntStatus,
   Location,
   HuntAccessType,
