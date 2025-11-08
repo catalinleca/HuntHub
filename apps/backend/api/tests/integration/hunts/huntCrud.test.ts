@@ -3,11 +3,12 @@ import { Express } from 'express';
 import { createTestApp } from '../../setup/testServer';
 import { createTestUser } from '../../setup/factories/user.factory';
 import { createTestHunt, generateHuntData } from '../../setup/factories/hunt.factory';
+import { createTestSteps } from '../../setup/factories/step.factory';
 import { mockFirebaseAuth, createTestAuthToken, clearFirebaseAuthMocks } from '../../helpers/authHelper';
 import { IUser } from '@/database/types/User';
 import { IHunt } from '@/database/types/Hunt';
 import { IStep } from '@/database/types/Step';
-import { Hunt, HuntStatus } from '@hunthub/shared';
+import { Hunt, HuntStatus, ChallengeType } from '@hunthub/shared';
 import StepModel from '@/database/models/Step';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import HuntAccessModel from '@/database/models/HuntAccess';
@@ -129,6 +130,46 @@ describe('Hunt CRUD Integration Tests', () => {
       await request(app)
         .get(`/api/hunts/${createdHunt.huntId}`)
         .expect(401);
+    });
+
+    it('should populate steps array with full step details', async () => {
+      const hunt = await createTestHunt({
+        creatorId: testUser.id,
+        name: 'Hunt with Steps',
+      });
+
+      const steps = await createTestSteps(3, {
+        huntId: hunt.huntId,
+        huntVersion: hunt.latestVersion,
+        type: ChallengeType.Clue,
+      });
+
+      const response = await request(app)
+        .get(`/api/hunts/${hunt.huntId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200);
+
+      expect(response.body).toHaveProperty('steps');
+      expect(Array.isArray(response.body.steps)).toBe(true);
+      expect(response.body.steps).toHaveLength(3);
+
+      response.body.steps.forEach((step: any, index: number) => {
+        expect(step).toHaveProperty('stepId');
+        expect(typeof step.stepId).toBe('number');
+        expect(step.stepId).toBe(steps[index].stepId);
+        expect(step).toHaveProperty('type');
+        expect(step.type).toBe(ChallengeType.Clue);
+        expect(step).toHaveProperty('challenge');
+        expect(step.challenge).toHaveProperty('clue');
+        expect(step.challenge.clue).toHaveProperty('title');
+        expect(step.challenge.clue).toHaveProperty('description');
+        expect(step).toHaveProperty('huntId');
+        expect(step.huntId).toBe(hunt.huntId);
+      });
+
+      expect(response.body).toHaveProperty('stepOrder');
+      expect(Array.isArray(response.body.stepOrder)).toBe(true);
+      expect(response.body.stepOrder).toHaveLength(3);
     });
   });
 
