@@ -6,7 +6,7 @@ import HuntVersionModel from '@/database/models/HuntVersion';
 import StepModel from '@/database/models/Step';
 import { IHunt } from '@/database/types/Hunt';
 import { HuntMapper } from '@/shared/mappers';
-import { NotFoundError, ForbiddenError } from '@/shared/errors';
+import { NotFoundError } from '@/shared/errors';
 import { ValidationError } from '@/shared/errors';
 import { ConflictError } from '@/shared/errors/ConflictError';
 import { TYPES } from '@/shared/types';

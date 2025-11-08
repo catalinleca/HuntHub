@@ -1,5 +1,5 @@
 import { model, Schema, Model, HydratedDocument } from 'mongoose';
-import { HuntProgressStatus, IProgress, IStepProgress, ISubmission } from '../types/Progress';
+import { HuntProgressStatus, IProgress, IStepProgress, ISubmission } from '@/database/types';
 
 const SubmissionSchema = new Schema<ISubmission>(
   {

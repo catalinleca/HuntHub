@@ -1,6 +1,6 @@
 import { injectable, inject } from 'inversify';
 import mongoose, { ClientSession, HydratedDocument } from 'mongoose';
-import { Hunt, PublishResult, ReleaseResult, TakeOfflineResult } from '@hunthub/shared';
+import { PublishResult, ReleaseResult, TakeOfflineResult } from '@hunthub/shared';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import { IHuntVersion } from '@/database/types/HuntVersion';
 import { HuntMapper } from '@/shared/mappers';
