@@ -18,25 +18,21 @@ It imports all context about the project, so Claude always knows:
 
 ## 🚀 Quick Start & Current Focus
 
-@.claude/NEXT-SESSION-START-HERE.md
-@.claude/project-state.md
-@.claude/ROADMAP.md
+@.claude/core/NEXT-SESSION.md
+@.claude/core/PROJECT.md
+@.claude/core/ROADMAP.md
 
-## Project Overview & Requirements
+## High-Level Architecture
 
-@.claude/application-overview.md
-@.claude/requirements.md
-@.claude/publishing-workflow.md
+@.claude/core/ARCHITECTURE.md
 
-## Current Priority Work
+## Feature-Specific Documentation
 
-@.claude/tree-and-branching-strategy.md
-
-## Application Deep Dives
-
-@.claude/challenge-types-guide.md
-@.claude/data-model-decisions.md
-@.claude/player-api-design.md
+@.claude/features/hunt-sharing.md
+@.claude/features/hunt-release.md
+@.claude/features/numeric-id-strategy.md
+@.claude/features/versioning-system.md
+@.claude/features/release-concept.md
 
 ## Backend Context
 
@@ -60,13 +56,18 @@ It imports all context about the project, so Claude always knows:
 
 ## 📚 Reference Library (NOT auto-loaded - access manually)
 
-Use Read tool to access these historical documents when needed:
+Use Read tool to access these when needed:
 
+**Guides (Learning Materials):**
+- `.claude/guides/challenge-types-guide.md` - Challenge type reference
+- `.claude/guides/data-model-decisions.md` - Data model design rationale
+- `.claude/guides/player-api-design.md` - Player API design (future feature)
+- `.claude/guides/tree-and-branching-strategy.md` - Tree VIEW API design
 
-**Historical/Outdated:**
-- `.claude/reference/decisions-needed.md` - Old decision log (most decisions done)
-- `.claude/reference/design-concerns.md` - Feb 2025 discussion (historical)
-- `.claude/reference/session-summary-2025-02-05.md` - Requirements session notes
+**Reference (Historical/Archived):**
+- `.claude/reference/decisions-needed.md` - Old decision log
+- `.claude/reference/design-concerns.md` - Historical discussions
+- `.claude/reference/sessions/` - Old session summaries
 
 ---
 
