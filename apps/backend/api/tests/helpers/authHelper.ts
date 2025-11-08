@@ -17,25 +17,27 @@ export const mockFirebaseAuth = (user: IUser): void => {
   const token = `test-token-${user.firebaseUid}`;
   tokenToUserMap.set(token, user);
 
-  // Mock verifyIdToken to look up user by token
-  jest.spyOn(auth(), 'verifyIdToken').mockImplementation(async (tokenString: string) => {
-    const matchedUser = tokenToUserMap.get(tokenString);
-    if (!matchedUser) {
-      throw new Error(`No user mocked for token: ${tokenString}`);
-    }
+  const authInstance = auth();
+  if (!jest.isMockFunction(authInstance.verifyIdToken)) {
+    jest.spyOn(authInstance, 'verifyIdToken').mockImplementation(async (tokenString: string) => {
+      const matchedUser = tokenToUserMap.get(tokenString);
+      if (!matchedUser) {
+        throw new Error(`No user mocked for token: ${tokenString}`);
+      }
 
-    return {
-      uid: matchedUser.firebaseUid,
-      email: matchedUser.email,
-      email_verified: true,
-      aud: 'test-project',
-      auth_time: Date.now() / 1000,
-      exp: Date.now() / 1000 + 3600,
-      iat: Date.now() / 1000,
-      iss: 'https://securetoken.google.com/test-project',
-      sub: matchedUser.firebaseUid,
-    } as any;
-  });
+      return {
+        uid: matchedUser.firebaseUid,
+        email: matchedUser.email,
+        email_verified: true,
+        aud: 'test-project',
+        auth_time: Date.now() / 1000,
+        exp: Date.now() / 1000 + 3600,
+        iat: Date.now() / 1000,
+        iss: 'https://securetoken.google.com/test-project',
+        sub: matchedUser.firebaseUid,
+      } as any;
+    });
+  }
 };
 
 /**
