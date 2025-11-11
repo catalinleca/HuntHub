@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HuntHub Player - Interactive Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(180deg, #FFFBF5 0%, #FFF8EF 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .demo-title {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFB347 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+        }
+
+        .demo-subtitle {
+            font-size: 18px;
+            color: #7F8C8D;
+        }
+
+        .screens-navigation {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid #E0E0E0;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2C3E50;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-button:hover {
+            border-color: #FF6B6B;
+            background: #FFFBF5;
+            transform: translateY(-2px);
+        }
+
+        .nav-button.active {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFB347 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .phone-frame {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #1C1C1E;
+            border-radius: 48px;
+            padding: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 28px;
+            background: #1C1C1E;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+
+        .phone-screen {
+            background: #FFFBF5;
+            border-radius: 36px;
+            overflow: hidden;
+            position: relative;
+            min-height: 700px;
+        }
+
+        .screen-content {
+            display: none;
+        }
+
+        .screen-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* === HUNT START SCREEN === */
+        .hunt-start {
+            min-height: 700px;
+            background: linear-gradient(180deg, #FFFBF5 0%, #FFF8EF 100%);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bg-decoration {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.4;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-circle-1 {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFB347 0%, #FF6B6B 100%);
+            filter: blur(60px);
+            top: -50px;
+            right: -50px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .bg-circle-2 {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6BCF7F 0%, #4ECDC4 100%);
+            filter: blur(60px);
+            bottom: -40px;
+            left: -40px;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(15px, 15px) scale(1.1); }
+        }
+
+        .start-content {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .hunt-hero {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFB347 100%);
+        }
+
+        .hunt-hero-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .hunt-info-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            margin-bottom: 16px;
+        }
+
+        .hunt-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2C3E50;
+            margin: 0 0 8px 0;
+            line-height: 1.2;
+        }
+
+        .hunt-subtitle {
+            font-size: 15px;
+            color: #7F8C8D;
+            margin: 0 0 16px 0;
+            line-height: 1.5;
+        }
+
+        .hunt-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .meta-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #FFF8EF;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #2C3E50;
+        }
+
+        .hunt-description {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            margin-bottom: auto;
+        }
+
+        .description-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2C3E50;
+            margin: 0 0 12px 0;
+        }
+
+        .description-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #7F8C8D;
+            margin: 0;
+        }
+
+        .start-button-container {
+            padding: 20px;
+            background: linear-gradient(0deg,
+                rgba(255, 251, 245, 1) 0%,
+                rgba(255, 251, 245, 0) 100%
+            );
+            position: sticky;
+            bottom: 0;
+            z-index: 2;
+        }
+
+        .start-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFB347 100%);
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(255, 107, 107, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(255, 107, 107, 0.4);
+        }
+
+        .start-button:active {
+            transform: translateY(0);
+        }
+
+        .button-icon {
+            font-size: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* === STEP SCREEN === */
+        .step-screen {
+            min-height: 700px;
+            background: #FFFBF5;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .progress-header {
+            background: white;
+            padding: 16px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .progress-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-track {
+            flex: 1;
+            height: 8px;
+            background: #F0F0F0;
+            border-radius: 100px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6BCF7F 0%, #4ECDC4 100%);
+            border-radius: 100px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .progress-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2C3E50;
+            white-space: nowrap;
+        }
+
+        .step-info-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step-number-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, #6BCF7F 0%, #4ECDC4 100%);
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .step-type-badge {
+            padding: 4px 12px;
+            background: #FFF8EF;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #7F8C8D;
+        }
+
+        .step-content {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .step-title-card {
+            background: white;
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .step-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .step-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2C3E50;
+            margin: 0 0 8px 0;
+            line-height: 1.2;
+        }
+
+        .step-subtitle {
+            font-size: 14px;
+            color: #7F8C8D;
+            margin: 0;
+        }
+
+        .clue-card {
+            background: linear-gradient(135deg, #FFF8EF 0%, #FFFBF5 100%);
+            border: 2px solid #FFE5CC;
+            border-radius: 18px;
+            padding: 16px;
+            position: relative;
+        }
+
+        .clue-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #FF6B6B;
+            margin-bottom: 10px;
+        }
+
+        .clue-text {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #2C3E50;
+            margin: 0;
+            font-style: italic;
+        }
+
+        .location-status-card {
+            background: white;
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .status-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .status-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6BCF7F 0%, #4ECDC4 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            animation: pulse-ring 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(107, 207, 127, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(107, 207, 127, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(107, 207, 127, 0); }
+        }
+
+        .status-text {
+            flex: 1;
+        }
+
+        .status-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2C3E50;
+            margin: 0 0 4px 0;
+        }
+
+        .status-distance {
+            font-size: 22px;
+            font-weight: 700;
+            color: #6BCF7F;
+            margin: 0;
+        }
+
+        .mini-map {
+            width: 100%;
+            height: 100px;
+            background: #F0F0F0;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .map-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            background: linear-gradient(135deg, #E8F5E9 0%, #B9F6CA 100%);
+        }
+
+        .action-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #6BCF7F 0%, #4ECDC4 100%);
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(107, 207, 127, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(107, 207, 127, 0.4);
+        }
+
+        .hint-button {
+            width: 100%;
+            padding: 12px;
+            background: white;
+            border: 2px solid #E0E0E0;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #7F8C8D;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .hint-button:hover {
+            border-color: #FFB347;
+            color: #FF6B6B;
+            background: #FFFBF5;
+        }
+
+        /* === QUIZ SCREEN === */
+        .quiz-card {
+            background: white;
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .quiz-question {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2C3E50;
+            line-height: 1.4;
+            margin: 0 0 20px 0;
+        }
+
+        .answer-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .answer-option {
+            padding: 14px 16px;
+            background: #FFFBF5;
+            border: 2px solid #E0E0E0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #2C3E50;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .answer-option:hover {
+            border-color: #5DADE2;
+            background: #F0F8FF;
+            transform: translateX(4px);
+        }
+
+        .answer-option.selected {
+            border-color: #5DADE2;
+            background: linear-gradient(135deg, #E3F2FD 0%, #F0F8FF 100%);
+            border-width: 3px;
+        }
+
+        .option-prefix {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            margin-right: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #7F8C8D;
+            flex-shrink: 0;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #5DADE2 0%, #4ECDC4 100%);
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(93, 173, 226, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 16px;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(93, 173, 226, 0.4);
+        }
+
+        /* === COMPLETION SCREEN === */
+        .completion-screen {
+            min-height: 700px;
+            background: linear-gradient(180deg, #FFFBF5 0%, #FFF8EF 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            top: -10px;
+            opacity: 0;
+            animation: confetti-fall 3s ease-in infinite;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(700px) rotate(720deg);
+            }
+        }
+
+        .completion-card {
+            background: white;
+            border-radius: 28px;
+            padding: 40px 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            text-align: center;
+            width: 100%;
+            animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .completion-icon {
+            font-size: 72px;
+            margin-bottom: 20px;
+            animation: trophy-bounce 1s ease-in-out;
+        }
+
+        @keyframes trophy-bounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-15px) rotate(-5deg); }
+            50% { transform: translateY(0) rotate(0deg); }
+            75% { transform: translateY(-8px) rotate(5deg); }
+        }
+
+        .completion-title {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFB347 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0 0 10px 0;
+        }
+
+        .completion-subtitle {
+            font-size: 15px;
+            color: #7F8C8D;
+            margin: 0 0 28px 0;
+            line-height: 1.5;
+        }
+
+        .achievement-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #6BCF7F 0%, #4ECDC4 100%);
+            border-radius: 100px;
+            margin-bottom: 28px;
+        }
+
+        .badge-icon {
+            font-size: 20px;
+        }
+
+        .badge-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .stat-item {
+            background: #FFFBF5;
+            border-radius: 14px;
+            padding: 16px 12px;
+            text-align: center;
+        }
+
+        .stat-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2C3E50;
+            margin: 0 0 4px 0;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #7F8C8D;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .primary-action-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFB347 100%);
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(255, 107, 107, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .primary-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(255, 107, 107, 0.4);
+        }
+
+        .secondary-action-btn {
+            width: 100%;
+            padding: 16px;
+            background: white;
+            border: 2px solid #E0E0E0;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #2C3E50;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .secondary-action-btn:hover {
+            border-color: #FF6B6B;
+            background: #FFFBF5;
+        }
+
+        .share-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #E0E0E0;
+        }
+
+        .share-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #7F8C8D;
+            margin: 0 0 14px 0;
+        }
+
+        .share-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .share-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 2px solid #E0E0E0;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .share-btn:hover {
+            transform: scale(1.1);
+            border-color: #FF6B6B;
+        }
+
+        /* === PHOTO CHALLENGE === */
+        .photo-upload-card {
+            background: white;
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .upload-instructions {
+            font-size: 15px;
+            color: #7F8C8D;
+            line-height: 1.6;
+            margin: 0 0 20px 0;
+        }
+
+        .photo-upload-area {
+            width: 100%;
+            aspect-ratio: 4/3;
+            border: 3px dashed #E0E0E0;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #FFFBF5;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .photo-upload-area:hover {
+            border-color: #FF6B6B;
+            background: #FFF8EF;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            opacity: 0.5;
+        }
+
+        .upload-text {
+            font-size: 15px;
+            font-weight: 600;
+            color: #7F8C8D;
+        }
+
+        .upload-hint {
+            font-size: 13px;
+            color: #BDC3C7;
+        }
+
+        .camera-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .camera-button {
+            padding: 14px;
+            background: white;
+            border: 2px solid #E0E0E0;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2C3E50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .camera-button:hover {
+            border-color: #FF6B6B;
+            background: #FFFBF5;
+        }
+
+        .camera-button-icon {
+            font-size: 28px;
+        }
+
+        @media (max-width: 768px) {
+            .demo-title {
+                font-size: 32px;
+            }
+
+            .phone-frame {
+                border-radius: 0;
+                padding: 0;
+                background: transparent;
+                box-shadow: none;
+            }
+
+            .phone-notch {
+                display: none;
+            }
+
+            .phone-screen {
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1 class="demo-title">🎮 HuntHub Player</h1>
+            <p class="demo-subtitle">Interactive Demo - Click the buttons to see different screens</p>
+        </div>
+
+        <div class="screens-navigation">
+            <button class="nav-button active" onclick="showScreen('start')">🏠 Hunt Start</button>
+            <button class="nav-button" onclick="showScreen('location')">📍 Location</button>
+            <button class="nav-button" onclick="showScreen('quiz')">❓ Quiz</button>
+            <button class="nav-button" onclick="showScreen('photo')">📷 Photo</button>
+            <button class="nav-button" onclick="showScreen('complete')">🏆 Complete</button>
+        </div>
+
+        <div class="phone-frame">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+
+                <!-- HUNT START SCREEN -->
+                <div id="screen-start" class="screen-content active">
+                    <div class="hunt-start">
+                        <div class="bg-decoration">
+                            <div class="bg-circle-1"></div>
+                            <div class="bg-circle-2"></div>
+                        </div>
+
+                        <div class="start-content">
+                            <div class="hunt-hero">
+                                <div class="hunt-hero-placeholder">🗺️</div>
+                            </div>
+
+                            <div class="hunt-info-card">
+                                <h1 class="hunt-title">City Explorer Hunt</h1>
+                                <p class="hunt-subtitle">Discover hidden gems around downtown</p>
+
+                                <div class="hunt-meta">
+                                    <div class="meta-badge">
+                                        <span>📍</span>
+                                        <span>6 Stops</span>
+                                    </div>
+                                    <div class="meta-badge">
+                                        <span>⏱️</span>
+                                        <span>~45 min</span>
+                                    </div>
+                                    <div class="meta-badge">
+                                        <span>🏃</span>
+                                        <span>2.5 km</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="hunt-description">
+                                <h2 class="description-title">About this Hunt</h2>
+                                <p class="description-text">
+                                    Embark on an exciting journey through the heart of the city.
+                                    You'll solve puzzles, discover landmarks, and uncover stories
+                                    that most people walk past every day.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="start-button-container">
+                            <button class="start-button" onclick="showScreen('location')">
+                                <span>Start Adventure</span>
+                                <span class="button-icon">🚀</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LOCATION STEP SCREEN -->
+                <div id="screen-location" class="screen-content">
+                    <div class="step-screen">
+                        <header class="progress-header">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-track">
+                                    <div class="progress-bar-fill" style="width: 33%;"></div>
+                                </div>
+                                <span class="progress-text">2 of 6</span>
+                            </div>
+
+                            <div class="step-info-row">
+                                <span class="step-number-badge">
+                                    <span>📍</span>
+                                    <span>Step 2</span>
+                                </span>
+                                <span class="step-type-badge">Location Challenge</span>
+                            </div>
+                        </header>
+
+                        <main class="step-content">
+                            <div class="step-title-card">
+                                <div class="step-icon">⛲</div>
+                                <h1 class="step-title">Find the Fountain</h1>
+                                <p class="step-subtitle">Follow the clue to discover your next location</p>
+                            </div>
+
+                            <div class="clue-card">
+                                <div class="clue-label">
+                                    <span>💡</span>
+                                    <span>Your Clue</span>
+                                </div>
+                                <p class="clue-text">
+                                    "Where water dances in the square, and pigeons gather without care.
+                                    Four bronze lions guard this place, in the heart of downtown space."
+                                </p>
+                            </div>
+
+                            <div class="location-status-card">
+                                <div class="status-row">
+                                    <div class="status-icon">📍</div>
+                                    <div class="status-text">
+                                        <p class="status-title">Distance to location</p>
+                                        <p class="status-distance">127 m</p>
+                                    </div>
+                                </div>
+
+                                <div class="mini-map">
+                                    <div class="map-placeholder">🗺️</div>
+                                </div>
+
+                                <button class="action-button">
+                                    <span>Check My Location</span>
+                                    <span>🎯</span>
+                                </button>
+                            </div>
+
+                            <button class="hint-button">
+                                <span>💡</span>
+                                <span>Need a hint?</span>
+                            </button>
+                        </main>
+                    </div>
+                </div>
+
+                <!-- QUIZ STEP SCREEN -->
+                <div id="screen-quiz" class="screen-content">
+                    <div class="step-screen">
+                        <header class="progress-header">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-track">
+                                    <div class="progress-bar-fill" style="width: 50%;"></div>
+                                </div>
+                                <span class="progress-text">3 of 6</span>
+                            </div>
+
+                            <div class="step-info-row">
+                                <span class="step-number-badge" style="background: linear-gradient(135deg, #5DADE2 0%, #4ECDC4 100%);">
+                                    <span>❓</span>
+                                    <span>Step 3</span>
+                                </span>
+                                <span class="step-type-badge">Quiz Challenge</span>
+                            </div>
+                        </header>
+
+                        <main class="step-content">
+                            <div class="step-title-card">
+                                <div class="step-icon">🤔</div>
+                                <h1 class="step-title">History Question</h1>
+                                <p class="step-subtitle">Test your knowledge about this landmark</p>
+                            </div>
+
+                            <div class="quiz-card">
+                                <h2 class="quiz-question">
+                                    When was this fountain built and dedicated to the public?
+                                </h2>
+
+                                <div class="answer-options">
+                                    <button class="answer-option">
+                                        <span class="option-prefix">A</span>
+                                        <span>1847</span>
+                                    </button>
+
+                                    <button class="answer-option selected">
+                                        <span class="option-prefix">B</span>
+                                        <span>1892</span>
+                                    </button>
+
+                                    <button class="answer-option">
+                                        <span class="option-prefix">C</span>
+                                        <span>1923</span>
+                                    </button>
+
+                                    <button class="answer-option">
+                                        <span class="option-prefix">D</span>
+                                        <span>1956</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button class="submit-button">
+                                Submit Answer
+                            </button>
+                        </main>
+                    </div>
+                </div>
+
+                <!-- PHOTO STEP SCREEN -->
+                <div id="screen-photo" class="screen-content">
+                    <div class="step-screen">
+                        <header class="progress-header">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-track">
+                                    <div class="progress-bar-fill" style="width: 66%;"></div>
+                                </div>
+                                <span class="progress-text">4 of 6</span>
+                            </div>
+
+                            <div class="step-info-row">
+                                <span class="step-number-badge" style="background: linear-gradient(135deg, #FF6B6B 0%, #FFB347 100%);">
+                                    <span>📷</span>
+                                    <span>Step 4</span>
+                                </span>
+                                <span class="step-type-badge">Photo Challenge</span>
+                            </div>
+                        </header>
+
+                        <main class="step-content">
+                            <div class="step-title-card">
+                                <div class="step-icon">📸</div>
+                                <h1 class="step-title">Capture the Moment</h1>
+                                <p class="step-subtitle">Take a creative photo at this location</p>
+                            </div>
+
+                            <div class="photo-upload-card">
+                                <p class="upload-instructions">
+                                    Take a selfie with the fountain in the background.
+                                    Get creative and have fun with it!
+                                </p>
+
+                                <div class="photo-upload-area">
+                                    <div class="upload-icon">📷</div>
+                                    <div class="upload-text">Tap to add photo</div>
+                                    <div class="upload-hint">or choose from options below</div>
+                                </div>
+
+                                <div class="camera-options">
+                                    <button class="camera-button">
+                                        <span class="camera-button-icon">📸</span>
+                                        <span>Take Photo</span>
+                                    </button>
+                                    <button class="camera-button">
+                                        <span class="camera-button-icon">🖼️</span>
+                                        <span>Gallery</span>
+                                    </button>
+                                </div>
+
+                                <button class="action-button" style="margin-top: 14px;" disabled>
+                                    Continue
+                                </button>
+                            </div>
+                        </main>
+                    </div>
+                </div>
+
+                <!-- COMPLETION SCREEN -->
+                <div id="screen-complete" class="screen-content">
+                    <div class="completion-screen">
+                        <div class="confetti">
+                            <div class="confetti-piece" style="left: 10%; animation-delay: 0s; background: #FF6B6B;"></div>
+                            <div class="confetti-piece" style="left: 20%; animation-delay: 0.5s; background: #FFB347;"></div>
+                            <div class="confetti-piece" style="left: 30%; animation-delay: 1s; background: #6BCF7F;"></div>
+                            <div class="confetti-piece" style="left: 40%; animation-delay: 0.3s; background: #5DADE2;"></div>
+                            <div class="confetti-piece" style="left: 50%; animation-delay: 0.7s; background: #9B59B6;"></div>
+                            <div class="confetti-piece" style="left: 60%; animation-delay: 0.2s; background: #FF6B6B;"></div>
+                            <div class="confetti-piece" style="left: 70%; animation-delay: 0.9s; background: #FFB347;"></div>
+                            <div class="confetti-piece" style="left: 80%; animation-delay: 0.4s; background: #6BCF7F;"></div>
+                            <div class="confetti-piece" style="left: 90%; animation-delay: 0.6s; background: #5DADE2;"></div>
+                        </div>
+
+                        <div class="completion-card">
+                            <div class="completion-icon">🏆</div>
+
+                            <h1 class="completion-title">Hunt Completed!</h1>
+                            <p class="completion-subtitle">
+                                Congratulations! You've successfully completed the City Explorer Hunt.
+                            </p>
+
+                            <div class="achievement-badge">
+                                <span class="badge-icon">⭐</span>
+                                <span class="badge-text">Urban Explorer</span>
+                            </div>
+
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <div class="stat-icon">📍</div>
+                                    <p class="stat-value">6</p>
+                                    <p class="stat-label">Steps</p>
+                                </div>
+
+                                <div class="stat-item">
+                                    <div class="stat-icon">⏱️</div>
+                                    <p class="stat-value">42</p>
+                                    <p class="stat-label">Minutes</p>
+                                </div>
+
+                                <div class="stat-item">
+                                    <div class="stat-icon">🏃</div>
+                                    <p class="stat-value">2.8</p>
+                                    <p class="stat-label">km</p>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons">
+                                <button class="primary-action-btn">
+                                    View My Photos
+                                </button>
+                                <button class="secondary-action-btn" onclick="showScreen('start')">
+                                    Try Another Hunt
+                                </button>
+                            </div>
+
+                            <div class="share-section">
+                                <p class="share-title">Share your achievement</p>
+                                <div class="share-buttons">
+                                    <button class="share-btn">📱</button>
+                                    <button class="share-btn">🐦</button>
+                                    <button class="share-btn">📘</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showScreen(screenName) {
+            // Hide all screens
+            const screens = document.querySelectorAll('.screen-content');
+            screens.forEach(screen => screen.classList.remove('active'));
+
+            // Show selected screen
+            const selectedScreen = document.getElementById('screen-' + screenName);
+            if (selectedScreen) {
+                selectedScreen.classList.add('active');
+            }
+
+            // Update navigation buttons
+            const buttons = document.querySelectorAll('.nav-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // Add click handlers for quiz options
+        document.addEventListener('DOMContentLoaded', function() {
+            const answerOptions = document.querySelectorAll('.answer-option');
+            answerOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options
+                    answerOptions.forEach(opt => opt.classList.remove('selected'));
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
