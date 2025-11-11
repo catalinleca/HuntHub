@@ -31,8 +31,8 @@ export class HuntShareMapper {
   }
 
   static toCollaboratorFromPopulated(shareDoc: HydratedDocument<IHuntSharePopulated>): Collaborator {
-    const sharedWithUser = shareDoc.sharedWithId as any as HydratedDocument<IUser>;
-    const sharedByUser = shareDoc.sharedBy as any as HydratedDocument<IUser>;
+    const sharedWithUser = shareDoc.sharedWithId as unknown as HydratedDocument<IUser>;
+    const sharedByUser = shareDoc.sharedBy as unknown as HydratedDocument<IUser>;
 
     return {
       userId: sharedWithUser._id.toString(),

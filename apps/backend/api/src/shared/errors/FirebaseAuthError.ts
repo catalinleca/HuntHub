@@ -49,7 +49,7 @@ export class FirebaseAuthError extends AppError {
 
   constructor(error: unknown) {
     const originalError = error instanceof Error ? error : new Error(String(error));
-    const errorCode = (originalError as any).code || 'unknown';
+    const errorCode = (originalError as Error & { code?: string }).code || 'unknown';
 
     const errorConfig = FirebaseAuthError.ERROR_MAP[errorCode] || {
       message: 'Authentication failed',

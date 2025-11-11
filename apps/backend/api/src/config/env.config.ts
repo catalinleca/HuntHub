@@ -3,8 +3,8 @@ function getRequiredEnv(key: string): string {
   if (!value) {
     throw new Error(
       `Missing required environment variable: ${key}\n` +
-      `Check .env.local or .env file\n` +
-      `See .env.example for template`
+        `Check .env.local or .env file\n` +
+        `See .env.example for template`,
     );
   }
   return value;

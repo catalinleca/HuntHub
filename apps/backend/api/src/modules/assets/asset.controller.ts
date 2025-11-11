@@ -47,10 +47,7 @@ export class AssetController implements IAssetController {
       throw new ValidationError(`MIME type '${type}' not allowed`, []);
     }
 
-    const assets = await this.assetService.getUserAssets(
-      req.user.id,
-      type ? (type as MimeTypes) : undefined
-    );
+    const assets = await this.assetService.getUserAssets(req.user.id, type ? (type as MimeTypes) : undefined);
 
     return res.status(200).json(assets);
   };
