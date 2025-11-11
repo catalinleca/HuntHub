@@ -5,7 +5,6 @@ import { MimeTypes } from '@/database/types';
 import { AssetCreate, AssetDTO, AssetMapper } from '@/shared/mappers/asset.mapper';
 import { AssetModel } from '@/database/models';
 import { ALLOWED_EXTENSIONS, ALLOWED_MIME_TYPES } from '@/shared/utils/mimeTypes';
-import { awsS3Bucket } from '@/config/env.config';
 import { TYPES } from '@/shared/types';
 
 export interface IAssetService {
@@ -22,7 +21,10 @@ export class AssetService implements IAssetService {
 
   constructor(@inject(TYPES.StorageService) private storageService: IStorageService) {}
 
-  async requestUpload(userId: string, extension: string): Promise<{ signedUrl: string; publicUrl: string; s3Key: string }> {
+  async requestUpload(
+    userId: string,
+    extension: string,
+  ): Promise<{ signedUrl: string; publicUrl: string; s3Key: string }> {
     if (!ALLOWED_EXTENSIONS.includes(extension.toLowerCase())) {
       throw new ValidationError(`Extension '${extension}' not allowed`, []);
     }

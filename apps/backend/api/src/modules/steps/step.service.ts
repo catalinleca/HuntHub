@@ -1,13 +1,13 @@
 import { Step, StepCreate } from '@hunthub/shared';
 import { inject, injectable } from 'inversify';
-import mongoose from 'mongoose';
 import StepModel from '@/database/models/Step';
 import { StepMapper } from '@/shared/mappers';
 import { IHuntService } from '@/modules/hunts/hunt.service';
 import { TYPES } from '@/shared/types';
-import { NotFoundError, ValidationError } from '@/shared/errors';
+import { NotFoundError } from '@/shared/errors';
 import { ConflictError } from '@/shared/errors/ConflictError';
 import { IAuthorizationService } from '@/services/authorization/authorization.service';
+import { withTransaction } from '@/shared/utils/transaction';
 
 export interface IStepService {
   createStep(stepData: StepCreate, huntId: number, userId: string): Promise<Step>;
@@ -26,23 +26,14 @@ export class StepService implements IStepService {
     const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
     const huntVersion = huntDoc.latestVersion;
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
+    return withTransaction(async (session) => {
       const docData = StepMapper.toDocument(stepData, huntId, huntVersion);
       const [createdStep] = await StepModel.create([docData], { session });
 
       await this.huntService.addStepToVersion(huntId, huntVersion, createdStep.stepId, session);
 
-      await session.commitTransaction();
       return StepMapper.fromDocument(createdStep);
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      await session.endSession();
-    }
+    });
   }
 
   async updateStep(stepId: number, huntId: number, stepData: Step, userId: string): Promise<Step> {
@@ -50,10 +41,7 @@ export class StepService implements IStepService {
     const huntVersion = huntDoc.latestVersion;
     const stepUpdateData = StepMapper.toDocumentUpdate(stepData);
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
+    return withTransaction(async (session) => {
       const updatedStep = await StepModel.findOneAndUpdate(
         {
           stepId,
@@ -83,24 +71,15 @@ export class StepService implements IStepService {
         throw new Error('Update failed for unknown reason');
       }
 
-      await session.commitTransaction();
       return StepMapper.fromDocument(updatedStep);
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      await session.endSession();
-    }
+    });
   }
 
   async deleteStep(stepId: number, huntId: number, userId: string): Promise<void> {
     const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
     const huntVersion = huntDoc.latestVersion;
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
+    await withTransaction(async (session) => {
       const step = await StepModel.findOne({ stepId, huntId, huntVersion }).session(session);
       if (!step) {
         throw new NotFoundError('Step not found');
@@ -109,13 +88,6 @@ export class StepService implements IStepService {
       await this.huntService.removeStepFromVersion(huntId, huntVersion, stepId, session);
 
       await step.deleteOne({ session });
-
-      await session.commitTransaction();
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      await session.endSession();
-    }
+    });
   }
 }

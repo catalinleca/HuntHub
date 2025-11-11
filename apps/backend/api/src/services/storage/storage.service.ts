@@ -8,8 +8,6 @@ import {
   awsSecretAccessKey,
   s3UseAcceleration,
 } from '@/config/env.config';
-import { MimeTypes } from '@/database/types';
-import { ValidationError } from '@/shared/errors';
 import { injectable } from 'inversify';
 import * as crypto from 'node:crypto';
 import { getMimeTypeFromExtension } from '@/shared/utils/mimeTypes';
@@ -30,8 +28,6 @@ export class StorageService implements IStorageService {
   private bucketName = awsS3Bucket;
   private useAcceleration = s3UseAcceleration;
   private cdnDomain = awsCloudFrontDomain;
-  private awsAccessKeyId = awsAccessKeyId;
-  private awsSecretAccessKey = awsSecretAccessKey;
 
   constructor() {
     const baseConfig = {
@@ -92,5 +88,3 @@ export class StorageService implements IStorageService {
     return getMimeTypeFromExtension(extension);
   }
 }
-
-const requestUpload = (userId: string, extension: string) => {};

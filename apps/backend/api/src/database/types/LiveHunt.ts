@@ -5,8 +5,8 @@
  * One document per hunt (unique index on huntId).
  */
 export interface ILiveHunt {
-  huntId: number;                 // FK to Hunt (unique)
-  huntVersion: number;            // Which hunt version is live (FK to HuntVersion)
+  huntId: number; // FK to Hunt (unique)
+  huntVersion: number; // Which hunt version is live (FK to HuntVersion)
 
   // Runtime metrics (mutable)
   activePlayerCount: number;

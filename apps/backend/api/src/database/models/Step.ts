@@ -55,11 +55,7 @@ stepSchema.index({ huntId: 1, huntVersion: 1 }); // Query steps for a specific v
 interface IStepModel extends Model<IStep> {
   findByHuntVersion(huntId: number, version: number): Promise<HydratedDocument<IStep>[]>;
 
-  findByHuntVersionAndType(
-    huntId: number,
-    version: number,
-    type: ChallengeType,
-  ): Promise<HydratedDocument<IStep>[]>;
+  findByHuntVersionAndType(huntId: number, version: number, type: ChallengeType): Promise<HydratedDocument<IStep>[]>;
 
   countByHuntVersion(huntId: number, version: number): Promise<number>;
 
@@ -70,18 +66,11 @@ stepSchema.statics.findByHuntVersion = function (huntId: number, version: number
   return this.find({ huntId, huntVersion: version }).sort({ createdAt: 1 }).exec();
 };
 
-stepSchema.statics.findByHuntVersionAndType = function (
-  huntId: number,
-  version: number,
-  type: ChallengeType,
-) {
+stepSchema.statics.findByHuntVersionAndType = function (huntId: number, version: number, type: ChallengeType) {
   return this.find({ huntId, huntVersion: version, type }).sort({ createdAt: 1 }).exec();
 };
 
-stepSchema.statics.countByHuntVersion = async function (
-  huntId: number,
-  version: number,
-): Promise<number> {
+stepSchema.statics.countByHuntVersion = async function (huntId: number, version: number): Promise<number> {
   return this.countDocuments({ huntId, huntVersion: version });
 };
 

@@ -9,14 +9,14 @@ import { ILocation } from '@/database/schemas/location.schema';
 export interface IStep {
   stepId: number;
   huntId: number;
-  huntVersion: number;            // FK to HuntVersion (compound: huntId + huntVersion)
-  type: string;                   // ChallengeType from shared package
-  challenge: unknown;             // Flexible: clue, quiz, mission, or task
+  huntVersion: number; // FK to HuntVersion (compound: huntId + huntVersion)
+  type: string; // ChallengeType from a shared package
+  challenge: unknown; // Flexible: clue, quiz, mission, or task
   hint?: string;
   requiredLocation?: ILocation;
   timeLimit?: number;
   maxAttempts?: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdAt?: string;
   updatedAt?: string;
 }

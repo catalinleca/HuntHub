@@ -14,7 +14,7 @@ export interface ISubmission {
   // Extended fields for AI validation and feedback
   score?: number; // Quality/confidence score (0-1 or 0-10)
   feedback?: string; // Player guidance message from AI or system
-  metadata?: Record<string, any>; // Extensibility (e.g., branchTaken, AI model used)
+  metadata?: Record<string, unknown>; // Extensibility (e.g., branchTaken, AI model used)
 }
 
 export interface IStepProgress {

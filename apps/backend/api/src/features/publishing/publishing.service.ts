@@ -42,9 +42,10 @@ export interface IPublishingService {
  */
 @injectable()
 export class PublishingService implements IPublishingService {
-  constructor(@inject(TYPES.HuntService) private huntService: IHuntService,
-              @inject(TYPES.AuthorizationService) private authService: IAuthorizationService,
-              ) {}
+  constructor(
+    @inject(TYPES.HuntService) private huntService: IHuntService,
+    @inject(TYPES.AuthorizationService) private authService: IAuthorizationService,
+  ) {}
 
   async publishHunt(huntId: number, userId: string): Promise<PublishResult> {
     const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
@@ -69,7 +70,13 @@ export class PublishingService implements IPublishingService {
 
       await this.createNewDraftVersion(currentVersionDoc, huntDoc.huntId, newVersion, session);
 
-      const publishedAt = await VersionPublisher.markVersionPublished(huntId, currentVersion, userId, versionUpdatedAt, session);
+      const publishedAt = await VersionPublisher.markVersionPublished(
+        huntId,
+        currentVersion,
+        userId,
+        versionUpdatedAt,
+        session,
+      );
 
       await VersionPublisher.updateHuntPointers(huntId, currentVersion, newVersion, session);
 

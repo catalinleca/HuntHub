@@ -1,6 +1,7 @@
 import 'dotenv';
 import mongoose from 'mongoose';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function baseTransform(_: unknown, ret: any) {
   const id = ret._id.toString();
   delete ret._id;

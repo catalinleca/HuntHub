@@ -68,7 +68,7 @@ export class AssetMapper {
       size: dto.sizeBytes,
       storageLocation: {
         bucket: awsS3Bucket,
-        path: dto.s3Key
+        path: dto.s3Key,
       },
     };
   }

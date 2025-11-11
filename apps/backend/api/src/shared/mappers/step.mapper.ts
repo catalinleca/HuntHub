@@ -1,4 +1,4 @@
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 import { Step, StepCreate, StepUpdate, ChallengeType, Challenge } from '@hunthub/shared';
 import { IStep } from '@/database/types/Step';
 
