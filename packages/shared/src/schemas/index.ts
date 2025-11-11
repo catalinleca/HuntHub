@@ -7,7 +7,7 @@
  * When you add new schemas to OpenAPI, add them here for clean imports.
  */
 
-import { schemas } from './gen/index.js';
+import { schemas } from './gen';
 
 // Individual named exports for clean imports
 export const {

@@ -23,8 +23,7 @@ module.exports = {
     // React Refresh (HMR)
     'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
 
-    // React best practices
-    'react/prop-types': 'off', // Using TypeScript for prop validation
+    'react/prop-types': 'off',
     'react/jsx-uses-react': 'off',
     'react/jsx-uses-vars': 'error',
   },
