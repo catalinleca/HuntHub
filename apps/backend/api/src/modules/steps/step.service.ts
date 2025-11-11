@@ -5,7 +5,7 @@ import StepModel from '@/database/models/Step';
 import { StepMapper } from '@/shared/mappers';
 import { IHuntService } from '@/modules/hunts/hunt.service';
 import { TYPES } from '@/shared/types';
-import { NotFoundError, ValidationError } from '@/shared/errors';
+import { NotFoundError } from '@/shared/errors';
 import { ConflictError } from '@/shared/errors/ConflictError';
 import { IAuthorizationService } from '@/services/authorization/authorization.service';
 

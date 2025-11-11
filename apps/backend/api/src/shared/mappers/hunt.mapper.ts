@@ -1,5 +1,5 @@
 import { HydratedDocument, Types } from 'mongoose';
-import { Hunt, HuntCreate, HuntStatus, HuntUpdate } from '@hunthub/shared';
+import { Hunt, HuntCreate, HuntStatus } from '@hunthub/shared';
 import { IHunt } from '@/database/types/Hunt';
 import { IHuntVersion } from '@/database/types/HuntVersion';
 
