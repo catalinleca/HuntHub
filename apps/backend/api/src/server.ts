@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import express from 'express';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 
 const result = dotenv.config({ path: '.env.local' });
 if (!result.error) {
@@ -31,6 +32,7 @@ async function bootstrap() {
   await mustConnectDb(databaseUrl);
 
   const app = express();
+  app.use(cors());
   app.use(bodyParser.json());
 
   app.use('/auth', authRouter);
