@@ -28,8 +28,6 @@ export class StorageService implements IStorageService {
   private bucketName = awsS3Bucket;
   private useAcceleration = s3UseAcceleration;
   private cdnDomain = awsCloudFrontDomain;
-  private awsAccessKeyId = awsAccessKeyId;
-  private awsSecretAccessKey = awsSecretAccessKey;
 
   constructor() {
     const baseConfig = {
