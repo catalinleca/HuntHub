@@ -11,6 +11,28 @@ It imports all context about the project, so Claude always knows:
 
 ---
 
+## 🎯 CURRENT FOCUS: Frontend (Editor App)
+
+**Working on:** Building the Hunt Editor frontend (React 19 + MUI + Vite)
+
+**Backend Summary (for context only):**
+- ✅ **Production-ready** - 185/185 tests passing
+- ✅ Hunt CRUD + Versioning (Hunt master + HuntVersion snapshots)
+- ✅ Publishing & Release workflow (optimistic locking, race prevention)
+- ✅ Hunt Sharing (3-tier permissions: Owner > Admin > View)
+- ✅ AWS S3 integration for assets
+- 📍 **Next backend:** Player API (sessions, validation, progress tracking)
+- **Tech:** Node.js + Express + MongoDB + Firebase Auth
+
+**Frontend Focus:**
+- Editor app only (Player is separate, ignore for now)
+- React 19 + TypeScript + Vite + MUI v6 + styled-components
+- Journey Timeline layout (NOT traditional sidebar)
+- Zustand (UI state) + React Query (server state)
+- React Hook Form + Zod for forms
+
+---
+
 ## Core Behavior & Principles
 
 @.claude/behavior/principles.md
@@ -47,9 +69,19 @@ It imports all context about the project, so Claude always knows:
 @.claude/decisions/production-best-practices-type-sharing.md
 @.claude/decisions/schema-validation-strategy.md
 
-## Frontend & Deployment (Future Work)
+## 🎨 Frontend Context (CURRENT FOCUS - Editor App)
 
-@.claude/frontend/overview.md
+@.claude/frontend/FRONTEND-ARCHITECTURE.md
+@.claude/frontend/Design-decisions.md
+@.claude/frontend/Component-specs.md
+@.claude/frontend/codebase-tools/UI-decision.md
+@.claude/frontend/codebase-tools/MUI-implementation-guide-suggestion.md
+@.claude/frontend/codebase-tools/react-19-usage-guide-hunthub.md
+
+**Note:** Player app is separate - ignore `.claude/frontend/player/` and `.claude/frontend/_archive/` folders
+
+## Deployment (Future)
+
 @.claude/deployment/strategy.md
 
 ---
