@@ -1,6 +1,6 @@
 import axios from 'axios';
+import { auth } from '@/lib/firebase';
 
-// Create axios instance with base configuration
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
   headers: {
@@ -9,14 +9,15 @@ export const apiClient = axios.create({
   timeout: 10000,
 });
 
-// Request interceptor (for adding auth tokens later)
 apiClient.interceptors.request.use(
-  (config) => {
-    // TODO: Add Firebase auth token when auth is implemented
-    // const token = getAuthToken();
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+  async (config) => {
+    const user = auth.currentUser;
+
+    if (user) {
+      const token = await user.getIdToken(true);
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
     return config;
   },
   (error) => {
@@ -24,14 +25,11 @@ apiClient.interceptors.request.use(
   },
 );
 
-// Response interceptor (for error handling)
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Handle errors globally
     if (error.response?.status === 401) {
-      // TODO: Handle unauthorized (redirect to login)
-      console.error('Unauthorized');
+      console.error('Unauthorized - token may be invalid');
     }
     return Promise.reject(error);
   },
