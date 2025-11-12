@@ -5,6 +5,7 @@ import { huntsApi } from '@/api/hunts';
 import { CreateHuntForm } from '@/components';
 import styled from 'styled-components';
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Example of using styled-components with MUI theme
 const StyledHeader = styled(Box)`
@@ -25,10 +26,16 @@ const StyledHuntCard = styled(Card)`
 `;
 
 function Dashboard() {
+  const { user, signOut } = useAuth();
+
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   // Fetch hunts using React Query
-  const { data: hunts, isLoading, error } = useQuery({
+  const {
+    data: hunts,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['hunts'],
     queryFn: huntsApi.getAll,
   });
@@ -43,14 +50,10 @@ function Dashboard() {
         <Typography variant="h3" component="h1">
           My Hunts
         </Typography>
-        <Button
-          variant="contained"
-          size="large"
-          startIcon={<Plus size={20} />}
-          onClick={handleCreateHunt}
-        >
+        <Button variant="contained" size="large" startIcon={<Plus size={20} />} onClick={handleCreateHunt}>
           Create Hunt
         </Button>
+        <Button onClick={signOut}>Sign Out ({user?.email})</Button>
       </StyledHeader>
 
       {/* Loading state */}
@@ -81,12 +84,7 @@ function Dashboard() {
           <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
             Create your first treasure hunt to get started!
           </Typography>
-          <Button
-            variant="contained"
-            size="large"
-            startIcon={<Plus size={20} />}
-            onClick={handleCreateHunt}
-          >
+          <Button variant="contained" size="large" startIcon={<Plus size={20} />} onClick={handleCreateHunt}>
             Create Your First Hunt
           </Button>
         </Box>
@@ -120,12 +118,7 @@ function Dashboard() {
       )}
 
       {/* Create Hunt Dialog */}
-      <Dialog
-        open={isCreateDialogOpen}
-        onClose={() => setIsCreateDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
+      <Dialog open={isCreateDialogOpen} onClose={() => setIsCreateDialogOpen(false)} maxWidth="sm" fullWidth>
         <CreateHuntForm />
       </Dialog>
     </Container>
