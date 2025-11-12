@@ -11,6 +11,15 @@ export interface SignUpCredentials {
   displayName: string;
 }
 
+export interface OAuthUserData {
+  firebaseUid: string;
+  email: string;
+  firstName: string;
+  lastName?: string;
+  displayName: string;
+  profilePicture?: string;
+}
+
 export interface AuthResponse {
   accessToken: string;
   refreshToken?: string;

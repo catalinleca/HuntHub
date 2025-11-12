@@ -2,11 +2,12 @@ import { injectable } from 'inversify';
 import { User } from '@hunthub/shared';
 import UserModel from '@/database/models/User';
 import { UserMapper } from '@/shared/mappers';
-import { SignUpCredentials } from '@/modules/auth/auth.types';
+import { SignUpCredentials, OAuthUserData } from '@/modules/auth/auth.types';
 
 export interface IUserService {
   getUserByFirebaseUid(firebaseUid: string): Promise<User | null>;
   createUser(userData: Required<SignUpCredentials>): Promise<User>;
+  createOAuthUser(userData: OAuthUserData): Promise<User>;
 }
 
 @injectable()
@@ -25,6 +26,12 @@ export class UserService implements IUserService {
 
   async createUser(userData: Required<SignUpCredentials>): Promise<User> {
     const docData = UserMapper.toDocument(userData);
+    const user = await UserModel.create(docData);
+    return UserMapper.fromDocument(user);
+  }
+
+  async createOAuthUser(userData: OAuthUserData): Promise<User> {
+    const docData = UserMapper.toOAuthDocument(userData);
     const user = await UserModel.create(docData);
     return UserMapper.fromDocument(user);
   }

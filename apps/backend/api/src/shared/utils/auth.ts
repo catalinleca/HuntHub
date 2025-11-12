@@ -3,14 +3,40 @@ import { TYPES } from '@/shared/types';
 import { IUserService } from '@/modules/users/user.service';
 import { container } from '@/config/inversify';
 import { CompactUser } from '@/shared/types/CompactUser';
-import { NotFoundError } from '@/shared/errors';
+
+const parseFullName = (fullName?: string): { firstName: string; lastName?: string } => {
+  if (!fullName) return { firstName: '' };
+
+  const parts = fullName.trim().split(/\s+/);
+
+  if (parts.length === 1) {
+    return { firstName: parts[0] };
+  }
+
+  return {
+    firstName: parts[0],
+    lastName: parts.slice(1).join(' '),
+  };
+};
 
 export const authUser = async (token: DecodedIdToken): Promise<CompactUser> => {
   const userService = container.get<IUserService>(TYPES.UserService);
 
-  const user = await userService.getUserByFirebaseUid(token.uid);
+  let user = await userService.getUserByFirebaseUid(token.uid);
+
   if (!user) {
-    throw new NotFoundError();
+    console.log(`User with firebaseUid ${token.uid} not found. Creating OAuth user`);
+
+    const { firstName, lastName } = parseFullName(token.name);
+
+    user = await userService.createOAuthUser({
+      firebaseUid: token.uid,
+      email: token.email!,
+      firstName: firstName || token.email!.split('@')[0],
+      lastName,
+      displayName: token.name || token.email!,
+      profilePicture: token.picture,
+    });
   }
 
   return {
