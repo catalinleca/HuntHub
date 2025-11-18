@@ -1,0 +1,1 @@
+export { DashboardHero } from './DashboardHero';

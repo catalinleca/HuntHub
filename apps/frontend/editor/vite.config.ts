@@ -12,6 +12,10 @@ export default defineConfig({
       '@mui/styled-engine': '@mui/styled-engine-sc',
     },
   },
+  assetsInclude: ['**/*.svg'], // Treat SVGs as assets
+  build: {
+    assetsInlineLimit: 0, // Don't inline any assets as data URIs
+  },
   server: {
     port: 5174,
     proxy: {

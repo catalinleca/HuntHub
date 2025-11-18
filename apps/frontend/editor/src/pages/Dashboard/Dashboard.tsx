@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useGetHunts } from '@/api/Hunt';
 import {
   DashboardNavBar,
+  DashboardHero,
   EmptyState,
   ErrorState,
   HuntsGrid,
@@ -10,7 +11,7 @@ import {
 } from './components';
 import { DashboardContainer, ContentContainer, PageTitle } from './Dashboard.styles';
 
-export default function Dashboard() {
+const Dashboard = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const { data: hunts, isLoading, error } = useGetHunts();
 
@@ -20,6 +21,7 @@ export default function Dashboard() {
   return (
     <DashboardContainer>
       <DashboardNavBar onCreateClick={handleCreateClick} />
+      <DashboardHero onCreateClick={handleCreateClick} />
 
       <ContentContainer maxWidth="lg">
         <PageTitle variant="h3">
@@ -40,4 +42,6 @@ export default function Dashboard() {
       </ContentContainer>
     </DashboardContainer>
   );
-}
+};
+
+export default Dashboard;
