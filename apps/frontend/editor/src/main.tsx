@@ -4,9 +4,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
-import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import App from './App';
-import { theme } from './theme';
+import { theme } from './material-ui';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,11 +21,9 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
-        <StyledThemeProvider theme={theme}>
-          <CssBaseline />
-          <App />
-          <ReactQueryDevtools initialIsOpen={false} />
-        </StyledThemeProvider>
+        <CssBaseline />
+        <App />
+        <ReactQueryDevtools initialIsOpen={false} />
       </ThemeProvider>
     </QueryClientProvider>
   </StrictMode>,
