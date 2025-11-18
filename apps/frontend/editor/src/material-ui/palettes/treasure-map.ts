@@ -1,5 +1,5 @@
 import { ThemeOptions } from '@mui/material';
-import '../styled';
+import '../styled.d.ts';
 
 const treasureMapPalette = {
   palette: {

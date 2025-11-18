@@ -18,7 +18,7 @@ import type { HuntCreate, Hunt } from '@hunthub/shared';
 import { HuntCreate as HuntCreateSchema } from '@hunthub/shared/schemas';
 
 // Import API client
-import { huntsApi } from '@/api/hunts';
+import { huntsApi } from '@/network/Hunt/api';
 
 /**
  * Example form demonstrating type imports from @hunthub/shared

@@ -8,7 +8,7 @@ import {
   signInWithPopup,
   signOut as firebaseSignOut,
 } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth } from '@/services/firebase';
 import { FirebaseError } from 'firebase/app';
 
 interface AuthContextType {

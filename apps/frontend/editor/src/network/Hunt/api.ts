@@ -1,5 +1,5 @@
 import { Hunt, HuntCreate, HuntUpdate } from '@hunthub/shared';
-import { apiClient } from './client';
+import { apiClient } from '@/services/http-client';
 
 export const huntsApi = {
   // Get all user's hunts

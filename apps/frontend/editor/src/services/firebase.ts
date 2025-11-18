@@ -37,7 +37,7 @@ if (getApps().length === 0) {
  * - Consistent auth instance across the app
  *
  * Usage in components:
- * import { auth } from '@/lib/firebase';
+ * import { auth } from '@/services/firebase';
  * signInWithPopup(auth, provider);
  */
 export const auth: Auth = getAuth(app);
