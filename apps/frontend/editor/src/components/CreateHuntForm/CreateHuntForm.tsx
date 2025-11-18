@@ -1,36 +1,13 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Paper,
-  Stack,
-} from '@mui/material';
+import { Button, TextField, Typography, Stack } from '@mui/material';
 import { FloppyDisk } from '@phosphor-icons/react';
-
-// Import TypeScript types from @hunthub/shared (same as backend)
 import type { HuntCreate } from '@hunthub/shared';
-
-// Import Zod schemas from @hunthub/shared/schemas (same as backend)
 import { HuntCreate as HuntCreateSchema } from '@hunthub/shared/schemas';
-
-// Import React Query hook
 import { useCreateHunt } from '@/api/Hunt';
+import { FormPaper, FormDescription, ButtonContainer } from './CreateHuntForm.styles';
 
-/**
- * Example form demonstrating type imports from @hunthub/shared
- *
- * Pattern matches backend:
- * - TypeScript types from '@hunthub/shared' for type safety
- * - Zod schemas from '@hunthub/shared/schemas' for validation
- * - Same validation rules as backend API
- */
 export function CreateHuntForm() {
-  // React Hook Form with Zod validation
-  // HuntCreate type ensures type safety
-  // HuntCreateSchema provides runtime validation
   const {
     register,
     handleSubmit,
@@ -44,7 +21,6 @@ export function CreateHuntForm() {
     },
   });
 
-  // React Query mutation hook (handles cache invalidation automatically)
   const createHuntMutation = useCreateHunt();
 
   const onSubmit = (data: HuntCreate) => {
@@ -60,20 +36,18 @@ export function CreateHuntForm() {
   };
 
   return (
-    <Paper elevation={2} sx={{ p: 3, maxWidth: 600, mx: 'auto' }}>
+    <FormPaper elevation={2}>
       <Typography variant="h5" gutterBottom>
         Create New Hunt
       </Typography>
 
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        This form uses the same types and validation as the backend.
-        Types from <code>@hunthub/shared</code>, schemas from{' '}
-        <code>@hunthub/shared/schemas</code>
-      </Typography>
+      <FormDescription variant="body2" color="text.secondary">
+        This form uses the same types and validation as the backend. Types from{' '}
+        <code>@hunthub/shared</code>, schemas from <code>@hunthub/shared/schemas</code>
+      </FormDescription>
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={3}>
-          {/* Hunt Name Field */}
           <TextField
             {...register('name')}
             label="Hunt Name"
@@ -88,7 +62,6 @@ export function CreateHuntForm() {
             }}
           />
 
-          {/* Description Field */}
           <TextField
             {...register('description')}
             label="Description"
@@ -103,13 +76,11 @@ export function CreateHuntForm() {
             }}
           />
 
-          {/* Start Location (optional - can be added later) */}
           <Typography variant="caption" color="text.secondary">
             Start location and steps can be added after creating the hunt.
           </Typography>
 
-          {/* Submit Button */}
-          <Box sx={{ display: 'flex', gap: 2 }}>
+          <ButtonContainer>
             <Button
               type="submit"
               variant="contained"
@@ -120,9 +91,8 @@ export function CreateHuntForm() {
             >
               {createHuntMutation.isPending ? 'Creating...' : 'Create Hunt'}
             </Button>
-          </Box>
+          </ButtonContainer>
 
-          {/* Success/Error Messages */}
           {createHuntMutation.isSuccess && (
             <Typography color="success.main" variant="body2">
               ✓ Hunt created successfully!
@@ -136,6 +106,6 @@ export function CreateHuntForm() {
           )}
         </Stack>
       </form>
-    </Paper>
+    </FormPaper>
   );
 }

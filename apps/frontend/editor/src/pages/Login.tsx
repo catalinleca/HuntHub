@@ -1,17 +1,8 @@
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Box, Button, Typography, Alert } from '@mui/material';
-import { useEffect } from 'react';
 
 export const Login = () => {
-  const { user, signInWithGoogle, error, loading } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user) {
-      navigate('/dashboard');
-    }
-  }, [user, navigate]);
+  const { signInWithGoogle, error, loading } = useAuth();
 
   const handleGoogleSignIn = async () => {
     try {

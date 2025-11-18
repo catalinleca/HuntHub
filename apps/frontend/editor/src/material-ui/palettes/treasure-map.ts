@@ -23,8 +23,10 @@ const treasureMapPalette = {
       main: '#4a6841',
       contrastText: '#FFFFFF',
     },
-    warning: {
+    accent: {
       main: '#d4af35',
+      dark: '#b8941f',
+      light: 'rgba(212, 175, 53, 0.1)',
       contrastText: '#2C1810',
     },
     background: {
