@@ -1,6 +1,5 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Box,
   Button,
@@ -12,13 +11,13 @@ import {
 import { FloppyDisk } from '@phosphor-icons/react';
 
 // Import TypeScript types from @hunthub/shared (same as backend)
-import type { HuntCreate, Hunt } from '@hunthub/shared';
+import type { HuntCreate } from '@hunthub/shared';
 
 // Import Zod schemas from @hunthub/shared/schemas (same as backend)
 import { HuntCreate as HuntCreateSchema } from '@hunthub/shared/schemas';
 
-// Import API client
-import { huntsApi } from '@/network/Hunt/api';
+// Import React Query hook
+import { useCreateHunt } from '@/network/Hunt';
 
 /**
  * Example form demonstrating type imports from @hunthub/shared
@@ -29,8 +28,6 @@ import { huntsApi } from '@/network/Hunt/api';
  * - Same validation rules as backend API
  */
 export function CreateHuntForm() {
-  const queryClient = useQueryClient();
-
   // React Hook Form with Zod validation
   // HuntCreate type ensures type safety
   // HuntCreateSchema provides runtime validation
@@ -47,25 +44,19 @@ export function CreateHuntForm() {
     },
   });
 
-  // React Query mutation
-  const createHuntMutation = useMutation({
-    mutationFn: (data: HuntCreate) => huntsApi.create(data),
-    onSuccess: (newHunt: Hunt) => {
-      console.log('Hunt created:', newHunt);
-
-      // Invalidate hunts list query
-      queryClient.invalidateQueries({ queryKey: ['hunts'] });
-
-      // Reset form
-      reset();
-    },
-    onError: (error) => {
-      console.error('Failed to create hunt:', error);
-    },
-  });
+  // React Query mutation hook (handles cache invalidation automatically)
+  const createHuntMutation = useCreateHunt();
 
   const onSubmit = (data: HuntCreate) => {
-    createHuntMutation.mutate(data);
+    createHuntMutation.mutate(data, {
+      onSuccess: (newHunt) => {
+        console.log('Hunt created:', newHunt);
+        reset();
+      },
+      onError: (error) => {
+        console.error('Failed to create hunt:', error);
+      },
+    });
   };
 
   return (
