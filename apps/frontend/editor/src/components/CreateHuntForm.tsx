@@ -17,7 +17,7 @@ import type { HuntCreate } from '@hunthub/shared';
 import { HuntCreate as HuntCreateSchema } from '@hunthub/shared/schemas';
 
 // Import React Query hook
-import { useCreateHunt } from '@/network/Hunt';
+import { useCreateHunt } from '@/api/Hunt';
 
 /**
  * Example form demonstrating type imports from @hunthub/shared

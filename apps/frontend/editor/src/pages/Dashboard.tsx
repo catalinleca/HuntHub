@@ -1,7 +1,6 @@
 import { Container, Typography, Box, Button, Card, CardContent, Dialog } from '@mui/material';
 import { Plus } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
-import { huntsApi } from '@/network/Hunt/api';
 import { CreateHuntForm } from '@/components';
 import styled from 'styled-components';
 import { useState } from 'react';
