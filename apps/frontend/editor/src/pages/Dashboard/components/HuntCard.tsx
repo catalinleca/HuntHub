@@ -6,7 +6,7 @@ interface HuntCardProps {
   hunt: Hunt;
 }
 
-export function HuntCard({ hunt }: HuntCardProps) {
+export const HuntCard = ({ hunt }: HuntCardProps) => {
   return (
     <StyledHuntCard>
       <CardContent>
@@ -22,4 +22,4 @@ export function HuntCard({ hunt }: HuntCardProps) {
       </CardContent>
     </StyledHuntCard>
   );
-}
+};

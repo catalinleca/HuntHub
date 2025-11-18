@@ -7,7 +7,7 @@ interface NavBarProps {
   actions?: ReactNode;
 }
 
-export function NavBar({ actions }: NavBarProps) {
+export const NavBar = ({ actions }: NavBarProps) => {
   return (
     <StyledAppBar position="sticky" elevation={0}>
       <StyledToolbar>
@@ -22,4 +22,4 @@ export function NavBar({ actions }: NavBarProps) {
       </StyledToolbar>
     </StyledAppBar>
   );
-}
+};

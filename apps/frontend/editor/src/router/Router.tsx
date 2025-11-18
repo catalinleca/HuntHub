@@ -7,6 +7,6 @@ const router = createBrowserRouter(routes, {
   },
 });
 
-export function Router() {
+export const Router = () => {
   return <RouterProvider router={router} future={{ v7_startTransition: true }} />;
-}
+};

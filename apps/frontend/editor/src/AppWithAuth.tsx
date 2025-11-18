@@ -3,7 +3,7 @@ import { Router } from './router';
 import { Login } from './pages/Login';
 import { Box, CircularProgress } from '@mui/material';
 
-export function AppWithAuth() {
+export const AppWithAuth = () => {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -26,4 +26,4 @@ export function AppWithAuth() {
   }
 
   return <Router />;
-}
+};

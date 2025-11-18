@@ -7,7 +7,7 @@ import { HuntCreate as HuntCreateSchema } from '@hunthub/shared/schemas';
 import { useCreateHunt } from '@/api/Hunt';
 import { FormPaper, FormDescription, ButtonContainer } from './CreateHuntForm.styles';
 
-export function CreateHuntForm() {
+export const CreateHuntForm = () => {
   const {
     register,
     handleSubmit,

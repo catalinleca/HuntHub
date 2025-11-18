@@ -6,10 +6,10 @@ interface CreateHuntDialogProps {
   onClose: () => void;
 }
 
-export function CreateHuntDialog({ open, onClose }: CreateHuntDialogProps) {
+export const CreateHuntDialog = ({ open, onClose }: CreateHuntDialogProps) => {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <CreateHuntForm />
     </Dialog>
   );
-}
+};

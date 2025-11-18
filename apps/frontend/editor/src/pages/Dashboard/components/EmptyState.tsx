@@ -6,7 +6,7 @@ interface EmptyStateProps {
   onCreateClick: () => void;
 }
 
-export function EmptyState({ onCreateClick }: EmptyStateProps) {
+export const EmptyState = ({ onCreateClick }: EmptyStateProps) => {
   return (
     <EmptyStateContainer>
       <Typography variant="h5" gutterBottom>
@@ -25,4 +25,4 @@ export function EmptyState({ onCreateClick }: EmptyStateProps) {
       </Button>
     </EmptyStateContainer>
   );
-}
+};

@@ -4,7 +4,7 @@ import { SignOut, User } from '@phosphor-icons/react';
 import { useAuth } from '@/contexts/AuthContext';
 import { StyledAvatar } from './UserMenu.styles';
 
-export function UserMenu() {
+export const UserMenu = () => {
   const { user, signOut } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -55,4 +55,4 @@ export function UserMenu() {
       </Menu>
     </>
   );
-}
+};

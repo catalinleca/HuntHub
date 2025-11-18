@@ -6,7 +6,7 @@ interface HuntsGridProps {
   hunts: Hunt[];
 }
 
-export function HuntsGrid({ hunts }: HuntsGridProps) {
+export const HuntsGrid = ({ hunts }: HuntsGridProps) => {
   return (
     <StyledHuntsGrid>
       {hunts.map((hunt) => (
@@ -14,4 +14,4 @@ export function HuntsGrid({ hunts }: HuntsGridProps) {
       ))}
     </StyledHuntsGrid>
   );
-}
+};

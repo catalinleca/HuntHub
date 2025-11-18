@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import { Box } from '@mui/material';
 
-export function RootLayout() {
+export const RootLayout = () => {
   return (
     <Box
       sx={{
@@ -12,4 +12,4 @@ export function RootLayout() {
       <Outlet />
     </Box>
   );
-}
+};

@@ -6,7 +6,7 @@ interface DashboardNavBarProps {
   onCreateClick: () => void;
 }
 
-export function DashboardNavBar({ onCreateClick }: DashboardNavBarProps) {
+export const DashboardNavBar = ({ onCreateClick }: DashboardNavBarProps) => {
   return (
     <NavBar
       actions={
@@ -24,4 +24,4 @@ export function DashboardNavBar({ onCreateClick }: DashboardNavBarProps) {
       }
     />
   );
-}
+};

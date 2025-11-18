@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 import { EmptyStateContainer } from '../Dashboard.styles';
 
-export function ErrorState() {
+export const ErrorState = () => {
   return (
     <EmptyStateContainer>
       <Typography variant="h6" gutterBottom color="text.secondary">
@@ -12,4 +12,4 @@ export function ErrorState() {
       </Typography>
     </EmptyStateContainer>
   );
-}
+};
