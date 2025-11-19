@@ -1,14 +1,14 @@
 import styled from 'styled-components';
-import { AppBar, Toolbar, Box } from '@mui/material';
+import { AppBar as MuiAppBar, Toolbar as MuiToolbar, Box } from '@mui/material';
 
-export const StyledAppBar = styled(AppBar)`
+export const AppBar = styled(MuiAppBar)`
   background-color: ${({ theme }) => theme.palette.background.paper};
   color: ${({ theme }) => theme.palette.primary.main};
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
   box-shadow: none;
 `;
 
-export const StyledToolbar = styled(Toolbar)`
+export const Toolbar = styled(MuiToolbar)`
   gap: ${({ theme }) => theme.spacing(2)};
 `;
 

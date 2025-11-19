@@ -10,12 +10,12 @@ export const DashboardHero = ({ onCreateClick }: DashboardHeroProps) => {
     <S.HeroContainer>
       <S.HeroContent>
         <S.CompassCircle>
-          <CompassIcon size={52} color="white" style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))' }} />
+          <CompassIcon size={52} />
         </S.CompassCircle>
 
-        <S.HeroTitle>YOUR QUEST AWAITS</S.HeroTitle>
+        <S.HeroTitle variant="h1">YOUR QUEST AWAITS</S.HeroTitle>
 
-        <S.HeroSubtitle>
+        <S.HeroSubtitle variant="body1" fontWeight={500}>
           Forge legendary treasure hunts that transform ordinary places into extraordinary adventures
         </S.HeroSubtitle>
 

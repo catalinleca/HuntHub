@@ -1,4 +1,4 @@
-import { Typography } from '@mui/material';
+import { Dialog, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useGetHunts } from '@/api/Hunt';
 import {
@@ -10,6 +10,17 @@ import {
   CreateHuntDialog,
 } from './components';
 import { DashboardContainer, ContentContainer, PageTitle } from './Dashboard.styles';
+import { CreateHuntForm } from '@/components';
+
+// TODO: to be deleted
+const CreateHuntDialog = ({ open, onClose }: any) => {
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <CreateHuntForm />
+    </Dialog>
+  );
+};
+
 
 const Dashboard = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);

@@ -1,5 +1,4 @@
 import { ThemeOptions } from '@mui/material';
-import '../styled.d.ts';
 
 const treasureMapPalette = {
   palette: {
@@ -24,9 +23,10 @@ const treasureMapPalette = {
       contrastText: '#FFFFFF',
     },
     accent: {
+      light: '#c17a3a',
       main: '#d4af35',
+      medium: '#a8651f',
       dark: '#b8941f',
-      light: 'rgba(212, 175, 53, 0.1)',
       contrastText: '#2C1810',
     },
     background: {
@@ -117,7 +117,7 @@ const treasureMapPalette = {
     '0 16px 32px rgba(44, 24, 16, 0.10)',
     '0 20px 40px rgba(44, 24, 16, 0.10)',
     '0 24px 48px rgba(44, 24, 16, 0.12)',
-    '',
+    '0 8px 32px rgba(44, 24, 16, 0.3)',
     '',
     '',
     '',

@@ -1,12 +1,17 @@
 import styled from 'styled-components';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, alpha } from '@mui/material';
 import noiseSvg from '@/assets/patterns/noise.svg';
 import geometricSvg from '@/assets/patterns/geometric.svg';
 
 export const HeroContainer = styled(Box)`
   position: relative;
-  padding: 80px 24px;
-  background: linear-gradient(135deg, #c17a3a 0%, #a8651f 40%, #8b4513 100%);
+  padding: ${({ theme }) => theme.spacing(20)} ${({ theme }) => theme.spacing(6)};
+  background: linear-gradient(
+    135deg,
+    ${({ theme }) => theme.palette.accent.light} 0%,
+    ${({ theme }) => theme.palette.accent.medium} 40%,
+    ${({ theme }) => theme.palette.secondary.main} 100%
+  );
   overflow: hidden;
 
   &::before {
@@ -41,7 +46,7 @@ export const HeroContent = styled(Box)`
   z-index: 1;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 ${({ theme }) => theme.spacing(6)};
   text-align: center;
 `;
 
@@ -52,31 +57,29 @@ export const CompassCircle = styled(Box)`
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: ${({ theme }) => alpha(theme.palette.common.white, 0.2)};
   backdrop-filter: blur(8px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: ${({ theme }) => theme.shadows[7]};
   margin-bottom: ${({ theme }) => theme.spacing(5)};
+
+  > svg {
+    color: ${({ theme }) => theme.palette.common.white};
+    filter: drop-shadow(${({ theme }) => theme.shadows[8]});
+  }
 `;
 
 export const HeroTitle = styled(Typography)`
   color: ${({ theme }) => theme.palette.common.white};
-  font-family: 'Georgia', 'Cinzel', serif;
-  font-size: 48px;
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: 0.02em;
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  font-family: ${({ theme }) => theme.typography.displayFontFamily};
+  text-shadow: ${({ theme }) => theme.shadows[7]};
   margin-bottom: ${({ theme }) => theme.spacing(3)};
 `;
 
 export const HeroSubtitle = styled(Typography)`
-  color: rgba(255, 255, 255, 0.95);
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1.6;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  color: ${({ theme }) => alpha(theme.palette.common.white, 0.95)};
+  text-shadow: ${({ theme }) => theme.shadows[4]};
   margin-bottom: ${({ theme }) => theme.spacing(7)};
-  max-width: 672px;
+  max-width: 700px;
   margin-left: auto;
   margin-right: auto;
 `;
@@ -93,7 +96,7 @@ export const Dot = styled(Box)`
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.4);
+  background-color: ${({ theme }) => alpha(theme.palette.common.white, 0.4)};
 `;
 
 export const ButtonContainer = styled(Box)`
@@ -105,19 +108,15 @@ export const ButtonContainer = styled(Box)`
 
 export const PrimaryHeroButton = styled(Button)`
   background-color: ${({ theme }) => theme.palette.common.white};
-  color: #b6591b;
-  font-weight: 700;
-  font-size: 15px;
   height: 48px;
-  padding: 0 24px;
-  border-radius: 12px;
-  border: 3px solid #b6591b;
-  box-shadow: 0 2px 6px rgba(139, 69, 19, 0.2);
+  border: 3px solid ${({ theme }) => theme.palette.primary.main};
+  box-shadow: ${({ theme }) => theme.shadows[4]};
   transition: all 0.3s ease;
 
   &:hover {
     background-color: ${({ theme }) => theme.palette.common.white};
     transform: scale(1.05) translateY(-2px);
+    box-shadow: ${({ theme }) => theme.shadows[4]};
   }
 
   &:active {
@@ -126,21 +125,18 @@ export const PrimaryHeroButton = styled(Button)`
 `;
 
 export const SecondaryHeroButton = styled(Button)`
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: ${({ theme }) => alpha(theme.palette.common.white, 0.1)};
   color: ${({ theme }) => theme.palette.common.white};
-  font-weight: 600;
-  font-size: 15px;
   height: 48px;
-  padding: 0 24px;
-  border-radius: 12px;
-  border: 2px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 2px 6px rgba(139, 69, 19, 0.2);
+  border: 2px solid ${({ theme }) => alpha(theme.palette.common.white, 0.6)};
+  box-shadow: ${({ theme }) => theme.shadows[2]};
   backdrop-filter: blur(4px);
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: ${({ theme }) => alpha(theme.palette.common.white, 0.15)};
     transform: scale(1.05) translateY(-2px);
+    box-shadow: ${({ theme }) => theme.shadows[4]};
   }
 
   &:active {

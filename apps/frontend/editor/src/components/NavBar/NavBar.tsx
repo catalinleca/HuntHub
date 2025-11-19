@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 import { CompassIcon } from '@phosphor-icons/react';
 import { ReactNode } from 'react';
-import { StyledAppBar, StyledToolbar, LogoContainer, ActionsContainer } from './NavBar.styles';
+import * as S from './NavBar.styles';
 
 interface NavBarProps {
   actions?: ReactNode;
@@ -9,17 +9,17 @@ interface NavBarProps {
 
 export const NavBar = ({ actions }: NavBarProps) => {
   return (
-    <StyledAppBar position="sticky" elevation={0}>
-      <StyledToolbar>
-        <LogoContainer>
+    <S.AppBar position="sticky" elevation={0}>
+      <S.Toolbar>
+        <S.LogoContainer>
           <CompassIcon size={32} weight="duotone" />
           <Typography variant="h6" component="div" fontWeight={700}>
             HuntHub
           </Typography>
-        </LogoContainer>
+        </S.LogoContainer>
 
-        {actions && <ActionsContainer>{actions}</ActionsContainer>}
-      </StyledToolbar>
-    </StyledAppBar>
+        {actions && <S.ActionsContainer>{actions}</S.ActionsContainer>}
+      </S.Toolbar>
+    </S.AppBar>
   );
 };

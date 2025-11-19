@@ -4,11 +4,8 @@ import { EmptyStateContainer } from '../Dashboard.styles';
 export const ErrorState = () => {
   return (
     <EmptyStateContainer>
-      <Typography variant="h6" gutterBottom color="text.secondary">
-        Backend not running
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        Start the backend API: <code>npm run dev:backend</code>
+      <Typography variant="h4" gutterBottom color="text.secondary">
+        Big error
       </Typography>
     </EmptyStateContainer>
   );
