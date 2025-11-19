@@ -4,6 +4,7 @@ import {
   getMuiButtonOverrides,
   getMuiCardOverrides,
   getMuiTextFieldOverrides,
+  getMuiTypographyOverrides,
 } from './overrides';
 
 export const createAppTheme = (): Theme => {
@@ -13,6 +14,7 @@ export const createAppTheme = (): Theme => {
       MuiButton: getMuiButtonOverrides(),
       MuiCard: getMuiCardOverrides(),
       MuiTextField: getMuiTextFieldOverrides(),
+      MuiTypography: getMuiTypographyOverrides(),
     },
   };
 

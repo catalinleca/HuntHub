@@ -53,60 +53,54 @@ const treasureMapPalette = {
     },
   },
   typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica", "Arial", sans-serif',
+    displayFontFamily: 'Georgia, "Times New Roman", serif',
+
     fontWeightRegular: 400,
     fontWeightMedium: 500,
     fontWeightBold: 600,
+
     h1: {
-      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
       fontSize: 40,
       fontWeight: 600,
       lineHeight: 1.2,
     },
     h2: {
-      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
       fontSize: 32,
       fontWeight: 600,
       lineHeight: 1.25,
     },
     h3: {
-      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
       fontSize: 28,
       fontWeight: 600,
       lineHeight: 1.43,
     },
     h4: {
-      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
       fontSize: 24,
       fontWeight: 600,
       lineHeight: 1.33,
     },
     h5: {
-      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
       fontSize: 20,
       fontWeight: 600,
       lineHeight: 1.2,
     },
     h6: {
-      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
       fontSize: 16,
       fontWeight: 600,
       lineHeight: 1.5,
     },
     body1: {
-      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
       fontSize: 16,
       fontWeight: 400,
       lineHeight: 1.5,
     },
     body2: {
-      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
       fontSize: 14,
       fontWeight: 400,
       lineHeight: 1.43,
     },
     button: {
-      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
       fontSize: 14,
       fontWeight: 600,
       lineHeight: 1.5,

@@ -42,53 +42,52 @@ It imports all context about the project, so Claude always knows:
 
 @.claude/core/NEXT-SESSION.md
 @.claude/core/PROJECT.md
-@.claude/core/ROADMAP.md
+<!-- Commented out for frontend work - uncomment when needed -->
+<!-- @.claude/core/ROADMAP.md -->
 
-## High-Level Architecture
+<!-- ## High-Level Architecture -->
+<!-- @.claude/core/ARCHITECTURE.md -->
 
-@.claude/core/ARCHITECTURE.md
+<!-- ## Feature-Specific Documentation -->
+<!-- @.claude/features/hunt-sharing.md -->
+<!-- @.claude/features/hunt-release.md -->
+<!-- @.claude/features/numeric-id-strategy.md -->
+<!-- @.claude/features/versioning-system.md -->
+<!-- @.claude/features/release-concept.md -->
 
-## Feature-Specific Documentation
+<!-- ## Backend Context -->
+<!-- @.claude/backend/architecture.md -->
+<!-- @.claude/backend/patterns.md -->
+<!-- @.claude/backend/current-state.md -->
 
-@.claude/features/hunt-sharing.md
-@.claude/features/hunt-release.md
-@.claude/features/numeric-id-strategy.md
-@.claude/features/versioning-system.md
-@.claude/features/release-concept.md
-
-## Backend Context
-
-@.claude/backend/architecture.md
-@.claude/backend/patterns.md
-@.claude/backend/current-state.md
-
-## Technical Decisions (Why We Chose This)
-
-@.claude/decisions/mongodb-vs-postgres.md
-@.claude/decisions/schema-sharing-final-strategy.md
-@.claude/decisions/production-best-practices-type-sharing.md
-@.claude/decisions/schema-validation-strategy.md
+<!-- ## Technical Decisions (Why We Chose This) -->
+<!-- @.claude/decisions/mongodb-vs-postgres.md -->
+<!-- @.claude/decisions/schema-sharing-final-strategy.md -->
+<!-- @.claude/decisions/production-best-practices-type-sharing.md -->
+<!-- @.claude/decisions/schema-validation-strategy.md -->
 
 ## 🎨 Frontend Context (CURRENT FOCUS - Editor App)
 
 @.claude/frontend/FRONTEND-ARCHITECTURE.md
-@.claude/frontend/Design-decisions.md
-@.claude/frontend/Component-specs.md
 @.claude/frontend/codebase-tools/UI-decision.md
 @.claude/frontend/codebase-tools/MUI-implementation-guide-suggestion.md
 @.claude/frontend/codebase-tools/react-19-usage-guide-hunthub.md
 
 **Note:** Player app is separate - ignore `.claude/frontend/player/` and `.claude/frontend/_archive/` folders
 
-## Deployment (Future)
-
-@.claude/deployment/strategy.md
+<!-- ## Deployment (Future) -->
+<!-- @.claude/deployment/strategy.md -->
 
 ---
 
 ## 📚 Reference Library (NOT auto-loaded - access manually)
 
 Use Read tool to access these when needed:
+
+**Frontend Reference (Editor-specific):**
+- `.claude/frontend/reference/Design-decisions.md` - Editor layout rationale (timeline approach)
+- `.claude/frontend/reference/Component-specs.md` - Editor component specs (StepCard, Timeline, etc.)
+- `.claude/frontend/reference/performance-patterns.md` - Performance optimization patterns
 
 **Guides (Learning Materials):**
 - `.claude/guides/challenge-types-guide.md` - Challenge type reference

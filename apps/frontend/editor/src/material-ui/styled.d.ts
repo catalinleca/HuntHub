@@ -21,6 +21,14 @@ declare module '@mui/material/styles' {
     lg: number;
     xl: number;
   }
+
+  interface TypographyVariants {
+    displayFontFamily: string;
+  }
+
+  interface TypographyVariantsOptions {
+    displayFontFamily?: string;
+  }
 }
 
 declare module '@mui/material/Button' {
@@ -38,5 +46,11 @@ declare module '@mui/material/Chip' {
 declare module '@mui/material/Badge' {
   interface BadgePropsColorOverrides {
     accent: true;
+  }
+}
+
+declare module '@mui/material/Typography' {
+  interface TypographyProps {
+    textStyle?: 'display' | 'ui';
   }
 }
