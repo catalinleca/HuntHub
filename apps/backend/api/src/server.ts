@@ -33,7 +33,9 @@ async function bootstrap() {
 
   const app = express();
 
-  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:5174'];
+  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',')
+    .map((s) => s.trim())
+    .filter(Boolean) || ['http://localhost:5174'];
   app.use(
     cors({
       origin: allowedOrigins,
