@@ -19,3 +19,21 @@ export const validateRequest = (schema: ZodSchema) => async (req: Request, res: 
     return next(error);
   }
 };
+
+export const validateQuery = (schema: ZodSchema) => async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    req.query = await schema.parseAsync(req.query);
+    return next();
+  } catch (error) {
+    if (error instanceof ZodError) {
+      const errors = error.errors.map((err) => ({
+        field: err.path.join('.'),
+        message: err.message,
+      }));
+
+      return next(new ValidationError('Invalid query parameters', errors));
+    }
+
+    return next(error);
+  }
+};

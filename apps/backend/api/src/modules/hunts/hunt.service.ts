@@ -1,10 +1,9 @@
 import { Hunt, HuntCreate } from '@hunthub/shared';
 import { inject, injectable } from 'inversify';
-import { ClientSession, HydratedDocument, Types } from 'mongoose';
+import { ClientSession, Types } from 'mongoose';
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import StepModel from '@/database/models/Step';
-import { IHunt } from '@/database/types/Hunt';
 import { HuntMapper, StepMapper } from '@/shared/mappers';
 import { NotFoundError } from '@/shared/errors';
 import { ValidationError } from '@/shared/errors';
@@ -14,10 +13,17 @@ import { IAuthorizationService } from '@/services/authorization/authorization.se
 import { HuntAccessModel } from '@/database/models';
 import { HuntPermission } from '@/database/types';
 import { withTransaction } from '@/shared/utils/transaction';
+import {
+  PaginationParams,
+  PaginatedResponse,
+  buildPaginationMeta,
+  calculateSkip,
+  buildSortObject,
+} from '@/shared/utils/pagination';
 
 export interface IHuntService {
   createHunt(hunt: HuntCreate, creatorId: string): Promise<Hunt>;
-  getUserHunts(userId: string): Promise<Hunt[]>;
+  getUserHunts(userId: string, pagination: PaginationParams): Promise<PaginatedResponse<Hunt>>;
   getHuntById(huntId: number): Promise<Hunt>;
   getUserHuntById(huntId: number, userId: string): Promise<Hunt>;
   updateHunt(huntId: number, huntData: Hunt, userId: string): Promise<Hunt>;
@@ -31,16 +37,6 @@ export interface IHuntService {
 export class HuntService implements IHuntService {
   constructor(@inject(TYPES.AuthorizationService) private authService: IAuthorizationService) {}
 
-  private async fetchHuntWithVersion(huntDoc: HydratedDocument<IHunt>): Promise<Hunt | null> {
-    const versionDoc = await HuntVersionModel.findDraftByVersion(huntDoc.huntId, huntDoc.latestVersion);
-
-    if (!versionDoc) {
-      return null;
-    }
-
-    return HuntMapper.fromDocuments(huntDoc, versionDoc);
-  }
-
   async createHunt(hunt: HuntCreate, creatorId: string): Promise<Hunt> {
     return withTransaction(async (session) => {
       const huntData = HuntMapper.toHuntDocument(creatorId);
@@ -53,7 +49,7 @@ export class HuntService implements IHuntService {
     });
   }
 
-  async getUserHunts(userId: string): Promise<Hunt[]> {
+  async getUserHunts(userId: string, pagination: PaginationParams): Promise<PaginatedResponse<Hunt>> {
     const [ownedHuntIds, sharedAccess] = await Promise.all([
       HuntModel.find({ creatorId: userId, isDeleted: false }).select('huntId').lean().exec(),
       HuntAccessModel.find({ sharedWithId: userId }).select('huntId permission').lean().exec(),
@@ -71,29 +67,51 @@ export class HuntService implements IHuntService {
     });
 
     const allHuntIds = [...ownedHuntIds.map((h) => h.huntId), ...sharedAccess.map((s) => s.huntId)];
+    const total = allHuntIds.length;
 
-    const hundDocs = await HuntModel.findHuntsByIds(allHuntIds);
+    const skip = calculateSkip(pagination.page, pagination.limit);
+    const sortObject = buildSortObject(pagination.sortBy, pagination.sortOrder);
 
-    const huntsOrNull = await Promise.all(
-      hundDocs.map(async (doc) => {
+    const huntDocs = await HuntModel.find({ huntId: { $in: allHuntIds }, isDeleted: false })
+      .sort(sortObject)
+      .skip(skip)
+      .limit(pagination.limit)
+      .exec();
+
+    const huntVersionIds = huntDocs.map((doc) => ({ huntId: doc.huntId, version: doc.latestVersion }));
+
+    const versionDocs = await HuntVersionModel.find({
+      $or: huntVersionIds.map(({ huntId, version }) => ({ huntId, version })),
+    }).exec();
+
+    const versionMap = new Map<number, (typeof versionDocs)[0]>();
+    versionDocs.forEach((vDoc) => {
+      versionMap.set(vDoc.huntId, vDoc);
+    });
+
+    const hunts = huntDocs
+      .map((doc) => {
         const permission = permissionMap.get(doc.huntId);
-        if (!permission) {
+        const versionDoc = versionMap.get(doc.huntId);
+
+        if (!permission || !versionDoc) {
           return null;
         }
 
-        const huntDTO = await this.fetchHuntWithVersion(doc);
-        if (!huntDTO) {
-          return null;
-        }
-
+        const huntDTO = HuntMapper.fromDocuments(doc, versionDoc);
         return {
           ...huntDTO,
           permission,
         } as Hunt;
-      }),
-    );
+      })
+      .filter((hunt): hunt is Hunt => hunt !== null);
 
-    return huntsOrNull.filter((hunt): hunt is Hunt => hunt !== null);
+    const paginationMeta = buildPaginationMeta(total, pagination.page, pagination.limit);
+
+    return {
+      data: hunts,
+      pagination: paginationMeta,
+    };
   }
 
   async getHuntById(huntId: number): Promise<Hunt> {

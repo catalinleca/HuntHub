@@ -10,6 +10,34 @@
  * ---------------------------------------------------------------
  */
 
+/**
+ * Field to sort assets by
+ * @example "createdAt"
+ */
+export enum AssetSortField {
+  CreatedAt = "createdAt",
+  OriginalFilename = "originalFilename",
+  Size = "size",
+}
+
+/**
+ * Field to sort hunts by
+ * @example "updatedAt"
+ */
+export enum HuntSortField {
+  CreatedAt = "createdAt",
+  UpdatedAt = "updatedAt",
+}
+
+/**
+ * Sort order direction
+ * @example "desc"
+ */
+export enum SortOrder {
+  Asc = "asc",
+  Desc = "desc",
+}
+
 /** Player's progress status through a hunt */
 export enum HuntProgressStatus {
   InProgress = "in_progress",
@@ -604,4 +632,88 @@ export interface ShareHuntRequest {
 export interface UpdatePermissionRequest {
   /** New permission level */
   permission: "admin" | "view";
+}
+
+/** Standard pagination query parameters */
+export interface PaginationQueryParams {
+  /**
+   * Page number (1-indexed)
+   * @min 1
+   * @default 1
+   * @example 1
+   */
+  page?: number;
+  /**
+   * Number of items per page (max 100)
+   * @min 1
+   * @max 100
+   * @default 10
+   * @example 10
+   */
+  limit?: number;
+  /** Sort order direction */
+  sortOrder?: SortOrder;
+}
+
+export type HuntQueryParams = PaginationQueryParams & {
+  /** Field to sort hunts by */
+  sortBy?: HuntSortField;
+};
+
+export type AssetQueryParams = PaginationQueryParams & {
+  /** Field to sort assets by */
+  sortBy?: AssetSortField;
+  /** Optional filter by MIME type */
+  mimeType?: MimeTypes;
+};
+
+/** Pagination metadata in response */
+export interface PaginationMeta {
+  /**
+   * Total number of items across all pages
+   * @example 47
+   */
+  total: number;
+  /**
+   * Current page number (1-indexed)
+   * @min 1
+   * @example 1
+   */
+  page: number;
+  /**
+   * Number of items per page
+   * @min 1
+   * @example 10
+   */
+  limit: number;
+  /**
+   * Total number of pages
+   * @min 0
+   * @example 5
+   */
+  totalPages: number;
+  /**
+   * Whether there is a next page
+   * @example true
+   */
+  hasNext: boolean;
+  /**
+   * Whether there is a previous page
+   * @example false
+   */
+  hasPrev: boolean;
+}
+
+/** Paginated response for hunts list */
+export interface PaginatedHuntsResponse {
+  data: Hunt[];
+  /** Pagination metadata in response */
+  pagination: PaginationMeta;
+}
+
+/** Paginated response for assets list */
+export interface PaginatedAssetsResponse {
+  data: Asset[];
+  /** Pagination metadata in response */
+  pagination: PaginationMeta;
 }

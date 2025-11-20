@@ -64,6 +64,17 @@ export const {
   ShareResult,
   ShareHuntRequest,
   UpdatePermissionRequest,
+
+  // Pagination
+  SortOrder,
+  HuntSortField,
+  AssetSortField,
+  PaginationQueryParams,
+  HuntQueryParams,
+  AssetQueryParams,
+  PaginationMeta,
+  PaginatedHuntsResponse,
+  PaginatedAssetsResponse,
 } = schemas;
 
 // Also export the schemas object for bulk imports if needed
