@@ -895,7 +895,7 @@ components:
 
     HuntSortField:
       type: string
-      enum: [createdAt, updatedAt, name]
+      enum: [createdAt, updatedAt]
       description: Field to sort hunts by
       example: updatedAt
 

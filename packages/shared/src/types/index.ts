@@ -27,7 +27,6 @@ export enum AssetSortField {
 export enum HuntSortField {
   CreatedAt = "createdAt",
   UpdatedAt = "updatedAt",
-  Name = "name",
 }
 
 /**

@@ -1,17 +1,10 @@
+import type { PaginationMeta } from '@hunthub/shared';
+
 export interface PaginationParams {
   page: number;
   limit: number;
   sortBy?: string;
-  sortOrder: 'asc' | 'desc';
-}
-
-export interface PaginationMeta {
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-  hasNext: boolean;
-  hasPrev: boolean;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface PaginatedResponse<T> {
@@ -20,6 +13,13 @@ export interface PaginatedResponse<T> {
 }
 
 export function buildPaginationMeta(total: number, page: number, limit: number): PaginationMeta {
+  if (limit <= 0) {
+    throw new Error('Limit must be a positive number');
+  }
+  if (page <= 0) {
+    throw new Error('Page must be a positive number');
+  }
+
   const totalPages = Math.ceil(total / limit);
 
   return {
@@ -36,7 +36,10 @@ export function calculateSkip(page: number, limit: number): number {
   return (page - 1) * limit;
 }
 
-export function buildSortObject(sortBy: string | undefined, sortOrder: 'asc' | 'desc'): Record<string, 1 | -1> {
+export function buildSortObject(
+  sortBy: string | undefined,
+  sortOrder: 'asc' | 'desc' = 'desc',
+): Record<string, 1 | -1> {
   if (!sortBy) {
     return {};
   }

@@ -290,7 +290,7 @@ const TakeOfflineRequest = z.object({ currentLiveVersion: z.number().int().nulla
 const ShareHuntRequest = z.object({ email: z.string().email(), permission: z.enum(['admin', 'view']) }).strict();
 const UpdatePermissionRequest = z.object({ permission: z.enum(['admin', 'view']) }).strict();
 const SortOrder = z.enum(['asc', 'desc']);
-const HuntSortField = z.enum(['createdAt', 'updatedAt', 'name']);
+const HuntSortField = z.enum(['createdAt', 'updatedAt']);
 const AssetSortField = z.enum(['createdAt', 'originalFilename', 'size']);
 const PaginationQueryParams = z
   .object({
