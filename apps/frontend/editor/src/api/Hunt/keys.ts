@@ -13,7 +13,8 @@
 export const huntKeys = {
   all: () => ['hunts'] as const,
   lists: () => [...huntKeys.all(), 'list'] as const,
-  list: (filters?: { status?: string }) => [...huntKeys.lists(), filters] as const,
+  list: (filters?: { status?: string; page?: number; limit?: number; sortBy?: string; sortOrder?: string }) =>
+    [...huntKeys.lists(), filters] as const,
   details: () => [...huntKeys.all(), 'detail'] as const,
   detail: (id: number) => [...huntKeys.details(), id] as const,
 };

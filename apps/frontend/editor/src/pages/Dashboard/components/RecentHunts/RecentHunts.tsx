@@ -3,13 +3,13 @@ import { ScrollIcon } from '@phosphor-icons/react';
 import { HuntCard, HuntCardTitle } from '@/components/HuntCard';
 import type { Hunt } from '@hunthub/shared/types';
 import { getColor } from '@/utils';
-import { DraftCard } from '@/pages/Dashboard/components/DraftCard';
+import { HuntActionCard } from '@/pages/Dashboard/components/HuntActionCard';
 
-interface ResumeHuntsProps {
+interface RecentHuntsProps {
   hunts: Hunt[];
 }
 
-export const ResumeHunts = ({ hunts }: ResumeHuntsProps) => {
+export const RecentHunts = ({ hunts }: RecentHuntsProps) => {
   const recentHunts = hunts.slice(0, 2);
 
   if (recentHunts.length === 0) return null;
@@ -24,7 +24,7 @@ export const ResumeHunts = ({ hunts }: ResumeHuntsProps) => {
         <Grid2 container spacing={3} sx={{ mt: 2 }}>
           {recentHunts.map((hunt) => (
             <Grid2 size={{ xs: 12, md: 6 }} key={hunt.huntId}>
-              <DraftCard title={hunt.name} subtitle={hunt.description || 'No description'} />
+              <HuntActionCard title={hunt.name} subtitle={hunt.description || 'No description'} />
             </Grid2>
           ))}
         </Grid2>

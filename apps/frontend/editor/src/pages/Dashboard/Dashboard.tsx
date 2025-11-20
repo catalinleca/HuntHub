@@ -1,17 +1,17 @@
 import { Dialog, Typography } from '@mui/material';
 import { useState } from 'react';
-import { useGetHunts } from '@/api/Hunt';
+import { useDashboardHunts } from '@/api/Hunt';
+import { RECENT_HUNTS_COUNT } from '@/api/Hunt/config';
 import {
   DashboardNavBar,
   DashboardHero,
   EmptyState,
   ErrorState,
-  ResumeHunts,
+  RecentHunts,
 } from './components';
 import { DashboardContainer, ContentContainer } from './Dashboard.styles';
 import { CreateHuntForm } from '@/components';
 
-// TODO: to be deleted
 const CreateHuntDialog = ({ open, onClose }: any) => {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -20,13 +20,16 @@ const CreateHuntDialog = ({ open, onClose }: any) => {
   );
 };
 
-
 const Dashboard = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const { data: hunts, isLoading, error } = useGetHunts();
+
+  const { hunts, isLoading, error } = useDashboardHunts();
 
   const handleCreateClick = () => setIsCreateDialogOpen(true);
   const handleCloseDialog = () => setIsCreateDialogOpen(false);
+
+  const recentHunts = hunts.slice(0, RECENT_HUNTS_COUNT);
+  const hasHunts = hunts.length > 0;
 
   return (
     <DashboardContainer>
@@ -38,11 +41,11 @@ const Dashboard = () => {
 
         {error && <ErrorState />}
 
-        {!isLoading && !error && hunts?.length === 0 && (
+        {!isLoading && !error && !hasHunts && (
           <EmptyState onCreateClick={handleCreateClick} />
         )}
 
-        {!isLoading && hunts && hunts.length > 0 && <ResumeHunts hunts={hunts} />}
+        {!isLoading && hasHunts && <RecentHunts hunts={recentHunts} />}
 
         <CreateHuntDialog open={isCreateDialogOpen} onClose={handleCloseDialog} />
       </ContentContainer>

@@ -1,10 +1,10 @@
 import { Typography, Box, Button } from '@mui/material';
 import { HuntCard, HuntCardImage, HuntCardBody } from '@/components/HuntCard';
 import { BookOpenIcon, ClockIcon } from '@phosphor-icons/react';
-import * as S from './DraftCard.styled';
+import * as S from './HuntActionCard.styled';
 import { getColor } from '@/utils';
 
-interface DraftCardProps {
+interface HuntActionCardProps {
   image?: string;
   imageAlt?: string;
   title: string;
@@ -13,7 +13,7 @@ interface DraftCardProps {
   onClick?: () => void;
 }
 
-export const DraftCard = ({ image, imageAlt, title, subtitle, metadata, onClick }: DraftCardProps) => {
+export const HuntActionCard = ({ image, imageAlt, title, subtitle, metadata, onClick }: HuntActionCardProps) => {
   return (
     <HuntCard transition onClick={onClick} disableGutters>
       <HuntCardImage src={image} alt={imageAlt} />
