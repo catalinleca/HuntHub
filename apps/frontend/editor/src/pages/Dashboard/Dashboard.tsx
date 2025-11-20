@@ -8,7 +8,7 @@ import {
   ErrorState,
   ResumeHunts,
 } from './components';
-import { DashboardContainer, ContentContainer, PageTitle } from './Dashboard.styles';
+import { DashboardContainer, ContentContainer } from './Dashboard.styles';
 import { CreateHuntForm } from '@/components';
 
 // TODO: to be deleted

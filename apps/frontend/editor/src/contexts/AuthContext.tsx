@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     setPersistence(auth, browserSessionPersistence).catch(console.error);
 
-    const unsubscribe = onAuthStateChanged(
+    return onAuthStateChanged(
       auth,
       (firebaseUser) => {
         setUser(firebaseUser);
@@ -44,8 +44,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       },
     );
-
-    return unsubscribe;
   }, []);
 
   const signInWithGoogle = async () => {
