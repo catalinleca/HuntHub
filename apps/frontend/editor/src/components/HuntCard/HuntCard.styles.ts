@@ -1,14 +1,35 @@
 import styled from 'styled-components';
-import { Card } from '@mui/material';
+import { Card as MuiCard, Chip as MuiChip } from '@mui/material';
 
-export const HuntCard = styled(Card)`
-  border: 1px solid ${({ theme }) => theme.palette.divider};
-  border-radius: ${({ theme }) => theme.spacing(2)};
-  transition: all 0.2s ease-in-out;
-  cursor: pointer;
+export const Card = styled(MuiCard)<{ $transition?: boolean }>`
+  cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
 
-  &:hover {
-    box-shadow: ${({ theme }) => theme.shadows[2]};
-    transform: translateY(-2px);
-  }
+  ${({ $transition, theme }) =>
+    $transition &&
+    `
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: ${theme.shadows[4]};
+    }
+  `}
+`;
+
+export const Image = styled('img')<{ $height?: number }>`
+  width: 100%;
+  height: ${({ $height }) => $height || 200}px;
+  object-fit: cover;
+  display: block;
+`;
+
+export const ImageContainer = styled.div`
+  position: relative;
+  overflow: hidden;
+`;
+
+export const Badge = styled(MuiChip)`
+  position: absolute;
+  top: ${({ theme }) => theme.spacing(2)};
+  right: ${({ theme }) => theme.spacing(2)};
 `;

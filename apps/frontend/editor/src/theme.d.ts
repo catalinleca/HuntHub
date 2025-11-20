@@ -79,7 +79,7 @@ declare module '@mui/material/Badge' {
 }
 
 declare module '@mui/material/Typography' {
-  interface TypographyProps {
+  interface TypographyOwnProps {
     textStyle?: 'display' | 'ui';
   }
 }

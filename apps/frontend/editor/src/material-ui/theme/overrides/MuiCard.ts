@@ -6,8 +6,8 @@ export const getMuiCardOverrides = (): Components<Theme>['MuiCard'] => ({
   },
   styleOverrides: {
     root: ({ theme }) => ({
-      borderRadius: theme.shape.borderRadius * 2,
-      border: `2px solid ${theme.palette.divider}`,
+      borderRadius: theme.shape.lg,
+      border: `2px solid ${theme.palette.grey[600]}`,
     }),
   },
 });

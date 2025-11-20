@@ -4,4 +4,4 @@ export { EmptyState } from './EmptyState';
 export { ErrorState } from './ErrorState';
 export { HuntCard } from './HuntCard';
 export { HuntsGrid } from './HuntsGrid';
-export { CreateHuntDialog } from './CreateHuntDialog';
+export { ResumeHunts } from './ResumeHunts';

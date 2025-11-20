@@ -1,11 +1,16 @@
-import { ReactNode } from 'react';
 import * as S from './HuntCard.styles';
+import { ReactNode } from 'react'
 
-interface HuntCardProps {
+export interface HuntCardProps {
   children: ReactNode;
+  transition?: boolean;
   onClick?: () => void;
 }
 
-export const HuntCard = ({ children, onClick }: HuntCardProps) => {
-  return <S.HuntCard onClick={onClick}>{children}</S.HuntCard>;
+export const HuntCard = ({ children, transition = true, onClick }: HuntCardProps) => {
+  return (
+    <S.Card $transition={transition} onClick={onClick}>
+      {children}
+    </S.Card>
+  );
 };

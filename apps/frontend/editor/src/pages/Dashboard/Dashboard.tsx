@@ -7,7 +7,7 @@ import {
   EmptyState,
   ErrorState,
   HuntsGrid,
-  CreateHuntDialog,
+  ResumeHunts,
 } from './components';
 import { DashboardContainer, ContentContainer, PageTitle } from './Dashboard.styles';
 import { CreateHuntForm } from '@/components';
@@ -35,10 +35,6 @@ const Dashboard = () => {
       <DashboardHero onCreateClick={handleCreateClick} />
 
       <ContentContainer maxWidth="lg">
-        <PageTitle variant="h3">
-          My Hunts
-        </PageTitle>
-
         {isLoading && <Typography color="text.secondary">Loading hunts...</Typography>}
 
         {error && <ErrorState />}
@@ -47,7 +43,7 @@ const Dashboard = () => {
           <EmptyState onCreateClick={handleCreateClick} />
         )}
 
-        {!isLoading && hunts && hunts.length > 0 && <HuntsGrid hunts={hunts} />}
+        {!isLoading && hunts && hunts.length > 0 && <ResumeHunts hunts={hunts} />}
 
         <CreateHuntDialog open={isCreateDialogOpen} onClose={handleCloseDialog} />
       </ContentContainer>
