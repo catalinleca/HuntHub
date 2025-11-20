@@ -67,7 +67,7 @@ declare module '@mui/material/Button' {
 }
 
 declare module '@mui/material/Chip' {
-  interface ButtonPropsColorOverrides {
+  interface ChipPropsColorOverrides {
     accent: true;
   }
 }

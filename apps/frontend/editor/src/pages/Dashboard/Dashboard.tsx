@@ -6,7 +6,6 @@ import {
   DashboardHero,
   EmptyState,
   ErrorState,
-  HuntsGrid,
   ResumeHunts,
 } from './components';
 import { DashboardContainer, ContentContainer, PageTitle } from './Dashboard.styles';

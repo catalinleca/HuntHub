@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { IconButton, Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
-import { SignOut, User } from '@phosphor-icons/react';
+import { SignOutIcon, UserIcon } from '@phosphor-icons/react';
 import { useAuth } from '@/contexts/AuthContext';
 import { StyledAvatar } from './UserMenu.styles';
 
@@ -28,7 +28,7 @@ export const UserMenu = () => {
 
   return (
     <>
-      <IconButton onClick={handleClick} size="small">
+      <IconButton onClick={handleClick} size="small" aria-label="User Menu">
         <StyledAvatar>{getInitials()}</StyledAvatar>
       </IconButton>
 
@@ -41,14 +41,14 @@ export const UserMenu = () => {
       >
         <MenuItem disabled>
           <ListItemIcon>
-            <User size={20} />
+            <UserIcon size={20} />
           </ListItemIcon>
           <ListItemText primary={user?.email} />
         </MenuItem>
 
         <MenuItem onClick={handleSignOut}>
           <ListItemIcon>
-            <SignOut size={20} />
+            <SignOutIcon size={20} />
           </ListItemIcon>
           <ListItemText primary="Sign Out" />
         </MenuItem>

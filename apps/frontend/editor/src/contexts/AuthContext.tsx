@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
 
     return unsubscribe;
-  });
+  }, []);
 
   const signInWithGoogle = async () => {
     try {
