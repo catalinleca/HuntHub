@@ -1,14 +1,8 @@
-import { Dialog, Typography } from '@mui/material';
+import { Dialog, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useDashboardHunts } from '@/api/Hunt';
 import { RECENT_HUNTS_COUNT } from '@/api/Hunt/config';
-import {
-  DashboardNavBar,
-  DashboardHero,
-  EmptyState,
-  ErrorState,
-  RecentHunts,
-} from './components';
+import { DashboardNavBar, DashboardHero, EmptyState, ErrorState, RecentHunts, AllHunts } from './components';
 import { DashboardContainer, ContentContainer } from './Dashboard.styles';
 import { CreateHuntForm } from '@/components';
 
@@ -41,11 +35,14 @@ const Dashboard = () => {
 
         {error && <ErrorState />}
 
-        {!isLoading && !error && !hasHunts && (
-          <EmptyState onCreateClick={handleCreateClick} />
-        )}
+        {!isLoading && !error && !hasHunts && <EmptyState onCreateClick={handleCreateClick} />}
 
-        {!isLoading && hasHunts && <RecentHunts hunts={recentHunts} />}
+        {!isLoading && hasHunts && (
+          <Stack direction="column" gap={8}>
+            <RecentHunts hunts={recentHunts} />
+            <AllHunts hunts={hunts} />
+          </Stack>
+        )}
 
         <CreateHuntDialog open={isCreateDialogOpen} onClose={handleCloseDialog} />
       </ContentContainer>

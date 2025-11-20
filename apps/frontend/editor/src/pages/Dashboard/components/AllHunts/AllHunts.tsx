@@ -1,15 +1,15 @@
-import { Grid2, Box } from '@mui/material';
-import { ScrollIcon } from '@phosphor-icons/react';
-import { HuntCard, HuntCardTitle } from '@/components/HuntCard';
 import type { Hunt } from '@hunthub/shared/types';
+import { HuntCard, HuntCardTitle } from '@/components/HuntCard';
+import { Box, Grid2 } from '@mui/material';
+import { ScrollIcon } from '@phosphor-icons/react';
 import { getColor } from '@/utils';
 import { HuntActionCard } from '@/pages/Dashboard/components/HuntActionCard';
 
-interface RecentHuntsProps {
+interface AllHuntsProps {
   hunts: Hunt[];
 }
 
-export const RecentHunts = ({ hunts }: RecentHuntsProps) => {
+export const AllHunts = ({ hunts }: AllHuntsProps) => {
   const recentHunts = hunts.slice(0, 2);
 
   if (recentHunts.length === 0) return null;

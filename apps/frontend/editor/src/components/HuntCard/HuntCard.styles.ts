@@ -31,6 +31,6 @@ export const ImageContainer = styled.div`
 
 export const Badge = styled(MuiChip)`
   position: absolute;
-  top: ${({ theme }) => theme.spacing(2)};
-  right: ${({ theme }) => theme.spacing(2)};
+  top: ${({ theme }) => theme.spacing(3)};
+  left: ${({ theme }) => theme.spacing(3)};
 `;

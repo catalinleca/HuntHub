@@ -10,6 +10,7 @@ export const treasureMapPaletteConfig = {
     main: '#B6591B',
     dark: '#903300',
     light: 'rgba(182, 89, 27, 0.1)',
+    complementary: '#1B78B6',
     contrastText: '#FFFFFF',
   },
   secondary: {

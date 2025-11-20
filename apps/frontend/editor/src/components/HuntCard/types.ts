@@ -14,6 +14,7 @@ export interface HuntCardImageProps {
   src?: string;
   alt?: string;
   height?: number;
+  isPublished?: boolean;
 }
 
 export interface HuntCardBadgeProps {

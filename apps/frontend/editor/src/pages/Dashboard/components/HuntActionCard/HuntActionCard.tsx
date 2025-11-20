@@ -10,13 +10,14 @@ interface HuntActionCardProps {
   title: string;
   subtitle?: string;
   metadata?: string;
+  isPublished?: boolean;
   onClick?: () => void;
 }
 
-export const HuntActionCard = ({ image, imageAlt, title, subtitle, metadata, onClick }: HuntActionCardProps) => {
+export const HuntActionCard = ({ image, imageAlt, title, subtitle, metadata, isPublished, onClick }: HuntActionCardProps) => {
   return (
     <HuntCard transition onClick={onClick} disableGutters>
-      <HuntCardImage src={image} alt={imageAlt} />
+      <HuntCardImage src={image} alt={imageAlt} isPublished={isPublished} />
 
       <HuntCardBody>
         <S.IconTextRow $color={getColor('primary.main')}>
