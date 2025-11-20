@@ -6,11 +6,21 @@ import { AssetCreate, AssetDTO, AssetMapper } from '@/shared/mappers/asset.mappe
 import { AssetModel } from '@/database/models';
 import { ALLOWED_EXTENSIONS, ALLOWED_MIME_TYPES } from '@/shared/utils/mimeTypes';
 import { TYPES } from '@/shared/types';
+import {
+  PaginationParams,
+  PaginatedResponse,
+  buildPaginationMeta,
+  calculateSkip,
+  buildSortObject,
+} from '@/shared/utils/pagination';
 
 export interface IAssetService {
   requestUpload(userId: string, extension: string): Promise<{ signedUrl: string; publicUrl: string; s3Key: string }>;
   createAsset(userId: string, assetData: AssetCreate): Promise<AssetDTO>;
-  getUserAssets(userId: string, mimeType?: MimeTypes): Promise<AssetDTO[]>;
+  getUserAssets(
+    userId: string,
+    pagination: PaginationParams & { mimeType?: MimeTypes },
+  ): Promise<PaginatedResponse<AssetDTO>>;
   getAssetById(assetId: number, userId: string): Promise<AssetDTO>;
   deleteAsset(assetId: number, userId: string): Promise<void>;
 }
@@ -53,12 +63,30 @@ export class AssetService implements IAssetService {
     return AssetMapper.fromDocument(asset);
   }
 
-  async getUserAssets(userId: string, mimeType?: MimeTypes): Promise<AssetDTO[]> {
-    const assets = mimeType
-      ? await AssetModel.findByOwnerAndType(userId, mimeType)
-      : await AssetModel.findByOwner(userId);
+  async getUserAssets(
+    userId: string,
+    pagination: PaginationParams & { mimeType?: MimeTypes },
+  ): Promise<PaginatedResponse<AssetDTO>> {
+    const { page, limit, sortBy, sortOrder, mimeType } = pagination;
 
-    return AssetMapper.fromDocuments(assets);
+    const filter = {
+      ownerId: userId,
+      ...(mimeType && { mimeType }),
+    };
+
+    const total = await AssetModel.countDocuments(filter);
+    const skip = calculateSkip(page, limit);
+    const sortObject = buildSortObject(sortBy, sortOrder);
+
+    const assets = await AssetModel.find(filter).sort(sortObject).skip(skip).limit(limit).exec();
+
+    const assetDTOs = AssetMapper.fromDocuments(assets);
+    const paginationMeta = buildPaginationMeta(total, page, limit);
+
+    return {
+      data: assetDTOs,
+      pagination: paginationMeta,
+    };
   }
 
   async getAssetById(assetId: number, userId: string): Promise<AssetDTO> {

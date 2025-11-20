@@ -3,6 +3,7 @@ import { inject, injectable } from 'inversify';
 import { TYPES } from '@/shared/types';
 import { IHuntService } from './hunt.service';
 import { parseNumericId } from '@/shared/utils/parseId';
+import { ValidatedHuntQuery } from '@/shared/validation/query-params.validation';
 
 export interface IHuntController {
   createHunt(req: Request, res: Response): Promise<Response>;
@@ -24,8 +25,15 @@ export class HuntController implements IHuntController {
   }
 
   async getAllUserHunts(req: Request, res: Response) {
-    const hunts = await this.huntService.getUserHunts(req.user.id);
-    return res.status(200).json(hunts);
+    const { page, limit, sortBy, sortOrder } = req.query as unknown as ValidatedHuntQuery;
+
+    const result = await this.huntService.getUserHunts(req.user.id, {
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+    });
+    return res.status(200).json(result);
   }
 
   async getUserHuntById(req: Request, res: Response) {

@@ -190,8 +190,16 @@ describe('Hunt CRUD Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toHaveLength(3);
-      expect(response.body.every((hunt: Hunt) => hunt.creatorId === testUser.id)).toBe(true);
+      expect(response.body.data).toHaveLength(3);
+      expect(response.body.data.every((hunt: Hunt) => hunt.creatorId === testUser.id)).toBe(true);
+      expect(response.body.pagination).toMatchObject({
+        total: 3,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        hasNext: false,
+        hasPrev: false,
+      });
     });
 
     it('should return empty array when user has no hunts', async () => {
@@ -204,7 +212,8 @@ describe('Hunt CRUD Integration Tests', () => {
         .set('Authorization', `Bearer ${newUserToken}`)
         .expect(200);
 
-      expect(response.body).toHaveLength(0);
+      expect(response.body.data).toHaveLength(0);
+      expect(response.body.pagination.total).toBe(0);
     });
   });
 
@@ -545,8 +554,8 @@ describe('Hunt CRUD Integration Tests', () => {
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
-      expect(response.body.length).toBeGreaterThan(0);
-      const foundSharedHunt = response.body.find((h: Hunt) => h.huntId === sharedHunt.huntId);
+      expect(response.body.data.length).toBeGreaterThan(0);
+      const foundSharedHunt = response.body.data.find((h: Hunt) => h.huntId === sharedHunt.huntId);
       expect(foundSharedHunt).toBeDefined();
       expect(foundSharedHunt.permission).toBe('admin');
     });
