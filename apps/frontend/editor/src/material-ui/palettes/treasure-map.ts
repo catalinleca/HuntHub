@@ -31,7 +31,7 @@ const treasureMapPalette = {
     },
     background: {
       default: '#E4D5C1',
-      paper: '#FFFFFF',
+      paper: '#f5f1e8',
     },
     text: {
       primary: '#2C1810',

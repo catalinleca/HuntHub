@@ -1,5 +1,5 @@
-import { Stack, Typography, Box, Button } from '@mui/material';
-import { HuntCard, HuntCardImage } from '@/components/HuntCard';
+import { Typography, Box, Button } from '@mui/material';
+import { HuntCard, HuntCardImage, HuntCardBody } from '@/components/HuntCard';
 import { BookOpenIcon, ClockIcon } from '@phosphor-icons/react';
 import * as S from './DraftCard.styled';
 import { getColor } from '@/utils';
@@ -15,10 +15,10 @@ interface DraftCardProps {
 
 export const DraftCard = ({ image, imageAlt, title, subtitle, metadata, onClick }: DraftCardProps) => {
   return (
-    <HuntCard transition onClick={onClick}>
+    <HuntCard transition onClick={onClick} disableGutters>
       <HuntCardImage src={image} alt={imageAlt} />
 
-      <Stack spacing={2} sx={{ p: 3 }}>
+      <HuntCardBody>
         <S.IconTextRow $color={getColor('primary.main')}>
           <BookOpenIcon weight="bold" />
           <Typography variant="h6" textStyle="display" fontWeight={600}>
@@ -28,7 +28,7 @@ export const DraftCard = ({ image, imageAlt, title, subtitle, metadata, onClick 
 
         {subtitle && (
           <S.IconTextRow $color={getColor('grey.600')}>
-            <ClockIcon weight="bold" size={14}/>
+            <ClockIcon weight="bold" size={14} />
             <Typography variant="body2" textStyle="display">
               {subtitle}
             </Typography>
@@ -38,7 +38,7 @@ export const DraftCard = ({ image, imageAlt, title, subtitle, metadata, onClick 
         <Button variant="contained" fullWidth>
           Resume Crafting
         </Button>
-      </Stack>
+      </HuntCardBody>
     </HuntCard>
   );
 };

@@ -34,7 +34,7 @@ const Dashboard = () => {
       <DashboardNavBar onCreateClick={handleCreateClick} />
       <DashboardHero onCreateClick={handleCreateClick} />
 
-      <ContentContainer maxWidth="lg">
+      <ContentContainer maxWidth="xl">
         {isLoading && <Typography color="text.secondary">Loading hunts...</Typography>}
 
         {error && <ErrorState />}

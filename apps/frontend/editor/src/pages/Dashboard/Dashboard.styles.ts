@@ -7,8 +7,7 @@ export const DashboardContainer = styled(Box)`
 `;
 
 export const ContentContainer = styled(Container)`
-  padding-top: ${({ theme }) => theme.spacing(4)};
-  padding-bottom: ${({ theme }) => theme.spacing(4)};
+  padding: ${({ theme }) => theme.spacing(8, 0)};
 `;
 
 export const PageTitle = styled(Typography)`

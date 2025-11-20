@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { Card as MuiCard, Chip as MuiChip } from '@mui/material';
 
 export const Card = styled(MuiCard)<{ $transition?: boolean }>`
+  background-color: ${({ theme }) => theme.palette.background.paper};
   cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
 
   ${({ $transition, theme }) =>

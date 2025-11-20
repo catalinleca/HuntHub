@@ -3,15 +3,22 @@ import { HuntCardTitleProps } from './types';
 
 export const HuntCardTitle = ({ icon, count, children }: HuntCardTitleProps) => {
   return (
-    <Stack direction="row" spacing={2} alignItems="center">
+    <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 4 }}>
       {icon && (
         <Stack sx={{ color: 'primary.main' }} alignItems="center">
           {icon}
         </Stack>
       )}
-      <Typography variant="h6" textStyle="display">{children}</Typography>
+      <Typography variant="h4" textStyle="display">
+        {children}
+      </Typography>
       {count !== undefined && (
-        <Typography variant="h6" color="text.secondary" fontWeight="regular" textStyle="display">
+        <Typography
+          variant="h4"
+          color="text.secondary"
+          fontWeight="regular"
+          sx={{ fontFamily: (theme) => theme.typography.displayFontFamily }}
+        >
           ({count})
         </Typography>
       )}
