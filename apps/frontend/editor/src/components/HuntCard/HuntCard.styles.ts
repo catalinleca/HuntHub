@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Card as MuiCard, Chip as MuiChip } from '@mui/material';
+import { Card as MuiCard, Chip as MuiChip, IconButton as MuiIconButton, alpha } from '@mui/material';
 
 export const Card = styled(MuiCard)<{ $transition?: boolean }>`
   background-color: ${({ theme }) => theme.palette.background.paper};
@@ -33,4 +33,16 @@ export const Badge = styled(MuiChip)`
   position: absolute;
   top: ${({ theme }) => theme.spacing(3)};
   left: ${({ theme }) => theme.spacing(3)};
+`;
+
+export const MenuIconButton = styled(MuiIconButton)`
+  position: absolute;
+  top: ${({ theme }) => theme.spacing(2)};
+  right: ${({ theme }) => theme.spacing(2)};
+  background-color: ${({ theme }) => alpha(theme.palette.background.paper, 0.95)};
+  border-radius: ${({ theme }) => theme.shape.xs}px !important;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.palette.background.paper};
+  }
 `;

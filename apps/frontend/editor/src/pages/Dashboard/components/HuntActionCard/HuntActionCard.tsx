@@ -12,12 +12,15 @@ interface HuntActionCardProps {
   metadata?: string;
   isPublished?: boolean;
   onClick?: () => void;
+  onEdit?: () => void;
+  onDuplicate?: () => void;
+  onDelete?: () => void;
 }
 
-export const HuntActionCard = ({ image, imageAlt, title, subtitle, metadata, isPublished, onClick }: HuntActionCardProps) => {
+export const HuntActionCard = ({ image, imageAlt, title, subtitle, metadata, isPublished, onClick, onEdit, onDuplicate, onDelete }: HuntActionCardProps) => {
   return (
     <HuntCard transition onClick={onClick} disableGutters>
-      <HuntCardImage src={image} alt={imageAlt} isPublished={isPublished} />
+      <HuntCardImage src={image} alt={imageAlt} isPublished={isPublished} onEdit={onEdit} onDuplicate={onDuplicate} onDelete={onDelete} />
 
       <HuntCardBody>
         <S.IconTextRow $color={getColor('primary.main')}>

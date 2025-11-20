@@ -1,21 +1,28 @@
 import type { Hunt } from '@hunthub/shared/types';
 import { HuntCard, HuntCardTitle } from '@/components/HuntCard';
 import { Box, Grid2 } from '@mui/material';
-import { Stack } from '@phosphor-icons/react';
+import { StackIcon } from '@phosphor-icons/react';
 import { getColor } from '@/utils';
 import { HuntActionCard } from '@/pages/Dashboard/components/HuntActionCard';
+import { useDeleteHunt } from '@/api/Hunt';
 
 interface AllHuntsProps {
   hunts: Hunt[];
 }
 
 export const AllHunts = ({ hunts }: AllHuntsProps) => {
+  const deleteMutation = useDeleteHunt();
+
+  const handleDelete = (huntId: number) => {
+    deleteMutation.mutate(huntId);
+  };
+
   if (hunts.length === 0) return null;
 
   return (
     <HuntCard transition={false}>
       <Box sx={{ p: 4 }}>
-        <HuntCardTitle icon={<Stack size={24} color={getColor('grey.600')} />} count={hunts.length}>
+        <HuntCardTitle icon={<StackIcon size={24} color={getColor('grey.600')} />} count={hunts.length}>
           All Hunts
         </HuntCardTitle>
 
@@ -26,6 +33,7 @@ export const AllHunts = ({ hunts }: AllHuntsProps) => {
                 title={hunt.name}
                 subtitle={hunt.description || 'No description'}
                 isPublished={hunt.isPublished}
+                onDelete={() => handleDelete(hunt.huntId)}
               />
             </Grid2>
           ))}
