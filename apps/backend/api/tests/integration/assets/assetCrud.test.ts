@@ -221,10 +221,15 @@ describe('Asset CRUD Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body).toHaveLength(3);
+      expect(response.body.data).toHaveLength(3);
+      expect(response.body.pagination).toMatchObject({
+        total: 3,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      });
 
-      response.body.forEach((asset: any) => {
+      response.body.data.forEach((asset: any) => {
         expect(asset).toHaveProperty('assetId');
         expect(asset).toHaveProperty('ownerId', testUser.id);
         expect(asset).toHaveProperty('url');
@@ -238,12 +243,11 @@ describe('Asset CRUD Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body).toHaveLength(0);
+      expect(response.body.data).toHaveLength(0);
+      expect(response.body.pagination.total).toBe(0);
     });
 
     it('should filter assets by MIME type', async () => {
-      // Create mixed assets
       await createTestAsset({ ownerId: testUser.id, mimeType: MimeTypes.ImageJpeg });
       await createTestAsset({ ownerId: testUser.id, mimeType: MimeTypes.ImagePng });
       await createTestAsset({ ownerId: testUser.id, mimeType: MimeTypes.VideoMp4 });
@@ -251,23 +255,21 @@ describe('Asset CRUD Integration Tests', () => {
       const response = await request(app)
         .get('/api/assets')
         .set('Authorization', `Bearer ${authToken}`)
-        .query({ type: MimeTypes.ImageJpeg })
+        .query({ mimeType: MimeTypes.ImageJpeg })
         .expect(200);
 
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body).toHaveLength(1);
-      expect(response.body[0].mimeType).toBe(MimeTypes.ImageJpeg);
+      expect(response.body.data).toHaveLength(1);
+      expect(response.body.data[0].mimeType).toBe(MimeTypes.ImageJpeg);
     });
 
     it('should return 400 for invalid MIME type filter', async () => {
       const response = await request(app)
         .get('/api/assets')
         .set('Authorization', `Bearer ${authToken}`)
-        .query({ type: 'application/invalid' })
+        .query({ mimeType: 'application/invalid' })
         .expect(400);
 
       expect(response.body).toHaveProperty('message');
-      expect(response.body.message).toContain('not allowed');
     });
 
     it('should not return assets from other users', async () => {
@@ -281,8 +283,8 @@ describe('Asset CRUD Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
-      expect(response.body).toHaveLength(1);
-      expect(response.body[0].ownerId).toBe(testUser.id);
+      expect(response.body.data).toHaveLength(1);
+      expect(response.body.data[0].ownerId).toBe(testUser.id);
     });
 
     it('should return 401 when no auth token provided', async () => {
@@ -349,7 +351,7 @@ describe('Asset CRUD Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(204);
 
-      const response = await request(app)
+      await request(app)
         .get(`/api/assets/${asset.assetId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(404);

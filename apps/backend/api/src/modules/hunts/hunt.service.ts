@@ -1,10 +1,9 @@
 import { Hunt, HuntCreate } from '@hunthub/shared';
 import { inject, injectable } from 'inversify';
-import { ClientSession, HydratedDocument, Types } from 'mongoose';
+import { ClientSession, Types } from 'mongoose';
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import StepModel from '@/database/models/Step';
-import { IHunt } from '@/database/types/Hunt';
 import { HuntMapper, StepMapper } from '@/shared/mappers';
 import { NotFoundError } from '@/shared/errors';
 import { ValidationError } from '@/shared/errors';
