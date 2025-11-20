@@ -12,9 +12,13 @@
     "build:shared": "npm run build --workspace=@hunthub/shared",
     "build:api": "npm run build --workspace=@hunthub/api",
     "build:backend": "npm run build:api",
+    "build:editor": "npm run build --workspace=@hunthub/editor",
+    "build:frontend": "npm run build:editor",
     "build:all": "npm run build --workspaces --if-present",
     "dev:api": "npm run dev --workspace=@hunthub/api",
     "dev:backend": "npm run dev:api",
+    "dev:editor": "npm run dev --workspace=@hunthub/editor",
+    "dev:frontend": "npm run dev:editor",
     "generate": "npm run generate --workspace=@hunthub/shared",
     "test:api": "npm run test --workspace=@hunthub/api",
     "test:api:verbose": "npm run test:verbose --workspace=@hunthub/api",
@@ -23,7 +27,8 @@
     "test:api:debug": "npm run test:debug --workspace=@hunthub/api",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"**/*.{ts,json,md}\"",
-    "type-check": "tsc --noEmit --workspaces"
+    "type-check": "tsc --noEmit --workspaces",
+    "type-check:editor": "npm run type-check --workspace=@hunthub/editor"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.0.0",

@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import express from 'express';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 
 const result = dotenv.config({ path: '.env.local' });
 if (!result.error) {
@@ -31,6 +32,18 @@ async function bootstrap() {
   await mustConnectDb(databaseUrl);
 
   const app = express();
+
+  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',')
+    .map((s) => s.trim())
+    .filter(Boolean) || ['http://localhost:5174'];
+  app.use(
+    cors({
+      origin: allowedOrigins,
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    }),
+  );
+
   app.use(bodyParser.json());
 
   app.use('/auth', authRouter);

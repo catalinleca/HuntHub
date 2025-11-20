@@ -7,11 +7,21 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "import": "./src/index.ts",
+      "require": "./dist/index.js",
+      "default": "./src/index.ts"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./src/types/index.ts",
+      "require": "./dist/types/index.js",
+      "default": "./src/types/index.ts"
     },
     "./schemas": {
       "types": "./dist/schemas/index.d.ts",
-      "default": "./dist/schemas/index.js"
+      "import": "./src/schemas/index.ts",
+      "require": "./dist/schemas/index.js",
+      "default": "./src/schemas/index.ts"
     }
   },
   "scripts": {
