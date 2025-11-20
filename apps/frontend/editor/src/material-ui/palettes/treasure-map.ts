@@ -1,65 +1,65 @@
 import { ThemeOptions } from '@mui/material';
 
-const treasureMapPalette = {
-  palette: {
-    mode: 'light',
-    common: {
-      black: '#2C1810',
-      white: '#FFFFFF',
-    },
-    primary: {
-      main: '#B6591B',
-      dark: '#903300',
-      light: 'rgba(182, 89, 27, 0.1)',
-      contrastText: '#FFFFFF',
-    },
-    secondary: {
-      main: '#8b4513',
-      dark: '#651f00',
-      contrastText: '#FFFFFF',
-    },
-    success: {
-      main: '#4a6841',
-      contrastText: '#FFFFFF',
-    },
-    accent: {
-      light: '#c17a3a',
-      main: '#d4af35',
-      medium: '#a8651f',
-      dark: '#b8941f',
-      contrastText: '#2C1810',
-    },
-    background: {
-      default: '#E4D5C1',
-      paper: '#f5f1e8',
-    },
-    text: {
-      primary: '#2C1810',
-      secondary: '#5D4E37',
-      disabled: '#8B7355',
-    },
-    divider: '#D4A574',
-    grey: {
-      50: '#F5EFE6',
-      100: '#E4D5C1',
-      200: '#D4C4B0',
-      300: '#D4A574',
-      400: '#8B7355',
-      500: '#5D4E37',
-      600: '#8B6F47',
-      700: '#2C1810',
-      800: '#1F110A',
-      900: '#120A06',
-    },
+export const treasureMapPaletteConfig = {
+  mode: 'light' as const,
+  common: {
+    black: '#2C1810',
+    white: '#FFFFFF',
   },
+  primary: {
+    main: '#B6591B',
+    dark: '#903300',
+    light: 'rgba(182, 89, 27, 0.1)',
+    contrastText: '#FFFFFF',
+  },
+  secondary: {
+    main: '#8b4513',
+    dark: '#651f00',
+    contrastText: '#FFFFFF',
+  },
+  success: {
+    main: '#4a6841',
+    contrastText: '#FFFFFF',
+  },
+  accent: {
+    light: '#c17a3a',
+    main: '#d4af35',
+    medium: '#a8651f',
+    dark: '#b8941f',
+    contrastText: '#2C1810',
+  },
+  background: {
+    default: '#E4D5C1',
+    paper: '#f5f1e8',
+  },
+  text: {
+    primary: '#2C1810',
+    secondary: '#5D4E37',
+    disabled: '#8B7355',
+  },
+  divider: '#D4A574',
+  grey: {
+    50: '#F5EFE6',
+    100: '#E4D5C1',
+    200: '#D4C4B0',
+    300: '#D4A574',
+    400: '#8B7355',
+    500: '#5D4E37',
+    600: '#8B6F47',
+    700: '#2C1810',
+    800: '#1F110A',
+    900: '#120A06',
+  },
+} as const;
+
+const treasureMapPalette = {
+  palette: treasureMapPaletteConfig,
   typography: {
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica", "Arial", sans-serif',
     displayFontFamily: 'Georgia, "Times New Roman", serif',
-
     fontWeightRegular: 400,
     fontWeightMedium: 500,
     fontWeightBold: 600,
-
     h1: {
       fontSize: 40,
       fontWeight: 600,
@@ -104,7 +104,7 @@ const treasureMapPalette = {
       fontSize: 14,
       fontWeight: 600,
       lineHeight: 1.5,
-      textTransform: 'none',
+      textTransform: 'none' as const,
     },
   },
   spacing: [0, 4, 8, 12, 16, 24, 32, 48, 64],

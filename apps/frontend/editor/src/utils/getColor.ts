@@ -1,26 +1,30 @@
-import treasureMapPalette from '@/material-ui/palettes/treasure-map';
+import { treasureMapPaletteConfig } from '@/material-ui/palettes/treasure-map';
 
-type Palette = typeof treasureMapPalette.palette;
+export type NestedKeyOf<ObjectType extends object> = {
+  [Key in keyof ObjectType & (string | number)]: ObjectType[Key] extends object
+    ? ObjectType[Key] extends string
+      ? `${Key}`
+      : `${Key}` | `${Key}.${NestedKeyOf<ObjectType[Key]>}`
+    : `${Key}`;
+}[keyof ObjectType & (string | number)];
 
-type DotPath<T> = {
-  [K in keyof T]: K extends string
-    ? T[K] extends string
-      ? K
-      : T[K] extends object
-      ? `${K}.${DotPath<T[K]>}`
-      : never
-    : never;
-}[keyof T];
+export type Color = NestedKeyOf<typeof treasureMapPaletteConfig>;
 
-export type Color = DotPath<Palette>;
-
-export const getColor = (path: Color): string => {
-  const keys = (path as string).split('.');
-  let value: any = treasureMapPalette.palette;
+const getNestedValue = (obj: object, path: string): string => {
+  const keys = path.split('.');
+  let current: unknown = obj;
 
   for (const key of keys) {
-    value = value[key];
+    if (current != null && typeof current === 'object' && key in current) {
+      current = (current as Record<string, unknown>)[key];
+    } else {
+      return '#000000';
+    }
   }
 
-  return value;
+  return typeof current === 'string' ? current : '#000000';
+};
+
+export const getColor = (path: Color): string => {
+  return getNestedValue(treasureMapPaletteConfig, path);
 };
