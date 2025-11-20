@@ -2,9 +2,8 @@ import { Request, Response } from 'express';
 import { injectable, inject } from 'inversify';
 import { IAssetService } from './asset.service';
 import { MimeTypes } from '@/database/types';
-import { ValidationError } from '@/shared/errors';
-import { ALLOWED_MIME_TYPES } from '@/shared/utils/mimeTypes';
 import { TYPES } from '@/shared/types';
+import { ValidatedAssetQuery } from '@/shared/validation/query-params.validation';
 
 export interface IAssetController {
   requestUpload(req: Request, res: Response): Promise<Response>;
@@ -41,15 +40,17 @@ export class AssetController implements IAssetController {
   };
 
   getAssets = async (req: Request, res: Response) => {
-    const { type } = req.query;
+    const { page, limit, sortBy, sortOrder, mimeType } = req.query as unknown as ValidatedAssetQuery;
 
-    if (type && typeof type === 'string' && !ALLOWED_MIME_TYPES.includes(type as MimeTypes)) {
-      throw new ValidationError(`MIME type '${type}' not allowed`, []);
-    }
+    const result = await this.assetService.getUserAssets(req.user.id, {
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+      mimeType: mimeType as MimeTypes | undefined,
+    });
 
-    const assets = await this.assetService.getUserAssets(req.user.id, type ? (type as MimeTypes) : undefined);
-
-    return res.status(200).json(assets);
+    return res.status(200).json(result);
   };
 
   getAsset = async (req: Request, res: Response) => {

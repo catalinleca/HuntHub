@@ -289,6 +289,33 @@ const ReleaseHuntRequest = z
 const TakeOfflineRequest = z.object({ currentLiveVersion: z.number().int().nullable() }).strict();
 const ShareHuntRequest = z.object({ email: z.string().email(), permission: z.enum(['admin', 'view']) }).strict();
 const UpdatePermissionRequest = z.object({ permission: z.enum(['admin', 'view']) }).strict();
+const SortOrder = z.enum(['asc', 'desc']);
+const HuntSortField = z.enum(['createdAt', 'updatedAt', 'name']);
+const AssetSortField = z.enum(['createdAt', 'originalFilename', 'size']);
+const PaginationQueryParams = z
+  .object({
+    page: z.number().int().gte(1).default(1),
+    limit: z.number().int().gte(1).lte(100).default(10),
+    sortOrder: SortOrder,
+  })
+  .partial()
+  .strict();
+const HuntQueryParams = PaginationQueryParams.and(z.object({ sortBy: HuntSortField }).partial().strict());
+const AssetQueryParams = PaginationQueryParams.and(
+  z.object({ sortBy: AssetSortField, mimeType: MimeTypes }).partial().strict(),
+);
+const PaginationMeta = z
+  .object({
+    total: z.number().int(),
+    page: z.number().int().gte(1),
+    limit: z.number().int().gte(1),
+    totalPages: z.number().int().gte(0),
+    hasNext: z.boolean(),
+    hasPrev: z.boolean(),
+  })
+  .strict();
+const PaginatedHuntsResponse = z.object({ data: z.array(Hunt), pagination: PaginationMeta }).strict();
+const PaginatedAssetsResponse = z.object({ data: z.array(Asset), pagination: PaginationMeta }).strict();
 
 export const schemas: Record<string, z.ZodTypeAny> = {
   HuntStatus,
@@ -331,6 +358,15 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   TakeOfflineRequest,
   ShareHuntRequest,
   UpdatePermissionRequest,
+  SortOrder,
+  HuntSortField,
+  AssetSortField,
+  PaginationQueryParams,
+  HuntQueryParams,
+  AssetQueryParams,
+  PaginationMeta,
+  PaginatedHuntsResponse,
+  PaginatedAssetsResponse,
 };
 
 const endpoints = makeApi([]);

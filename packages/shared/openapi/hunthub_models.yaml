@@ -882,3 +882,138 @@ components:
       required:
         - permission
       additionalProperties: false
+
+    # ============================================================
+    # Pagination Schemas (Standard Offset-Based REST Pattern)
+    # ============================================================
+
+    SortOrder:
+      type: string
+      enum: [asc, desc]
+      description: Sort order direction
+      example: desc
+
+    HuntSortField:
+      type: string
+      enum: [createdAt, updatedAt, name]
+      description: Field to sort hunts by
+      example: updatedAt
+
+    AssetSortField:
+      type: string
+      enum: [createdAt, originalFilename, size]
+      description: Field to sort assets by
+      example: createdAt
+
+    PaginationQueryParams:
+      type: object
+      description: Standard pagination query parameters
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          default: 1
+          description: Page number (1-indexed)
+          example: 1
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 10
+          description: Number of items per page (max 100)
+          example: 10
+        sortOrder:
+          $ref: '#/components/schemas/SortOrder'
+      additionalProperties: false
+
+    HuntQueryParams:
+      allOf:
+        - $ref: '#/components/schemas/PaginationQueryParams'
+        - type: object
+          properties:
+            sortBy:
+              $ref: '#/components/schemas/HuntSortField'
+          additionalProperties: false
+
+    AssetQueryParams:
+      allOf:
+        - $ref: '#/components/schemas/PaginationQueryParams'
+        - type: object
+          properties:
+            sortBy:
+              $ref: '#/components/schemas/AssetSortField'
+            mimeType:
+              $ref: '#/components/schemas/MimeTypes'
+              description: Optional filter by MIME type
+          additionalProperties: false
+
+    PaginationMeta:
+      type: object
+      description: Pagination metadata in response
+      properties:
+        total:
+          type: integer
+          description: Total number of items across all pages
+          example: 47
+        page:
+          type: integer
+          description: Current page number (1-indexed)
+          example: 1
+          minimum: 1
+        limit:
+          type: integer
+          description: Number of items per page
+          example: 10
+          minimum: 1
+        totalPages:
+          type: integer
+          description: Total number of pages
+          example: 5
+          minimum: 0
+        hasNext:
+          type: boolean
+          description: Whether there is a next page
+          example: true
+        hasPrev:
+          type: boolean
+          description: Whether there is a previous page
+          example: false
+      required:
+        - total
+        - page
+        - limit
+        - totalPages
+        - hasNext
+        - hasPrev
+      additionalProperties: false
+
+    PaginatedHuntsResponse:
+      type: object
+      description: Paginated response for hunts list
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Hunt'
+        pagination:
+          $ref: '#/components/schemas/PaginationMeta'
+      required:
+        - data
+        - pagination
+      additionalProperties: false
+
+    PaginatedAssetsResponse:
+      type: object
+      description: Paginated response for assets list
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Asset'
+        pagination:
+          $ref: '#/components/schemas/PaginationMeta'
+      required:
+        - data
+        - pagination
+      additionalProperties: false
+

@@ -2,8 +2,9 @@ import express from 'express';
 import { TYPES } from '@/shared/types';
 import { container } from '@/config/inversify';
 import { IHuntController } from './hunt.controller';
-import { validateRequest } from '@/shared/middlewares';
+import { validateRequest, validateQuery } from '@/shared/middlewares';
 import { createHuntSchema, updateHuntSchema, reorderStepsSchema } from './hunt.validation';
+import { HuntQueryParamsValidation } from '@/shared/validation/query-params.validation';
 
 const huntRouter = express.Router();
 const controller = container.get<IHuntController>(TYPES.HuntController);
@@ -12,7 +13,7 @@ huntRouter.post('/', validateRequest(createHuntSchema), (req, res, next) => {
   controller.createHunt(req, res).catch(next);
 });
 
-huntRouter.get('/', (req, res, next) => {
+huntRouter.get('/', validateQuery(HuntQueryParamsValidation), (req, res, next) => {
   controller.getAllUserHunts(req, res).catch(next);
 });
 
