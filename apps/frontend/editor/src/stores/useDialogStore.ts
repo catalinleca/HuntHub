@@ -43,9 +43,9 @@ export const useDialogStore = create<DialogStore>((set, get) => ({
         isOpen: true,
         title: options.title,
         message: options.message,
-        confirmText: options.confirmText || 'Confirm',
-        cancelText: options.cancelText || 'Cancel',
-        variant: options.variant || DialogVariants.Info,
+        confirmText: options.confirmText ?? 'Confirm',
+        cancelText: options.cancelText ?? 'Cancel',
+        variant: options.variant ?? DialogVariants.Info,
         resolve,
       });
     });
