@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dialog, DialogProps, DialogTitle, DialogContent, DialogActions, Button, Divider } from '@mui/material';
+import { Dialog, DialogProps, DialogTitle, DialogContent, DialogActions, Button, Divider, CircularProgress } from '@mui/material';
 
 export interface SimpleModalAction {
   label: string;
@@ -7,6 +7,7 @@ export interface SimpleModalAction {
   intent?: 'primary' | 'danger' | 'secondary';
   icon?: React.ReactNode;
   disabled?: boolean;
+  loading?: boolean;
 }
 
 export interface SimpleModalProps extends Omit<DialogProps, 'open' | 'title'> {
@@ -54,8 +55,8 @@ export const SimpleModal = ({
             <Button
               key={`${action.label}-${index}`}
               onClick={action.onClick}
-              disabled={action.disabled}
-              startIcon={action.icon}
+              disabled={action.disabled || action.loading}
+              startIcon={action.loading ? <CircularProgress size={16} /> : action.icon}
               {...getButtonProps(action, index)}
             >
               {action.label}

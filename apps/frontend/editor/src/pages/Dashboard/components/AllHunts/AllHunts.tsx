@@ -16,17 +16,16 @@ export const AllHunts = ({ hunts }: AllHuntsProps) => {
   const { confirm } = useConfirmationDialog();
   const deleteMutation = useDeleteHunt();
 
-  const handleDelete = async (huntId: number) => {
-    const confirmed = await confirm({
+  const handleDelete = (huntId: number) => {
+    confirm({
       title: 'Delete Hunt',
       message: 'Are you sure you want to delete this hunt?',
       confirmText: 'Delete',
       variant: DialogVariants.Danger,
+      onConfirm: async () => {
+        await deleteMutation.mutateAsync(huntId);
+      },
     });
-
-    if (!confirmed) return;
-
-    deleteMutation.mutate(huntId);
   };
 
   if (hunts.length === 0) return null;
