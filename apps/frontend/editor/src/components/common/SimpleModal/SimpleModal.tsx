@@ -5,6 +5,7 @@ export interface SimpleModalAction {
   label: string;
   onClick: () => void;
   intent?: 'primary' | 'danger' | 'secondary';
+  icon?: React.ReactNode;
   disabled?: boolean;
 }
 
@@ -54,6 +55,7 @@ export const SimpleModal = ({
               key={action.label}
               onClick={action.onClick}
               disabled={action.disabled}
+              startIcon={action.icon}
               {...getButtonProps(action, index)}
             >
               {action.label}

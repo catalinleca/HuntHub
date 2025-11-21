@@ -2,9 +2,7 @@ import { Components, Theme } from '@mui/material';
 
 export const getMuiDialogOverrides = (): Components<Theme>['MuiDialog'] => ({
   defaultProps: {
-    TransitionProps: {
-      timeout: 200,
-    },
+    transitionDuration: 200,
   },
   styleOverrides: {
     root: {
@@ -17,7 +15,7 @@ export const getMuiDialogOverrides = (): Components<Theme>['MuiDialog'] => ({
       borderRadius: theme.shape.lg, // 16px
       boxShadow: '0 12px 24px rgba(44, 24, 16, 0.12)', // Soft warm shadow
       backgroundImage: 'none', // Remove MUI default gradient
-      border: `4px solid ${theme.palette.divider}`, // Subtle border matching Card
+      border: `1px solid ${theme.palette.divider}`, // Subtle border matching Card
     }),
   },
 });

@@ -1,4 +1,5 @@
 import { Typography } from '@mui/material';
+import { WarningCircleIcon, InfoIcon, TrashSimpleIcon } from '@phosphor-icons/react';
 import { DialogVariants, useDialogStore } from '@/stores';
 import { SimpleModal, SimpleModalAction } from '@/components/common';
 
@@ -17,6 +18,18 @@ export const ConfirmationDialog = () => {
     }
   };
 
+  const getConfirmIcon = () => {
+    switch (variant) {
+      case DialogVariants.Danger:
+        return <TrashSimpleIcon size={20} weight="bold" />;
+      case DialogVariants.Warning:
+        return <WarningCircleIcon size={20} weight="bold" />;
+      case DialogVariants.Info:
+      default:
+        return <InfoIcon size={20} weight="bold" />;
+    }
+  };
+
   const actions: SimpleModalAction[] = [
     {
       label: cancelText,
@@ -27,6 +40,7 @@ export const ConfirmationDialog = () => {
       label: confirmText,
       onClick: handleConfirm,
       intent: getConfirmIntent(),
+      icon: getConfirmIcon(),
     },
   ];
 
