@@ -12,7 +12,11 @@ export const useDeleteHunt = () => {
 
   return useMutation({
     mutationFn: deleteHunt,
-    onSuccess: (_, huntId) => {
+    onMutate: async (huntId) => {
+      await queryClient.cancelQueries({ queryKey: huntKeys.lists() });
+
+      const previousHunts = queryClient.getQueriesData<PaginatedHuntsResponse>({ queryKey: huntKeys.lists() });
+
       queryClient.setQueriesData<PaginatedHuntsResponse>({ queryKey: huntKeys.lists() }, (old) => {
         if (!old) return old;
         return {
@@ -25,7 +29,19 @@ export const useDeleteHunt = () => {
         };
       });
 
+      return { previousHunts };
+    },
+    onError: (_err, _huntId, context) => {
+      if (context?.previousHunts) {
+        context.previousHunts.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+    },
+    onSuccess: (_, huntId) => {
       queryClient.removeQueries({ queryKey: huntKeys.detail(huntId) });
+    },
+    onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: huntKeys.lists() });
     },
   });
