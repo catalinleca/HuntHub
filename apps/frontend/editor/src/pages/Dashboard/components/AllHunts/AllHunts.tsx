@@ -22,6 +22,7 @@ export const AllHunts = ({ hunts }: AllHuntsProps) => {
       message: 'Are you sure you want to delete this hunt?',
       confirmText: 'Delete',
       variant: DialogVariants.Danger,
+      awaitConfirmation: false,
       onConfirm: async () => {
         await deleteMutation.mutateAsync(huntId);
       },

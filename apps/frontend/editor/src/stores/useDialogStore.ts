@@ -14,6 +14,7 @@ interface DialogOptions {
   variant?: DialogVariants;
   onConfirm: () => void | Promise<void>;
   onCancel?: () => void | Promise<void>;
+  awaitConfirmation?: boolean;
 }
 
 interface DialogStore {
@@ -27,6 +28,7 @@ interface DialogStore {
   variant: DialogVariants;
   onConfirm: (() => void | Promise<void>) | null;
   onCancel: (() => void | Promise<void>) | null;
+  awaitConfirmation: boolean;
 
   confirm: (options: DialogOptions) => void;
   handleConfirm: () => Promise<void>;
@@ -44,6 +46,7 @@ export const useDialogStore = create<DialogStore>((set, get) => ({
   variant: DialogVariants.Info,
   onConfirm: null,
   onCancel: null,
+  awaitConfirmation: true,
 
   confirm: (options: DialogOptions) => {
     set({
@@ -57,12 +60,19 @@ export const useDialogStore = create<DialogStore>((set, get) => ({
       variant: options.variant ?? DialogVariants.Info,
       onConfirm: options.onConfirm,
       onCancel: options.onCancel ?? null,
+      awaitConfirmation: options.awaitConfirmation ?? true,
     });
   },
 
   handleConfirm: async () => {
-    const { onConfirm } = get();
+    const { onConfirm, awaitConfirmation } = get();
     if (!onConfirm) return;
+
+    if (!awaitConfirmation) {
+      set({ isOpen: false, isLoading: false, error: null, onConfirm: null, onCancel: null });
+      onConfirm();
+      return;
+    }
 
     set({ isLoading: true, error: null });
 
