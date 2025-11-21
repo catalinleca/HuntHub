@@ -5,16 +5,28 @@ import { StackIcon } from '@phosphor-icons/react';
 import { getColor } from '@/utils';
 import { HuntActionCard } from '@/pages/Dashboard/components/HuntActionCard';
 import { useDeleteHunt } from '@/api/Hunt';
+import { useConfirmationDialog } from '@/hooks';
+import { DialogVariants } from '@/stores/useDialogStore';
 
 interface AllHuntsProps {
   hunts: Hunt[];
 }
 
 export const AllHunts = ({ hunts }: AllHuntsProps) => {
+  const { confirm } = useConfirmationDialog();
   const deleteMutation = useDeleteHunt();
 
-  const handleDelete = (huntId: number) => {
-    deleteMutation.mutate(huntId);
+  const handleDelete = async (huntId: number) => {
+    const confirmed = await confirm({
+      title: 'Delete Hunt',
+      message: 'Are you sure you want to delete this hunt?',
+      confirmText: 'Delete',
+      variant: DialogVariants.Danger,
+    });
+
+    if (!confirmed) return;
+
+    await deleteMutation.mutateAsync(huntId);
   };
 
   if (hunts.length === 0) return null;
