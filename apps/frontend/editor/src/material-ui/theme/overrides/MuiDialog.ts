@@ -1,21 +1,20 @@
-import { Components, Theme } from '@mui/material';
+import { Components, Theme, alpha } from '@mui/material';
 
 export const getMuiDialogOverrides = (): Components<Theme>['MuiDialog'] => ({
   defaultProps: {
     transitionDuration: 200,
   },
   styleOverrides: {
-    root: {
+    root: ({ theme }) => ({
       '& .MuiBackdrop-root': {
         backdropFilter: 'blur(8px)',
-        backgroundColor: 'rgba(44, 24, 16, 0.25)', // Warm brown overlay
+        backgroundColor: alpha(theme.palette.common.black, 0.25),
       },
-    },
+    }),
     paper: ({ theme }) => ({
-      borderRadius: theme.shape.lg, // 16px
-      boxShadow: '0 12px 24px rgba(44, 24, 16, 0.12)', // Soft warm shadow
-      backgroundImage: 'none', // Remove MUI default gradient
-      border: `1px solid ${theme.palette.divider}`, // Subtle border matching Card
+      borderRadius: theme.shape.lg,
+      boxShadow: theme.shadows[4],
+      border: `4px solid ${theme.palette.divider}`
     }),
   },
 });
