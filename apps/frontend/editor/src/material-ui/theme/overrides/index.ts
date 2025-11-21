@@ -1,5 +1,9 @@
 export { getMuiButtonOverrides } from './MuiButton';
 export { getMuiCardOverrides } from './MuiCard';
 export { getMuiChipOverrides } from './MuiChip';
+export { getMuiDialogOverrides } from './MuiDialog';
+export { getMuiDialogActionsOverrides } from './MuiDialogActions';
+export { getMuiDialogContentOverrides } from './MuiDialogContent';
+export { getMuiDialogTitleOverrides } from './MuiDialogTitle';
 export { getMuiTextFieldOverrides } from './MuiTextField';
 export { getMuiTypographyOverrides } from './MuiTypography';

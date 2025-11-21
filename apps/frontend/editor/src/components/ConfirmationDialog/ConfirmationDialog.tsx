@@ -31,7 +31,7 @@ export const ConfirmationDialog = () => {
   ];
 
   return (
-    <SimpleModal open={isOpen} onClose={handleCancel} title={title} actions={actions}>
+    <SimpleModal open={isOpen} onClose={handleCancel} title={title} actions={actions} maxWidth="xs">
       <Typography>{message}</Typography>
     </SimpleModal>
   );
