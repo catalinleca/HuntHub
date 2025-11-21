@@ -11,7 +11,7 @@ interface DialogOptions {
   message: string;
   confirmText?: string;
   cancelText?: string;
-  variant?: keyof typeof DialogVariants;
+  variant?: DialogVariants;
 }
 
 interface DialogStore {
@@ -20,7 +20,7 @@ interface DialogStore {
   message: string;
   confirmText: string;
   cancelText: string;
-  variant: keyof typeof DialogVariants;
+  variant: DialogVariants;
   resolve: ((value: boolean) => void) | null;
 
   confirm: (options: DialogOptions) => Promise<boolean>;
@@ -38,6 +38,11 @@ export const useDialogStore = create<DialogStore>((set, get) => ({
   resolve: null,
 
   confirm: (options: DialogOptions) => {
+    const { resolve: existingResolve, isOpen } = get();
+    if (isOpen && existingResolve) {
+      existingResolve(false);
+    }
+
     return new Promise<boolean>((resolve) => {
       set({
         isOpen: true,

@@ -11,8 +11,8 @@ export interface GetHuntsParams {
 }
 
 const fetchHunts = async (params?: GetHuntsParams): Promise<PaginatedHuntsResponse> => {
-  const response = await apiClient.get<PaginatedHuntsResponse>('/hunts', { params });
-  return response.data;
+  const { data } = await apiClient.get<PaginatedHuntsResponse>('/hunts', { params });
+  return data;
 };
 
 export const useHuntsQuery = (params?: GetHuntsParams) => {

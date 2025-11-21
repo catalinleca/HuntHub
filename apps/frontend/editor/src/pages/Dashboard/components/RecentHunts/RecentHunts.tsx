@@ -10,9 +10,7 @@ interface RecentHuntsProps {
 }
 
 export const RecentHunts = ({ hunts }: RecentHuntsProps) => {
-  const recentHunts = hunts.slice(0, 2);
-
-  if (recentHunts.length === 0) return null;
+  if (hunts.length === 0) return null;
 
   return (
     <HuntCard transition={false}>
@@ -20,7 +18,7 @@ export const RecentHunts = ({ hunts }: RecentHuntsProps) => {
         <HuntCardTitle icon={<ScrollIcon size={24} color={getColor('grey.600')} />}>Resume Your Crafting</HuntCardTitle>
 
         <Grid2 container spacing={3} sx={{ mt: 2 }}>
-          {recentHunts.map((hunt) => (
+          {hunts.map((hunt) => (
             <Grid2 size={{ xs: 12, md: 6 }} key={hunt.huntId}>
               <HuntActionCard
                 title={hunt.name}

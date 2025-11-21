@@ -52,7 +52,7 @@ export const SimpleModal = ({
         <DialogActions>
           {actions.map((action, index) => (
             <Button
-              key={action.label}
+              key={`${action.label}-${index}`}
               onClick={action.onClick}
               disabled={action.disabled}
               startIcon={action.icon}

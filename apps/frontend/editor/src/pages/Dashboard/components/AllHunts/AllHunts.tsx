@@ -26,7 +26,7 @@ export const AllHunts = ({ hunts }: AllHuntsProps) => {
 
     if (!confirmed) return;
 
-    await deleteMutation.mutateAsync(huntId);
+    deleteMutation.mutate(huntId);
   };
 
   if (hunts.length === 0) return null;
