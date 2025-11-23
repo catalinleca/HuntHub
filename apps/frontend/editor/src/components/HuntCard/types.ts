@@ -14,6 +14,10 @@ export interface HuntCardImageProps {
   src?: string;
   alt?: string;
   height?: number;
+  isPublished?: boolean;
+  onEdit?: () => void;
+  onDuplicate?: () => void;
+  onDelete?: () => void;
 }
 
 export interface HuntCardBadgeProps {

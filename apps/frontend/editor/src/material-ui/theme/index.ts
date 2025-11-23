@@ -3,7 +3,13 @@ import treasureMapPalette from '../palettes/treasure-map';
 import {
   getMuiButtonOverrides,
   getMuiCardOverrides,
-  getMuiTextFieldOverrides, getMuiTypographyOverrides,
+  getMuiChipOverrides,
+  getMuiDialogOverrides,
+  getMuiDialogActionsOverrides,
+  getMuiDialogContentOverrides,
+  getMuiDialogTitleOverrides,
+  getMuiTextFieldOverrides,
+  getMuiTypographyOverrides,
 } from './overrides';
 
 export const createAppTheme = (): Theme => {
@@ -12,8 +18,13 @@ export const createAppTheme = (): Theme => {
     components: {
       MuiButton: getMuiButtonOverrides(),
       MuiCard: getMuiCardOverrides(),
+      MuiChip: getMuiChipOverrides(),
+      MuiDialog: getMuiDialogOverrides(),
+      MuiDialogActions: getMuiDialogActionsOverrides(),
+      MuiDialogContent: getMuiDialogContentOverrides(),
+      MuiDialogTitle: getMuiDialogTitleOverrides(),
       MuiTextField: getMuiTextFieldOverrides(),
-      MuiTypography: getMuiTypographyOverrides()
+      MuiTypography: getMuiTypographyOverrides(),
     },
   };
 

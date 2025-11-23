@@ -5,6 +5,7 @@ import { CssBaseline } from '@mui/material';
 import { AuthProvider } from './contexts/AuthContext';
 import { AppWithAuth } from './AppWithAuth';
 import { theme } from './material-ui';
+import { ConfirmationDialog } from '@/components';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,6 +26,7 @@ function App() {
           <AppWithAuth />
         </AuthProvider>
         <ReactQueryDevtools initialIsOpen={false} />
+        <ConfirmationDialog />
       </ThemeProvider>
     </QueryClientProvider>
   );
