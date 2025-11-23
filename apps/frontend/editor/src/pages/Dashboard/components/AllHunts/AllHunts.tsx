@@ -23,8 +23,8 @@ export const AllHunts = ({ hunts }: AllHuntsProps) => {
       confirmText: 'Delete',
       variant: DialogVariants.Danger,
       awaitConfirmation: false,
-      onConfirm: async () => {
-        await deleteMutation.mutateAsync(huntId);
+      onConfirm: () => {
+        return deleteMutation.mutateAsync(huntId);
       },
     });
   };

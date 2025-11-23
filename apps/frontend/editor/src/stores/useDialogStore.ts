@@ -31,8 +31,8 @@ interface DialogStore {
   awaitConfirmation: boolean;
 
   confirm: (options: DialogOptions) => void;
-  handleConfirm: () => Promise<void>;
-  handleCancel: () => Promise<void>;
+  handleConfirm: () => void;
+  handleCancel: () => void;
 }
 
 export const useDialogStore = create<DialogStore>((set, get) => ({
@@ -66,11 +66,15 @@ export const useDialogStore = create<DialogStore>((set, get) => ({
 
   handleConfirm: async () => {
     const { onConfirm, awaitConfirmation } = get();
-    if (!onConfirm) return;
+    if (!onConfirm) {
+      return;
+    }
 
     if (!awaitConfirmation) {
       set({ isOpen: false, isLoading: false, error: null, onConfirm: null, onCancel: null });
-      onConfirm();
+      Promise.resolve(onConfirm()).catch((error) => {
+        console.error('Dialog onConfirm error:', error);
+      });
       return;
     }
 
@@ -87,15 +91,19 @@ export const useDialogStore = create<DialogStore>((set, get) => ({
     }
   },
 
-  handleCancel: async () => {
+  handleCancel: () => {
     const { onCancel, isLoading } = get();
 
-    if (isLoading) return;
-
-    if (onCancel) {
-      await onCancel();
+    if (isLoading) {
+      return;
     }
 
     set({ isOpen: false, isLoading: false, error: null, onConfirm: null, onCancel: null });
+
+    if (onCancel) {
+      Promise.resolve(onCancel()).catch((error) => {
+        console.error('Dialog onCancel error:', error);
+      });
+    }
   },
 }));
