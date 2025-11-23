@@ -31,7 +31,7 @@ interface DialogStore {
   awaitConfirmation: boolean;
 
   confirm: (options: DialogOptions) => void;
-  handleConfirm: () => void;
+  handleConfirm: () => Promise<void>;
   handleCancel: () => void;
 }
 
