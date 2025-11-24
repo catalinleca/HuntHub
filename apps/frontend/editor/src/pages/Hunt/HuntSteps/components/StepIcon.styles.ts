@@ -1,7 +1,7 @@
 import styled from 'styled-components';
-import { Box } from '@mui/material';
+import { Stack } from '@mui/material';
 
-export const Container = styled(Box)<{ $selected: boolean }>`
+export const Container = styled(Stack)<{ $selected: boolean }>`
   position: relative;
   width: 64px;
   height: 64px;
@@ -10,7 +10,6 @@ export const Container = styled(Box)<{ $selected: boolean }>`
     $selected ? theme.palette.primary.main : theme.palette.grey[100]};
   color: ${({ theme, $selected }) =>
     $selected ? theme.palette.primary.contrastText : theme.palette.text.secondary};
-  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -24,7 +23,7 @@ export const Container = styled(Box)<{ $selected: boolean }>`
   }
 `;
 
-export const Number = styled(Box)`
+export const Number = styled(Stack)`
   position: absolute;
   top: 4px;
   right: 4px;
@@ -35,7 +34,6 @@ export const Number = styled(Box)`
   color: ${({ theme }) => theme.palette.text.primary};
   font-size: 11px;
   font-weight: 700;
-  display: flex;
   align-items: center;
   justify-content: center;
 `;

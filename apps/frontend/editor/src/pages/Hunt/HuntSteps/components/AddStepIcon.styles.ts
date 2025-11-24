@@ -1,14 +1,13 @@
 import styled from 'styled-components';
-import { Box } from '@mui/material';
+import { Stack } from '@mui/material';
 
-export const Container = styled(Box)`
+export const Container = styled(Stack)`
   width: 64px;
   height: 64px;
   border-radius: 12px;
   border: 2px dashed ${({ theme }) => theme.palette.divider};
   background-color: transparent;
   color: ${({ theme }) => theme.palette.text.secondary};
-  display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;

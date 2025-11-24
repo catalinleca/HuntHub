@@ -1,17 +1,18 @@
 import { ChallengeType, OptionType, MissionType } from '@hunthub/shared';
 import { StepFormData } from '@/types/editor';
 
-const createBaseStep = (type: ChallengeType): StepFormData => {
+const createBaseStep = (type: ChallengeType, huntId: number): StepFormData => {
   return {
-    _id: crypto.randomUUID(),
+    _id: crypto.randomUUID(), // RHF tracking ID
+    huntId,
     type,
     challenge: {},
   };
 };
 
-const createClue = (): StepFormData => {
+const createClue = (huntId: number): StepFormData => {
   return {
-    ...createBaseStep(ChallengeType.Clue),
+    ...createBaseStep(ChallengeType.Clue, huntId),
     challenge: {
       clue: {
         title: '',
@@ -21,9 +22,9 @@ const createClue = (): StepFormData => {
   };
 };
 
-const createQuiz = (): StepFormData => {
+const createQuiz = (huntId: number): StepFormData => {
   return {
-    ...createBaseStep(ChallengeType.Quiz),
+    ...createBaseStep(ChallengeType.Quiz, huntId),
     challenge: {
       quiz: {
         title: '',
@@ -40,9 +41,9 @@ const createQuiz = (): StepFormData => {
   };
 };
 
-const createMission = (): StepFormData => {
+const createMission = (huntId: number): StepFormData => {
   return {
-    ...createBaseStep(ChallengeType.Mission),
+    ...createBaseStep(ChallengeType.Mission, huntId),
     challenge: {
       mission: {
         title: '',
@@ -54,9 +55,9 @@ const createMission = (): StepFormData => {
   };
 };
 
-const createTask = (): StepFormData => {
+const createTask = (huntId: number): StepFormData => {
   return {
-    ...createBaseStep(ChallengeType.Task),
+    ...createBaseStep(ChallengeType.Task, huntId),
     challenge: {
       task: {
         title: '',
@@ -67,16 +68,16 @@ const createTask = (): StepFormData => {
 };
 
 export const StepFactory = {
-  create: (type: ChallengeType): StepFormData => {
+  create: (type: ChallengeType, huntId: number): StepFormData => {
     switch (type) {
       case ChallengeType.Clue:
-        return createClue();
+        return createClue(huntId);
       case ChallengeType.Quiz:
-        return createQuiz();
+        return createQuiz(huntId);
       case ChallengeType.Mission:
-        return createMission();
+        return createMission(huntId);
       case ChallengeType.Task:
-        return createTask();
+        return createTask(huntId);
       default:
         throw new Error(`Unknown challenge type: ${type}`);
     }

@@ -1,6 +1,6 @@
 import { RouteObject, Navigate } from 'react-router-dom';
 import Dashboard from '@/pages/Dashboard';
-import { EditorPage } from '@/pages/Editor';
+import { HuntPage } from '@/pages/Hunt';
 import { RootLayout } from './RootLayout';
 
 export const routes: RouteObject[] = [
@@ -13,7 +13,7 @@ export const routes: RouteObject[] = [
       },
       {
         path: '/editor/:id',
-        element: <EditorPage />,
+        element: <HuntPage />,
       },
       {
         path: '/',

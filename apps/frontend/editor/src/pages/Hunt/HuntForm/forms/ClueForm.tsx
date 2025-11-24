@@ -1,6 +1,6 @@
-import { Box, TextField, Typography, Divider } from '@mui/material';
+import { Stack, TextField, Typography, Divider } from '@mui/material';
 import { useFormContext } from 'react-hook-form';
-import { EditorFormData } from '@/types/editor';
+import { HuntFormData } from '@/types/editor';
 import * as S from './ClueForm.styles';
 
 interface ClueFormProps {
@@ -8,10 +8,10 @@ interface ClueFormProps {
 }
 
 export const ClueForm = ({ stepIndex }: ClueFormProps) => {
-  const { register, formState: { errors } } = useFormContext<EditorFormData>();
+  const { register, formState: { errors } } = useFormContext<{ hunt: HuntFormData }>();
 
-  const titlePath = `steps.${stepIndex}.challenge.clue.title` as const;
-  const descriptionPath = `steps.${stepIndex}.challenge.clue.description` as const;
+  const titlePath = `hunt.steps.${stepIndex}.challenge.clue.title` as const;
+  const descriptionPath = `hunt.steps.${stepIndex}.challenge.clue.description` as const;
 
   return (
     <S.Container>
@@ -36,8 +36,8 @@ export const ClueForm = ({ stepIndex }: ClueFormProps) => {
             placeholder="Welcome to Downtown"
             fullWidth
             {...register(titlePath)}
-            error={!!errors.steps?.[stepIndex]?.challenge?.clue?.title}
-            helperText={errors.steps?.[stepIndex]?.challenge?.clue?.title?.message}
+            error={!!errors.hunt?.steps?.[stepIndex]?.challenge?.clue?.title}
+            helperText={errors.hunt?.steps?.[stepIndex]?.challenge?.clue?.title?.message}
           />
 
           <TextField
@@ -47,8 +47,8 @@ export const ClueForm = ({ stepIndex }: ClueFormProps) => {
             multiline
             rows={4}
             {...register(descriptionPath)}
-            error={!!errors.steps?.[stepIndex]?.challenge?.clue?.description}
-            helperText={errors.steps?.[stepIndex]?.challenge?.clue?.description?.message}
+            error={!!errors.hunt?.steps?.[stepIndex]?.challenge?.clue?.description}
+            helperText={errors.hunt?.steps?.[stepIndex]?.challenge?.clue?.description?.message}
           />
         </S.FormFields>
       </S.Section>
@@ -67,7 +67,7 @@ export const ClueForm = ({ stepIndex }: ClueFormProps) => {
             fullWidth
           />
 
-          <Box display="flex" gap={2}>
+          <Stack direction="row" spacing={2}>
             <TextField
               label="Latitude"
               placeholder="40,7128"
@@ -79,7 +79,7 @@ export const ClueForm = ({ stepIndex }: ClueFormProps) => {
               placeholder="-74,006"
               fullWidth
             />
-          </Box>
+          </Stack>
 
           <TextField
             label="Check-in Radius (meters)"

@@ -13,6 +13,9 @@ export const useGetHunt = (huntId: number | undefined) => {
     queryKey: huntKeys.detail(huntId!),
     queryFn: () => fetchHunt(huntId!),
     staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: true,
+    refetchOnMount: false,
     enabled: !!huntId,
   });
 };

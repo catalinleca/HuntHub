@@ -1,4 +1,3 @@
-import { Box, IconButton } from '@mui/material';
 import {
   MapTrifold,
   Question,

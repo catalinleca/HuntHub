@@ -1,10 +1,9 @@
 import { useParams } from 'react-router-dom';
 import { Box, CircularProgress } from '@mui/material';
 import { useGetHunt } from '@/api/Hunt';
-import { EditorForm } from './EditorForm';
+import { HuntLayout } from './HuntLayout';
 
-// Let's to some smart loading and only block what we didn't receive, buttons and header should load but later
-export const EditorPage = () => {
+export const HuntPage = () => {
   const { id } = useParams<{ id: string }>();
   const huntId = Number(id);
 
@@ -22,5 +21,5 @@ export const EditorPage = () => {
     return <Box>Error loading hunt</Box>;
   }
 
-  return <EditorForm hunt={hunt} />;
+  return <HuntLayout hunt={hunt} />;
 };
