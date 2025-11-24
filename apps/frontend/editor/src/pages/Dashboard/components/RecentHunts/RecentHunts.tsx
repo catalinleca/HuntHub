@@ -1,5 +1,6 @@
 import { Grid2, Box } from '@mui/material';
 import { ScrollIcon } from '@phosphor-icons/react';
+import { useNavigate } from 'react-router-dom';
 import { HuntCard, HuntCardTitle } from '@/components/HuntCard';
 import type { Hunt } from '@hunthub/shared/types';
 import { getColor } from '@/utils';
@@ -10,7 +11,13 @@ interface RecentHuntsProps {
 }
 
 export const RecentHunts = ({ hunts }: RecentHuntsProps) => {
+  const navigate = useNavigate();
+
   if (hunts.length === 0) return null;
+
+  const handleEditHunt = (huntId: number) => {
+    navigate(`/editor/${huntId}`);
+  };
 
   return (
     <HuntCard transition={false}>
@@ -24,6 +31,7 @@ export const RecentHunts = ({ hunts }: RecentHuntsProps) => {
                 title={hunt.name}
                 subtitle={hunt.description || 'No description'}
                 isPublished={hunt.isPublished}
+                onClick={() => handleEditHunt(hunt.huntId)}
               />
             </Grid2>
           ))}
