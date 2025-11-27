@@ -7,7 +7,7 @@ import { prepareHuntForSave } from '@/utils/transformers/huntOutput';
 import { Hunt } from '@hunthub/shared';
 import { HuntFormData } from '@/types/editor';
 import { HuntHeader } from './HuntHeader';
-import { HuntSteps } from './HuntSteps';
+import { HuntStepTimeline } from './HuntStepTimeline';
 import { HuntForm } from './HuntForm';
 import * as S from './HuntLayout.styles';
 
@@ -54,7 +54,7 @@ export const HuntLayout = ({ hunt }: HuntLayoutProps) => {
           onSave={handleSubmit(onSubmit)}
         />
 
-        <HuntSteps
+        <HuntStepTimeline
           steps={steps}
           selectedIndex={selectedStepIndex}
           onSelectStep={setSelectedStepIndex}

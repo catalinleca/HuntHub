@@ -1,2 +1,2 @@
-export { HuntTitle } from './HuntTitle';
-export { ActionBar } from './ActionBar';
+export { HuntTitle } from './HuntTitle/HuntTitle';
+export { ActionBar } from './ActionBar/ActionBar';
