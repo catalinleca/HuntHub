@@ -1,7 +1,7 @@
 import React from 'react';
 import { Typography } from '@mui/material';
 import { ChallengeType } from '@hunthub/shared';
-import { ClueForm } from './forms';
+import { ClueInput, QuizInput, MissionInput, TaskInput } from '../HuntSteps';
 import * as S from './HuntForm.styles';
 
 interface HuntFormProps {
@@ -9,11 +9,11 @@ interface HuntFormProps {
   stepType?: ChallengeType;
 }
 
-const FORM_COMPONENTS = {
-  [ChallengeType.Clue]: ClueForm,
-  [ChallengeType.Quiz]: null,
-  [ChallengeType.Mission]: null,
-  [ChallengeType.Task]: null,
+const STEP_INPUT_COMPONENTS: Record<ChallengeType, React.ComponentType<{ stepIndex: number }>> = {
+  [ChallengeType.Clue]: ClueInput,
+  [ChallengeType.Quiz]: QuizInput,
+  [ChallengeType.Mission]: MissionInput,
+  [ChallengeType.Task]: TaskInput,
 };
 
 export const HuntForm = ({ stepIndex, stepType }: HuntFormProps) => {
@@ -27,22 +27,12 @@ export const HuntForm = ({ stepIndex, stepType }: HuntFormProps) => {
     );
   }
 
-  const FormComponent = FORM_COMPONENTS[stepType];
-
-  if (!FormComponent) {
-    return (
-      <S.FormArea>
-        <S.FormCard>
-          <Typography color="text.secondary">{stepType} form coming soon...</Typography>
-        </S.FormCard>
-      </S.FormArea>
-    );
-  }
+  const StepInputComponent = STEP_INPUT_COMPONENTS[stepType];
 
   return (
     <S.FormArea>
       <S.FormCard>
-        <FormComponent stepIndex={stepIndex} />
+        <StepInputComponent stepIndex={stepIndex} />
       </S.FormCard>
     </S.FormArea>
   );

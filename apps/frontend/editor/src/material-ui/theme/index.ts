@@ -8,6 +8,7 @@ import {
   getMuiDialogActionsOverrides,
   getMuiDialogContentOverrides,
   getMuiDialogTitleOverrides,
+  getMuiInputLabelOverrides,
   getMuiTextFieldOverrides,
   getMuiTypographyOverrides,
 } from './overrides';
@@ -23,6 +24,7 @@ export const createAppTheme = (): Theme => {
       MuiDialogActions: getMuiDialogActionsOverrides(),
       MuiDialogContent: getMuiDialogContentOverrides(),
       MuiDialogTitle: getMuiDialogTitleOverrides(),
+      MuiInputLabel: getMuiInputLabelOverrides(),
       MuiTextField: getMuiTextFieldOverrides(),
       MuiTypography: getMuiTypographyOverrides(),
     },
