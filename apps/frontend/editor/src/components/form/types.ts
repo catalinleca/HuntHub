@@ -6,5 +6,10 @@ export interface FormFieldBaseProps {
   disabled?: boolean;
 }
 
+/** Props we always control in form components */
+type CommonControlledProps = 'error' | 'onChange';
 
-export type FormFieldProps<MuiProps, ExtraOmit extends string = never> = FormFieldBaseProps & Omit<MuiProps, keyof FormFieldBaseProps | ExtraOmit>
+export type FormFieldProps<
+  MuiProps,
+  ExtraOmit extends string = never
+> = FormFieldBaseProps & Omit<MuiProps, keyof FormFieldBaseProps | CommonControlledProps | ExtraOmit>;

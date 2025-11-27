@@ -4,7 +4,7 @@ import { FormFieldProps } from '../types';
 import { nameToId } from '../utils';
 import { FieldContainer } from '../core';
 
-export interface FormCheckboxProps extends FormFieldProps<CheckboxProps, 'checked' | 'onChange'> {}
+export interface FormCheckboxProps extends FormFieldProps<CheckboxProps, 'checked'> {}
 
 export const FormCheckbox = ({ name, label, disabled, ...props }: FormCheckboxProps) => {
   const { control } = useFormContext();

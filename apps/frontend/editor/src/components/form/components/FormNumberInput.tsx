@@ -4,7 +4,7 @@ import { FormFieldProps } from '../types';
 import { getNestedError, nameToId } from '../utils';
 import { InputLabel, FieldContainer } from '../core';
 
-export interface FormNumberInputProps extends FormFieldProps<TextFieldProps, 'error'> {
+export interface FormNumberInputProps extends FormFieldProps<TextFieldProps> {
   placeholder?: string;
   min?: number;
   max?: number;

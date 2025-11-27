@@ -9,7 +9,7 @@ export interface FormSelectOption {
   label: string;
 }
 
-export interface FormSelectProps extends FormFieldProps<SelectProps, 'error'> {
+export interface FormSelectProps extends FormFieldProps<SelectProps> {
   options: FormSelectOption[];
   placeholder?: string;
 }

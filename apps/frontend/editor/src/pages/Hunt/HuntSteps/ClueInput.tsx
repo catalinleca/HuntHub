@@ -22,12 +22,7 @@ export const ClueInput = ({ stepIndex }: ClueInputProps) => {
         BASIC INFORMATION
       </Typography>
 
-      <FormInput
-        name={fields.title}
-        label="Step Title"
-        placeholder="Welcome to Downtown"
-        required
-      />
+      <FormInput name={fields.title} label="Step Title" placeholder="Welcome to Downtown" required />
 
       <FormTextArea
         name={fields.description}
@@ -36,11 +31,7 @@ export const ClueInput = ({ stepIndex }: ClueInputProps) => {
         rows={4}
       />
 
-      {/* TODO: Remove - just testing FormCheckbox */}
-      <FormCheckbox
-        name={`hunt.steps.${stepIndex}.isOptional`}
-        label="This step is optional"
-      />
+      <FormCheckbox name={`hunt.steps.${stepIndex}.isOptional`} label="This step is optional" />
 
       <Divider sx={{ my: 2 }} />
 
