@@ -14,7 +14,7 @@ interface StepIconProps {
   onClick: () => void;
 }
 
-const STEP_ICONS = {
+const STEP_ICONS: Record<ChallengeType, typeof MapTrifold> = {
   [ChallengeType.Clue]: MapTrifold,
   [ChallengeType.Quiz]: Question,
   [ChallengeType.Mission]: Camera,

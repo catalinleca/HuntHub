@@ -26,12 +26,4 @@ export type HuntFormData = Omit<Hunt, 'steps'> & {
   steps: StepFormData[];
 };
 
-/** @deprecated Use HuntFormData with Efekta pattern instead */
-export interface EditorFormData {
-  name: string;
-  description: string;
-  startLocation?: Location;
-  steps: StepFormData[];
-}
-
 export type { Hunt, Step, Location };

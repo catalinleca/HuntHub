@@ -10,17 +10,15 @@ import { HuntFormData } from '@/types/editor';
  * - Readonly/computed fields that backend doesn't accept
  */
 export const prepareHuntForSave = (huntFormData: HuntFormData): Hunt => {
-  const steps: Step[] = huntFormData.steps.map(({ _id, ...step }) => step as Step);
-
   const {
-    createdAt,
-    isLive,
-    releasedAt,
+    steps: formSteps,
+    createdAt: _createdAt,
+    isLive: _isLive,
+    releasedAt: _releasedAt,
     ...huntData
-  } = huntFormData as any;
+  } = huntFormData;
 
-  return {
-    ...huntData,
-    steps,
-  } as Hunt;
+  const steps = formSteps.map(({ _id, ...step }) => step as Step);
+
+  return { ...huntData, steps } as Hunt;
 };

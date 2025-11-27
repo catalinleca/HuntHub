@@ -7,7 +7,11 @@ import { StepFactory } from '@/utils/factories/StepFactory';
 export const useHuntSteps = (formMethods: UseFormReturn<{ hunt: HuntFormData }>) => {
   const [selectedStepIndex, setSelectedStepIndex] = useState(0);
 
-  const { fields: steps, append, remove } = useFieldArray({
+  const {
+    fields: steps,
+    append,
+    remove,
+  } = useFieldArray({
     control: formMethods.control,
     name: 'hunt.steps',
   });
@@ -22,16 +26,18 @@ export const useHuntSteps = (formMethods: UseFormReturn<{ hunt: HuntFormData }>)
 
   const handleDeleteStep = (index: number) => {
     if (steps.length <= 1) {
-      alert('Cannot delete the last step'); // Use snackbar later
+      alert('Cannot delete the last step');
       return;
     }
 
     remove(index);
 
-    if (selectedStepIndex >= index && selectedStepIndex > 0) {
+    const newLength = steps.length - 1;
+
+    if (selectedStepIndex > index) {
       setSelectedStepIndex(selectedStepIndex - 1);
-    } else if (selectedStepIndex === steps.length - 1) {
-      setSelectedStepIndex(steps.length - 2);
+    } else if (selectedStepIndex === index && index >= newLength) {
+      setSelectedStepIndex(newLength - 1);
     }
   };
 
