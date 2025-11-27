@@ -10,7 +10,7 @@ export const getNestedError = (errors: FieldErrors, name: string): string | unde
  * Convert field name to valid HTML ID
  */
 export const nameToId = (name: string): string => {
-  return name.replace(/\./g, '-').replace(/\[(\d+)\]/g, '-$1');
+  return name.replace(/\./g, '-').replace(/\[(\d+)]/g, '-$1');
 };
 
 /**
@@ -18,9 +18,7 @@ export const nameToId = (name: string): string => {
  * Used by getFieldPath for autocomplete support
  */
 type NonNullableProps<T> = {
-  [P in keyof T]-?: NonNullable<T[P]> extends object
-    ? NonNullableProps<NonNullable<T[P]>>
-    : NonNullable<T[P]>;
+  [P in keyof T]-?: NonNullable<T[P]> extends object ? NonNullableProps<NonNullable<T[P]>> : NonNullable<T[P]>;
 };
 
 /**
@@ -29,19 +27,11 @@ type NonNullableProps<T> = {
  *
  * Solves: TypeScript loses type inference with dynamic array indices
  *
- * @example
  * const titlePath = getFieldPath(h => h.hunt.steps[stepIndex].challenge.clue.title);
- * // Returns: "hunt.steps.0.challenge.clue.title"
+ * Returns: "hunt.steps.0.challenge.clue.title"
  *
- * // With autocomplete:
- * const fields = {
- *   title: getFieldPath(h => h.hunt.steps[0].challenge.clue.title),
- *   description: getFieldPath(h => h.hunt.steps[0].challenge.clue.description),
- * };
- */
-export const getFieldPath = <T = { hunt: HuntFormData }>(
-  accessor: (a: NonNullableProps<T>) => unknown,
-): string => {
+ * */
+export const getFieldPath = <T = { hunt: HuntFormData }>(accessor: (a: NonNullableProps<T>) => unknown): string => {
   const path: string[] = [];
 
   const proxy: unknown = new Proxy(
