@@ -23,7 +23,7 @@ export const getInputErrorStyles = (theme: Theme) => ({
 
 export const getInputHoverStyles = (theme: Theme) => ({
   '&:hover:not(.Mui-focused):not(.Mui-error) .MuiOutlinedInput-notchedOutline': {
-    borderColor: theme.palette.action.hover,
+    borderColor: theme.palette.accent.medium,
   },
 });
 
