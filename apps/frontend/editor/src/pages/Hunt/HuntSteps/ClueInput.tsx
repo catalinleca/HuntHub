@@ -1,6 +1,7 @@
-import { Stack, Divider, Typography } from '@mui/material';
-import { FormInput, FormTextArea, FormCheckbox, getFieldPath } from '@/components/form';
-import { StepHeader, LocationFields, HintField } from './components';
+import { Typography } from '@mui/material';
+import { ChallengeType } from '@hunthub/shared';
+import { FormInput, FormTextArea, getFieldPath } from '@/components/form';
+import { StepCard } from './components';
 
 interface ClueInputProps {
   stepIndex: number;
@@ -15,14 +16,12 @@ export const ClueInput = ({ stepIndex }: ClueInputProps) => {
   const fields = getClueFieldNames(stepIndex);
 
   return (
-    <Stack spacing={3}>
-      <StepHeader stepIndex={stepIndex} />
-
-      <Typography variant="subtitle2" fontWeight={600} color="text.secondary">
-        BASIC INFORMATION
+    <StepCard stepIndex={stepIndex} type={ChallengeType.Clue}>
+      <Typography variant="label" color="text.secondary">
+        Clue Content
       </Typography>
 
-      <FormInput name={fields.title} label="Step Title" placeholder="Welcome to Downtown" required />
+      <FormInput name={fields.title} label="Title" placeholder="Welcome to Downtown" />
 
       <FormTextArea
         name={fields.description}
@@ -30,16 +29,6 @@ export const ClueInput = ({ stepIndex }: ClueInputProps) => {
         placeholder="Start your journey at the historic fountain in the town square..."
         rows={4}
       />
-
-      <FormCheckbox name={`hunt.steps.${stepIndex}.isOptional`} label="This step is optional" />
-
-      <Divider sx={{ my: 2 }} />
-
-      <LocationFields stepIndex={stepIndex} />
-
-      <Divider sx={{ my: 2 }} />
-
-      <HintField stepIndex={stepIndex} />
-    </Stack>
+    </StepCard>
   );
 };

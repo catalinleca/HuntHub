@@ -4,6 +4,7 @@ import { Stack } from '@mui/material';
 export const Container = styled(Stack)`
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   gap: ${({ theme }) => theme.spacing(2)};
   padding: ${({ theme }) => theme.spacing(2, 4)};
   background-color: ${({ theme }) => theme.palette.background.defaultLight};

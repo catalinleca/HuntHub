@@ -59,6 +59,7 @@ declare module '@mui/material/styles' {
     xsRegular: React.CSSProperties;
     xsMedium: React.CSSProperties;
     xsBold: React.CSSProperties;
+    label: React.CSSProperties;
   }
 
   interface TypographyVariantsOptions {
@@ -68,6 +69,7 @@ declare module '@mui/material/styles' {
     xsRegular?: React.CSSProperties;
     xsMedium?: React.CSSProperties;
     xsBold?: React.CSSProperties;
+    label?: React.CSSProperties;
   }
 
   interface Theme {
@@ -109,6 +111,7 @@ declare module '@mui/material/Typography' {
     xsRegular: true;
     xsMedium: true;
     xsBold: true;
+    label: true;
   }
 }
 

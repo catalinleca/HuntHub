@@ -2,6 +2,7 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { NavBar } from '@/components';
 import { useSaveHunt } from '@/api/Hunt';
 import { useHuntSteps } from '@/pages/Hunt/hooks';
+import { StepFormProvider } from '@/pages/Hunt/context';
 import { transformHuntToFormData } from '@/utils/transformers/huntInput';
 import { prepareHuntForSave } from '@/utils/transformers/huntOutput';
 import { Hunt } from '@hunthub/shared';
@@ -28,7 +29,8 @@ export const HuntLayout = ({ hunt }: HuntLayoutProps) => {
     reset,
   } = formMethods;
 
-  const { steps, selectedStepIndex, setSelectedStepIndex, handleCreateStep } = useHuntSteps(formMethods);
+  const { steps, selectedStepIndex, setSelectedStepIndex, handleCreateStep, handleDeleteStep } =
+    useHuntSteps(formMethods);
 
   const saveHuntMutation = useSaveHunt();
 
@@ -40,29 +42,31 @@ export const HuntLayout = ({ hunt }: HuntLayoutProps) => {
   };
 
   return (
-    <FormProvider {...formMethods}>
-      <S.Container>
-        <NavBar />
+    <StepFormProvider onDeleteStep={() => handleDeleteStep(selectedStepIndex)}>
+      <FormProvider {...formMethods}>
+        <S.Container>
+          <NavBar />
 
-        <HuntHeader
-          huntName={hunt.name}
-          lastUpdatedBy="You"
-          hasUnsavedChanges={isDirty}
-          isSaving={isSubmitting}
-          onSave={handleSubmit(onSubmit)}
-        />
+          <HuntHeader
+            huntName={hunt.name}
+            lastUpdatedBy="You"
+            hasUnsavedChanges={isDirty}
+            isSaving={isSubmitting}
+            onSave={handleSubmit(onSubmit)}
+          />
 
-        <HuntStepTimeline
-          steps={steps}
-          selectedIndex={selectedStepIndex}
-          onSelectStep={setSelectedStepIndex}
-          onAddStep={handleCreateStep}
-        />
+          <HuntStepTimeline
+            steps={steps}
+            selectedIndex={selectedStepIndex}
+            onSelectStep={setSelectedStepIndex}
+            onAddStep={handleCreateStep}
+          />
 
-        {selectedStepIndex !== -1 && (
-          <HuntForm stepIndex={selectedStepIndex} stepType={steps[selectedStepIndex]?.type} />
-        )}
-      </S.Container>
-    </FormProvider>
+          {selectedStepIndex !== -1 && (
+            <HuntForm stepIndex={selectedStepIndex} stepType={steps[selectedStepIndex]?.type} />
+          )}
+        </S.Container>
+      </FormProvider>
+    </StepFormProvider>
   );
 };

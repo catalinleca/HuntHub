@@ -144,6 +144,13 @@ const treasureMapPalette = {
       fontWeight: 700,
       lineHeight: 1.33,
     },
+    label: {
+      fontSize: 12,
+      fontWeight: 600,
+      lineHeight: 1.33,
+      letterSpacing: '0.05em',
+      textTransform: 'uppercase' as const,
+    },
   },
   spacing: [0, 4, 8, 12, 16, 24, 32, 48, 64],
   shadows: [
