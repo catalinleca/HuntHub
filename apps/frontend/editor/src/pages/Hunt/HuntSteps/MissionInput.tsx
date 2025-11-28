@@ -1,7 +1,8 @@
-import { Typography } from '@mui/material';
+import { Divider, Typography } from '@mui/material';
 import { ChallengeType, MissionType } from '@hunthub/shared';
 import { FormInput, FormTextArea, FormSelect, getFieldPath } from '@/components/form';
 import { StepCard } from './components';
+import { StepSettings } from './StepSettings';
 
 interface MissionInputProps {
   stepIndex: number;
@@ -43,6 +44,10 @@ export const MissionInput = ({ stepIndex }: MissionInputProps) => {
         placeholder="Tell players what they need to do..."
         rows={4}
       />
+
+      <Divider sx={{ my: 2 }} />
+
+      <StepSettings stepIndex={stepIndex} />
     </StepCard>
   );
 };

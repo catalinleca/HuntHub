@@ -1,7 +1,8 @@
-import { Typography } from '@mui/material';
+import { Divider, Typography } from '@mui/material';
 import { ChallengeType } from '@hunthub/shared';
 import { FormInput, FormTextArea, getFieldPath } from '@/components/form';
 import { StepCard } from './components';
+import { StepSettings } from './StepSettings';
 
 interface TaskInputProps {
   stepIndex: number;
@@ -38,6 +39,10 @@ export const TaskInput = ({ stepIndex }: TaskInputProps) => {
         rows={3}
         helperText="Example: 'Accept if player mentions at least 2 architectural features'"
       />
+
+      <Divider sx={{ my: 2 }} />
+
+      <StepSettings stepIndex={stepIndex} />
     </StepCard>
   );
 };

@@ -1,7 +1,8 @@
-import { Typography } from '@mui/material';
+import { Divider, Typography } from '@mui/material';
 import { ChallengeType } from '@hunthub/shared';
 import { FormInput, FormTextArea, getFieldPath } from '@/components/form';
 import { StepCard } from './components';
+import { StepSettings } from './StepSettings';
 
 interface ClueInputProps {
   stepIndex: number;
@@ -29,6 +30,10 @@ export const ClueInput = ({ stepIndex }: ClueInputProps) => {
         placeholder="Start your journey at the historic fountain in the town square..."
         rows={4}
       />
+
+      <Divider sx={{ my: 2 }} />
+
+      <StepSettings stepIndex={stepIndex} />
     </StepCard>
   );
 };

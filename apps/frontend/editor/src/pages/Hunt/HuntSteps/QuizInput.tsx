@@ -1,7 +1,8 @@
-import { Typography } from '@mui/material';
+import { Divider, Typography } from '@mui/material';
 import { ChallengeType, OptionType } from '@hunthub/shared';
 import { FormInput, FormTextArea, FormSelect, getFieldPath } from '@/components/form';
 import { StepCard } from './components';
+import { StepSettings } from './StepSettings';
 
 interface QuizInputProps {
   stepIndex: number;
@@ -38,6 +39,10 @@ export const QuizInput = ({ stepIndex }: QuizInputProps) => {
         placeholder="1892"
         helperText="The answer players need to provide"
       />
+
+      <Divider sx={{ my: 2 }} />
+
+      <StepSettings stepIndex={stepIndex} />
     </StepCard>
   );
 };

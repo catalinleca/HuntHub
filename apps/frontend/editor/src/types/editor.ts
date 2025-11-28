@@ -10,13 +10,34 @@ export type WithRHFInternalId<T> = T & {
 };
 
 /**
+ * Location for form - object always exists, leaves can be null (disabled state)
+ * When all leaves are null = setting disabled
+ * When all leaves are numbers = setting enabled
+ * Invariant: updaters always set ALL fields together
+ */
+export type LocationFormData = {
+  lat: number | null;
+  lng: number | null;
+  radius: number | null;
+};
+
+/**
  * Step data for form - keeps ALL Step fields + adds _id for RHF tracking
  * huntId is required (we know it from the parent Hunt)
  * stepId is optional (assigned by backend on save)
+ *
+ * Settings are explicitly nullable for RHF:
+ * - null = setting disabled (not sent to API)
+ * - non-null = setting enabled (required to fill)
  */
 export type StepFormData = WithRHFInternalId<
-  Omit<Step, 'stepId'> & {
+  Omit<Step, 'stepId' | 'requiredLocation' | 'hint' | 'timeLimit' | 'maxAttempts'> & {
     stepId?: number; // Optional - assigned by backend when step is saved
+    // Settings - null means disabled
+    requiredLocation: LocationFormData;
+    hint: string | null;
+    timeLimit: number | null;
+    maxAttempts: number | null;
   }
 >;
 
@@ -26,6 +47,14 @@ export type StepFormData = WithRHFInternalId<
  */
 export type HuntFormData = Omit<Hunt, 'steps'> & {
   steps: StepFormData[];
+};
+
+/**
+ * Root form data structure for the editor
+ * This is what useForm<EditorFormData>() expects
+ */
+export type EditorFormData = {
+  hunt: HuntFormData;
 };
 
 export type { Hunt, Step, Location };

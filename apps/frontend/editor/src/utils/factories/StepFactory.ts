@@ -1,5 +1,6 @@
 import { ChallengeType, OptionType, MissionType } from '@hunthub/shared';
 import { StepFormData } from '@/types/editor';
+import { LOCATION_DEFAULTS } from '@/utils/stepSettings';
 
 const createBaseStep = (type: ChallengeType, huntId: number): StepFormData => {
   return {
@@ -7,6 +8,11 @@ const createBaseStep = (type: ChallengeType, huntId: number): StepFormData => {
     huntId,
     type,
     challenge: {},
+
+    requiredLocation: { ...LOCATION_DEFAULTS.disabled },
+    hint: null,
+    timeLimit: null,
+    maxAttempts: null,
   };
 };
 

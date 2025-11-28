@@ -1,14 +1,12 @@
 import { Hunt, Step } from '@hunthub/shared';
-import { HuntFormData } from '@/types/editor';
+import { HuntFormData, StepFormData } from '@/types/editor';
 
-/**
- * FORM → API
- * Prepare HuntFormData for submission to backend
- *
- * Removes:
- * - _id from each step (RHF tracking ID, not for API)
- * - Readonly/computed fields that backend doesn't accept
- */
+const transformStepForApi = (formStep: StepFormData): Step => {
+  const { _id, ...rest } = formStep;
+
+  return rest as Step;
+};
+
 export const prepareHuntForSave = (huntFormData: HuntFormData): Hunt => {
   const {
     steps: formSteps,
@@ -18,7 +16,7 @@ export const prepareHuntForSave = (huntFormData: HuntFormData): Hunt => {
     ...huntData
   } = huntFormData;
 
-  const steps = formSteps.map(({ _id, ...step }) => step as Step);
+  const steps = formSteps.map(transformStepForApi);
 
   return { ...huntData, steps } as Hunt;
 };
