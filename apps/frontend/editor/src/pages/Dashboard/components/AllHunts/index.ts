@@ -1,1 +1,1 @@
-export { AllHunts } from './AllHunts'
+export { AllHunts } from './AllHunts';

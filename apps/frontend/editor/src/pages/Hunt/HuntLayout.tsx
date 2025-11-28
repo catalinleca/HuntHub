@@ -22,15 +22,13 @@ export const HuntLayout = ({ hunt }: HuntLayoutProps) => {
     mode: 'onChange',
   });
 
-  const { handleSubmit, formState: { isDirty, isSubmitting }, reset } = formMethods;
-
   const {
-    steps,
-    selectedStepIndex,
-    setSelectedStepIndex,
-    handleCreateStep,
-    handleDeleteStep,
-  } = useHuntSteps(formMethods);
+    handleSubmit,
+    formState: { isDirty, isSubmitting },
+    reset,
+  } = formMethods;
+
+  const { steps, selectedStepIndex, setSelectedStepIndex, handleCreateStep } = useHuntSteps(formMethods);
 
   const saveHuntMutation = useSaveHunt();
 
@@ -62,10 +60,7 @@ export const HuntLayout = ({ hunt }: HuntLayoutProps) => {
         />
 
         {selectedStepIndex !== -1 && (
-          <HuntForm
-            stepIndex={selectedStepIndex}
-            stepType={steps[selectedStepIndex]?.type}
-          />
+          <HuntForm stepIndex={selectedStepIndex} stepType={steps[selectedStepIndex]?.type} />
         )}
       </S.Container>
     </FormProvider>

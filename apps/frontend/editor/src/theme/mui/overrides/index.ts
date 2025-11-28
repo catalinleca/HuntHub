@@ -6,5 +6,7 @@ export { getMuiDialogActionsOverrides } from './MuiDialogActions';
 export { getMuiDialogContentOverrides } from './MuiDialogContent';
 export { getMuiDialogTitleOverrides } from './MuiDialogTitle';
 export { getMuiInputLabelOverrides } from './MuiInputLabel';
+export { getMuiOutlinedInputOverrides } from './MuiOutlinedInput';
+export { getMuiSelectOverrides } from './MuiSelect';
 export { getMuiTextFieldOverrides } from './MuiTextField';
 export { getMuiTypographyOverrides } from './MuiTypography';

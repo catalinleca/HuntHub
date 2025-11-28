@@ -44,12 +44,7 @@ export const QuizInput = ({ stepIndex }: QuizInputProps) => {
         rows={3}
       />
 
-      <FormSelect
-        name={fields.type}
-        label="Answer Type"
-        options={QUIZ_TYPE_OPTIONS}
-        placeholder="Select answer type"
-      />
+      <FormSelect name={fields.type} label="Answer Type" options={QUIZ_TYPE_OPTIONS} placeholder="Select answer type" />
 
       <Divider sx={{ my: 2 }} />
 

@@ -42,8 +42,8 @@ export const CreateHuntForm = () => {
       </Typography>
 
       <FormDescription variant="body2" color="text.secondary">
-        This form uses the same types and validation as the backend. Types from{' '}
-        <code>@hunthub/shared</code>, schemas from <code>@hunthub/shared/schemas</code>
+        This form uses the same types and validation as the backend. Types from <code>@hunthub/shared</code>, schemas
+        from <code>@hunthub/shared/schemas</code>
       </FormDescription>
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -108,4 +108,4 @@ export const CreateHuntForm = () => {
       </form>
     </FormPaper>
   );
-}
+};

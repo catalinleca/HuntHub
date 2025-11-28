@@ -1,5 +1,6 @@
 module.exports = {
-  extends: ['../../.eslintrc.js'],
+  extends: ['../../../.eslintrc.js'],
+  ignorePatterns: ['vite.config.ts'],
   env: {
     browser: true,
     es2020: true,
@@ -13,6 +14,11 @@ module.exports = {
     tsconfigRootDir: __dirname,
   },
   rules: {
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+    ],
+
     // React 17+ doesn't need React in scope
     'react/react-in-jsx-scope': 'off',
 

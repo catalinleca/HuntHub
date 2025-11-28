@@ -14,9 +14,11 @@ export type WithRHFInternalId<T> = T & {
  * huntId is required (we know it from the parent Hunt)
  * stepId is optional (assigned by backend on save)
  */
-export type StepFormData = Omit<Step, 'stepId'> & {
-  stepId?: number; // Optional - assigned by backend when step is saved
-} & WithRHFInternalId<{}>;
+export type StepFormData = WithRHFInternalId<
+  Omit<Step, 'stepId'> & {
+    stepId?: number; // Optional - assigned by backend when step is saved
+  }
+>;
 
 /**
  * Hunt data for form - keeps ALL Hunt fields, but steps have _id added for RHF

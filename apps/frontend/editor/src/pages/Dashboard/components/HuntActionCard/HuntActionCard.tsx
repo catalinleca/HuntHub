@@ -1,4 +1,4 @@
-import { Typography, Box, Button } from '@mui/material';
+import { Typography, Button } from '@mui/material';
 import { HuntCard, HuntCardImage, HuntCardBody } from '@/components/HuntCard';
 import { BookOpenIcon, ClockIcon } from '@phosphor-icons/react';
 import * as S from './HuntActionCard.styled';
@@ -17,10 +17,27 @@ interface HuntActionCardProps {
   onDelete?: () => void;
 }
 
-export const HuntActionCard = ({ image, imageAlt, title, subtitle, metadata, isPublished, onClick, onEdit, onDuplicate, onDelete }: HuntActionCardProps) => {
+export const HuntActionCard = ({
+  image,
+  imageAlt,
+  title,
+  subtitle,
+  isPublished,
+  onClick,
+  onEdit,
+  onDuplicate,
+  onDelete,
+}: HuntActionCardProps) => {
   return (
     <HuntCard transition onClick={onClick} disableGutters>
-      <HuntCardImage src={image} alt={imageAlt} isPublished={isPublished} onEdit={onEdit} onDuplicate={onDuplicate} onDelete={onDelete} />
+      <HuntCardImage
+        src={image}
+        alt={imageAlt}
+        isPublished={isPublished}
+        onEdit={onEdit}
+        onDuplicate={onDuplicate}
+        onDelete={onDelete}
+      />
 
       <HuntCardBody>
         <S.IconTextRow $color={getColor('primary.main')}>

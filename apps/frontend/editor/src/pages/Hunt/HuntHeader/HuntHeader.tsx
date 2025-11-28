@@ -9,26 +9,12 @@ interface HuntHeaderProps {
   onSave: () => void;
 }
 
-export const HuntHeader = ({
-  huntName,
-  lastUpdatedBy,
-  hasUnsavedChanges,
-  isSaving,
-  onSave
-}: HuntHeaderProps) => {
+export const HuntHeader = ({ huntName, lastUpdatedBy, hasUnsavedChanges, isSaving, onSave }: HuntHeaderProps) => {
   return (
     <S.Container>
-      <HuntTitle
-        huntName={huntName}
-        lastUpdatedBy={lastUpdatedBy}
-        hasUnsavedChanges={hasUnsavedChanges}
-      />
+      <HuntTitle huntName={huntName} lastUpdatedBy={lastUpdatedBy} hasUnsavedChanges={hasUnsavedChanges} />
 
-      <ActionBar
-        hasUnsavedChanges={hasUnsavedChanges}
-        isSaving={isSaving}
-        onSave={onSave}
-      />
+      <ActionBar hasUnsavedChanges={hasUnsavedChanges} isSaving={isSaving} onSave={onSave} />
     </S.Container>
   );
 };
