@@ -7,7 +7,7 @@ export const FOCUS_RING_SHADOW = {
 
 export const getFieldTokens = (theme: Theme) => ({
   base: {
-    background: theme.palette.background.paper,
+    background: theme.palette.common.white,
     border: theme.palette.divider,
     text: theme.palette.text.primary,
   },
@@ -32,6 +32,7 @@ export const getFieldTokens = (theme: Theme) => ({
     text: theme.palette.text.disabled,
   },
 
+  height: 40,
   padding: theme.spacing(2, 3),
   borderRadius: theme.shape.borderRadius,
   borderWidth: {
@@ -42,6 +43,8 @@ export const getFieldTokens = (theme: Theme) => ({
   transition: theme.transitions.create(['border-color', 'box-shadow'], {
     duration: theme.transitions.duration.short,
   }),
+
+  typography: theme.typography.smRegular,
 });
 
 export type FieldTokens = ReturnType<typeof getFieldTokens>;

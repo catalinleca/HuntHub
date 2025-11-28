@@ -5,9 +5,8 @@ export const getMuiInputLabelOverrides = (): Components<Theme>['MuiInputLabel'] 
     root: ({ theme }) => ({
       position: 'static',
       transform: 'none',
-      marginBottom: theme.spacing(0.5),
-      fontSize: '0.875rem',
-      fontWeight: 500,
+      marginBottom: theme.spacing(1),
+      ...theme.typography.smMedium,
       color: theme.palette.text.primary,
 
       '&.Mui-focused': {

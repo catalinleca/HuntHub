@@ -1,3 +1,4 @@
+import React from 'react';
 import '@mui/material/styles';
 
 declare module '@mui/material/styles' {
@@ -43,12 +44,30 @@ declare module '@mui/material/styles' {
     accent?: SimplePaletteColorOptions;
   }
 
+  interface TypeBackground {
+    default: string;
+    defaultLight: string;
+    paper: string;
+    surface: string;
+  }
+
   interface TypographyVariants {
     displayFontFamily: string;
+    smRegular: React.CSSProperties;
+    smMedium: React.CSSProperties;
+    smBold: React.CSSProperties;
+    xsRegular: React.CSSProperties;
+    xsMedium: React.CSSProperties;
+    xsBold: React.CSSProperties;
   }
 
   interface TypographyVariantsOptions {
-    displayFontFamily?: string;
+    smRegular?: React.CSSProperties;
+    smMedium?: React.CSSProperties;
+    smBold?: React.CSSProperties;
+    xsRegular?: React.CSSProperties;
+    xsMedium?: React.CSSProperties;
+    xsBold?: React.CSSProperties;
   }
 
   interface Theme {
@@ -81,6 +100,15 @@ declare module '@mui/material/Badge' {
 declare module '@mui/material/Typography' {
   interface TypographyOwnProps {
     textStyle?: 'display' | 'ui';
+  }
+
+  interface TypographyPropsVariantOverrides {
+    smRegular: true;
+    smMedium: true;
+    smBold: true;
+    xsRegular: true;
+    xsMedium: true;
+    xsBold: true;
   }
 }
 

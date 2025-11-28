@@ -16,9 +16,12 @@ export const getMuiInputOverrideStyles = (theme: Theme) => {
     backgroundColor: tokens.base.background,
     borderRadius: tokens.borderRadius,
     transition: tokens.transition,
+    minHeight: tokens.height,
 
     [descendant(outlinedInputClasses.input)]: {
       padding: tokens.padding,
+      ...tokens.typography,
+      boxSizing: 'border-box',
     },
 
     [descendant(outlinedInputClasses.notchedOutline)]: {
@@ -70,14 +73,16 @@ export const muiInputSelectors = {
       backgroundColor: tokens.base.background,
       borderRadius: tokens.borderRadius,
       transition: tokens.transition,
+      minHeight: tokens.height,
     };
   },
 
-  inputPadding: (theme: Theme) => {
+  inputStyles: (theme: Theme) => {
     const tokens = getFieldTokens(theme);
     return {
       [descendant(outlinedInputClasses.input)]: {
         padding: tokens.padding,
+        ...tokens.typography,
       },
     };
   },

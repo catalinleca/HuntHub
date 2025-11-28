@@ -10,7 +10,7 @@ export const FormArea = styled(Stack)`
 export const FormCard = styled(Box)`
   max-width: 800px;
   width: 100%;
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  background-color: ${({ theme }) => theme.palette.background.surface};
   border-radius: ${({ theme }) => theme.spacing(2)};
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   padding: ${({ theme }) => theme.spacing(4)};

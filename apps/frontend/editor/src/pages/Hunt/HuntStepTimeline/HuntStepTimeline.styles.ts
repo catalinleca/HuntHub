@@ -6,7 +6,7 @@ export const Container = styled(Stack)`
   align-items: center;
   gap: ${({ theme }) => theme.spacing(2)};
   padding: ${({ theme }) => theme.spacing(2, 4)};
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  background-color: ${({ theme }) => theme.palette.background.defaultLight};
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
   overflow-x: auto;
 

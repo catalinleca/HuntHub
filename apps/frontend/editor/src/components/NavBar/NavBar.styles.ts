@@ -4,7 +4,7 @@ import { AppBar as MuiAppBar, Toolbar as MuiToolbar, Box } from '@mui/material';
 export const AppBar = styled(MuiAppBar)`
   background-color: ${({ theme }) => theme.palette.common.white};
   color: ${({ theme }) => theme.palette.primary.main};
-  border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
+  border-bottom: 2px solid ${({ theme }) => theme.palette.divider};
   box-shadow: none;
 `;
 
