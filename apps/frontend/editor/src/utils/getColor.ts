@@ -1,4 +1,4 @@
-import { treasureMapPaletteConfig } from '@/material-ui/palettes/treasure-map';
+import { treasureMapPaletteConfig } from '@/theme/palettes';
 
 export type NestedKeyOf<ObjectType extends object> = {
   [Key in keyof ObjectType & (string | number)]: ObjectType[Key] extends object

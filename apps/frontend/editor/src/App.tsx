@@ -4,7 +4,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import { AuthProvider } from './contexts/AuthContext';
 import { AppWithAuth } from './AppWithAuth';
-import { theme } from './material-ui';
+import { theme } from './theme';
 import { ConfirmationDialog } from '@/components';
 
 const queryClient = new QueryClient({

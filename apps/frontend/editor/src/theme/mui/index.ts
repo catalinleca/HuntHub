@@ -1,5 +1,5 @@
 import { createTheme, Theme, ThemeOptions } from '@mui/material';
-import treasureMapPalette from '../palettes/treasure-map';
+import { treasureMapPalette } from '../palettes';
 import {
   getMuiButtonOverrides,
   getMuiCardOverrides,
@@ -9,6 +9,7 @@ import {
   getMuiDialogContentOverrides,
   getMuiDialogTitleOverrides,
   getMuiInputLabelOverrides,
+  getMuiOutlinedInputOverrides,
   getMuiSelectOverrides,
   getMuiTextFieldOverrides,
   getMuiTypographyOverrides,
@@ -26,6 +27,7 @@ export const createAppTheme = (): Theme => {
       MuiDialogContent: getMuiDialogContentOverrides(),
       MuiDialogTitle: getMuiDialogTitleOverrides(),
       MuiInputLabel: getMuiInputLabelOverrides(),
+      MuiOutlinedInput: getMuiOutlinedInputOverrides(),
       MuiSelect: getMuiSelectOverrides(),
       MuiTextField: getMuiTextFieldOverrides(),
       MuiTypography: getMuiTypographyOverrides(),

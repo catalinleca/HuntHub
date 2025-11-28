@@ -5,7 +5,7 @@ export const FOCUS_RING_SHADOW = {
   error: 10,
 } as const;
 
-export const getInputTokens = (theme: Theme) => ({
+export const getFieldTokens = (theme: Theme) => ({
   base: {
     background: theme.palette.background.paper,
     border: theme.palette.divider,
@@ -32,7 +32,7 @@ export const getInputTokens = (theme: Theme) => ({
     text: theme.palette.text.disabled,
   },
 
-  padding: '8px 12px',
+  padding: theme.spacing(2, 3),
   borderRadius: theme.shape.borderRadius,
   borderWidth: {
     base: 1,
@@ -44,4 +44,4 @@ export const getInputTokens = (theme: Theme) => ({
   }),
 });
 
-export type InputTokens = ReturnType<typeof getInputTokens>;
+export type FieldTokens = ReturnType<typeof getFieldTokens>;
