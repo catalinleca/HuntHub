@@ -23,12 +23,7 @@ export const TaskInput = ({ stepIndex }: TaskInputProps) => {
         TASK DETAILS
       </Typography>
 
-      <FormInput
-        name={fields.title}
-        label="Task Title"
-        placeholder="Complete the scavenger hunt challenge"
-        required
-      />
+      <FormInput name={fields.title} label="Task Title" placeholder="Complete the scavenger hunt challenge" required />
 
       <FormTextArea
         name={fields.instructions}

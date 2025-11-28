@@ -1,5 +1,5 @@
 import { Stack, Menu, MenuItem } from '@mui/material';
-import { Plus, MapTrifold, Question, Camera, CheckSquare } from '@phosphor-icons/react';
+import { PlusIcon, MapTrifoldIcon, QuestionIcon, CameraIcon, CheckSquareIcon } from '@phosphor-icons/react';
 import { ChallengeType } from '@hunthub/shared';
 import { useState } from 'react';
 import * as S from './AddStepIcon.styles';
@@ -27,35 +27,31 @@ export const AddStepIcon = ({ onAddStep }: AddStepIconProps) => {
   return (
     <>
       <S.Container onClick={handleClick}>
-        <Plus size={32} weight="bold" />
+        <PlusIcon size={32} weight="bold" />
       </S.Container>
 
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
         <MenuItem onClick={() => handleSelect(ChallengeType.Clue)}>
           <Stack direction="row" spacing={1.5} alignItems="center">
-            <MapTrifold size={20} weight="duotone" />
+            <MapTrifoldIcon size={20} weight="duotone" />
             Clue
           </Stack>
         </MenuItem>
         <MenuItem onClick={() => handleSelect(ChallengeType.Quiz)}>
           <Stack direction="row" spacing={1.5} alignItems="center">
-            <Question size={20} weight="duotone" />
+            <QuestionIcon size={20} weight="duotone" />
             Quiz
           </Stack>
         </MenuItem>
         <MenuItem onClick={() => handleSelect(ChallengeType.Mission)}>
           <Stack direction="row" spacing={1.5} alignItems="center">
-            <Camera size={20} weight="duotone" />
+            <CameraIcon size={20} weight="duotone" />
             Mission
           </Stack>
         </MenuItem>
         <MenuItem onClick={() => handleSelect(ChallengeType.Task)}>
           <Stack direction="row" spacing={1.5} alignItems="center">
-            <CheckSquare size={20} weight="duotone" />
+            <CheckSquareIcon size={20} weight="duotone" />
             Task
           </Stack>
         </MenuItem>

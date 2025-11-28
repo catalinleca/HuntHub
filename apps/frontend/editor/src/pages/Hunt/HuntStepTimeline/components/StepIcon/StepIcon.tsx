@@ -1,9 +1,4 @@
-import {
-  MapTrifold,
-  Question,
-  Camera,
-  CheckSquare
-} from '@phosphor-icons/react';
+import { MapTrifold, Question, Camera, CheckSquare } from '@phosphor-icons/react';
 import { ChallengeType } from '@hunthub/shared';
 import * as S from './StepIcon.styles';
 

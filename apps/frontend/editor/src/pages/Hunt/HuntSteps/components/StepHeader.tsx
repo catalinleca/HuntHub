@@ -1,4 +1,4 @@
-import { Typography, Divider, Stack } from '@mui/material';
+import { Typography, Divider } from '@mui/material';
 
 interface StepHeaderProps {
   stepIndex: number;

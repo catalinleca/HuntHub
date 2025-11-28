@@ -1,1 +1,1 @@
-export { getColor } from './getColor'
+export { getColor } from './getColor';

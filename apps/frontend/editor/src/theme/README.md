@@ -5,6 +5,7 @@ A 5-layer architecture for scalable, maintainable styling in MUI v6.
 ## Why This Architecture?
 
 **Problem:** Styling MUI components often leads to:
+
 - Hardcoded CSS values scattered everywhere
 - Duplicate styles across components
 - Ugly CSS class selectors in JSX
@@ -34,7 +35,9 @@ A 5-layer architecture for scalable, maintainable styling in MUI v6.
 ```
 
 ### Layer 1: Palettes (`palettes/`)
+
 Raw design values - colors, typography, shadows.
+
 ```typescript
 // treasure-map.ts
 palette: {
@@ -44,13 +47,15 @@ palette: {
 ```
 
 ### Layer 2: Tokens (`tokens/`)
+
 Semantic tokens derived from palette. Maps design intent to values.
+
 ```typescript
 // field.ts
 export const getFieldTokens = (theme) => ({
   focus: {
     border: theme.palette.primary.main,
-    shadow: theme.shadows[9],  // Focus ring shadow
+    shadow: theme.shadows[9], // Focus ring shadow
   },
   error: {
     border: theme.palette.error.main,
@@ -60,6 +65,7 @@ export const getFieldTokens = (theme) => ({
 ```
 
 ### Layer 3: Mixins (`mixins/`)
+
 **Key insight:** Raw CSS objects with NO selectors.
 
 This is what makes the system flexible. Mixins can be wrapped with ANY selector - native HTML, MUI classes, CodeMirror, ProseMirror, etc.
@@ -76,9 +82,11 @@ export const fieldMixins = {
 ```
 
 ### Layer 4: Selectors (`selectors/`)
+
 Wraps mixins with appropriate CSS selectors.
 
 **Native selectors** - for `<input>`, `<textarea>`, styled-components:
+
 ```typescript
 // native.ts
 '&:focus': fieldMixins.focus(theme),
@@ -86,6 +94,7 @@ Wraps mixins with appropriate CSS selectors.
 ```
 
 **MUI selectors** - for MUI components, using type-safe class constants:
+
 ```typescript
 // mui.ts
 import { outlinedInputClasses } from '@mui/material/OutlinedInput';
@@ -96,6 +105,7 @@ import { outlinedInputClasses } from '@mui/material/OutlinedInput';
 ```
 
 ### Layer 5: Components (`mui/overrides/`)
+
 MUI theme component overrides. Uses selectors from Layer 4.
 
 ```typescript
@@ -136,6 +146,7 @@ theme/
 ## Usage
 
 ### Basic - Just use the theme
+
 ```typescript
 import { theme } from '@/theme';
 
@@ -145,6 +156,7 @@ import { theme } from '@/theme';
 ```
 
 ### Custom styled-component with field styles
+
 ```typescript
 import { getNativeFieldStyles } from '@/theme/selectors';
 import styled from 'styled-components';
@@ -155,6 +167,7 @@ const CustomInput = styled.input`
 ```
 
 ### Custom component with specific mixins
+
 ```typescript
 import { fieldMixins } from '@/theme/mixins';
 import styled from 'styled-components';
@@ -188,7 +201,9 @@ import { outlinedInputClasses } from '@mui/material/OutlinedInput';
 ## Key Decisions
 
 ### Why MuiOutlinedInput instead of MuiTextField?
+
 TextField contains OutlinedInput. By styling OutlinedInput directly:
+
 - TextField gets the styles automatically
 - Select gets the styles automatically
 - Autocomplete gets the styles automatically
@@ -196,21 +211,27 @@ TextField contains OutlinedInput. By styling OutlinedInput directly:
 - No descendant selectors needed
 
 ### Why separate mixins from selectors?
+
 Mixins are pure CSS properties. Selectors are CSS selectors.
 This separation allows mixins to be reused with ANY selector system:
+
 - Native HTML (`:hover`, `:focus`)
 - MUI classes (`.Mui-focused`)
 - CodeMirror (`.cm-focused`)
 - ProseMirror (`.ProseMirror-focused`)
 
 ### Why tokens?
+
 Tokens provide semantic meaning. Instead of:
+
 ```typescript
-borderColor: theme.palette.primary.main  // What does this mean?
+borderColor: theme.palette.primary.main; // What does this mean?
 ```
+
 We have:
+
 ```typescript
-borderColor: tokens.focus.border  // Clear: this is the focus state border
+borderColor: tokens.focus.border; // Clear: this is the focus state border
 ```
 
 ## Adding New Styles

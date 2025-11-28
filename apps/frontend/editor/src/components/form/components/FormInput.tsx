@@ -8,15 +8,7 @@ export interface FormInputProps extends FormFieldProps<TextFieldProps> {
   placeholder?: string;
 }
 
-export const FormInput = ({
-  name,
-  label,
-  required,
-  placeholder,
-  helperText,
-  disabled,
-  ...props
-}: FormInputProps) => {
+export const FormInput = ({ name, label, required, placeholder, helperText, disabled, ...props }: FormInputProps) => {
   const {
     register,
     formState: { errors },

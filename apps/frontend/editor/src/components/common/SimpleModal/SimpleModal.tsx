@@ -1,5 +1,14 @@
 import React from 'react';
-import { Dialog, DialogProps, DialogTitle, DialogContent, DialogActions, Button, Divider, CircularProgress } from '@mui/material';
+import {
+  Dialog,
+  DialogProps,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Divider,
+  CircularProgress,
+} from '@mui/material';
 
 export interface SimpleModalAction {
   label: string;

@@ -8,6 +8,8 @@ export const Login = () => {
     try {
       await signInWithGoogle();
     } catch (err) {
+      const error = err as Error;
+      console.log('Login error: ', error.message || err);
     }
   };
 

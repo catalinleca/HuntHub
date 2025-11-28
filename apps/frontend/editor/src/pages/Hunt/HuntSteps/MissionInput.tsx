@@ -30,12 +30,7 @@ export const MissionInput = ({ stepIndex }: MissionInputProps) => {
         MISSION DETAILS
       </Typography>
 
-      <FormInput
-        name={fields.title}
-        label="Mission Title"
-        placeholder="Take a photo with the statue"
-        required
-      />
+      <FormInput name={fields.title} label="Mission Title" placeholder="Take a photo with the statue" required />
 
       <FormTextArea
         name={fields.description}

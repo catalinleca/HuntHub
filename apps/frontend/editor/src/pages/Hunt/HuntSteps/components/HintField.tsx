@@ -5,8 +5,7 @@ interface HintFieldProps {
   stepIndex: number;
 }
 
-const getHintFieldName = (stepIndex: number) =>
-  getFieldPath((h) => h.hunt.steps[stepIndex].hint);
+const getHintFieldName = (stepIndex: number) => getFieldPath((h) => h.hunt.steps[stepIndex].hint);
 
 export const HintField = ({ stepIndex }: HintFieldProps) => {
   const hintField = getHintFieldName(stepIndex);

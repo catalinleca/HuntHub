@@ -6,10 +6,8 @@ export const Container = styled(Stack)<{ $selected: boolean }>`
   width: 64px;
   height: 64px;
   border-radius: 12px;
-  background-color: ${({ theme, $selected }) =>
-    $selected ? theme.palette.primary.main : theme.palette.grey[100]};
-  color: ${({ theme, $selected }) =>
-    $selected ? theme.palette.primary.contrastText : theme.palette.text.secondary};
+  background-color: ${({ theme, $selected }) => ($selected ? theme.palette.primary.main : theme.palette.grey[100])};
+  color: ${({ theme, $selected }) => ($selected ? theme.palette.primary.contrastText : theme.palette.text.secondary)};
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -17,8 +15,7 @@ export const Container = styled(Stack)<{ $selected: boolean }>`
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: ${({ theme, $selected }) =>
-      $selected ? theme.palette.primary.dark : theme.palette.grey[200]};
+    background-color: ${({ theme, $selected }) => ($selected ? theme.palette.primary.dark : theme.palette.grey[200])};
     transform: translateY(-2px);
   }
 `;
