@@ -119,8 +119,9 @@ const treasureMapPalette = {
     '0 20px 40px rgba(44, 24, 16, 0.10)',
     '0 24px 48px rgba(44, 24, 16, 0.12)',
     '0 8px 32px rgba(44, 24, 16, 0.3)',
-    '',
-    '',
+    // Focus ring shadows (9-10)
+    '0 0 0 3px rgba(182, 89, 27, 0.1)', // 9: focusRing.primary
+    '0 0 0 3px rgba(211, 47, 47, 0.1)', // 10: focusRing.error
     '',
     '',
     '',
