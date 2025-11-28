@@ -14,7 +14,7 @@ export const getMuiDialogOverrides = (): Components<Theme>['MuiDialog'] => ({
     paper: ({ theme }) => ({
       borderRadius: theme.shape.lg,
       boxShadow: theme.shadows[4],
-      border: `4px solid ${theme.palette.divider}`
+      border: `4px solid ${theme.palette.divider}`,
     }),
   },
 });
