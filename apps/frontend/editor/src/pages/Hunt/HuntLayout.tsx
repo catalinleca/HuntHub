@@ -41,6 +41,8 @@ export const HuntLayout = ({ hunt }: HuntLayoutProps) => {
     reset({ hunt: transformHuntToFormData(savedHunt) }, { keepDirty: false });
   };
 
+  console.log('===getValues: ', formMethods.getValues());
+
   return (
     <StepFormProvider onDeleteStep={() => handleDeleteStep(selectedStepIndex)}>
       <FormProvider {...formMethods}>

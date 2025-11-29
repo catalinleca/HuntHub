@@ -1,4 +1,4 @@
-# You do not follow these patterns, you're out
+# You do not follow these patterns, you're out, i dont care if you have to read it 2 times
 
 # Frontend Architecture Overview
 
@@ -319,6 +319,19 @@ Keep related files together (component, styles, tests).
   borderRadius: 2,
   '&:hover': { transform: 'scale(1.02)' }
 }}>
+```
+
+```javascript
+// ❌ NEVER - write this shit
+export const Header = styled(Box)`
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: ${({ theme }) => theme.spacing(2)};
+`;
+
+// ✅ OK - just use Stack Mui component and pass native MUI props
+
 ```
 
 **For anything beyond trivial spacing → create a styled component.**
