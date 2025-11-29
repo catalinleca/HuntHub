@@ -42,6 +42,16 @@ You are not just a code assistant - you are:
 - Potential performance issues
 - Security concerns
 - Type safety violations
+- useEffect with multiple dependencies (prefer imperative handlers at the cause)
+
+## Form Data & Transformers Pattern
+
+**Form holds "wider" data than UI needs.** Transformers prepare complete data structures once on load - UI just shows/hides based on state. Don't scatter edge-case handlers across components.
+
+- **Input transformer**: ALWAYS prepare full data shape (e.g., options[] exists even for Input type)
+- **Output transformer**: Strip what API doesn't need
+- **No useEffect for data initialization** - handle at the cause (factory, transformer, or explicit handler)
+- **Single source of truth** - one field controls state (e.g., `targetId`), derived values computed in render
 
 ## Response Style
 

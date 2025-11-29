@@ -7,8 +7,11 @@ export interface ArrayInputProps<T> extends ArrayActions {
   render: (props: { index: number; item: FieldArrayItem<T> }) => ReactNode;
 }
 
-export const ArrayInput = <T extends object>({ fields, swap, remove, render }: ArrayInputProps<T>) => {
-  const contextValue = useMemo(() => ({ swap, remove, length: fields.length }), [swap, remove, fields.length]);
+export const ArrayInput = <T extends object>({ fields, swap, remove, move, render }: ArrayInputProps<T>) => {
+  const contextValue = useMemo(
+    () => ({ swap, remove, move, length: fields.length }),
+    [swap, remove, move, fields.length],
+  );
 
   return (
     <ArrayInputProvider value={contextValue}>
