@@ -1,8 +1,10 @@
 import { Divider, Typography } from '@mui/material';
+import { useWatch } from 'react-hook-form';
 import { ChallengeType, OptionType } from '@hunthub/shared';
 import { FormInput, FormTextArea, FormToggleButtonGroup, getFieldPath } from '@/components/form';
 import { StepCard } from './components';
 import { StepSettings } from './StepSettings';
+import { MultipleChoiceEditor } from './MultipleChoiceEditor';
 import { STEP_TYPE_CONFIG } from '@/pages/Hunt/HuntSteps/stepTypeConfig';
 import { ListBulletsIcon, TextTIcon } from '@phosphor-icons/react';
 
@@ -26,6 +28,9 @@ export const QuizInput = ({ stepIndex }: QuizInputProps) => {
   const fields = getQuizFieldNames(stepIndex);
   const { color } = STEP_TYPE_CONFIG[ChallengeType.Quiz];
 
+  const quizType = useWatch({ name: fields.type });
+  const isMultipleChoice = quizType === OptionType.Choice;
+
   return (
     <StepCard stepIndex={stepIndex} type={ChallengeType.Quiz}>
       <Typography variant="label" color="text.secondary">
@@ -36,12 +41,16 @@ export const QuizInput = ({ stepIndex }: QuizInputProps) => {
 
       <FormTextArea name={fields.description} label="Question" placeholder="When was this library built?" rows={2} />
 
-      <FormInput
-        name={fields.targetText}
-        label="Correct Answer"
-        placeholder="1892"
-        helperText="The answer players need to provide"
-      />
+      {isMultipleChoice ? (
+        <MultipleChoiceEditor stepIndex={stepIndex} />
+      ) : (
+        <FormInput
+          name={fields.targetText}
+          label="Correct Answer"
+          placeholder="1892"
+          helperText="The answer players need to provide"
+        />
+      )}
 
       <Divider sx={{ my: 2 }} />
 

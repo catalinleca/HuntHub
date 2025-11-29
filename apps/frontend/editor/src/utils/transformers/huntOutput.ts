@@ -1,10 +1,50 @@
-import { Hunt, Step } from '@hunthub/shared';
-import { HuntFormData, StepFormData } from '@/types/editor';
+import { Hunt, Step, Quiz, OptionType } from '@hunthub/shared';
+import { HuntFormData, StepFormData, QuizFormData } from '@/types/editor';
+
+/**
+ * For 'input' type: strips options, keeps target
+ * For 'choice' type: splits options[] back to target + distractors + displayOrder
+ */
+const transformQuizForApi = (quizForm?: QuizFormData): Quiz | undefined => {
+  if (!quizForm) {
+    return undefined;
+  }
+
+  const { options, ...rest } = quizForm;
+
+  if (quizForm.type === OptionType.Input) {
+    return rest;
+  }
+
+  if (!options?.length) {
+    return rest;
+  }
+
+  const targetOption = options.find((o) => o.isTarget);
+  const distractorOptions = options.filter((o) => !o.isTarget);
+
+  return {
+    ...rest,
+    target: targetOption ? { id: targetOption.id, text: targetOption.text } : undefined,
+    distractors: distractorOptions.map((d) => ({ id: d.id, text: d.text })),
+    displayOrder: options.map((o) => o.id),
+  };
+};
+
+const transformChallengeForApi = (challenge: StepFormData['challenge']): Step['challenge'] => {
+  return {
+    ...challenge,
+    quiz: transformQuizForApi(challenge.quiz as QuizFormData),
+  };
+};
 
 const transformStepForApi = (formStep: StepFormData): Step => {
-  const { _id, ...rest } = formStep;
+  const { _id, challenge, ...rest } = formStep;
 
-  return rest as Step;
+  return {
+    ...rest,
+    challenge: transformChallengeForApi(challenge),
+  } as Step;
 };
 
 export const prepareHuntForSave = (huntFormData: HuntFormData): Hunt => {

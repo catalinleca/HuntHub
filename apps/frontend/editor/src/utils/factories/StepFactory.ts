@@ -1,5 +1,5 @@
 import { ChallengeType, OptionType, MissionType } from '@hunthub/shared';
-import { StepFormData } from '@/types/editor';
+import { StepFormData, QuizFormData } from '@/types/editor';
 import { LOCATION_DEFAULTS } from '@/utils/stepSettings';
 
 const createBaseStep = (type: ChallengeType, huntId: number): StepFormData => {
@@ -29,21 +29,27 @@ const createClue = (huntId: number): StepFormData => {
 };
 
 const createQuiz = (huntId: number): StepFormData => {
+  const targetId = crypto.randomUUID();
+  const distractorIds = [crypto.randomUUID(), crypto.randomUUID(), crypto.randomUUID()];
+
+  const quiz: QuizFormData = {
+    title: '',
+    description: '',
+    type: OptionType.Choice,
+    target: { id: targetId, text: '' },
+    distractors: distractorIds.map((id) => ({ id, text: '' })),
+    randomizeOrder: true,
+
+    // Form-only: options[] for ArrayInput editing
+    options: [
+      { id: targetId, text: '', isTarget: true, _id: targetId },
+      ...distractorIds.map((id) => ({ id, text: '', isTarget: false, _id: id })),
+    ],
+  };
+
   return {
     ...createBaseStep(ChallengeType.Quiz, huntId),
-    challenge: {
-      quiz: {
-        title: '',
-        description: '',
-        type: OptionType.Choice,
-        target: { id: crypto.randomUUID(), text: '' },
-        distractors: [
-          { id: crypto.randomUUID(), text: '' },
-          { id: crypto.randomUUID(), text: '' },
-          { id: crypto.randomUUID(), text: '' },
-        ],
-      },
-    },
+    challenge: { quiz },
   };
 };
 

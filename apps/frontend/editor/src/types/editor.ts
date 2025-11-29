@@ -1,4 +1,4 @@
-import { Step, Hunt, Location } from '@hunthub/shared';
+import { Step, Hunt, Location, Quiz } from '@hunthub/shared';
 
 /**
  * Generic type that adds RHF internal tracking ID to any type.
@@ -19,6 +19,21 @@ export type LocationFormData = {
   lat: number | null;
   lng: number | null;
   radius: number | null;
+};
+
+export type QuizOptionFormData = WithRHFInternalId<{
+  id: string;
+  text: string;
+  isTarget: boolean;
+}>;
+
+/**
+ * Quiz form model = API model + options[]
+ * options[] exists ONLY for editing convenience when type='choice'
+ * On save, transforms split options back to target + distractors
+ */
+export type QuizFormData = Quiz & {
+  options?: QuizOptionFormData[];
 };
 
 /**
@@ -57,4 +72,4 @@ export type EditorFormData = {
   hunt: HuntFormData;
 };
 
-export type { Hunt, Step, Location };
+export type { Hunt, Step, Location, Quiz };

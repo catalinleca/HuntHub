@@ -1,0 +1,1 @@
+export { MultipleChoiceEditor } from './MultipleChoiceEditor';
