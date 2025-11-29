@@ -3,6 +3,7 @@ import { Theme } from '@mui/material';
 export const FOCUS_RING_SHADOW = {
   primary: 9,
   error: 10,
+  success: 11,
 } as const;
 
 export const getFieldTokens = (theme: Theme) => ({

@@ -1,7 +1,6 @@
 import { forwardRef, memo, CSSProperties, HTMLAttributes } from 'react';
 import { IconButton } from '@mui/material';
 import { CheckIcon, DotsSixVerticalIcon, XIcon } from '@phosphor-icons/react';
-import { FormInput } from '@/components/form';
 import * as S from './OptionItem.styles';
 
 export interface OptionItemProps {
@@ -22,22 +21,20 @@ export const OptionItem = memo(
     ref,
   ) {
     return (
-      <S.OptionRow ref={ref} style={style} $isTarget={isTarget}>
+      <S.OptionRow ref={ref} style={style}>
         <S.DragHandle {...dragHandleProps}>
-          <DotsSixVerticalIcon size={16} weight="bold" />
+          <DotsSixVerticalIcon size={20} weight="bold" />
         </S.DragHandle>
 
         <S.TargetCircle $isTarget={isTarget} onClick={onMarkTarget}>
           {isTarget ? <CheckIcon size={16} weight="bold" /> : index + 1}
         </S.TargetCircle>
 
-        <FormInput
+        <S.OptionInput
           name={`${fieldPath}.text`}
-          label=""
           placeholder={`Option ${index + 1}`}
           size="small"
-          color={isTarget ? 'success' : undefined}
-          sx={{ flex: 1 }}
+          $isTarget={isTarget}
         />
 
         <IconButton size="small" onClick={onRemove} disabled={!canRemove}>

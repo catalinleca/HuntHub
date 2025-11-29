@@ -1,4 +1,4 @@
-import { Divider, Typography } from '@mui/material';
+import { Box, Divider, Typography } from '@mui/material';
 import { useWatch } from 'react-hook-form';
 import { ChallengeType, OptionType } from '@hunthub/shared';
 import { FormInput, FormTextArea, FormToggleButtonGroup, getFieldPath } from '@/components/form';
@@ -34,6 +34,8 @@ export const QuizInput = ({ stepIndex }: QuizInputProps) => {
   const quizType = useWatch({ name: fields.type });
   const isMultipleChoice = quizType === OptionType.Choice;
 
+  const text = isMultipleChoice ? 'Answer Options (click ✓ to mark correct)' : 'Expected Answer';
+
   return (
     <StepCard stepIndex={stepIndex} type={ChallengeType.Quiz}>
       <Typography variant="label" color="text.secondary">
@@ -46,16 +48,24 @@ export const QuizInput = ({ stepIndex }: QuizInputProps) => {
 
       <AnswerSection>
         <WithTransition transitionKey={quizType} variant="fade-slide-down">
-          {isMultipleChoice ? (
-            <MultipleChoiceEditor stepIndex={stepIndex} />
-          ) : (
-            <FormInput
-              name={fields.targetText}
-              label="Correct Answer"
-              placeholder="1892"
-              helperText="The answer players need to provide"
-            />
-          )}
+          <>
+            <Box mb={3}>
+              <Typography variant="smBold" color="success.main">
+                {text}
+              </Typography>
+            </Box>
+
+            {isMultipleChoice ? (
+              <MultipleChoiceEditor stepIndex={stepIndex} />
+            ) : (
+              <FormInput
+                name={fields.targetText}
+                label="Correct Answer"
+                placeholder="1892"
+                helperText="The answer players need to provide"
+              />
+            )}
+          </>
         </WithTransition>
       </AnswerSection>
 

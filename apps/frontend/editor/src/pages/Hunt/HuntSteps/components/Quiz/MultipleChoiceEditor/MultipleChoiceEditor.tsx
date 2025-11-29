@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
-import { Button, Stack } from '@mui/material';
-import { alpha } from '@mui/material/styles';
+import { Box, Stack, Typography } from '@mui/material';
 import { PlusIcon } from '@phosphor-icons/react';
 import { DndContext, PointerSensor, closestCenter, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { SortableOptionItem } from '../OptionItem/SortableOptionItem';
 import { useMultipleChoiceOptions } from './useMultipleChoiceOptions';
+import * as S from './MultipleChoiceEditor.styles';
 
 interface MultipleChoiceEditorProps {
   stepIndex: number;
@@ -52,22 +52,9 @@ export const MultipleChoiceEditor = ({ stepIndex }: MultipleChoiceEditorProps) =
         </SortableContext>
       </DndContext>
 
-      <Button
-        onClick={handleAdd}
-        disabled={!canAdd}
-        startIcon={<PlusIcon size={16} weight="bold" />}
-        size="small"
-        sx={(theme) => ({
-          alignSelf: 'flex-start',
-          backgroundColor: alpha(theme.palette.success.main, 0.15),
-          color: 'success.main',
-          '&:hover': {
-            backgroundColor: alpha(theme.palette.success.main, 0.25),
-          },
-        })}
-      >
+      <S.AddOptionButton onClick={handleAdd} disabled={!canAdd} startIcon={<PlusIcon size={16} weight="bold" />}>
         Add Option
-      </Button>
+      </S.AddOptionButton>
     </Stack>
   );
 };

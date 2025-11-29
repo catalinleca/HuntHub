@@ -1,6 +1,6 @@
-import { Box, Stack } from '@mui/material';
-import { alpha } from '@mui/material/styles';
+import { Box, Stack, TextField, outlinedInputClasses } from '@mui/material';
 import styled from 'styled-components';
+import { descendant } from '@/theme/selectors';
 
 export const DragHandle = styled(Box)(({ theme }) => ({
   cursor: 'grab',
@@ -9,18 +9,36 @@ export const DragHandle = styled(Box)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-interface OptionRowProps {
-  $isTarget: boolean;
-}
-
-export const OptionRow = styled(Stack)<OptionRowProps>(({ theme, $isTarget }) => ({
+export const OptionRow = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'center',
-  gap: theme.spacing(1.5),
+  gap: theme.spacing(2),
   padding: theme.spacing(1),
   borderRadius: theme.shape.sm,
-  backgroundColor: $isTarget ? alpha(theme.palette.success.main, 0.1) : 'transparent',
   transition: 'background-color 0.15s ease',
+}));
+
+interface OptionInputProps {
+  $isTarget?: boolean;
+}
+
+export const OptionInput = styled(TextField)<OptionInputProps>(({ theme, $isTarget }) => ({
+  flex: 1,
+  ...($isTarget && {
+    [descendant(outlinedInputClasses.notchedOutline)]: {
+      borderColor: `${theme.palette.success.main} !important`,
+      borderWidth: '2px !important',
+    },
+
+    [descendant(outlinedInputClasses.focused)]: {
+      boxShadow: `${theme.shadows[11]}`,
+    },
+
+    '&:hover': {
+      borderRadius: theme.shape.sm,
+      boxShadow: `${theme.shadows[11]}`,
+    },
+  }),
 }));
 
 interface TargetCircleProps {
@@ -28,9 +46,9 @@ interface TargetCircleProps {
 }
 
 export const TargetCircle = styled(Box)<TargetCircleProps>(({ theme, $isTarget }) => ({
-  width: 28,
-  height: 28,
-  minWidth: 28,
+  width: 26,
+  height: 26,
+  minWidth: 26,
   borderRadius: '50%',
   display: 'flex',
   alignItems: 'center',

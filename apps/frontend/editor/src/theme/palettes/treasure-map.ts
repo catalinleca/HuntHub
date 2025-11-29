@@ -163,10 +163,10 @@ const treasureMapPalette = {
     '0 20px 40px rgba(44, 24, 16, 0.10)',
     '0 24px 48px rgba(44, 24, 16, 0.12)',
     '0 8px 32px rgba(44, 24, 16, 0.3)',
-    // Focus ring shadows (9-10) - derived from palette
+    // Focus ring shadows (9-11) - derived from palette
     createFocusRing(treasureMapPaletteConfig.primary.main),
     createFocusRing(treasureMapPaletteConfig.error.main),
-    '',
+    createFocusRing(treasureMapPaletteConfig.success.main),
     '',
     '',
     '',
