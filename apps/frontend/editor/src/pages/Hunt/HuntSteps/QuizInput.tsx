@@ -4,7 +4,7 @@ import { ChallengeType, OptionType } from '@hunthub/shared';
 import { FormInput, FormTextArea, FormToggleButtonGroup, getFieldPath } from '@/components/form';
 import { StepCard } from './components';
 import { StepSettings } from './StepSettings';
-import { MultipleChoiceEditor } from './MultipleChoiceEditor';
+import { MultipleChoiceEditor } from './components/Quiz';
 import { STEP_TYPE_CONFIG } from '@/pages/Hunt/HuntSteps/stepTypeConfig';
 import { ListBulletsIcon, TextTIcon } from '@phosphor-icons/react';
 
