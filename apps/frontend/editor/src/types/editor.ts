@@ -1,4 +1,4 @@
-import { Step, Hunt, Location, Quiz } from '@hunthub/shared';
+import { Step, Hunt, Location, Quiz, Challenge } from '@hunthub/shared';
 
 /**
  * Generic type that adds RHF internal tracking ID to any type.
@@ -24,16 +24,24 @@ export type LocationFormData = {
 export type QuizOptionFormData = WithRHFInternalId<{
   id: string;
   text: string;
-  isTarget: boolean;
 }>;
 
 /**
- * Quiz form model = API model + options[]
+ * Quiz form model = API model + options[] + targetId
  * options[] exists ONLY for editing convenience when type='choice'
+ * targetId points to the correct option (single source of truth)
  * On save, transforms split options back to target + distractors
  */
 export type QuizFormData = Quiz & {
   options?: QuizOptionFormData[];
+  targetId?: string;
+};
+
+/**
+ * Challenge for form - uses QuizFormData instead of Quiz
+ */
+export type ChallengeFormData = Omit<Challenge, 'quiz'> & {
+  quiz?: QuizFormData;
 };
 
 /**
@@ -46,8 +54,9 @@ export type QuizFormData = Quiz & {
  * - non-null = setting enabled (required to fill)
  */
 export type StepFormData = WithRHFInternalId<
-  Omit<Step, 'stepId' | 'requiredLocation' | 'hint' | 'timeLimit' | 'maxAttempts'> & {
+  Omit<Step, 'stepId' | 'requiredLocation' | 'hint' | 'timeLimit' | 'maxAttempts' | 'challenge'> & {
     stepId?: number; // Optional - assigned by backend when step is saved
+    challenge: ChallengeFormData; // Use form version with QuizFormData
     // Settings - null means disabled
     requiredLocation: LocationFormData;
     hint: string | null;

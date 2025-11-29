@@ -1,4 +1,4 @@
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { useArrayInput } from '@/components/form';
 import { QuizOptionFormData } from '@/types/editor';
 
@@ -7,26 +7,25 @@ const MAX_OPTIONS = 6;
 
 export const useMultipleChoiceOptions = (stepIndex: number) => {
   const optionsPath = `hunt.steps.${stepIndex}.challenge.quiz.options`;
+  const targetIdPath = `hunt.steps.${stepIndex}.challenge.quiz.targetId`;
+
   const { fields, arrayActions, append } = useArrayInput<QuizOptionFormData>(optionsPath);
   const { setValue } = useFormContext();
 
-  const handleMarkTarget = (targetId: string) => {
-    fields.forEach((field, idx) => {
-      const shouldBeTarget = field.id === targetId;
-      if (field.isTarget !== shouldBeTarget) {
-        setValue(`${optionsPath}.${idx}.isTarget`, shouldBeTarget, { shouldDirty: true });
-      }
-    });
+  const targetId = useWatch({ name: targetIdPath });
+
+  const handleMarkTarget = (optionId: string) => {
+    setValue(targetIdPath, optionId, { shouldDirty: true });
   };
 
   const handleRemove = (index: number) => {
     if (fields.length <= MIN_OPTIONS) return;
 
-    const wasTarget = fields[index].isTarget;
+    const removedId = fields[index].id;
 
-    if (wasTarget) {
-      const newTargetIndex = index === 0 ? 1 : 0;
-      setValue(`${optionsPath}.${newTargetIndex}.isTarget`, true, { shouldDirty: true });
+    if (removedId === targetId) {
+      const newTargetId = fields[index === 0 ? 1 : 0].id;
+      setValue(targetIdPath, newTargetId, { shouldDirty: true });
     }
 
     arrayActions.remove(index);
@@ -34,15 +33,15 @@ export const useMultipleChoiceOptions = (stepIndex: number) => {
 
   const handleAdd = () => {
     if (fields.length >= MAX_OPTIONS) return;
-
     const newId = crypto.randomUUID();
-    append({ id: newId, text: '', isTarget: false, _id: newId });
+    append({ id: newId, text: '', _id: newId });
   };
 
   return {
     fields,
     arrayActions,
     optionsPath,
+    targetId,
     handleMarkTarget,
     handleRemove,
     handleAdd,

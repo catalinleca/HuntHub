@@ -1,6 +1,7 @@
 import { Hunt, Step, Quiz, OptionType } from '@hunthub/shared';
 import { HuntFormData, StepFormData, LocationFormData, QuizFormData, QuizOptionFormData } from '@/types/editor';
 import { LOCATION_DEFAULTS } from '@/utils/stepSettings';
+import { createInitialQuizOptions } from '@/pages/Hunt/HuntSteps/components/Quiz';
 
 const transformStepSettings = (
   step: Step,
@@ -21,36 +22,42 @@ const transformStepSettings = (
   };
 };
 
-/**
- * For 'choice' type: merges target + distractors into options[] for ArrayInput
- * For 'input' type: returns quiz as-is (no options needed)
- */
 const transformQuizToFormData = (quiz?: Quiz): QuizFormData | undefined => {
   if (!quiz) {
     return undefined;
   }
 
-  if (quiz.type !== OptionType.Choice) {
-    return quiz;
+  if (quiz.type === OptionType.Choice && quiz.target) {
+    const { target, distractors = [], displayOrder = [] } = quiz;
+
+    const allOptions: Omit<QuizOptionFormData, '_id'>[] = [
+      { id: target.id, text: target.text },
+      ...distractors.map((d) => ({ id: d.id, text: d.text })),
+    ];
+
+    const sortedOptions =
+      displayOrder.length > 0
+        ? displayOrder
+            .map((id: string) => allOptions.find((o) => o.id === id))
+            .filter((o): o is Omit<QuizOptionFormData, '_id'> => o !== undefined)
+        : allOptions;
+
+    const options: QuizOptionFormData[] = sortedOptions.map((o) => ({ ...o, _id: o.id }));
+
+    return {
+      ...quiz,
+      options,
+      targetId: target.id,
+    };
   }
 
-  const { target, distractors = [], displayOrder = [] } = quiz;
+  const { options, targetId } = createInitialQuizOptions();
 
-  const allOptions: Omit<QuizOptionFormData, '_id'>[] = [
-    ...(target ? [{ ...target, isTarget: true }] : []),
-    ...distractors.map((d) => ({ ...d, isTarget: false })),
-  ];
-
-  const sortedOptions =
-    displayOrder.length > 0
-      ? displayOrder
-          .map((id: string) => allOptions.find((o) => o.id === id))
-          .filter((o): o is Omit<QuizOptionFormData, '_id'> => o !== undefined)
-      : allOptions;
-
-  const options: QuizOptionFormData[] = sortedOptions.map((o) => ({ ...o, _id: o.id }));
-
-  return { ...quiz, options };
+  return {
+    ...quiz,
+    options,
+    targetId,
+  };
 };
 
 const transformStepChallenge = (challenge: Step['challenge']): Step['challenge'] => {

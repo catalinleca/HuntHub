@@ -30,21 +30,20 @@ const createClue = (huntId: number): StepFormData => {
 
 const createQuiz = (huntId: number): StepFormData => {
   const targetId = crypto.randomUUID();
-  const distractorIds = [crypto.randomUUID(), crypto.randomUUID(), crypto.randomUUID()];
+  const option2Id = crypto.randomUUID();
 
   const quiz: QuizFormData = {
     title: '',
     description: '',
     type: OptionType.Choice,
-    target: { id: targetId, text: '' },
-    distractors: distractorIds.map((id) => ({ id, text: '' })),
     randomizeOrder: true,
 
-    // Form-only: options[] for ArrayInput editing
+    // Form-only: options[] for ArrayInput, targetId for correct answer
     options: [
-      { id: targetId, text: '', isTarget: true, _id: targetId },
-      ...distractorIds.map((id) => ({ id, text: '', isTarget: false, _id: id })),
+      { id: targetId, text: '', _id: targetId },
+      { id: option2Id, text: '', _id: option2Id },
     ],
+    targetId,
   };
 
   return {

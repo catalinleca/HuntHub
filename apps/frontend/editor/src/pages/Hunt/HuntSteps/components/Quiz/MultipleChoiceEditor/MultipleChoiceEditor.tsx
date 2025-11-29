@@ -1,45 +1,51 @@
-import { Stack, Typography } from '@mui/material';
+import { Button, Stack } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import { PlusIcon } from '@phosphor-icons/react';
 import { ArrayInput } from '@/components/form';
-import { OptionItem } from './OptionItem';
+import { OptionItem } from '../OptionItem/OptionItem';
 import { useMultipleChoiceOptions } from './useMultipleChoiceOptions';
-import * as S from './MultipleChoiceEditor.styles';
 
 interface MultipleChoiceEditorProps {
   stepIndex: number;
 }
 
 export const MultipleChoiceEditor = ({ stepIndex }: MultipleChoiceEditorProps) => {
-  const { fields, arrayActions, optionsPath, handleMarkTarget, handleRemove, handleAdd, canAdd } =
+  const { fields, arrayActions, optionsPath, targetId, handleMarkTarget, handleRemove, handleAdd, canAdd, canRemove } =
     useMultipleChoiceOptions(stepIndex);
 
   return (
-    <Stack spacing={1.5}>
-      <Typography variant="label" color="text.secondary">
-        Answer Options
-      </Typography>
-
+    <Stack spacing={1}>
       <ArrayInput
         fields={fields}
         {...arrayActions}
         render={({ index, item }) => (
           <OptionItem
             index={index}
-            option={item}
+            isTarget={item.id === targetId}
             fieldPath={`${optionsPath}.${index}`}
             onMarkTarget={() => handleMarkTarget(item.id)}
             onRemove={() => handleRemove(index)}
+            canRemove={canRemove}
           />
         )}
       />
 
-      <S.AddButton
+      <Button
         onClick={handleAdd}
         disabled={!canAdd}
-        startIcon={<PlusIcon size={18} weight="bold" />}
+        startIcon={<PlusIcon size={16} weight="bold" />}
+        size="small"
+        sx={(theme) => ({
+          alignSelf: 'flex-start',
+          backgroundColor: alpha(theme.palette.success.main, 0.15),
+          color: 'success.main',
+          '&:hover': {
+            backgroundColor: alpha(theme.palette.success.main, 0.25),
+          },
+        })}
       >
-        Add Option {canAdd && `(${fields.length}/6)`}
-      </S.AddButton>
+        Add Option
+      </Button>
     </Stack>
   );
 };

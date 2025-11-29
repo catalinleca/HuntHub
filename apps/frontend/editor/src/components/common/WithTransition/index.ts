@@ -1,0 +1,1 @@
+export { WithTransition, type TransitionVariant } from './WithTransition';

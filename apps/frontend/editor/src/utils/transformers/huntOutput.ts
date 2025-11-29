@@ -10,7 +10,7 @@ const transformQuizForApi = (quizForm?: QuizFormData): Quiz | undefined => {
     return undefined;
   }
 
-  const { options, ...rest } = quizForm;
+  const { options, targetId, ...rest } = quizForm;
 
   if (quizForm.type === OptionType.Input) {
     return rest;
@@ -20,8 +20,8 @@ const transformQuizForApi = (quizForm?: QuizFormData): Quiz | undefined => {
     return rest;
   }
 
-  const targetOption = options.find((o) => o.isTarget);
-  const distractorOptions = options.filter((o) => !o.isTarget);
+  const targetOption = options.find((o) => o.id === targetId);
+  const distractorOptions = options.filter((o) => o.id !== targetId);
 
   return {
     ...rest,

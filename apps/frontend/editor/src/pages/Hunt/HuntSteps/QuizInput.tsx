@@ -2,9 +2,10 @@ import { Divider, Typography } from '@mui/material';
 import { useWatch } from 'react-hook-form';
 import { ChallengeType, OptionType } from '@hunthub/shared';
 import { FormInput, FormTextArea, FormToggleButtonGroup, getFieldPath } from '@/components/form';
+import { WithTransition } from '@/components/common';
 import { StepCard } from './components';
 import { StepSettings } from './StepSettings';
-import { MultipleChoiceEditor } from './components/Quiz';
+import { MultipleChoiceEditor, AnswerSection } from './components/Quiz';
 import { STEP_TYPE_CONFIG } from '@/pages/Hunt/HuntSteps/stepTypeConfig';
 import { ListBulletsIcon, TextTIcon } from '@phosphor-icons/react';
 
@@ -17,6 +18,8 @@ const getQuizFieldNames = (stepIndex: number) => ({
   description: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.description),
   type: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.type),
   targetText: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.target.text),
+  options: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.options),
+  targetId: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.targetId),
 });
 
 const QUIZ_TYPE_OPTIONS = [
@@ -41,16 +44,20 @@ export const QuizInput = ({ stepIndex }: QuizInputProps) => {
 
       <FormTextArea name={fields.description} label="Question" placeholder="When was this library built?" rows={2} />
 
-      {isMultipleChoice ? (
-        <MultipleChoiceEditor stepIndex={stepIndex} />
-      ) : (
-        <FormInput
-          name={fields.targetText}
-          label="Correct Answer"
-          placeholder="1892"
-          helperText="The answer players need to provide"
-        />
-      )}
+      <AnswerSection>
+        <WithTransition transitionKey={quizType} variant="fade-slide-down">
+          {isMultipleChoice ? (
+            <MultipleChoiceEditor stepIndex={stepIndex} />
+          ) : (
+            <FormInput
+              name={fields.targetText}
+              label="Correct Answer"
+              placeholder="1892"
+              helperText="The answer players need to provide"
+            />
+          )}
+        </WithTransition>
+      </AnswerSection>
 
       <Divider sx={{ my: 2 }} />
 
