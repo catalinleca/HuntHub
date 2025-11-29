@@ -38,6 +38,12 @@ It imports all context about the project, so Claude always knows:
 @.claude/behavior/principles.md
 @.claude/decisions/solid-principles.md
 
+When working with a library like react query, material ui, react hook form, zustand, zod or any core library in our code, or even basic css styling, alignments common problems, it is EXTREMELY important that you understand the problem and you search for the best patterns and recommendations.
+You either check docs, or other resources
+
+Same applies in general, when we have a problem that is relatively common, you can search for relatively "standardized" solutions. However when you encounter a situation like this
+Explain it to me and make me aware
+
 ## 🚀 Quick Start & Current Focus
 
 @.claude/core/NEXT-SESSION.md

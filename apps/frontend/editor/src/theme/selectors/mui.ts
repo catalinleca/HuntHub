@@ -3,9 +3,9 @@ import { outlinedInputClasses } from '@mui/material/OutlinedInput';
 import { fieldMixins } from '../mixins';
 import { getFieldTokens } from '../tokens';
 
-const stateSelector = (className: string) => `&.${className}`;
+export const stateSelector = (className: string) => `&.${className}`;
 
-const descendant = (className: string) => `& .${className}`;
+export const descendant = (className: string) => `& .${className}`;
 
 const hoverExcludingStates = `&:hover:not(.${outlinedInputClasses.focused}):not(.${outlinedInputClasses.error}):not(.${outlinedInputClasses.disabled})`;
 

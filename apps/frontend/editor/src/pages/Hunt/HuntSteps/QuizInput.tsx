@@ -1,8 +1,10 @@
 import { Divider, Typography } from '@mui/material';
 import { ChallengeType, OptionType } from '@hunthub/shared';
-import { FormInput, FormTextArea, FormSelect, getFieldPath } from '@/components/form';
+import { FormInput, FormTextArea, FormToggleButtonGroup, getFieldPath } from '@/components/form';
 import { StepCard } from './components';
 import { StepSettings } from './StepSettings';
+import { STEP_TYPE_CONFIG } from '@/pages/Hunt/HuntSteps/stepTypeConfig';
+import { ListBulletsIcon, TextTIcon } from '@phosphor-icons/react';
 
 interface QuizInputProps {
   stepIndex: number;
@@ -16,12 +18,13 @@ const getQuizFieldNames = (stepIndex: number) => ({
 });
 
 const QUIZ_TYPE_OPTIONS = [
-  { value: OptionType.Choice, label: 'Multiple Choice' },
-  { value: OptionType.Input, label: 'Text Input' },
+  { value: OptionType.Choice, label: 'Multiple Choice', icon: <ListBulletsIcon size={16} weight="bold" /> },
+  { value: OptionType.Input, label: 'Text Input', icon: <TextTIcon size={16} weight="bold" /> },
 ];
 
 export const QuizInput = ({ stepIndex }: QuizInputProps) => {
   const fields = getQuizFieldNames(stepIndex);
+  const { color } = STEP_TYPE_CONFIG[ChallengeType.Quiz];
 
   return (
     <StepCard stepIndex={stepIndex} type={ChallengeType.Quiz}>
@@ -29,9 +32,9 @@ export const QuizInput = ({ stepIndex }: QuizInputProps) => {
         Quiz Content
       </Typography>
 
-      <FormSelect name={fields.type} label="Answer Type" options={QUIZ_TYPE_OPTIONS} placeholder="Select answer type" />
+      <FormToggleButtonGroup name={fields.type} label="Answer Type" options={QUIZ_TYPE_OPTIONS} color={color} />
 
-      <FormTextArea name={fields.description} label="Question" placeholder="When was this library built?" rows={3} />
+      <FormTextArea name={fields.description} label="Question" placeholder="When was this library built?" rows={2} />
 
       <FormInput
         name={fields.targetText}

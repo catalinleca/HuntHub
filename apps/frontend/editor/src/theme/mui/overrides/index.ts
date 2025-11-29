@@ -10,3 +10,4 @@ export { getMuiOutlinedInputOverrides } from './MuiOutlinedInput';
 export { getMuiSelectOverrides } from './MuiSelect';
 export { getMuiTextFieldOverrides } from './MuiTextField';
 export { getMuiTypographyOverrides } from './MuiTypography';
+export { getMuiToggleButtonOverrides, getMuiToggleButtonGroupOverrides } from './MuiToggleButton';

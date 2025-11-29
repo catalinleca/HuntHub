@@ -1,3 +1,5 @@
+# You do not follow these patterns, you're out
+
 # Frontend Architecture Overview
 
 > 🎯 **CONTEXT:** High-level frontend architecture and technical decisions for HuntHub Editor.  
@@ -260,11 +262,11 @@ Phosphor icons work seamlessly alongside MUI components:
 ### 1. Semantic JSX (No className Spam)
 ```tsx
 // ✅ Good - MUI components + Phosphor icons
-import { MapTrifold, Trophy } from '@phosphor-icons/react';
+import { MapTrifoldIcon, TrophyIcon } from '@phosphor-icons/react';
 
 <StyledCard>
   <Typography variant="h5">
-    <MapTrifold size={24} weight="duotone" style={{ marginRight: 8 }} />
+    <MapTrifoldIcon size={24} weight="duotone" />
     Hunt Name
   </Typography>
   <GradientButton>Edit</GradientButton>
@@ -276,8 +278,17 @@ import { MapTrifold, Trophy } from '@phosphor-icons/react';
 </div>
 ```
 
-### 2. Phosphor Icon Weights
-Use different weights for visual hierarchy:
+### 2. Phosphor Icons
+**IMPORTANT: All Phosphor icons use the `Icon` suffix.**
+```tsx
+// ✅ Correct
+import { MapTrifoldIcon, CameraIcon, TrophyIcon } from '@phosphor-icons/react';
+
+// ❌ Wrong
+import { MapTrifold, Camera, Trophy } from '@phosphor-icons/react';
+```
+
+**Weights for visual hierarchy:**
 - **thin/light** - Secondary actions, subtle indicators
 - **regular** - Default UI elements
 - **bold** - Primary actions, emphasis
@@ -289,6 +300,139 @@ Use component composition instead of complex prop drilling.
 
 ### 4. Colocation
 Keep related files together (component, styles, tests).
+
+---
+
+## Code Patterns (MANDATORY)
+
+### NO Inline CSS in Components
+
+**Only allowed inline:** Simple spacing props like `sx={{ p: 2, gap: 1, m: 1 }}`
+
+```tsx
+// ✅ OK - trivial spacing
+<Stack sx={{ gap: 2, p: 1 }}>
+
+// ❌ NEVER - complex styles inline
+<Box sx={{
+  backgroundColor: 'primary.main',
+  borderRadius: 2,
+  '&:hover': { transform: 'scale(1.02)' }
+}}>
+```
+
+**For anything beyond trivial spacing → create a styled component.**
+
+---
+
+### Styled Components Pattern
+
+**Import pattern:**
+```tsx
+import * as S from './Component.styles';
+
+// Use as
+<S.Container>
+  <S.Title>Hello</S.Title>
+</S.Container>
+```
+
+**Wrapping MUI components:**
+```tsx
+// In Component.styles.ts
+import styled from 'styled-components';
+import { Button as MuiButton } from '@mui/material';
+
+export const Button = styled(MuiButton)`
+  // custom styles
+`;
+```
+
+**Using MUI class selectors (type-safe):**
+```tsx
+import { toggleButtonClasses } from '@mui/material/ToggleButton';
+import { stateSelector } from '@/theme/selectors';
+
+export const ToggleButton = styled(MuiToggleButton)<{ $color?: string }>(
+  ({ $color, theme }) => ({
+    color: $color || theme.palette.text.secondary,
+
+    [stateSelector(toggleButtonClasses.selected)]: {
+      color: $color || theme.palette.text.secondary,
+    },
+  })
+);
+```
+
+---
+
+### File Structure
+
+**Component with styles → folder with barrel export:**
+```
+components/
+└── ToggleButton/
+    ├── index.ts              # barrel export
+    ├── ToggleButton.tsx      # component + types
+    └── ToggleButton.styles.ts
+```
+
+**Main page component → styles file alongside:**
+```
+pages/
+└── Hunt/
+    ├── HuntLayout.tsx
+    └── HuntLayout.styles.ts
+```
+
+**Component props/types → same file as component (.tsx)**
+
+---
+
+### Theme Usage
+
+**Always use theme system** - see `apps/frontend/editor/src/theme/README.md`
+
+```tsx
+// ✅ Use theme values
+background: ${({ theme }) => theme.palette.primary.main};
+border-radius: ${({ theme }) => theme.shape.md}px;
+
+// ✅ Use getColor utility for static values
+import { getColor } from '@/utils';
+const color = getColor('primary.main');
+
+// ❌ Never hardcode
+background: #B6591B;
+```
+
+**General styles → MUI theme overrides** in `theme/mui/overrides/`
+
+---
+
+### React Patterns
+
+**Predictable render flow:**
+- No crazy optimization patterns that break reconciliation
+- Use React by the book - consistent and predictable
+- Avoid premature memoization unless there's a real perf issue
+
+**Keep it simple:**
+```tsx
+// ✅ Simple, predictable
+const Component = ({ items }) => (
+  <S.List>
+    {items.map(item => <S.Item key={item.id}>{item.name}</S.Item>)}
+  </S.List>
+);
+
+// ❌ Over-engineered
+const Component = memo(({ items }) => {
+  const memoizedItems = useMemo(() => items.map(...), [items]);
+  const handleClick = useCallback(() => {}, []);
+  // ...
+});
+```
 
 ---
 
