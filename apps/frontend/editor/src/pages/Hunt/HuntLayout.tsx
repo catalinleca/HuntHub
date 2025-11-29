@@ -5,7 +5,6 @@ import { useHuntSteps } from '@/pages/Hunt/hooks';
 import { StepFormProvider } from '@/pages/Hunt/context';
 import { transformHuntToFormData } from '@/utils/transformers/huntInput';
 import { prepareHuntForSave } from '@/utils/transformers/huntOutput';
-import { Hunt } from '@hunthub/shared';
 import { HuntFormData } from '@/types/editor';
 import { HuntHeader } from './HuntHeader';
 import { HuntStepTimeline } from './HuntStepTimeline';
@@ -13,24 +12,19 @@ import { HuntForm } from './HuntForm';
 import * as S from './HuntLayout.styles';
 
 interface HuntLayoutProps {
-  hunt: Hunt;
+  huntFormData: HuntFormData;
 }
 
-export const HuntLayout = ({ hunt }: HuntLayoutProps) => {
+export const HuntLayout = ({ huntFormData }: HuntLayoutProps) => {
   const formMethods = useForm<{ hunt: HuntFormData }>({
-    values: { hunt: transformHuntToFormData(hunt) },
+    values: { hunt: huntFormData },
     resetOptions: { keepDirtyValues: true },
-    mode: 'onChange',
+    mode: 'onBlur',
   });
 
-  const {
-    handleSubmit,
-    formState: { isDirty, isSubmitting },
-    reset,
-  } = formMethods;
+  const { handleSubmit, reset } = formMethods;
 
-  const { steps, selectedStepIndex, setSelectedStepIndex, handleCreateStep, handleDeleteStep } =
-    useHuntSteps(formMethods);
+  const { steps, selectedStepId, setSelectedStepId, handleCreateStep, handleDeleteStep } = useHuntSteps(formMethods);
 
   const saveHuntMutation = useSaveHunt();
 
@@ -41,32 +35,26 @@ export const HuntLayout = ({ hunt }: HuntLayoutProps) => {
     reset({ hunt: transformHuntToFormData(savedHunt) }, { keepDirty: false });
   };
 
-  console.log('===getValues: ', formMethods.getValues());
+  const selectedStepIndex = selectedStepId ? steps.findIndex((s) => s._id === selectedStepId) : -1;
+
+  const selectedStepType = selectedStepIndex >= 0 ? steps[selectedStepIndex]?.type : undefined;
 
   return (
-    <StepFormProvider onDeleteStep={() => handleDeleteStep(selectedStepIndex)}>
+    <StepFormProvider onDeleteStep={() => selectedStepId && handleDeleteStep(selectedStepId)}>
       <FormProvider {...formMethods}>
         <S.Container>
           <NavBar />
 
-          <HuntHeader
-            huntName={hunt.name}
-            lastUpdatedBy="You"
-            hasUnsavedChanges={isDirty}
-            isSaving={isSubmitting}
-            onSave={handleSubmit(onSubmit)}
-          />
+          <HuntHeader huntName={huntFormData.name} lastUpdatedBy="You" onSave={handleSubmit(onSubmit)} />
 
           <HuntStepTimeline
             steps={steps}
-            selectedIndex={selectedStepIndex}
-            onSelectStep={setSelectedStepIndex}
+            selectedStepId={selectedStepId}
+            onSelectStep={setSelectedStepId}
             onAddStep={handleCreateStep}
           />
 
-          {selectedStepIndex !== -1 && (
-            <HuntForm stepIndex={selectedStepIndex} stepType={steps[selectedStepIndex]?.type} />
-          )}
+          {selectedStepIndex !== -1 && <HuntForm stepIndex={selectedStepIndex} stepType={selectedStepType} />}
         </S.Container>
       </FormProvider>
     </StepFormProvider>

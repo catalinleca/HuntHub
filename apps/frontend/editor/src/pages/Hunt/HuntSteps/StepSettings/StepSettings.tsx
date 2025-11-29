@@ -25,13 +25,12 @@ interface StepSettingsProps {
 }
 
 export const StepSettings = ({ stepIndex }: StepSettingsProps) => {
-  const { resetField } = useFormContext();
+  const { setValue } = useFormContext();
   const basePath = `hunt.steps.${stepIndex}`;
 
-  const location = useWatch({ name: `${basePath}.requiredLocation` });
-  const hint = useWatch({ name: `${basePath}.hint` });
-  const timeLimit = useWatch({ name: `${basePath}.timeLimit` });
-  const maxAttempts = useWatch({ name: `${basePath}.maxAttempts` });
+  const [location, hint, timeLimit, maxAttempts] = useWatch({
+    name: [`${basePath}.requiredLocation`, `${basePath}.hint`, `${basePath}.timeLimit`, `${basePath}.maxAttempts`],
+  });
 
   const locationEnabled = isLocationEnabled(location);
   const hintEnabled = isHintEnabled(hint);
@@ -45,26 +44,26 @@ export const StepSettings = ({ stepIndex }: StepSettingsProps) => {
 
   const locationVis = useSettingVisibility(
     locationEnabled,
-    () => enableLocation(resetField, locationPath),
-    () => disableLocation(resetField, locationPath),
+    () => enableLocation(setValue, locationPath),
+    () => disableLocation(setValue, locationPath),
   );
 
   const hintVis = useSettingVisibility(
     hintEnabled,
-    () => enableHint(resetField, hintPath),
-    () => disableHint(resetField, hintPath),
+    () => enableHint(setValue, hintPath),
+    () => disableHint(setValue, hintPath),
   );
 
   const timeLimitVis = useSettingVisibility(
     timeLimitEnabled,
-    () => enableTimeLimit(resetField, timeLimitPath),
-    () => disableTimeLimit(resetField, timeLimitPath),
+    () => enableTimeLimit(setValue, timeLimitPath),
+    () => disableTimeLimit(setValue, timeLimitPath),
   );
 
   const maxAttemptsVis = useSettingVisibility(
     maxAttemptsEnabled,
-    () => enableMaxAttempts(resetField, maxAttemptsPath),
-    () => disableMaxAttempts(resetField, maxAttemptsPath),
+    () => enableMaxAttempts(setValue, maxAttemptsPath),
+    () => disableMaxAttempts(setValue, maxAttemptsPath),
   );
 
   return (

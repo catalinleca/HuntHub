@@ -1,5 +1,5 @@
 import { FormHelperText, FormControl } from '@mui/material';
-import { useFormContext, useController } from 'react-hook-form';
+import { useFormContext, useController, useFormState } from 'react-hook-form';
 import { FormFieldProps } from '../types';
 import { getNestedError, nameToId } from '../utils';
 import { InputLabel, FieldContainer } from '../core';
@@ -20,11 +20,10 @@ export const FormSelect = ({
   disabled,
   ...props
 }: FormSelectProps) => {
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext();
+  const { control } = useFormContext();
   const { field } = useController({ name, control });
+
+  const { errors } = useFormState({ name });
 
   const error = getNestedError(errors, name);
   const id = nameToId(name);

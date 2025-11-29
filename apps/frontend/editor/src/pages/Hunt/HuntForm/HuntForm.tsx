@@ -17,6 +17,7 @@ const STEP_INPUT_COMPONENTS: Record<ChallengeType, React.ComponentType<{ stepInd
 };
 
 export const HuntForm = ({ stepIndex, stepType }: HuntFormProps) => {
+
   if (!stepType) {
     return (
       <S.FormArea>

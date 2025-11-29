@@ -1,40 +1,40 @@
-import { FieldValues, UseFormResetField } from 'react-hook-form';
+import { FieldValues, UseFormSetValue } from 'react-hook-form';
 import { LOCATION_DEFAULTS, HINT_DEFAULTS, TIME_LIMIT_DEFAULTS, MAX_ATTEMPTS_DEFAULTS } from '@/utils';
 
-type ResetField = UseFormResetField<FieldValues>;
+type SetValue = UseFormSetValue<FieldValues>;
 
-export const enableLocation = (resetField: ResetField, basePath: string) => {
-  resetField(`${basePath}.lat`, { defaultValue: LOCATION_DEFAULTS.enabled.lat });
-  resetField(`${basePath}.lng`, { defaultValue: LOCATION_DEFAULTS.enabled.lng });
-  resetField(`${basePath}.radius`, { defaultValue: LOCATION_DEFAULTS.enabled.radius });
+export const enableLocation = (setValue: SetValue, basePath: string) => {
+  setValue(`${basePath}.lat`, LOCATION_DEFAULTS.enabled.lat, { shouldDirty: true });
+  setValue(`${basePath}.lng`, LOCATION_DEFAULTS.enabled.lng, { shouldDirty: true });
+  setValue(`${basePath}.radius`, LOCATION_DEFAULTS.enabled.radius, { shouldDirty: true });
 };
 
-export const disableLocation = (resetField: ResetField, basePath: string) => {
-  resetField(`${basePath}.lat`, { defaultValue: LOCATION_DEFAULTS.disabled.lat });
-  resetField(`${basePath}.lng`, { defaultValue: LOCATION_DEFAULTS.disabled.lng });
-  resetField(`${basePath}.radius`, { defaultValue: LOCATION_DEFAULTS.disabled.radius });
+export const disableLocation = (setValue: SetValue, basePath: string) => {
+  setValue(`${basePath}.lat`, LOCATION_DEFAULTS.disabled.lat, { shouldDirty: true });
+  setValue(`${basePath}.lng`, LOCATION_DEFAULTS.disabled.lng, { shouldDirty: true });
+  setValue(`${basePath}.radius`, LOCATION_DEFAULTS.disabled.radius, { shouldDirty: true });
 };
 
-export const enableHint = (resetField: ResetField, path: string) => {
-  resetField(path, { defaultValue: HINT_DEFAULTS.enabled });
+export const enableHint = (setValue: SetValue, path: string) => {
+  setValue(path, HINT_DEFAULTS.enabled, { shouldDirty: true });
 };
 
-export const disableHint = (resetField: ResetField, path: string) => {
-  resetField(path, { defaultValue: HINT_DEFAULTS.disabled });
+export const disableHint = (setValue: SetValue, path: string) => {
+  setValue(path, HINT_DEFAULTS.disabled, { shouldDirty: true });
 };
 
-export const enableTimeLimit = (resetField: ResetField, path: string) => {
-  resetField(path, { defaultValue: TIME_LIMIT_DEFAULTS.enabled });
+export const enableTimeLimit = (setValue: SetValue, path: string) => {
+  setValue(path, TIME_LIMIT_DEFAULTS.enabled, { shouldDirty: true });
 };
 
-export const disableTimeLimit = (resetField: ResetField, path: string) => {
-  resetField(path, { defaultValue: TIME_LIMIT_DEFAULTS.disabled });
+export const disableTimeLimit = (setValue: SetValue, path: string) => {
+  setValue(path, TIME_LIMIT_DEFAULTS.disabled, { shouldDirty: true });
 };
 
-export const enableMaxAttempts = (resetField: ResetField, path: string) => {
-  resetField(path, { defaultValue: MAX_ATTEMPTS_DEFAULTS.enabled });
+export const enableMaxAttempts = (setValue: SetValue, path: string) => {
+  setValue(path, MAX_ATTEMPTS_DEFAULTS.enabled, { shouldDirty: true });
 };
 
-export const disableMaxAttempts = (resetField: ResetField, path: string) => {
-  resetField(path, { defaultValue: MAX_ATTEMPTS_DEFAULTS.disabled });
+export const disableMaxAttempts = (setValue: SetValue, path: string) => {
+  setValue(path, MAX_ATTEMPTS_DEFAULTS.disabled, { shouldDirty: true });
 };

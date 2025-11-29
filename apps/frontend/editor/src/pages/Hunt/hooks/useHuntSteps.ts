@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { useFieldArray, UseFormReturn, useWatch } from 'react-hook-form';
+import { useFieldArray, UseFormReturn } from 'react-hook-form';
 import { ChallengeType } from '@hunthub/shared';
 import { HuntFormData } from '@/types/editor';
 import { StepFactory } from '@/utils/factories/StepFactory';
 
 export const useHuntSteps = (formMethods: UseFormReturn<{ hunt: HuntFormData }>) => {
-  const [selectedStepIndex, setSelectedStepIndex] = useState(0);
+  const [selectedStepId, setSelectedStepId] = useState<string | null>(null);
 
   const {
     fields: steps,
@@ -16,15 +16,21 @@ export const useHuntSteps = (formMethods: UseFormReturn<{ hunt: HuntFormData }>)
     name: 'hunt.steps',
   });
 
-  const huntId = useWatch({ control: formMethods.control, name: 'hunt.huntId' });
+  const effectiveSelectedId = selectedStepId ?? steps[0]?._id ?? null;
 
   const handleCreateStep = (type: ChallengeType) => {
+    const huntId = formMethods.getValues('hunt.huntId');
     const newStep = StepFactory.create(type, huntId);
     append(newStep);
-    setSelectedStepIndex(steps.length);
+    setSelectedStepId(newStep._id);
   };
 
-  const handleDeleteStep = (index: number) => {
+  const handleDeleteStep = (stepId: string) => {
+    const index = steps.findIndex((s) => s._id === stepId);
+    if (index === -1) {
+      return;
+    }
+
     if (steps.length <= 1) {
       alert('Cannot delete the last step');
       return;
@@ -32,19 +38,16 @@ export const useHuntSteps = (formMethods: UseFormReturn<{ hunt: HuntFormData }>)
 
     remove(index);
 
-    const newLength = steps.length - 1;
-
-    if (selectedStepIndex > index) {
-      setSelectedStepIndex(selectedStepIndex - 1);
-    } else if (selectedStepIndex === index && index >= newLength) {
-      setSelectedStepIndex(newLength - 1);
+    if (effectiveSelectedId === stepId) {
+      const nextStep = steps[index + 1] ?? steps[index - 1];
+      setSelectedStepId(nextStep?._id ?? null);
     }
   };
 
   return {
     steps,
-    selectedStepIndex,
-    setSelectedStepIndex,
+    selectedStepId: effectiveSelectedId,
+    setSelectedStepId,
     handleCreateStep,
     handleDeleteStep,
   };

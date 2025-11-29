@@ -1,5 +1,5 @@
 import { TextField, FormHelperText, TextFieldProps } from '@mui/material';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useFormState } from 'react-hook-form';
 import { FormFieldProps } from '../types';
 import { getNestedError, nameToId } from '../utils';
 import { InputLabel, FieldContainer } from '../core';
@@ -21,10 +21,9 @@ export const FormTextArea = ({
   maxRows,
   ...props
 }: FormTextAreaProps) => {
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext();
+  const { register } = useFormContext();
+  const { errors } = useFormState({ name });
+
   const error = getNestedError(errors, name);
   const id = nameToId(name);
 

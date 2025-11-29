@@ -2,19 +2,19 @@ import { StepIcon, AddStepIcon } from './components';
 import { ChallengeType } from '@hunthub/shared';
 import * as S from './HuntStepTimeline.styles';
 
-interface Step {
+interface TimelineStep {
   _id: string;
   type: ChallengeType;
 }
 
 interface HuntStepTimelineProps {
-  steps: Step[];
-  selectedIndex: number;
-  onSelectStep: (index: number) => void;
+  steps: TimelineStep[];
+  selectedStepId: string | null;
+  onSelectStep: (stepId: string) => void;
   onAddStep: (type: ChallengeType) => void;
 }
 
-export const HuntStepTimeline = ({ steps, selectedIndex, onSelectStep, onAddStep }: HuntStepTimelineProps) => {
+export const HuntStepTimeline = ({ steps, selectedStepId, onSelectStep, onAddStep }: HuntStepTimelineProps) => {
   return (
     <S.Container>
       {steps.map((step, index) => (
@@ -22,8 +22,8 @@ export const HuntStepTimeline = ({ steps, selectedIndex, onSelectStep, onAddStep
           key={step._id}
           stepNumber={index + 1}
           type={step.type}
-          isSelected={selectedIndex === index}
-          onClick={() => onSelectStep(index)}
+          isSelected={selectedStepId === step._id}
+          onClick={() => onSelectStep(step._id)}
         />
       ))}
       <AddStepIcon onAddStep={onAddStep} />
