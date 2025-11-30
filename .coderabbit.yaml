@@ -1,0 +1,72 @@
+# CodeRabbit Configuration - Balanced Mode
+# Focus on bugs, security, and meaningful patterns - not nitpicking
+
+reviews:
+  # Assertive catches more than chill, but we'll tone down instructions
+  profile: "assertive"
+
+  # Just comment, don't force changes (you decide what to fix)
+  request_changes_workflow: false
+
+  # Keep summaries helpful
+  high_level_summary: true
+  poem: false
+
+  # Path-specific instructions - FOCUSED on real issues
+  path_instructions:
+    # Backend - Focus on bugs that BREAK things
+    - path: "apps/backend/api/src/**/*.ts"
+      instructions: |
+        Focus on actual bugs and security issues:
+        - SQL injection risks (string concatenation in queries)
+        - Missing error handling that could crash the server
+        - Authentication/authorization gaps
+        - Race conditions that could corrupt data
+        - Memory leaks (unclosed connections)
+        - Hardcoded secrets/credentials
+        
+        Suggest improvements for:
+        - N+1 queries (performance impact)
+        - Better error messages for debugging
+        
+        Skip:
+        - Minor style preferences
+        - Overly strict type enforcement if types are reasonable
+
+    # Frontend - Focus on bugs that BREAK UX
+    - path: "apps/frontend/**/*.tsx"
+      instructions: |
+        Focus on actual bugs:
+        - Missing useEffect dependencies causing stale data
+        - Infinite render loops
+        - Unhandled errors that crash the UI
+        - Memory leaks (missing cleanup)
+        - XSS vulnerabilities
+        
+        Suggest improvements for:
+        - Better component patterns if current approach is problematic
+        - Accessibility issues that hurt real users
+        
+        Skip:
+        - Formatting and style preferences
+        - Overly opinionated component structure suggestions
+
+    # Shared Code - Prevent integration bugs
+    - path: "packages/shared/src/**/*.ts"
+      instructions: |
+        Focus on:
+        - Type mismatches that will cause runtime errors
+        - Missing null checks where data could actually be null
+        - API contract breaking changes
+        
+        Skip:
+        - Perfect TypeScript purity (some 'any' is pragmatic)
+        - Over-engineering simple types
+
+  # Enable security scanner only
+  tools:
+    gitleaks:
+      enabled: true  # Catches leaked secrets
+
+# Language
+language: "en-US"

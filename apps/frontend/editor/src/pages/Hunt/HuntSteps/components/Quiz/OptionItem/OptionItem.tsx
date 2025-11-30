@@ -26,7 +26,12 @@ export const OptionItem = memo(
           <DotsSixVerticalIcon size={20} weight="bold" />
         </S.DragHandle>
 
-        <S.TargetCircle $isTarget={isTarget} onClick={onMarkTarget}>
+        <S.TargetCircle
+          type="button"
+          $isTarget={isTarget}
+          onClick={onMarkTarget}
+          aria-label={isTarget ? 'Correct answer' : `Mark option ${index + 1} as correct`}
+        >
           {isTarget ? <CheckIcon size={16} weight="bold" /> : index + 1}
         </S.TargetCircle>
 

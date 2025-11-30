@@ -21,6 +21,11 @@ const transformQuizForApi = (quizForm?: QuizFormData): Quiz | undefined => {
   }
 
   const targetOption = options.find((o) => o.id === targetId);
+
+  if (!targetOption && quizForm.type === OptionType.Choice) {
+    throw new Error('Target option must be selected for choice-type quiz');
+  }
+
   const distractorOptions = options.filter((o) => o.id !== targetId);
 
   return {

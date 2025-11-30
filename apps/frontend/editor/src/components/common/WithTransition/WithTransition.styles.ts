@@ -2,6 +2,10 @@ import { Box } from '@mui/material';
 import styled, { css } from 'styled-components';
 import type { TransitionVariant } from './WithTransition';
 
+const assertUnreachable = (x: never): never => {
+  throw new Error(`Unhandled TransitionVariant: ${x}`);
+};
+
 interface TransitionWrapperProps {
   $variant: TransitionVariant;
   $duration: number;
@@ -33,6 +37,8 @@ const getEnterStyles = (variant: TransitionVariant) => {
         opacity: 0;
         transform: translateX(16px);
       `;
+    default:
+      return assertUnreachable(variant);
   }
 };
 
@@ -62,6 +68,8 @@ const getExitStyles = (variant: TransitionVariant) => {
         opacity: 0;
         transform: translateX(-16px);
       `;
+    default:
+      return assertUnreachable(variant);
   }
 };
 

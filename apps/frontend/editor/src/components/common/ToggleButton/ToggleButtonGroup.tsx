@@ -4,6 +4,7 @@ import {
 } from '@mui/material';
 import { ReactNode } from 'react';
 import { ToggleButton } from './ToggleButton';
+import type { PaletteColor } from '@/utils/getColor/types';
 
 export interface ToggleButtonOption {
   value: string | number;
@@ -13,7 +14,7 @@ export interface ToggleButtonOption {
 
 export interface ToggleButtonGroupProps extends Omit<MuiToggleButtonGroupProps, 'children' | 'color'> {
   options: ToggleButtonOption[];
-  color?: string;
+  color?: PaletteColor;
 }
 
 export const ToggleButtonGroup = ({ options, color, ...props }: ToggleButtonGroupProps) => (

@@ -45,10 +45,11 @@ interface TargetCircleProps {
   $isTarget: boolean;
 }
 
-export const TargetCircle = styled(Box)<TargetCircleProps>(({ theme, $isTarget }) => ({
+export const TargetCircle = styled('button')<TargetCircleProps>(({ theme, $isTarget }) => ({
   width: 26,
   height: 26,
   minWidth: 26,
+  padding: 0,
   borderRadius: '50%',
   display: 'flex',
   alignItems: 'center',
@@ -79,5 +80,10 @@ export const TargetCircle = styled(Box)<TargetCircleProps>(({ theme, $isTarget }
           borderColor: theme.palette.success.main,
           color: theme.palette.success.main,
         }),
+  },
+
+  '&:focus-visible': {
+    outline: `2px solid ${theme.palette.primary.main}`,
+    outlineOffset: 2,
   },
 }));
