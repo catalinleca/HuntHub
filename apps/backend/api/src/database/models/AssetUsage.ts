@@ -1,5 +1,5 @@
 import { Schema, model, Model, HydratedDocument } from 'mongoose';
-import { IAssetUsage, AssetReferenceModel } from '../types/AssetUsage';
+import { IAssetUsage } from '../types/AssetUsage';
 
 const assetUsageSchema: Schema<IAssetUsage> = new Schema<IAssetUsage>(
   {
@@ -8,20 +8,8 @@ const assetUsageSchema: Schema<IAssetUsage> = new Schema<IAssetUsage>(
       ref: 'Asset',
       required: true,
     },
-    referencedBy: {
-      model: {
-        type: String,
-        required: true,
-        enum: ['Step'] as AssetReferenceModel[],
-      },
-      documentId: {
-        type: Schema.Types.ObjectId,
-        required: true,
-        refPath: 'referencedBy.model',
-      },
-    },
-    field: {
-      type: String,
+    huntId: {
+      type: Number,
       required: true,
     },
   },
@@ -32,47 +20,30 @@ const assetUsageSchema: Schema<IAssetUsage> = new Schema<IAssetUsage>(
 );
 
 // Indexes for efficient queries
-assetUsageSchema.index({ assetId: 1 }); // Find usage by asset
-assetUsageSchema.index({ 'referencedBy.documentId': 1 }); // Find usage by step
-assetUsageSchema.index({ assetId: 1, 'referencedBy.documentId': 1, field: 1 }, { unique: true }); // Prevent duplicates
+assetUsageSchema.index({ assetId: 1 }); // Check if asset is in use
+assetUsageSchema.index({ huntId: 1 }); // Delete all usage for a hunt
+assetUsageSchema.index({ assetId: 1, huntId: 1 }, { unique: true }); // Prevent duplicates
 
 interface IAssetUsageModel extends Model<IAssetUsage> {
   /**
-   * Find all usage records for an asset
-   */
-  findByAsset(assetId: string): Promise<HydratedDocument<IAssetUsage>[]>;
-
-  /**
-   * Find all usage records for a document (e.g., Step)
-   */
-  findByDocument(documentId: string): Promise<HydratedDocument<IAssetUsage>[]>;
-
-  /**
-   * Count how many documents reference this asset
-   */
-  countUsage(assetId: string): Promise<number>;
-
-  /**
-   * Check if asset is referenced anywhere
+   * Check if asset is referenced by any hunt
    */
   isAssetInUse(assetId: string): Promise<boolean>;
+
+  /**
+   * Get list of huntIds using an asset
+   */
+  getHuntsUsingAsset(assetId: string): Promise<number[]>;
 }
-
-assetUsageSchema.statics.findByAsset = function (assetId: string) {
-  return this.find({ assetId }).exec();
-};
-
-assetUsageSchema.statics.findByDocument = function (documentId: string) {
-  return this.find({ 'referencedBy.documentId': documentId }).exec();
-};
-
-assetUsageSchema.statics.countUsage = function (assetId: string) {
-  return this.countDocuments({ assetId });
-};
 
 assetUsageSchema.statics.isAssetInUse = async function (assetId: string): Promise<boolean> {
   const usage = await this.findOne({ assetId }).lean();
   return !!usage;
+};
+
+assetUsageSchema.statics.getHuntsUsingAsset = async function (assetId: string): Promise<number[]> {
+  const usages = await this.find({ assetId }).select('huntId').lean();
+  return usages.map((u: { huntId: number }) => u.huntId);
 };
 
 const AssetUsageModel = model<IAssetUsage, IAssetUsageModel>('AssetUsage', assetUsageSchema);

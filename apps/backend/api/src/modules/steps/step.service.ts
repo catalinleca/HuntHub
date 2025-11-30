@@ -39,10 +39,10 @@ export class StepService implements IStepService {
       const docData = StepMapper.toDocument(stepData, huntId, huntVersion);
       const [createdStep] = await StepModel.create([docData], { session });
 
-      // Track asset usage
-      await this.usageTracker.trackUsage(extracted, createdStep._id, 'Step', session);
-
       await this.huntService.addStepToVersion(huntId, huntVersion, createdStep.stepId, session);
+
+      // Rebuild asset usage for the hunt (scans all steps)
+      await this.usageTracker.rebuildHuntAssetUsage(huntId, session);
 
       return StepMapper.fromDocument(createdStep);
     });
@@ -87,8 +87,8 @@ export class StepService implements IStepService {
         throw new Error('Update failed for unknown reason');
       }
 
-      // Update asset usage tracking (remove old, add new)
-      await this.usageTracker.updateUsage(extracted, updatedStep._id, 'Step', session);
+      // Rebuild asset usage for the hunt (scans all steps)
+      await this.usageTracker.rebuildHuntAssetUsage(huntId, session);
 
       return StepMapper.fromDocument(updatedStep);
     });
@@ -104,12 +104,12 @@ export class StepService implements IStepService {
         throw new NotFoundError('Step not found');
       }
 
-      // Untrack asset usage before deleting step
-      await this.usageTracker.untrackUsage(step._id, session);
-
       await this.huntService.removeStepFromVersion(huntId, huntVersion, stepId, session);
 
       await step.deleteOne({ session });
+
+      // Rebuild asset usage for the hunt (after step is deleted)
+      await this.usageTracker.rebuildHuntAssetUsage(huntId, session);
     });
   }
 }

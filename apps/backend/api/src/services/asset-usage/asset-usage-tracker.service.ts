@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
 import mongoose from 'mongoose';
-import { AssetUsageModel } from '@/database/models';
-import { AssetReferenceModel } from '@/database/types/AssetUsage';
+import { AssetUsageModel, StepModel } from '@/database/models';
+import { AssetExtractor } from '@/utils/assetExtractor';
 
 /**
  * Extracted asset reference info
@@ -21,144 +21,119 @@ export interface ExtractedAssets {
 
 /**
  * Service interface for asset usage tracking
+ *
+ * SIMPLIFIED: Hunt-level tracking with "rebuild from source" approach.
  */
 export interface IAssetUsageTracker {
-  trackUsage(
-    extracted: ExtractedAssets,
-    documentId: mongoose.Types.ObjectId,
-    model?: AssetReferenceModel,
-    session?: mongoose.ClientSession,
-  ): Promise<void>;
+  /**
+   * Rebuild asset usage for a hunt from source of truth (all steps)
+   */
+  rebuildHuntAssetUsage(huntId: number, session?: mongoose.ClientSession): Promise<void>;
 
-  untrackUsage(documentId: mongoose.Types.ObjectId, session?: mongoose.ClientSession): Promise<void>;
+  /**
+   * Delete all usage for a hunt (called on hunt delete)
+   */
+  deleteHuntUsage(huntId: number, session?: mongoose.ClientSession): Promise<void>;
 
-  updateUsage(
-    newExtracted: ExtractedAssets,
-    documentId: mongoose.Types.ObjectId,
-    model?: AssetReferenceModel,
-    session?: mongoose.ClientSession,
-  ): Promise<void>;
-
-  getUsageCount(assetId: string): Promise<number>;
-
+  /**
+   * Check if asset is used by any hunt
+   */
   isAssetInUse(assetId: string): Promise<boolean>;
 
-  getUsageByAsset(
-    assetId: string,
-  ): Promise<Array<{ model: AssetReferenceModel; documentId: string; field: string }>>;
+  /**
+   * Get list of huntIds using an asset (for error messages)
+   */
+  getHuntsUsingAsset(assetId: string): Promise<number[]>;
 }
 
 /**
- * AssetUsageTracker - Manages asset usage tracking in a separate collection
+ * AssetUsageTracker - Manages asset usage tracking at hunt level
  *
- * Responsibilities:
- * - Track which documents reference which assets
- * - Support efficient queries in both directions (by asset, by document)
- * - Enable deletion protection checks
- * - Maintain data integrity during document lifecycle
+ * SIMPLIFIED from step-level to hunt-level tracking.
+ *
+ * Key Design: "Rebuild from source of truth"
+ * - Instead of incremental track/untrack, rebuild usage from all steps
+ * - Always correct (source of truth = steps)
+ * - No sync bugs possible
+ * - Simple to understand
+ * - Fast enough (hunts have ~10-50 steps max)
+ *
+ * Benefits:
+ * - Fixes cascade delete bug (hunt delete cleans up directly)
+ * - Tracks ALL versions (published and draft)
+ * - No orphan records possible
+ * - Simpler code (one rebuild function instead of track/untrack/update)
  */
 @injectable()
 export class AssetUsageTracker implements IAssetUsageTracker {
   /**
-   * Track asset usage for a document
+   * Rebuild asset usage for a hunt from source of truth (all steps)
    *
-   * @param extracted - Extracted asset references from document
-   * @param documentId - ID of the document referencing the assets
-   * @param model - Model type (default: 'Step')
+   * Scans ALL steps across ALL versions for this hunt and rebuilds usage records.
+   *
+   * @param huntId - Hunt ID (numeric)
    * @param session - MongoDB session for transaction support
    */
-  async trackUsage(
-    extracted: ExtractedAssets,
-    documentId: mongoose.Types.ObjectId,
-    model: AssetReferenceModel = 'Step',
-    session?: mongoose.ClientSession,
-  ): Promise<void> {
-    if (extracted.sources.length === 0) return;
+  async rebuildHuntAssetUsage(huntId: number, session?: mongoose.ClientSession): Promise<void> {
+    // 1. Get ALL steps across ALL versions
+    const steps = await StepModel.find({ huntId }).lean();
 
-    const usageRecords = extracted.sources.map((source) => ({
-      assetId: new mongoose.Types.ObjectId(source.assetId),
-      referencedBy: {
-        model,
-        documentId,
-      },
-      field: source.path,
-    }));
+    // 2. Extract all unique asset IDs
+    const assetIds = new Set<string>();
+    for (const step of steps) {
+      // AssetExtractor.fromDTO expects StepCreate/StepUpdate shape
+      // Lean document is close enough - media and challenge fields exist
+      const extracted = AssetExtractor.fromDTO(step as any);
+      extracted.assetIds.forEach((id) => assetIds.add(id));
+    }
 
-    await AssetUsageModel.insertMany(usageRecords, { session });
+    // 3. Replace usage records for this hunt (atomic delete + insert)
+    await AssetUsageModel.deleteMany({ huntId }, { session });
+
+    if (assetIds.size > 0) {
+      const records = [...assetIds].map((id) => ({
+        assetId: new mongoose.Types.ObjectId(id),
+        huntId,
+      }));
+      await AssetUsageModel.insertMany(records, { session });
+    }
   }
 
   /**
-   * Remove all usage tracking for a document
+   * Delete all usage for a hunt (called on hunt delete)
    *
-   * @param documentId - ID of the document being deleted
+   * @param huntId - Hunt ID (numeric)
    * @param session - MongoDB session for transaction support
    */
-  async untrackUsage(documentId: mongoose.Types.ObjectId, session?: mongoose.ClientSession): Promise<void> {
-    await AssetUsageModel.deleteMany({ 'referencedBy.documentId': documentId }, { session });
+  async deleteHuntUsage(huntId: number, session?: mongoose.ClientSession): Promise<void> {
+    await AssetUsageModel.deleteMany({ huntId }, { session });
   }
 
   /**
-   * Update usage tracking for a document (remove old, add new)
+   * Check if asset is used by any hunt
    *
-   * @param newExtracted - New extracted asset references
-   * @param documentId - ID of the document
-   * @param model - Model type (default: 'Step')
-   * @param session - MongoDB session for transaction support
-   */
-  async updateUsage(
-    newExtracted: ExtractedAssets,
-    documentId: mongoose.Types.ObjectId,
-    model: AssetReferenceModel = 'Step',
-    session?: mongoose.ClientSession,
-  ): Promise<void> {
-    // Simple approach: remove all, add new
-    // More efficient than diffing for most cases
-    await this.untrackUsage(documentId, session);
-    await this.trackUsage(newExtracted, documentId, model, session);
-  }
-
-  /**
-   * Get count of documents referencing an asset
-   *
-   * @param assetId - Asset ID (string or ObjectId)
-   * @returns Number of references
-   */
-  async getUsageCount(assetId: string): Promise<number> {
-    return AssetUsageModel.countDocuments({
-      assetId: new mongoose.Types.ObjectId(assetId),
-    });
-  }
-
-  /**
-   * Check if asset is referenced by any document
-   *
-   * @param assetId - Asset ID (string or ObjectId)
+   * @param assetId - Asset ID (ObjectId string)
    * @returns True if asset is in use
    */
   async isAssetInUse(assetId: string): Promise<boolean> {
-    const usage = await AssetUsageModel.findOne({
+    const exists = await AssetUsageModel.exists({
       assetId: new mongoose.Types.ObjectId(assetId),
-    }).lean();
-    return !!usage;
+    });
+    return !!exists;
   }
 
   /**
-   * Get all documents referencing an asset
+   * Get list of huntIds using an asset (for error messages)
    *
-   * @param assetId - Asset ID (string or ObjectId)
-   * @returns Array of usage records
+   * @param assetId - Asset ID (ObjectId string)
+   * @returns Array of hunt IDs
    */
-  async getUsageByAsset(
-    assetId: string,
-  ): Promise<Array<{ model: AssetReferenceModel; documentId: string; field: string }>> {
+  async getHuntsUsingAsset(assetId: string): Promise<number[]> {
     const usages = await AssetUsageModel.find({
       assetId: new mongoose.Types.ObjectId(assetId),
-    }).lean();
-
-    return usages.map((u) => ({
-      model: u.referencedBy.model,
-      documentId: u.referencedBy.documentId.toString(),
-      field: u.field,
-    }));
+    })
+      .select('huntId')
+      .lean();
+    return usages.map((u) => u.huntId);
   }
 }

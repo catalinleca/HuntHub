@@ -111,11 +111,13 @@ export class AssetService implements IAssetService {
       throw new NotFoundError('Asset not found');
     }
 
-    // Check if asset is in use
+    // Check if asset is in use by any hunt
     const isInUse = await this.usageTracker.isAssetInUse(asset._id.toString());
     if (isInUse) {
-      const usageCount = await this.usageTracker.getUsageCount(asset._id.toString());
-      throw new ConflictError(`Cannot delete asset: it is referenced by ${usageCount} step(s). Remove references first.`);
+      const huntIds = await this.usageTracker.getHuntsUsingAsset(asset._id.toString());
+      throw new ConflictError(
+        `Cannot delete asset: it is used by ${huntIds.length} hunt(s). Remove references first.`,
+      );
     }
 
     // TODO: Add S3 deletion when StorageService.deleteFile is implemented

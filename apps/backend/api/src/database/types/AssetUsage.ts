@@ -1,32 +1,21 @@
 import mongoose from 'mongoose';
 
 /**
- * Models that can reference assets.
- * Extensible for future models.
- */
-export type AssetReferenceModel = 'Step';
-
-/**
- * IAssetUsageReference - Describes which document references an asset
- */
-export interface IAssetUsageReference {
-  model: AssetReferenceModel;
-  documentId: mongoose.Types.ObjectId;
-}
-
-/**
  * IAssetUsage - Database interface for AssetUsage documents
  *
- * Separate collection for tracking asset references.
+ * SIMPLIFIED: Hunt-level tracking instead of step-level.
+ *
  * Benefits:
- * - Easy bidirectional queries (find usage by asset OR by step)
- * - Proper indexing for both directions
- * - Clean deletion protection checks
- * - Single source of truth for asset usage
+ * - Simple schema (2 meaningful fields)
+ * - Easy cleanup on hunt delete (no orphan records)
+ * - Rebuild from source approach (always correct)
+ * - No cascading delete bugs
+ *
+ * Trade-off: Less granular tracking, but for our use case
+ * (preventing asset deletion while in use), hunt-level is sufficient.
  */
 export interface IAssetUsage {
   assetId: mongoose.Types.ObjectId;
-  referencedBy: IAssetUsageReference;
-  field: string; // e.g., 'media.content.image.assetId', 'challenge.mission.referenceAssetIds[0]'
+  huntId: number; // FK to Hunt.huntId
   createdAt?: Date;
 }
