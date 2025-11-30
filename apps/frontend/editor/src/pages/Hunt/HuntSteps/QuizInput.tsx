@@ -44,7 +44,9 @@ export const QuizInput = ({ stepIndex }: QuizInputProps) => {
 
       <FormToggleButtonGroup name={fields.type} label="Answer Type" options={QUIZ_TYPE_OPTIONS} color={color} />
 
-      <FormTextArea name={fields.description} label="Question" placeholder="When was this library built?" rows={2} />
+      <FormInput name={fields.title} label="Question" placeholder="When was this library built?" />
+
+      <FormTextArea name={fields.description} label="Details" placeholder="Markdown placeholder" rows={2} />
 
       <AnswerSection>
         <WithTransition transitionKey={quizType} variant="fade-slide-down">
