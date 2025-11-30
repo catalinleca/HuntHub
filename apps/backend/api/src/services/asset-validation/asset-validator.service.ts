@@ -1,8 +1,8 @@
 import { injectable } from 'inversify';
-import mongoose from 'mongoose';
 import { AssetModel } from '@/database/models';
 import { NotFoundError, ForbiddenError, ValidationError } from '@/shared/errors';
 import { ExtractedAssets } from '@/services/asset-usage';
+import { isValidObjectId, toObjectId, toObjectIds } from '@/utils';
 
 export interface AssetValidationResult {
   assetId: string;
@@ -28,38 +28,34 @@ export interface IAssetValidator {
 @injectable()
 export class AssetValidator implements IAssetValidator {
   async validateOrThrow(extracted: ExtractedAssets, userId: string): Promise<void> {
-    if (extracted.sources.length === 0) return;
+    if (extracted.sources.length === 0) {
+      return;
+    }
 
     for (const source of extracted.sources) {
-      if (!mongoose.Types.ObjectId.isValid(source.assetId)) {
+      if (!isValidObjectId(source.assetId)) {
         throw new ValidationError(`Invalid asset ID format at ${source.path}: "${source.assetId}"`, [
           { field: source.path, message: `Invalid asset ID format: "${source.assetId}"` },
         ]);
       }
     }
 
-    const objectIds = extracted.assetIds.map((id) => new mongoose.Types.ObjectId(id));
-    const ownedAssets = await AssetModel.find({
-      _id: { $in: objectIds },
-      ownerId: userId,
-    })
+    const objectIds = toObjectIds(extracted.assetIds);
+    const ownedAssets = await AssetModel.find({ _id: { $in: objectIds }, ownerId: userId })
       .select('_id')
       .lean();
 
     const ownedIds = new Set(ownedAssets.map((a) => a._id.toString()));
-
     const unownedSources = extracted.sources.filter((s) => !ownedIds.has(s.assetId));
+
     if (unownedSources.length === 0) {
       return;
     }
 
-    const unownedIds = [...new Set(unownedSources.map((s) => s.assetId))];
-    const existingAssets = await AssetModel.find({
-      _id: { $in: unownedIds.map((id) => new mongoose.Types.ObjectId(id)) },
-    })
+    const unownedIds = toObjectIds([...new Set(unownedSources.map((s) => s.assetId))]);
+    const existingAssets = await AssetModel.find({ _id: { $in: unownedIds } })
       .select('_id')
       .lean();
-
     const existingIds = new Set(existingAssets.map((a) => a._id.toString()));
 
     for (const source of unownedSources) {
@@ -80,7 +76,7 @@ export class AssetValidator implements IAssetValidator {
 
     const validSources: typeof extracted.sources = [];
     for (const source of extracted.sources) {
-      if (!mongoose.Types.ObjectId.isValid(source.assetId)) {
+      if (!isValidObjectId(source.assetId)) {
         results.push({
           assetId: source.assetId,
           path: source.path,
@@ -98,22 +94,15 @@ export class AssetValidator implements IAssetValidator {
       return { valid: errors.length === 0, results, errors };
     }
 
-    const validObjectIds = validSources.map((s) => new mongoose.Types.ObjectId(s.assetId));
-    const ownedAssets = await AssetModel.find({
-      _id: { $in: validObjectIds },
-      ownerId: userId,
-    })
+    const validObjectIds = toObjectIds(validSources.map((s) => s.assetId));
+    const ownedAssets = await AssetModel.find({ _id: { $in: validObjectIds }, ownerId: userId })
       .select('_id')
       .lean();
 
     const ownedIds = new Set(ownedAssets.map((a) => a._id.toString()));
-
-    const allAssets = await AssetModel.find({
-      _id: { $in: validObjectIds },
-    })
+    const allAssets = await AssetModel.find({ _id: { $in: validObjectIds } })
       .select('_id')
       .lean();
-
     const existingIds = new Set(allAssets.map((a) => a._id.toString()));
 
     for (const source of validSources) {
@@ -129,36 +118,27 @@ export class AssetValidator implements IAssetValidator {
         errors.push(`Asset not owned by user at ${source.path}`);
       }
 
-      results.push({
-        assetId: source.assetId,
-        path: source.path,
-        exists,
-        isOwned,
-        error,
-      });
+      results.push({ assetId: source.assetId, path: source.path, exists, isOwned, error });
     }
 
     return { valid: errors.length === 0, results, errors };
   }
 
   async assetExists(assetId: string): Promise<boolean> {
-    if (!mongoose.Types.ObjectId.isValid(assetId)) {
+    const objectId = toObjectId(assetId);
+    if (!objectId) {
       return false;
     }
-    const exists = await AssetModel.exists({
-      _id: new mongoose.Types.ObjectId(assetId),
-    });
+    const exists = await AssetModel.exists({ _id: objectId });
     return !!exists;
   }
 
   async userOwnsAsset(assetId: string, userId: string): Promise<boolean> {
-    if (!mongoose.Types.ObjectId.isValid(assetId)) {
+    const objectId = toObjectId(assetId);
+    if (!objectId) {
       return false;
     }
-    const exists = await AssetModel.exists({
-      _id: new mongoose.Types.ObjectId(assetId),
-      ownerId: userId,
-    });
+    const exists = await AssetModel.exists({ _id: objectId, ownerId: userId });
     return !!exists;
   }
 }

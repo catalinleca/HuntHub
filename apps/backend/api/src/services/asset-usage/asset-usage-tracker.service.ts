@@ -2,7 +2,7 @@ import { injectable } from 'inversify';
 import mongoose from 'mongoose';
 import { StepCreate } from '@hunthub/shared';
 import { AssetUsageModel, StepModel } from '@/database/models';
-import { AssetExtractor } from '@/utils/assetExtractor';
+import { AssetExtractor, toObjectId, toObjectIds } from '@/utils';
 import { withTransaction } from '@/shared/utils/transaction';
 
 export interface AssetSource {
@@ -39,28 +39,29 @@ export class AssetUsageTracker implements IAssetUsageTracker {
 
     await AssetUsageModel.deleteMany({ huntId }, { session });
 
-    if (assetIds.size > 0) {
-      const records = [...assetIds].map((id) => ({
-        assetId: new mongoose.Types.ObjectId(id),
-        huntId,
-      }));
+    const objectIds = toObjectIds([...assetIds], { warnContext: `rebuildHuntAssetUsage(${huntId})` });
+
+    if (objectIds.length > 0) {
+      const records = objectIds.map((assetId) => ({ assetId, huntId }));
       await AssetUsageModel.insertMany(records, { session });
     }
   }
 
   async isAssetInUse(assetId: string): Promise<boolean> {
-    const exists = await AssetUsageModel.exists({
-      assetId: new mongoose.Types.ObjectId(assetId),
-    });
+    const objectId = toObjectId(assetId);
+    if (!objectId) {
+      return false;
+    }
+    const exists = await AssetUsageModel.exists({ assetId: objectId });
     return !!exists;
   }
 
   async getHuntsUsingAsset(assetId: string): Promise<number[]> {
-    const usages = await AssetUsageModel.find({
-      assetId: new mongoose.Types.ObjectId(assetId),
-    })
-      .select('huntId')
-      .lean();
+    const objectId = toObjectId(assetId);
+    if (!objectId) {
+      return [];
+    }
+    const usages = await AssetUsageModel.find({ assetId: objectId }).select('huntId').lean();
     return usages.map((u) => u.huntId);
   }
 }

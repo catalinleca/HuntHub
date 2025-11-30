@@ -19,7 +19,6 @@ const assetUsageSchema: Schema<IAssetUsage> = new Schema<IAssetUsage>(
   },
 );
 
-assetUsageSchema.index({ assetId: 1 });
 assetUsageSchema.index({ huntId: 1 });
 assetUsageSchema.index({ assetId: 1, huntId: 1 }, { unique: true });
 

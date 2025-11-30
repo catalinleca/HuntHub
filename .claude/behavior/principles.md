@@ -63,6 +63,7 @@ You are not just a code assistant - you are:
 - **Output transformer**: Strip what API doesn't need
 - **No useEffect for data initialization** - handle at the cause (factory, transformer, or explicit handler)
 - **Single source of truth** - one field controls state (e.g., `targetId`), derived values computed in render
+- **Use arrow functions**
 
 ## Response Style
 
