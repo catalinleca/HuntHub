@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { PlusIcon } from '@phosphor-icons/react';
 import { DndContext, PointerSensor, closestCenter, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { SortableOptionItem } from '../OptionItem/SortableOptionItem';
 import { useMultipleChoiceOptions } from './useMultipleChoiceOptions';
-import * as S from './MultipleChoiceEditor.styles';
+import { SectionButton } from '../../Section/Section.styles';
 
 interface MultipleChoiceEditorProps {
   stepIndex: number;
@@ -52,10 +52,15 @@ export const MultipleChoiceEditor = ({ stepIndex }: MultipleChoiceEditorProps) =
         </SortableContext>
       </DndContext>
 
-      <Box sx={{ mt: 2 }}>
-        <S.AddOptionButton onClick={handleAdd} disabled={!canAdd} startIcon={<PlusIcon size={16} weight="bold" />}>
+      <Box sx={{ pt: 2 }}>
+        <SectionButton
+          $color="success.main"
+          onClick={handleAdd}
+          disabled={!canAdd}
+          startIcon={<PlusIcon size={16} weight="bold" />}
+        >
           Add Option
-        </S.AddOptionButton>
+        </SectionButton>
       </Box>
     </Stack>
   );

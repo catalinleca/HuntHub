@@ -22,25 +22,13 @@ export const LocationSection = ({ stepIndex }: LocationSectionProps) => {
 
         <Grid2 container spacing={2}>
           <Grid2 size={{ xs: 12, sm: 4 }}>
-            <FormNumberInput
-              name={latPath}
-              label="Latitude"
-              placeholder="0.0000"
-            />
+            <FormNumberInput name={latPath} label="Latitude" placeholder="0.0000" />
           </Grid2>
           <Grid2 size={{ xs: 12, sm: 4 }}>
-            <FormNumberInput
-              name={lngPath}
-              label="Longitude"
-              placeholder="0.0000"
-            />
+            <FormNumberInput name={lngPath} label="Longitude" placeholder="0.0000" />
           </Grid2>
           <Grid2 size={{ xs: 12, sm: 4 }}>
-            <FormNumberInput
-              name={radiusPath}
-              label="Radius (meters)"
-              placeholder="100"
-            />
+            <FormNumberInput name={radiusPath} label="Radius (meters)" placeholder="100" />
           </Grid2>
         </Grid2>
       </Stack>

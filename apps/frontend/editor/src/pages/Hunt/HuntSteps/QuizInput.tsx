@@ -1,11 +1,11 @@
-import { Box, Divider, Typography } from '@mui/material';
+import { Divider, Typography } from '@mui/material';
 import { useWatch } from 'react-hook-form';
 import { ChallengeType, OptionType } from '@hunthub/shared';
 import { FormInput, FormTextArea, FormToggleButtonGroup, getFieldPath } from '@/components/form';
 import { WithTransition } from '@/components/common';
-import { StepCard } from './components';
+import { Section, SectionTitle, StepCard } from './components';
 import { StepSettings } from './StepSettings';
-import { MultipleChoiceEditor, AnswerSection } from './components/Quiz';
+import { MultipleChoiceEditor } from './components/Quiz';
 import { STEP_TYPE_CONFIG } from '@/pages/Hunt/HuntSteps/stepTypeConfig';
 import { ListBulletsIcon, TextTIcon } from '@phosphor-icons/react';
 
@@ -48,14 +48,10 @@ export const QuizInput = ({ stepIndex }: QuizInputProps) => {
 
       <FormTextArea name={fields.description} label="Details" placeholder="Markdown placeholder" rows={2} />
 
-      <AnswerSection>
+      <Section $color={color}>
         <WithTransition transitionKey={quizType} variant="fade-slide-down">
           <>
-            <Box mb={3}>
-              <Typography variant="smBold" color="success.main">
-                {text}
-              </Typography>
-            </Box>
+            <SectionTitle $color={color}>{text}</SectionTitle>
 
             {isMultipleChoice ? (
               <MultipleChoiceEditor stepIndex={stepIndex} />
@@ -69,7 +65,7 @@ export const QuizInput = ({ stepIndex }: QuizInputProps) => {
             )}
           </>
         </WithTransition>
-      </AnswerSection>
+      </Section>
 
       <Divider sx={{ my: 2 }} />
 

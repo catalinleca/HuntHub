@@ -131,3 +131,4 @@ on the aws mcp that we installed
 
 **Memory auto-loads from:** `/Users/catalinleca/leca/HuntHub/.claude/`
 - phosphor icons have Icon suffix now, whenever you import a Phosphor icon you import it like NameIcon, example MapPin is now MapPinIcon
+- if you are lazy, you are out and I move th chatGPT. Never be lazy

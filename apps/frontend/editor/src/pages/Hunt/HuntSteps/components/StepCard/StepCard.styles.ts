@@ -1,15 +1,17 @@
 import styled from 'styled-components';
 import { Box } from '@mui/material';
+import { getColor } from '@/utils';
+import type { PaletteColor } from '@/utils/getColor/types';
 
-export const IconWrapper = styled(Box)<{ $bgColor: string }>`
-  width: 44px;
-  height: 44px;
-  border-radius: ${({ theme }) => theme.shape.sm}px;
-  background-color: ${({ $bgColor }) => $bgColor};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${({ theme }) => theme.palette.common.white};
-  box-shadow: ${({ theme }) => theme.shadows[3]};
-`;
+export const IconWrapper = styled(Box)<{ $bgColor: PaletteColor }>(({ theme, $bgColor }) => ({
+  width: 44,
+  height: 44,
+  borderRadius: theme.shape.sm,
+  backgroundColor: getColor($bgColor),
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  color: theme.palette.common.white,
+  boxShadow: theme.shadows[3],
+}));
 
