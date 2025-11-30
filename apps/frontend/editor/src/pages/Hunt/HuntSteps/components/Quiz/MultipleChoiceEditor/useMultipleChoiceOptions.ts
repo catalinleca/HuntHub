@@ -19,7 +19,7 @@ export const useMultipleChoiceOptions = (stepIndex: number) => {
   };
 
   const handleRemove = (index: number) => {
-    if (fields.length <= MIN_OPTIONS) {
+    if (fields.length <= MIN_OPTIONS || index < 0 || index >= fields.length) {
       return;
     }
 

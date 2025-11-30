@@ -16,7 +16,7 @@ reviews:
   profile: "assertive"
 
   # Keep comments scannable - first line tells you everything
-  tone_instructions: "Lead with severity (bug/security/perf/suggestion) and a one-line summary. Be direct and concise. Skip fluff."
+  tone_instructions: "Only comment on bugs, security issues, and breaking changes. No nitpicks, style suggestions, or 'nice to have' improvements, unless you are sure that is a standardized approach or good pattern to follow for that specific situation"
 
   # Just comment, don't force changes (you decide what to fix)
   request_changes_workflow: false
@@ -24,6 +24,10 @@ reviews:
   # Keep summaries helpful
   high_level_summary: true
   poem: false
+
+  # Ignore markdown files - not code, don't review
+  path_filters:
+    - "!**/*.md"
 
   # Path-specific instructions - FOCUSED on real issues
   path_instructions:

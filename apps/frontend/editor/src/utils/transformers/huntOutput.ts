@@ -39,7 +39,7 @@ const transformQuizForApi = (quizForm?: QuizFormData): Quiz | undefined => {
 const transformChallengeForApi = (challenge: StepFormData['challenge']): Step['challenge'] => {
   return {
     ...challenge,
-    quiz: transformQuizForApi(challenge.quiz as QuizFormData),
+    quiz: transformQuizForApi(challenge.quiz),
   };
 };
 

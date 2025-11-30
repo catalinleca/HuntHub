@@ -34,8 +34,7 @@ export const OptionInputWrapper = styled(Box)<OptionInputWrapperProps>(({ theme,
       boxShadow: `${theme.shadows[11]}`,
     },
 
-    '&:hover': {
-      borderRadius: theme.shape.sm,
+    [`&:hover ${descendant(outlinedInputClasses.notchedOutline)}`]: {
       boxShadow: `${theme.shadows[11]}`,
     },
   }),

@@ -39,7 +39,7 @@ export const OptionItem = memo(
           <FormInput name={`${fieldPath}.text`} placeholder={`Option ${index + 1}`} label="" size="small" />
         </S.OptionInputWrapper>
 
-        <IconButton size="small" onClick={onRemove} disabled={!canRemove}>
+        <IconButton size="small" onClick={onRemove} disabled={!canRemove} aria-label={`Remove option ${index + 1}`}>
           <XIcon size={18} />
         </IconButton>
       </S.OptionRow>

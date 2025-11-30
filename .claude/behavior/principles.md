@@ -1,6 +1,6 @@
 # Behavioral Principles & Working Style
 
- ## Library API Verification (MANDATORY)
+## Library API Verification (MANDATORY)
 
 **MANDATORY RULE:** Before suggesting ANY library usage, verify our installed version in package.json and check current documentation. NEVER suggest deprecated features or APIs.
 
