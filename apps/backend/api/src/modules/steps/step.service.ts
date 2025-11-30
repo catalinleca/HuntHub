@@ -31,7 +31,7 @@ export class StepService implements IStepService {
     const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
     const huntVersion = huntDoc.latestVersion;
 
-    const extracted = AssetExtractor.fromDTO(stepData);
+    const extracted = AssetExtractor.fromStep(stepData);
     await this.assetValidator.validateOrThrow(extracted, userId);
 
     return withTransaction(async (session) => {
@@ -51,7 +51,7 @@ export class StepService implements IStepService {
     const huntVersion = huntDoc.latestVersion;
     const stepUpdateData = StepMapper.toDocumentUpdate(stepData);
 
-    const extracted = AssetExtractor.fromDTO(stepData);
+    const extracted = AssetExtractor.fromStep(stepData);
     await this.assetValidator.validateOrThrow(extracted, userId);
 
     return withTransaction(async (session) => {

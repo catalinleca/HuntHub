@@ -1,8 +1,8 @@
 import { injectable } from 'inversify';
 import mongoose from 'mongoose';
-import { StepCreate } from '@hunthub/shared';
 import { AssetUsageModel, StepModel } from '@/database/models';
 import { AssetExtractor, toObjectId, toObjectIds } from '@/utils';
+import { StepMapper } from '@/shared/mappers/step.mapper';
 import { withTransaction } from '@/shared/utils/transaction';
 
 export interface AssetSource {
@@ -29,11 +29,12 @@ export class AssetUsageTracker implements IAssetUsageTracker {
       return;
     }
 
-    const steps = await StepModel.find({ huntId }).session(session).lean();
+    const steps = await StepModel.find({ huntId }).session(session);
 
     const assetIds = new Set<string>();
     for (const step of steps) {
-      const extracted = AssetExtractor.fromDTO(step as unknown as StepCreate);
+      const stepDTO = StepMapper.fromDocument(step);
+      const extracted = AssetExtractor.fromStep(stepDTO);
       extracted.assetIds.forEach((id) => assetIds.add(id));
     }
 

@@ -1,8 +1,8 @@
-import { StepCreate, StepUpdate, Media, MediaType } from '@hunthub/shared';
+import { Step, StepCreate, StepUpdate, Media, MediaType } from '@hunthub/shared';
 import { ExtractedAssets, AssetSource } from '@/services/asset-usage';
 
 export const AssetExtractor = {
-  fromDTO(step: StepCreate | StepUpdate): ExtractedAssets {
+  fromStep(step: Step | StepCreate | StepUpdate): ExtractedAssets {
     const sources: AssetSource[] = [];
 
     if (step.media) {
@@ -75,13 +75,13 @@ export const AssetExtractor = {
     }
   },
 
-  hasAssets(step: StepCreate | StepUpdate): boolean {
-    const { assetIds } = this.fromDTO(step);
+  hasAssets(step: Step | StepCreate | StepUpdate): boolean {
+    const { assetIds } = this.fromStep(step);
     return assetIds.length > 0;
   },
 
-  getAssetCount(step: StepCreate | StepUpdate): number {
-    const { assetIds } = this.fromDTO(step);
+  getAssetCount(step: Step | StepCreate | StepUpdate): number {
+    const { assetIds } = this.fromStep(step);
     return assetIds.length;
   },
 };
