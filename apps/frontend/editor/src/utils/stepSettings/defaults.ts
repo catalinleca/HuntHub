@@ -1,3 +1,4 @@
+// Location defaults: enabled uses 0,0 as placeholder requiring user to set via map picker
 export const LOCATION_DEFAULTS = {
   enabled: { lat: 0, lng: 0, radius: 100 },
   disabled: { lat: null, lng: null, radius: null },

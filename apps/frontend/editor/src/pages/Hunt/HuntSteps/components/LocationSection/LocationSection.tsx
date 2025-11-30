@@ -9,6 +9,7 @@ interface LocationSectionProps {
   color?: PaletteColor;
 }
 
+// TODO: Wip
 export const LocationSection = ({
   title = 'Location',
   buttonLabel = 'Pick on map',

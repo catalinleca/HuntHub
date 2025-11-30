@@ -38,11 +38,9 @@ It imports all context about the project, so Claude always knows:
 @.claude/behavior/principles.md
 @.claude/decisions/solid-principles.md
 
-When working with a library like react query, material ui, react hook form, zustand, zod or any core library in our code, or even basic css styling, alignments common problems, it is EXTREMELY important that you understand the problem and you search for the best patterns and recommendations.
-You either check docs, or other resources
+When working with libraries like React Query, MUI, React Hook Form, Zustand, Zod, or CSS/layout patterns, always understand the problem first. Search for best practices in official docs and community resources.
 
-Same applies in general, when we have a problem that is relatively common, you can search for relatively "standardized" solutions. However when you encounter a situation like this
-Explain it to me and make me aware
+For common problems, search for standardized solutions. However, when you encounter an edge case or unique situation that doesn't have a clear standard approach, explain it to me so we can decide the best approach together.
 
 ## 🚀 Quick Start & Current Focus
 
@@ -131,4 +129,4 @@ on the aws mcp that we installed
 
 **Memory auto-loads from:** `/Users/catalinleca/leca/HuntHub/.claude/`
 - phosphor icons have Icon suffix now, whenever you import a Phosphor icon you import it like NameIcon, example MapPin is now MapPinIcon
-- if you are lazy, you are out and I move th chatGPT. Never be lazy
+- Thorough review and quality are non-negotiable: avoid shortcuts, validate patterns, and deliver production-grade code

@@ -27,9 +27,17 @@ export const useArrayInputItem = (index: number): ArrayInputItemState => {
       isFirst: index === 0,
       isLast: index === length - 1,
       onRemove: () => remove(index),
-      onMoveUp: () => swap(index, index - 1),
-      onMoveDown: () => swap(index, index + 1),
+      onMoveUp: () => {
+        if (index > 0) {
+          swap(index, index - 1);
+        }
+      },
+      onMoveDown: () => {
+        if (index < length - 1) {
+          swap(index, index + 1);
+        }
+      },
     }),
-    [index, length, remove, swap]
+    [index, length, remove, swap],
   );
 };

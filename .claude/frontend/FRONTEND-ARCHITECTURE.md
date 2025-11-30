@@ -1,4 +1,6 @@
-# You do not follow these patterns, you're out, i dont care if you have to read it 2 times
+# Frontend Architecture — Mandatory Patterns
+
+> ⚠️ **These patterns are non-negotiable for code quality and consistency. Review carefully and refer back as needed.**
 
 # Frontend Architecture Overview
 
@@ -322,7 +324,7 @@ Keep related files together (component, styles, tests).
 ```
 
 ```javascript
-// ❌ NEVER - write this shit
+// ❌ NEVER - do not write inline styled-components like this
 export const Header = styled(Box)`
  display: flex;
  align-items: center;

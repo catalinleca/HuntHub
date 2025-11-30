@@ -38,6 +38,8 @@ export const useHuntSteps = (formMethods: UseFormReturn<{ hunt: HuntFormData }>)
 
     remove(index);
 
+    // steps array still has OLD values here (remove is async)
+    // So steps[index + 1] correctly refers to the step after deleted one
     if (effectiveSelectedId === stepId) {
       const nextStep = steps[index + 1] ?? steps[index - 1];
       setSelectedStepId(nextStep?._id ?? null);
