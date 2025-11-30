@@ -4,9 +4,6 @@ import { AssetModel } from '@/database/models';
 import { NotFoundError, ForbiddenError, ValidationError } from '@/shared/errors';
 import { ExtractedAssets } from '@/services/asset-usage';
 
-/**
- * Asset validation result for a single asset
- */
 export interface AssetValidationResult {
   assetId: string;
   path: string;
@@ -15,18 +12,12 @@ export interface AssetValidationResult {
   error?: string;
 }
 
-/**
- * Bulk validation result
- */
 export interface BulkValidationResult {
   valid: boolean;
   results: AssetValidationResult[];
   errors: string[];
 }
 
-/**
- * Service interface for asset validation
- */
 export interface IAssetValidator {
   validateOrThrow(extracted: ExtractedAssets, userId: string): Promise<void>;
   validateBulk(extracted: ExtractedAssets, userId: string): Promise<BulkValidationResult>;
@@ -34,30 +25,11 @@ export interface IAssetValidator {
   userOwnsAsset(assetId: string, userId: string): Promise<boolean>;
 }
 
-/**
- * AssetValidator - Validates asset references in step data
- *
- * Responsibilities:
- * - Validate asset ID format
- * - Check asset existence
- * - Verify asset ownership
- * - Provide detailed error messages with field paths
- */
 @injectable()
 export class AssetValidator implements IAssetValidator {
-  /**
-   * Validate asset references and throw on first error
-   *
-   * @param extracted - Extracted asset references
-   * @param userId - ID of user who must own the assets
-   * @throws ValidationError - If asset ID format is invalid
-   * @throws NotFoundError - If asset doesn't exist
-   * @throws ForbiddenError - If user doesn't own the asset
-   */
   async validateOrThrow(extracted: ExtractedAssets, userId: string): Promise<void> {
     if (extracted.sources.length === 0) return;
 
-    // 1. Validate ObjectId format
     for (const source of extracted.sources) {
       if (!mongoose.Types.ObjectId.isValid(source.assetId)) {
         throw new ValidationError(`Invalid asset ID format at ${source.path}: "${source.assetId}"`, [
@@ -66,7 +38,6 @@ export class AssetValidator implements IAssetValidator {
       }
     }
 
-    // 2. Bulk fetch owned assets (efficient single query)
     const objectIds = extracted.assetIds.map((id) => new mongoose.Types.ObjectId(id));
     const ownedAssets = await AssetModel.find({
       _id: { $in: objectIds },
@@ -99,13 +70,6 @@ export class AssetValidator implements IAssetValidator {
     }
   }
 
-  /**
-   * Validate all asset references and return detailed results
-   *
-   * @param extracted - Extracted asset references
-   * @param userId - ID of user who must own the assets
-   * @returns Validation results for each asset reference
-   */
   async validateBulk(extracted: ExtractedAssets, userId: string): Promise<BulkValidationResult> {
     const results: AssetValidationResult[] = [];
     const errors: string[] = [];
@@ -114,7 +78,6 @@ export class AssetValidator implements IAssetValidator {
       return { valid: true, results, errors };
     }
 
-    // Separate valid and invalid ObjectIds
     const validSources: typeof extracted.sources = [];
     for (const source of extracted.sources) {
       if (!mongoose.Types.ObjectId.isValid(source.assetId)) {
@@ -135,7 +98,6 @@ export class AssetValidator implements IAssetValidator {
       return { valid: errors.length === 0, results, errors };
     }
 
-    // Fetch all assets (owned by user)
     const validObjectIds = validSources.map((s) => new mongoose.Types.ObjectId(s.assetId));
     const ownedAssets = await AssetModel.find({
       _id: { $in: validObjectIds },
@@ -146,7 +108,6 @@ export class AssetValidator implements IAssetValidator {
 
     const ownedIds = new Set(ownedAssets.map((a) => a._id.toString()));
 
-    // Fetch all assets (any owner) to check existence
     const allAssets = await AssetModel.find({
       _id: { $in: validObjectIds },
     })
@@ -155,7 +116,6 @@ export class AssetValidator implements IAssetValidator {
 
     const existingIds = new Set(allAssets.map((a) => a._id.toString()));
 
-    // Check each valid source
     for (const source of validSources) {
       const exists = existingIds.has(source.assetId);
       const isOwned = ownedIds.has(source.assetId);
@@ -181,12 +141,6 @@ export class AssetValidator implements IAssetValidator {
     return { valid: errors.length === 0, results, errors };
   }
 
-  /**
-   * Check if asset exists
-   *
-   * @param assetId - Asset ID to check
-   * @returns True if asset exists
-   */
   async assetExists(assetId: string): Promise<boolean> {
     if (!mongoose.Types.ObjectId.isValid(assetId)) {
       return false;
@@ -197,13 +151,6 @@ export class AssetValidator implements IAssetValidator {
     return !!exists;
   }
 
-  /**
-   * Check if user owns an asset
-   *
-   * @param assetId - Asset ID to check
-   * @param userId - User ID to check ownership
-   * @returns True if user owns the asset
-   */
   async userOwnsAsset(assetId: string, userId: string): Promise<boolean> {
     if (!mongoose.Types.ObjectId.isValid(assetId)) {
       return false;

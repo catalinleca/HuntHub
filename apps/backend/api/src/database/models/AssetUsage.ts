@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { IAssetUsage } from '../types/AssetUsage';
+import { IAssetUsage } from '@/database/types';
 
 const assetUsageSchema: Schema<IAssetUsage> = new Schema<IAssetUsage>(
   {
@@ -14,15 +14,14 @@ const assetUsageSchema: Schema<IAssetUsage> = new Schema<IAssetUsage>(
     },
   },
   {
-    timestamps: { createdAt: true, updatedAt: false }, // Only track creation
+    timestamps: { createdAt: true, updatedAt: false },
     collection: 'AssetUsage',
   },
 );
 
-// Indexes for efficient queries
-assetUsageSchema.index({ assetId: 1 }); // Check if asset is in use
-assetUsageSchema.index({ huntId: 1 }); // Delete all usage for a hunt
-assetUsageSchema.index({ assetId: 1, huntId: 1 }, { unique: true }); // Prevent duplicates
+assetUsageSchema.index({ assetId: 1 });
+assetUsageSchema.index({ huntId: 1 });
+assetUsageSchema.index({ assetId: 1, huntId: 1 }, { unique: true });
 
 const AssetUsageModel = model<IAssetUsage>('AssetUsage', assetUsageSchema);
 

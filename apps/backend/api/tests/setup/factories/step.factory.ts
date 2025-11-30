@@ -74,12 +74,6 @@ export const generateStepData = (options: CreateStepOptions = {}): Partial<IStep
   };
 };
 
-/**
- * Generate step data with a media attachment (image)
- * Useful for testing asset usage tracking
- *
- * @param assetId - Asset._id (ObjectId string) to reference in media
- */
 export const generateStepDataWithMedia = (assetId: string): Partial<IStep> => ({
   type: ChallengeType.Clue,
   challenge: {

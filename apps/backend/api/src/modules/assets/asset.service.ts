@@ -114,6 +114,7 @@ export class AssetService implements IAssetService {
 
     await withTransaction(async (session) => {
       const isInUse = await this.usageTracker.isAssetInUse(asset._id.toString());
+
       if (isInUse) {
         const huntIds = await this.usageTracker.getHuntsUsingAsset(asset._id.toString());
         throw new ConflictError(

@@ -31,7 +31,6 @@ export class StepService implements IStepService {
     const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
     const huntVersion = huntDoc.latestVersion;
 
-    // Extract and validate asset references before transaction
     const extracted = AssetExtractor.fromDTO(stepData);
     await this.assetValidator.validateOrThrow(extracted, userId);
 
@@ -41,7 +40,6 @@ export class StepService implements IStepService {
 
       await this.huntService.addStepToVersion(huntId, huntVersion, createdStep.stepId, session);
 
-      // Rebuild asset usage for the hunt (scans all steps)
       await this.usageTracker.rebuildHuntAssetUsage(huntId, session);
 
       return StepMapper.fromDocument(createdStep);
@@ -53,7 +51,6 @@ export class StepService implements IStepService {
     const huntVersion = huntDoc.latestVersion;
     const stepUpdateData = StepMapper.toDocumentUpdate(stepData);
 
-    // Extract and validate asset references before transaction
     const extracted = AssetExtractor.fromDTO(stepData);
     await this.assetValidator.validateOrThrow(extracted, userId);
 
@@ -87,7 +84,6 @@ export class StepService implements IStepService {
         throw new Error('Update failed for unknown reason');
       }
 
-      // Rebuild asset usage for the hunt (scans all steps)
       await this.usageTracker.rebuildHuntAssetUsage(huntId, session);
 
       return StepMapper.fromDocument(updatedStep);
@@ -108,7 +104,6 @@ export class StepService implements IStepService {
 
       await step.deleteOne({ session });
 
-      // Rebuild asset usage for the hunt (after step is deleted)
       await this.usageTracker.rebuildHuntAssetUsage(huntId, session);
     });
   }

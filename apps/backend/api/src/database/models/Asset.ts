@@ -30,7 +30,6 @@ const assetSchema: Schema<IAsset> = new Schema<IAsset>(
       bucket: String,
       path: String,
     },
-    // Note: usage is now tracked in the separate AssetUsage collection
   },
   {
     timestamps: true,
@@ -40,7 +39,6 @@ const assetSchema: Schema<IAsset> = new Schema<IAsset>(
 
 assetSchema.index({ ownerId: 1, createdAt: -1 });
 assetSchema.index({ mimeType: 1 });
-// Note: usage tracking index moved to AssetUsage collection
 
 assetSchema.pre('save', async function () {
   if (this.isNew && !this.assetId) {
@@ -53,8 +51,6 @@ interface IAssetModel extends Model<IAsset> {
 
   findByOwnerAndType(userId: string, mimeType: MimeTypes): Promise<HydratedDocument<IAsset>[]>;
 
-  // Note: findByDocumentUsage moved to AssetUsageModel.findByDocument
-
   hasAssets(userId: string): Promise<boolean>;
 }
 
@@ -65,8 +61,6 @@ assetSchema.statics.findByOwner = function (userId: string) {
 assetSchema.statics.findByOwnerAndType = function (userId: string, mimeType: MimeTypes) {
   return this.find({ ownerId: userId, mimeType }).sort({ createdAt: -1 }).exec();
 };
-
-// Note: findByDocumentUsage moved to AssetUsageModel.findByDocument
 
 assetSchema.statics.hasAssets = async function (userId: string): Promise<boolean> {
   const count = await this.countDocuments({ ownerId: userId }).limit(1);
