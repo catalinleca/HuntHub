@@ -8,11 +8,8 @@ export interface IStorageLocation {
   path?: string;
 }
 
-export interface IAssetUsage {
-  model: string;
-  field: string; // 'challenge.mission.referenceAssetIds', 'profilePicture'
-  documentId: mongoose.Types.ObjectId;
-}
+// Note: IAssetUsage is now defined in AssetUsage.ts for the separate collection approach
+// The inline usage tracking in IAsset.usage is deprecated in favor of the AssetUsage collection
 
 /**
  * IAsset - Database interface for Asset documents
@@ -34,7 +31,7 @@ export interface IAsset {
   size?: number;
   thumbnailUrl?: string;
   storageLocation?: IStorageLocation;
-  usage?: IAssetUsage[];
+  // Note: usage is now tracked in the separate AssetUsage collection
   createdAt?: string;
   updatedAt?: string;
 }

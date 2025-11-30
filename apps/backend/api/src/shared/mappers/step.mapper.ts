@@ -17,6 +17,7 @@ export class StepMapper {
       huntVersion,
       type: dto.type,
       challenge: dto.challenge,
+      media: dto.media,
       hint: dto.hint,
       requiredLocation: dto.requiredLocation,
       timeLimit: dto.timeLimit,
@@ -29,6 +30,7 @@ export class StepMapper {
     return {
       type: dto.type,
       challenge: dto.challenge,
+      media: dto.media,
       hint: dto.hint,
       requiredLocation: dto.requiredLocation,
       timeLimit: dto.timeLimit,
@@ -50,6 +52,7 @@ export class StepMapper {
       huntId: doc.huntId,
       type: doc.type, // TypeScript knows this is ChallengeType after type guard
       challenge: doc.challenge as Challenge,
+      media: doc.media,
       hint: doc.hint,
       requiredLocation: doc.requiredLocation
         ? {
@@ -81,6 +84,7 @@ export class StepMapper {
       huntId: sourceDoc.huntId,
       type: sourceDoc.type,
       challenge: sourceDoc.challenge, // Mongoose handles deep copy
+      media: sourceDoc.media,
       hint: sourceDoc.hint,
       requiredLocation: sourceDoc.requiredLocation,
       timeLimit: sourceDoc.timeLimit,

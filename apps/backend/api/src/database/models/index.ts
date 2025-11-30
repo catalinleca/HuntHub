@@ -3,6 +3,7 @@ export { default as HuntVersionModel } from './HuntVersion';
 export { default as UserModel } from './User';
 export { default as StepModel } from './Step';
 export { default as AssetModel } from './Asset';
+export { default as AssetUsageModel } from './AssetUsage';
 export { default as ProgressModel } from './Progress';
 export { default as LiveHuntModel } from './LiveHunt';
 export { default as HuntAccessModel } from './HuntAccess';

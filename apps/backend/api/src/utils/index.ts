@@ -1,0 +1,1 @@
+export { AssetExtractor } from './assetExtractor';
