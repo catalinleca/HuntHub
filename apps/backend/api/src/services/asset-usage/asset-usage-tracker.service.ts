@@ -70,8 +70,12 @@ export class AssetUsageTracker implements IAssetUsageTracker {
    * @param session - MongoDB session for transaction support
    */
   async rebuildHuntAssetUsage(huntId: number, session?: mongoose.ClientSession): Promise<void> {
-    // 1. Get ALL steps across ALL versions
-    const steps = await StepModel.find({ huntId }).lean();
+    // 1. Get ALL steps across ALL versions (use session to see uncommitted changes)
+    const query = StepModel.find({ huntId });
+    if (session) {
+      query.session(session);
+    }
+    const steps = await query.lean();
 
     // 2. Extract all unique asset IDs
     const assetIds = new Set<string>();

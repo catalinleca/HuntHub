@@ -73,3 +73,29 @@ export const generateStepData = (options: CreateStepOptions = {}): Partial<IStep
     maxAttempts: options.maxAttempts,
   };
 };
+
+/**
+ * Generate step data with a media attachment (image)
+ * Useful for testing asset usage tracking
+ *
+ * @param assetId - Asset._id (ObjectId string) to reference in media
+ */
+export const generateStepDataWithMedia = (assetId: string): Partial<IStep> => ({
+  type: ChallengeType.Clue,
+  challenge: {
+    clue: {
+      title: faker.lorem.sentence(),
+      description: faker.lorem.paragraph(),
+    },
+  },
+  media: {
+    type: 'image',
+    content: {
+      image: {
+        assetId,
+        title: 'Test image',
+        alt: 'Test image alt text',
+      },
+    },
+  },
+});
