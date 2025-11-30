@@ -32,25 +32,25 @@ export const AddStepIcon = ({ onAddStep }: AddStepIconProps) => {
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
         <MenuItem onClick={() => handleSelect(ChallengeType.Clue)}>
-          <Stack direction="row" spacing={1.5} alignItems="center">
+          <Stack direction="row" spacing={2} alignItems="center">
             <MapTrifoldIcon size={20} weight="duotone" />
             Clue
           </Stack>
         </MenuItem>
         <MenuItem onClick={() => handleSelect(ChallengeType.Quiz)}>
-          <Stack direction="row" spacing={1.5} alignItems="center">
+          <Stack direction="row" spacing={2} alignItems="center">
             <QuestionIcon size={20} weight="duotone" />
             Quiz
           </Stack>
         </MenuItem>
         <MenuItem onClick={() => handleSelect(ChallengeType.Mission)}>
-          <Stack direction="row" spacing={1.5} alignItems="center">
+          <Stack direction="row" spacing={2} alignItems="center">
             <CameraIcon size={20} weight="duotone" />
             Mission
           </Stack>
         </MenuItem>
         <MenuItem onClick={() => handleSelect(ChallengeType.Task)}>
-          <Stack direction="row" spacing={1.5} alignItems="center">
+          <Stack direction="row" spacing={2} alignItems="center">
             <CheckSquareIcon size={20} weight="duotone" />
             Task
           </Stack>

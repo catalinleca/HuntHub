@@ -1,2 +1,2 @@
 export { getNativeFieldStyles, nativeFieldSelectors } from './native';
-export { getMuiInputOverrideStyles, muiInputSelectors } from './mui';
+export { getMuiInputOverrideStyles, muiInputSelectors, stateSelector, descendant } from './mui';

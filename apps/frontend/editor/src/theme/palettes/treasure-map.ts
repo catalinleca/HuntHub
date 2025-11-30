@@ -36,7 +36,9 @@ export const treasureMapPaletteConfig = {
   },
   background: {
     default: '#E4D5C1',
+    defaultLight: '#EFE4D7',
     paper: '#f5f1e8',
+    surface: '#FFFBF5',
   },
   text: {
     primary: '#2C1810',
@@ -112,6 +114,61 @@ const treasureMapPalette = {
       lineHeight: 1.5,
       textTransform: 'none' as const,
     },
+    smRegular: {
+      fontSize: 14,
+      fontWeight: 400,
+      lineHeight: 1.43,
+    },
+    smMedium: {
+      fontSize: 14,
+      fontWeight: 500,
+      lineHeight: 1.43,
+    },
+    smBold: {
+      fontSize: 14,
+      fontWeight: 700,
+      lineHeight: 1.43,
+    },
+    xsRegular: {
+      fontSize: 12,
+      fontWeight: 400,
+      lineHeight: 1.33,
+    },
+    xsMedium: {
+      fontSize: 12,
+      fontWeight: 500,
+      lineHeight: 1.33,
+    },
+    xsBold: {
+      fontSize: 12,
+      fontWeight: 700,
+      lineHeight: 1.33,
+    },
+    label: {
+      fontSize: 12,
+      fontWeight: 600,
+      lineHeight: 1.33,
+      letterSpacing: '0.05em',
+      textTransform: 'uppercase' as const,
+    },
+    displayH4: {
+      fontSize: 24,
+      fontWeight: 600,
+      lineHeight: 1.33,
+      fontFamily: 'Georgia, "Times New Roman", serif',
+    },
+    displayH6: {
+      fontSize: 16,
+      fontWeight: 600,
+      lineHeight: 1.5,
+      fontFamily: 'Georgia, "Times New Roman", serif',
+    },
+    displayBody2: {
+      fontSize: 14,
+      fontWeight: 400,
+      lineHeight: 1.43,
+      fontFamily: 'Georgia, "Times New Roman", serif',
+    },
   },
   spacing: [0, 4, 8, 12, 16, 24, 32, 48, 64],
   shadows: [
@@ -124,10 +181,10 @@ const treasureMapPalette = {
     '0 20px 40px rgba(44, 24, 16, 0.10)',
     '0 24px 48px rgba(44, 24, 16, 0.12)',
     '0 8px 32px rgba(44, 24, 16, 0.3)',
-    // Focus ring shadows (9-10) - derived from palette
+    // Focus ring shadows (9-11) - derived from palette
     createFocusRing(treasureMapPaletteConfig.primary.main),
     createFocusRing(treasureMapPaletteConfig.error.main),
-    '',
+    createFocusRing(treasureMapPaletteConfig.success.main),
     '',
     '',
     '',

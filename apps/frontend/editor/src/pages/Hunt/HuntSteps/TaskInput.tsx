@@ -1,6 +1,8 @@
-import { Stack, Divider, Typography } from '@mui/material';
+import { Divider, Typography } from '@mui/material';
+import { ChallengeType } from '@hunthub/shared';
 import { FormInput, FormTextArea, getFieldPath } from '@/components/form';
-import { StepHeader, LocationFields, HintField } from './components';
+import { StepCard } from './components';
+import { StepSettings } from './StepSettings';
 
 interface TaskInputProps {
   stepIndex: number;
@@ -16,44 +18,31 @@ export const TaskInput = ({ stepIndex }: TaskInputProps) => {
   const fields = getTaskFieldNames(stepIndex);
 
   return (
-    <Stack spacing={3}>
-      <StepHeader stepIndex={stepIndex} />
-
-      <Typography variant="subtitle2" fontWeight={600} color="text.secondary">
-        TASK DETAILS
+    <StepCard stepIndex={stepIndex} type={ChallengeType.Task}>
+      <Typography variant="label" color="text.secondary">
+        Task Content
       </Typography>
 
-      <FormInput name={fields.title} label="Task Title" placeholder="Complete the scavenger hunt challenge" required />
+      <FormInput name={fields.title} label="Title" placeholder="Casa Batlló Architecture" />
 
       <FormTextArea
         name={fields.instructions}
-        label="Task Instructions"
-        placeholder="Find all 5 hidden markers in this area and note down their colors..."
+        label="Player Instructions"
+        placeholder="Describe the unique architectural features you observe..."
         rows={4}
-        helperText="What the player needs to do to complete this task"
       />
-
-      <Divider sx={{ my: 2 }} />
-
-      <Typography variant="subtitle2" fontWeight={600} color="text.secondary">
-        AI VALIDATION (OPTIONAL)
-      </Typography>
 
       <FormTextArea
         name={fields.aiInstructions}
-        label="AI Instructions"
-        placeholder="Verify that the player has found all 5 markers with correct colors..."
+        label="AI Validation"
+        placeholder="Tell the AI how to validate responses..."
         rows={3}
-        helperText="Instructions for AI to validate player responses (future feature)"
+        helperText="Example: 'Accept if player mentions at least 2 architectural features'"
       />
 
       <Divider sx={{ my: 2 }} />
 
-      <LocationFields stepIndex={stepIndex} />
-
-      <Divider sx={{ my: 2 }} />
-
-      <HintField stepIndex={stepIndex} />
-    </Stack>
+      <StepSettings stepIndex={stepIndex} />
+    </StepCard>
   );
 };

@@ -6,6 +6,6 @@ export const Container = styled(Stack)`
   align-items: center;
   justify-content: space-between;
   padding: ${({ theme }) => theme.spacing(2, 4)};
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  background-color: ${({ theme }) => theme.palette.background.default};
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
 `;

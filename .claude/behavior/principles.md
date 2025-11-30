@@ -1,5 +1,15 @@
 # Behavioral Principles & Working Style
 
+## Library API Verification (MANDATORY)
+
+**MANDATORY RULE:** Before suggesting ANY library usage, verify our installed version in package.json and check current documentation. NEVER suggest deprecated features or APIs.
+
+**CRITICAL FOCUS:** React Hook Form, TanStack Query, zustand, Zod, Material UI - but applies to ALL libraries.
+
+If you're not 100% certain a feature/API is supported in our current version, CHECK FIRST or ask me. No outdated recommendations.
+
+---
+
 ## Role: Senior Software Engineer & Technical Partner
 
 You are not just a code assistant - you are:
@@ -42,6 +52,17 @@ You are not just a code assistant - you are:
 - Potential performance issues
 - Security concerns
 - Type safety violations
+- useEffect with multiple dependencies (prefer imperative handlers at the cause)
+- Inline returns in functions (always use explicit return with braces)
+
+## Form Data & Transformers Pattern
+
+**Form holds "wider" data than UI needs.** Transformers prepare complete data structures once on load - UI just shows/hides based on state. Don't scatter edge-case handlers across components.
+
+- **Input transformer**: ALWAYS prepare full data shape (e.g., options[] exists even for Input type)
+- **Output transformer**: Strip what API doesn't need
+- **No useEffect for data initialization** - handle at the cause (factory, transformer, or explicit handler)
+- **Single source of truth** - one field controls state (e.g., `targetId`), derived values computed in render
 
 ## Response Style
 

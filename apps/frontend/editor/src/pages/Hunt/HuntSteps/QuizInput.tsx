@@ -1,7 +1,13 @@
-import { Stack, Divider, Typography } from '@mui/material';
-import { FormInput, FormTextArea, FormSelect, getFieldPath } from '@/components/form';
-import { OptionType } from '@hunthub/shared';
-import { StepHeader, LocationFields, HintField } from './components';
+import { Divider, Typography } from '@mui/material';
+import { useWatch } from 'react-hook-form';
+import { ChallengeType, OptionType } from '@hunthub/shared';
+import { FormInput, FormTextArea, FormToggleButtonGroup, getFieldPath } from '@/components/form';
+import { WithTransition } from '@/components/common';
+import { Section, SectionTitle, StepCard } from './components';
+import { StepSettings } from './StepSettings';
+import { MultipleChoiceEditor } from './components/Quiz';
+import { STEP_TYPE_CONFIG } from '@/pages/Hunt/HuntSteps/stepTypeConfig';
+import { ListBulletsIcon, TextTIcon } from '@phosphor-icons/react';
 
 interface QuizInputProps {
   stepIndex: number;
@@ -12,61 +18,58 @@ const getQuizFieldNames = (stepIndex: number) => ({
   description: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.description),
   type: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.type),
   targetText: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.target.text),
+  options: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.options),
+  targetId: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.targetId),
 });
 
 const QUIZ_TYPE_OPTIONS = [
-  { value: OptionType.Choice, label: 'Multiple Choice' },
-  { value: OptionType.Input, label: 'Text Input' },
+  { value: OptionType.Choice, label: 'Multiple Choice', icon: <ListBulletsIcon size={16} weight="bold" /> },
+  { value: OptionType.Input, label: 'Text Input', icon: <TextTIcon size={16} weight="bold" /> },
 ];
 
 export const QuizInput = ({ stepIndex }: QuizInputProps) => {
   const fields = getQuizFieldNames(stepIndex);
+  const { color } = STEP_TYPE_CONFIG[ChallengeType.Quiz];
+
+  const quizType = useWatch({ name: fields.type });
+  const isMultipleChoice = quizType === OptionType.Choice;
+
+  const text = isMultipleChoice ? 'Answer Options (click ✓ to mark correct)' : 'Expected Answer';
 
   return (
-    <Stack spacing={3}>
-      <StepHeader stepIndex={stepIndex} />
-
-      <Typography variant="subtitle2" fontWeight={600} color="text.secondary">
-        QUESTION DETAILS
+    <StepCard stepIndex={stepIndex} type={ChallengeType.Quiz}>
+      <Typography variant="label" color="text.secondary">
+        Quiz Content
       </Typography>
 
-      <FormInput
-        name={fields.title}
-        label="Question Title"
-        placeholder="What year was this building constructed?"
-        required
-      />
+      <FormToggleButtonGroup name={fields.type} label="Answer Type" options={QUIZ_TYPE_OPTIONS} color={color} />
 
-      <FormTextArea
-        name={fields.description}
-        label="Question Description"
-        placeholder="Look at the cornerstone near the entrance..."
-        rows={3}
-      />
+      <FormInput name={fields.title} label="Question" placeholder="When was this library built?" />
 
-      <FormSelect name={fields.type} label="Answer Type" options={QUIZ_TYPE_OPTIONS} placeholder="Select answer type" />
+      <FormTextArea name={fields.description} label="Details" placeholder="Markdown placeholder" rows={2} />
 
-      <Divider sx={{ my: 2 }} />
+      <Section $color={color}>
+        <WithTransition transitionKey={quizType} variant="fade-slide-down">
+          <>
+            <SectionTitle $color={color}>{text}</SectionTitle>
 
-      <Typography variant="subtitle2" fontWeight={600} color="text.secondary">
-        CORRECT ANSWER
-      </Typography>
-
-      <FormInput
-        name={fields.targetText}
-        label="Correct Answer"
-        placeholder="1892"
-        required
-        helperText="The answer players need to provide"
-      />
+            {isMultipleChoice ? (
+              <MultipleChoiceEditor stepIndex={stepIndex} />
+            ) : (
+              <FormInput
+                name={fields.targetText}
+                label="Correct Answer"
+                placeholder="1892"
+                helperText="The answer players need to provide"
+              />
+            )}
+          </>
+        </WithTransition>
+      </Section>
 
       <Divider sx={{ my: 2 }} />
 
-      <LocationFields stepIndex={stepIndex} />
-
-      <Divider sx={{ my: 2 }} />
-
-      <HintField stepIndex={stepIndex} />
-    </Stack>
+      <StepSettings stepIndex={stepIndex} />
+    </StepCard>
   );
 };

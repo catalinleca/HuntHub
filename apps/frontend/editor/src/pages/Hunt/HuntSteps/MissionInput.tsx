@@ -1,7 +1,12 @@
-import { Stack, Divider, Typography } from '@mui/material';
-import { FormInput, FormTextArea, FormSelect, getFieldPath } from '@/components/form';
-import { MissionType } from '@hunthub/shared';
-import { StepHeader, LocationFields, HintField } from './components';
+import { Divider, Typography } from '@mui/material';
+import { ChallengeType, MissionType } from '@hunthub/shared';
+import { FormInput, FormTextArea, getFieldPath, FormToggleButtonGroup } from '@/components/form';
+import { LocationSection, StepCard } from './components';
+import { StepSettings } from './StepSettings';
+import { STEP_TYPE_CONFIG } from '@/pages/Hunt/HuntSteps/stepTypeConfig';
+import { GpsIcon, UploadSimpleIcon } from '@phosphor-icons/react';
+import { useWatch } from 'react-hook-form';
+import { WithTransition } from '@/components/common';
 
 interface MissionInputProps {
   stepIndex: number;
@@ -15,58 +20,43 @@ const getMissionFieldNames = (stepIndex: number) => ({
 });
 
 const MISSION_TYPE_OPTIONS = [
-  { value: MissionType.UploadMedia, label: 'Upload Photo/Video' },
-  { value: MissionType.MatchLocation, label: 'Match Location' },
+  { value: MissionType.UploadMedia, label: 'Upload Photo/Video', icon: <UploadSimpleIcon size={16} weight="bold" /> },
+  { value: MissionType.MatchLocation, label: 'Match Location', icon: <GpsIcon size={16} weight="bold" /> },
 ];
 
 export const MissionInput = ({ stepIndex }: MissionInputProps) => {
   const fields = getMissionFieldNames(stepIndex);
+  const { color } = STEP_TYPE_CONFIG[ChallengeType.Mission];
+
+  const missionType = useWatch({ name: fields.type });
+  const isMatchLocation = missionType === MissionType.MatchLocation;
 
   return (
-    <Stack spacing={3}>
-      <StepHeader stepIndex={stepIndex} />
-
-      <Typography variant="subtitle2" fontWeight={600} color="text.secondary">
-        MISSION DETAILS
+    <StepCard stepIndex={stepIndex} type={ChallengeType.Mission}>
+      <Typography variant="label" color="text.secondary">
+        Mission Content
       </Typography>
 
-      <FormInput name={fields.title} label="Mission Title" placeholder="Take a photo with the statue" required />
+      <FormToggleButtonGroup name={fields.type} label="Answer Type" options={MISSION_TYPE_OPTIONS} color={color} />
+
+      <FormInput name={fields.title} label="Title" placeholder="Pigeon Challenge" />
 
       <FormTextArea
         name={fields.description}
-        label="Mission Description"
-        placeholder="Find the bronze statue in the center of the park and take a selfie..."
+        label="Instructions"
+        placeholder="Tell players what they need to do..."
         rows={4}
       />
 
-      <FormSelect
-        name={fields.type}
-        label="Mission Type"
-        options={MISSION_TYPE_OPTIONS}
-        placeholder="Select mission type"
-      />
+      <WithTransition transitionKey={missionType} variant="fade-slide-down">
+        {isMatchLocation && (
+          <LocationSection title="Target Location (Where players must go)" buttonLabel="Pick on map" color={color} />
+        )}
+      </WithTransition>
 
       <Divider sx={{ my: 2 }} />
 
-      <Typography variant="subtitle2" fontWeight={600} color="text.secondary">
-        AI VALIDATION (OPTIONAL)
-      </Typography>
-
-      <FormTextArea
-        name={fields.aiInstructions}
-        label="AI Instructions"
-        placeholder="Check that the photo contains a bronze statue and a person..."
-        rows={3}
-        helperText="Instructions for AI to validate player submissions (future feature)"
-      />
-
-      <Divider sx={{ my: 2 }} />
-
-      <LocationFields stepIndex={stepIndex} />
-
-      <Divider sx={{ my: 2 }} />
-
-      <HintField stepIndex={stepIndex} />
-    </Stack>
+      <StepSettings stepIndex={stepIndex} />
+    </StepCard>
   );
 };

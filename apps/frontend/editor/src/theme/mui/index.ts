@@ -12,7 +12,8 @@ import {
   getMuiOutlinedInputOverrides,
   getMuiSelectOverrides,
   getMuiTextFieldOverrides,
-  getMuiTypographyOverrides,
+  getMuiToggleButtonOverrides,
+  getMuiToggleButtonGroupOverrides,
 } from './overrides';
 
 export const createAppTheme = (): Theme => {
@@ -30,7 +31,8 @@ export const createAppTheme = (): Theme => {
       MuiOutlinedInput: getMuiOutlinedInputOverrides(),
       MuiSelect: getMuiSelectOverrides(),
       MuiTextField: getMuiTextFieldOverrides(),
-      MuiTypography: getMuiTypographyOverrides(),
+      MuiToggleButton: getMuiToggleButtonOverrides(),
+      MuiToggleButtonGroup: getMuiToggleButtonGroupOverrides(),
     },
   };
 

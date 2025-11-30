@@ -5,7 +5,7 @@ import geometricSvg from '@/assets/patterns/geometric.svg';
 
 export const HeroContainer = styled(Box)`
   position: relative;
-  padding: ${({ theme }) => theme.spacing(20)} ${({ theme }) => theme.spacing(6)};
+  padding: ${({ theme }) => theme.spacing(6)} ${({ theme }) => theme.spacing(6)};
   background: linear-gradient(
     135deg,
     ${({ theme }) => theme.palette.accent.light} 0%,

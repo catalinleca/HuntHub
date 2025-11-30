@@ -3,9 +3,9 @@ import { outlinedInputClasses } from '@mui/material/OutlinedInput';
 import { fieldMixins } from '../mixins';
 import { getFieldTokens } from '../tokens';
 
-const stateSelector = (className: string) => `&.${className}`;
+export const stateSelector = (className: string) => `&.${className}`;
 
-const descendant = (className: string) => `& .${className}`;
+export const descendant = (className: string) => `& .${className}`;
 
 const hoverExcludingStates = `&:hover:not(.${outlinedInputClasses.focused}):not(.${outlinedInputClasses.error}):not(.${outlinedInputClasses.disabled})`;
 
@@ -16,9 +16,12 @@ export const getMuiInputOverrideStyles = (theme: Theme) => {
     backgroundColor: tokens.base.background,
     borderRadius: tokens.borderRadius,
     transition: tokens.transition,
+    minHeight: tokens.height,
 
     [descendant(outlinedInputClasses.input)]: {
       padding: tokens.padding,
+      ...tokens.typography,
+      boxSizing: 'border-box',
     },
 
     [descendant(outlinedInputClasses.notchedOutline)]: {
@@ -70,14 +73,16 @@ export const muiInputSelectors = {
       backgroundColor: tokens.base.background,
       borderRadius: tokens.borderRadius,
       transition: tokens.transition,
+      minHeight: tokens.height,
     };
   },
 
-  inputPadding: (theme: Theme) => {
+  inputStyles: (theme: Theme) => {
     const tokens = getFieldTokens(theme);
     return {
       [descendant(outlinedInputClasses.input)]: {
         padding: tokens.padding,
+        ...tokens.typography,
       },
     };
   },

@@ -38,6 +38,10 @@ It imports all context about the project, so Claude always knows:
 @.claude/behavior/principles.md
 @.claude/decisions/solid-principles.md
 
+When working with libraries like React Query, MUI, React Hook Form, Zustand, Zod, or CSS/layout patterns, always understand the problem first. Search for best practices in official docs and community resources.
+
+For common problems, search for standardized solutions. However, when you encounter an edge case or unique situation that doesn't have a clear standard approach, explain it to me so we can decide the best approach together.
+
 ## 🚀 Quick Start & Current Focus
 
 @.claude/core/NEXT-SESSION.md
@@ -124,3 +128,5 @@ on the aws mcp that we installed
 ---
 
 **Memory auto-loads from:** `/Users/catalinleca/leca/HuntHub/.claude/`
+- phosphor icons have Icon suffix now, whenever you import a Phosphor icon you import it like NameIcon, example MapPin is now MapPinIcon
+- Thorough review and quality are non-negotiable: avoid shortcuts, validate patterns, and deliver production-grade code

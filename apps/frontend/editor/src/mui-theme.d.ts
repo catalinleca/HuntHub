@@ -1,3 +1,4 @@
+import React from 'react';
 import '@mui/material/styles';
 
 declare module '@mui/material/styles' {
@@ -43,12 +44,38 @@ declare module '@mui/material/styles' {
     accent?: SimplePaletteColorOptions;
   }
 
+  interface TypeBackground {
+    default: string;
+    defaultLight: string;
+    paper: string;
+    surface: string;
+  }
+
   interface TypographyVariants {
     displayFontFamily: string;
+    smRegular: React.CSSProperties;
+    smMedium: React.CSSProperties;
+    smBold: React.CSSProperties;
+    xsRegular: React.CSSProperties;
+    xsMedium: React.CSSProperties;
+    xsBold: React.CSSProperties;
+    label: React.CSSProperties;
+    displayH4: React.CSSProperties;
+    displayH6: React.CSSProperties;
+    displayBody2: React.CSSProperties;
   }
 
   interface TypographyVariantsOptions {
-    displayFontFamily?: string;
+    smRegular?: React.CSSProperties;
+    smMedium?: React.CSSProperties;
+    smBold?: React.CSSProperties;
+    xsRegular?: React.CSSProperties;
+    xsMedium?: React.CSSProperties;
+    xsBold?: React.CSSProperties;
+    label?: React.CSSProperties;
+    displayH4?: React.CSSProperties;
+    displayH6?: React.CSSProperties;
+    displayBody2?: React.CSSProperties;
   }
 
   interface Theme {
@@ -79,8 +106,17 @@ declare module '@mui/material/Badge' {
 }
 
 declare module '@mui/material/Typography' {
-  interface TypographyOwnProps {
-    textStyle?: 'display' | 'ui';
+  interface TypographyPropsVariantOverrides {
+    smRegular: true;
+    smMedium: true;
+    smBold: true;
+    xsRegular: true;
+    xsMedium: true;
+    xsBold: true;
+    label: true;
+    displayH4: true;
+    displayH6: true;
+    displayBody2: true;
   }
 }
 
