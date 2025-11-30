@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import StepModel from '@/database/models/Step';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import { IStep } from '@/database/types/Step';
-import { ChallengeType } from '@hunthub/shared';
+import { ChallengeType, MediaType } from '@hunthub/shared';
 
 export interface CreateStepOptions {
   huntId?: number;
@@ -89,7 +89,7 @@ export const generateStepDataWithMedia = (assetId: string): Partial<IStep> => ({
     },
   },
   media: {
-    type: 'image',
+    type: MediaType.Image,
     content: {
       image: {
         assetId,

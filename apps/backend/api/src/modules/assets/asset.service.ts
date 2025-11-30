@@ -15,6 +15,7 @@ import {
   calculateSkip,
   buildSortObject,
 } from '@/shared/utils/pagination';
+import { withTransaction } from '@/shared/utils/transaction';
 
 export interface IAssetService {
   requestUpload(userId: string, extension: string): Promise<{ signedUrl: string; publicUrl: string; s3Key: string }>;
@@ -111,20 +112,21 @@ export class AssetService implements IAssetService {
       throw new NotFoundError('Asset not found');
     }
 
-    // Check if asset is in use by any hunt
-    const isInUse = await this.usageTracker.isAssetInUse(asset._id.toString());
-    if (isInUse) {
-      const huntIds = await this.usageTracker.getHuntsUsingAsset(asset._id.toString());
-      throw new ConflictError(
-        `Cannot delete asset: it is used by ${huntIds.length} hunt(s). Remove references first.`,
-      );
-    }
+    await withTransaction(async (session) => {
+      const isInUse = await this.usageTracker.isAssetInUse(asset._id.toString());
+      if (isInUse) {
+        const huntIds = await this.usageTracker.getHuntsUsingAsset(asset._id.toString());
+        throw new ConflictError(
+          `Cannot delete asset: it is used by ${huntIds.length} hunt(s). Remove references first.`,
+        );
+      }
 
-    // TODO: Add S3 deletion when StorageService.deleteFile is implemented
-    // if (asset.storageLocation?.path) {
-    //   await this.storageService.deleteFile(asset.storageLocation.path);
-    // }
+      // TODO: Add S3 deletion when StorageService.deleteFile is implemented
+      // if (asset.storageLocation?.path) {
+      //   await this.storageService.deleteFile(asset.storageLocation.path);
+      // }
 
-    await asset.deleteOne();
+      await asset.deleteOne({ session });
+    });
   }
 }

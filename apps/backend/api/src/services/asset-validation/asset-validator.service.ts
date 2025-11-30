@@ -77,19 +77,25 @@ export class AssetValidator implements IAssetValidator {
 
     const ownedIds = new Set(ownedAssets.map((a) => a._id.toString()));
 
-    // 3. Check each reference
-    for (const source of extracted.sources) {
-      if (!ownedIds.has(source.assetId)) {
-        // Determine if not found or not owned
-        const exists = await AssetModel.exists({
-          _id: new mongoose.Types.ObjectId(source.assetId),
-        });
+    const unownedSources = extracted.sources.filter((s) => !ownedIds.has(s.assetId));
+    if (unownedSources.length === 0) {
+      return;
+    }
 
-        if (!exists) {
-          throw new NotFoundError(`Asset not found at ${source.path}: "${source.assetId}"`);
-        }
-        throw new ForbiddenError(`You don't own the asset at ${source.path}: "${source.assetId}"`);
+    const unownedIds = [...new Set(unownedSources.map((s) => s.assetId))];
+    const existingAssets = await AssetModel.find({
+      _id: { $in: unownedIds.map((id) => new mongoose.Types.ObjectId(id)) },
+    })
+      .select('_id')
+      .lean();
+
+    const existingIds = new Set(existingAssets.map((a) => a._id.toString()));
+
+    for (const source of unownedSources) {
+      if (!existingIds.has(source.assetId)) {
+        throw new NotFoundError(`Asset not found at ${source.path}: "${source.assetId}"`);
       }
+      throw new ForbiddenError(`You don't own the asset at ${source.path}: "${source.assetId}"`);
     }
   }
 

@@ -1,7 +1,9 @@
 import { injectable } from 'inversify';
 import mongoose from 'mongoose';
+import { StepCreate } from '@hunthub/shared';
 import { AssetUsageModel, StepModel } from '@/database/models';
 import { AssetExtractor } from '@/utils/assetExtractor';
+import { withTransaction } from '@/shared/utils/transaction';
 
 /**
  * Extracted asset reference info
@@ -70,19 +72,19 @@ export class AssetUsageTracker implements IAssetUsageTracker {
    * @param session - MongoDB session for transaction support
    */
   async rebuildHuntAssetUsage(huntId: number, session?: mongoose.ClientSession): Promise<void> {
-    // 1. Get ALL steps across ALL versions (use session to see uncommitted changes)
-    const query = StepModel.find({ huntId });
-    if (session) {
-      query.session(session);
+    if (!session) {
+      await withTransaction((s) => this.rebuildHuntAssetUsage(huntId, s));
+      return;
     }
-    const steps = await query.lean();
+
+    // 1. Get ALL steps across ALL versions (use session to see uncommitted changes)
+    const steps = await StepModel.find({ huntId }).session(session).lean();
 
     // 2. Extract all unique asset IDs
     const assetIds = new Set<string>();
     for (const step of steps) {
-      // AssetExtractor.fromDTO expects StepCreate/StepUpdate shape
-      // Lean document is close enough - media and challenge fields exist
-      const extracted = AssetExtractor.fromDTO(step as any);
+      // Lean document shape matches StepCreate for asset extraction purposes
+      const extracted = AssetExtractor.fromDTO(step as unknown as StepCreate);
       extracted.assetIds.forEach((id) => assetIds.add(id));
     }
 
