@@ -349,6 +349,10 @@ export interface Quiz {
   target?: Option;
   type?: OptionType;
   distractors?: Option[];
+  /** Order of option IDs for display (used by player) */
+  displayOrder?: string[];
+  /** If true, player shuffles options on each play */
+  randomizeOrder?: boolean;
   /** Optional validation rules (future feature) */
   validation?: QuizValidation;
 }

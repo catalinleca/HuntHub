@@ -1,6 +1,7 @@
 import { forwardRef, memo, CSSProperties, HTMLAttributes } from 'react';
 import { IconButton } from '@mui/material';
 import { CheckIcon, DotsSixVerticalIcon, XIcon } from '@phosphor-icons/react';
+import { FormInput } from '@/components/form';
 import * as S from './OptionItem.styles';
 
 export interface OptionItemProps {
@@ -10,7 +11,6 @@ export interface OptionItemProps {
   onMarkTarget: () => void;
   onRemove: () => void;
   canRemove: boolean;
-  // DnD props (optional - only when wrapped by SortableOptionItem)
   style?: CSSProperties;
   dragHandleProps?: HTMLAttributes<HTMLDivElement>;
 }
@@ -35,14 +35,11 @@ export const OptionItem = memo(
           {isTarget ? <CheckIcon size={16} weight="bold" /> : index + 1}
         </S.TargetCircle>
 
-        <S.OptionInput
-          name={`${fieldPath}.text`}
-          placeholder={`Option ${index + 1}`}
-          size="small"
-          $isTarget={isTarget}
-        />
+        <S.OptionInputWrapper $isTarget={isTarget}>
+          <FormInput name={`${fieldPath}.text`} placeholder={`Option ${index + 1}`} label="" size="small" />
+        </S.OptionInputWrapper>
 
-        <IconButton size="small" onClick={onRemove} disabled={!canRemove}>
+        <IconButton size="small" onClick={onRemove} disabled={!canRemove} aria-label={`Remove option ${index + 1}`}>
           <XIcon size={18} />
         </IconButton>
       </S.OptionRow>

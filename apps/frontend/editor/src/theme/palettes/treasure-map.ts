@@ -151,6 +151,24 @@ const treasureMapPalette = {
       letterSpacing: '0.05em',
       textTransform: 'uppercase' as const,
     },
+    displayH4: {
+      fontSize: 24,
+      fontWeight: 600,
+      lineHeight: 1.33,
+      fontFamily: 'Georgia, "Times New Roman", serif',
+    },
+    displayH6: {
+      fontSize: 16,
+      fontWeight: 600,
+      lineHeight: 1.5,
+      fontFamily: 'Georgia, "Times New Roman", serif',
+    },
+    displayBody2: {
+      fontSize: 14,
+      fontWeight: 400,
+      lineHeight: 1.43,
+      fontFamily: 'Georgia, "Times New Roman", serif',
+    },
   },
   spacing: [0, 4, 8, 12, 16, 24, 32, 48, 64],
   shadows: [

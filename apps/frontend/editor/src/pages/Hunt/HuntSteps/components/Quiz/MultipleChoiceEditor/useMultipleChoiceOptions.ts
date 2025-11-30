@@ -19,7 +19,9 @@ export const useMultipleChoiceOptions = (stepIndex: number) => {
   };
 
   const handleRemove = (index: number) => {
-    if (fields.length <= MIN_OPTIONS) return;
+    if (fields.length <= MIN_OPTIONS || index < 0 || index >= fields.length) {
+      return;
+    }
 
     const removedId = fields[index].id;
 
@@ -32,9 +34,11 @@ export const useMultipleChoiceOptions = (stepIndex: number) => {
   };
 
   const handleAdd = () => {
-    if (fields.length >= MAX_OPTIONS) return;
+    if (fields.length >= MAX_OPTIONS) {
+      return;
+    }
     const newId = crypto.randomUUID();
-    append({ id: newId, text: '', _id: newId });
+    append({ id: newId, text: '' });
   };
 
   return {
