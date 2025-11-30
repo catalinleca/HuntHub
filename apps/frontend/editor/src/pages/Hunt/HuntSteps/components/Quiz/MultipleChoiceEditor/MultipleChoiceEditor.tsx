@@ -34,7 +34,7 @@ export const MultipleChoiceEditor = ({ stepIndex }: MultipleChoiceEditorProps) =
   const itemIds = useMemo(() => fields.map((f) => f.id), [fields]);
 
   return (
-    <Stack spacing={1}>
+    <Stack gap={1}>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
           {fields.map((item, index) => (
@@ -52,9 +52,11 @@ export const MultipleChoiceEditor = ({ stepIndex }: MultipleChoiceEditorProps) =
         </SortableContext>
       </DndContext>
 
-      <S.AddOptionButton onClick={handleAdd} disabled={!canAdd} startIcon={<PlusIcon size={16} weight="bold" />}>
-        Add Option
-      </S.AddOptionButton>
+      <Box sx={{ mt: 2 }}>
+        <S.AddOptionButton onClick={handleAdd} disabled={!canAdd} startIcon={<PlusIcon size={16} weight="bold" />}>
+          Add Option
+        </S.AddOptionButton>
+      </Box>
     </Stack>
   );
 };
