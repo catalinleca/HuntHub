@@ -18,6 +18,20 @@ const MimeTypes = z.enum([
   'audio/wav',
   'audio/ogg',
 ]);
+const MediaType = z.enum(['image', 'audio', 'video', 'image-audio']);
+const ImageMedia = z.object({ assetId: z.string(), title: z.string().optional(), alt: z.string().optional() }).strict();
+const AudioMedia = z
+  .object({ assetId: z.string(), title: z.string().optional(), transcript: z.string().optional() })
+  .strict();
+const VideoMedia = z.object({ assetId: z.string(), title: z.string().optional(), alt: z.string().optional() }).strict();
+const ImageAudioMedia = z
+  .object({ imageAssetId: z.string(), audioAssetId: z.string(), title: z.string().optional() })
+  .strict();
+const MediaContent = z
+  .object({ image: ImageMedia, audio: AudioMedia, video: VideoMedia, imageAudio: ImageAudioMedia })
+  .partial()
+  .strict();
+const Media = z.object({ type: MediaType, content: MediaContent }).strict();
 const Clue = z.object({ title: z.string(), description: z.string() }).partial().strict();
 const Option = z.object({ id: z.string(), text: z.string() }).strict();
 const QuizValidation = z
@@ -68,6 +82,7 @@ const Step = z
     huntId: z.number().int(),
     type: ChallengeType,
     challenge: Challenge,
+    media: Media.optional(),
     requiredLocation: Location.optional(),
     hint: z.string().optional(),
     timeLimit: z.number().optional(),
@@ -105,6 +120,7 @@ const StepCreate = z
   .object({
     type: ChallengeType,
     challenge: Challenge,
+    media: Media.optional(),
     requiredLocation: Location.optional(),
     hint: z.string().optional(),
     timeLimit: z.number().optional(),
@@ -132,6 +148,7 @@ const StepUpdate = z
   .object({
     type: ChallengeType,
     challenge: Challenge,
+    media: Media.optional(),
     requiredLocation: Location.optional(),
     hint: z.string().optional(),
     timeLimit: z.number().optional(),
@@ -325,6 +342,13 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   OptionType,
   MissionType,
   MimeTypes,
+  MediaType,
+  ImageMedia,
+  AudioMedia,
+  VideoMedia,
+  ImageAudioMedia,
+  MediaContent,
+  Media,
   Clue,
   Option,
   QuizValidation,

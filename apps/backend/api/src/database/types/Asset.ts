@@ -8,12 +8,6 @@ export interface IStorageLocation {
   path?: string;
 }
 
-export interface IAssetUsage {
-  model: string;
-  field: string; // 'challenge.mission.referenceAssetIds', 'profilePicture'
-  documentId: mongoose.Types.ObjectId;
-}
-
 /**
  * IAsset - Database interface for Asset documents
  *
@@ -34,7 +28,6 @@ export interface IAsset {
   size?: number;
   thumbnailUrl?: string;
   storageLocation?: IStorageLocation;
-  usage?: IAssetUsage[];
   createdAt?: string;
   updatedAt?: string;
 }

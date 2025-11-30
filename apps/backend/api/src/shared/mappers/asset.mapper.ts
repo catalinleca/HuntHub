@@ -15,11 +15,6 @@ export interface AssetDTO {
     bucket?: string;
     path?: string;
   };
-  usage?: Array<{
-    model: string;
-    field: string;
-    documentId: string;
-  }>;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -49,11 +44,6 @@ export class AssetMapper {
             path: doc.storageLocation.path,
           }
         : undefined,
-      usage: doc.usage?.map((u) => ({
-        model: u.model,
-        field: u.field,
-        documentId: u.documentId.toString(),
-      })),
       createdAt: doc.createdAt?.toString(),
       updatedAt: doc.updatedAt?.toString(),
     };

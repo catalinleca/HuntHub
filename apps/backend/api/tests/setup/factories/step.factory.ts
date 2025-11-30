@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import StepModel from '@/database/models/Step';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import { IStep } from '@/database/types/Step';
-import { ChallengeType } from '@hunthub/shared';
+import { ChallengeType, MediaType } from '@hunthub/shared';
 
 export interface CreateStepOptions {
   huntId?: number;
@@ -73,3 +73,23 @@ export const generateStepData = (options: CreateStepOptions = {}): Partial<IStep
     maxAttempts: options.maxAttempts,
   };
 };
+
+export const generateStepDataWithMedia = (assetId: string): Partial<IStep> => ({
+  type: ChallengeType.Clue,
+  challenge: {
+    clue: {
+      title: faker.lorem.sentence(),
+      description: faker.lorem.paragraph(),
+    },
+  },
+  media: {
+    type: MediaType.Image,
+    content: {
+      image: {
+        assetId,
+        title: 'Test image',
+        alt: 'Test image alt text',
+      },
+    },
+  },
+});

@@ -45,6 +45,14 @@ export enum HuntProgressStatus {
   Abandoned = "abandoned",
 }
 
+/** Type of media attached to a step */
+export enum MediaType {
+  Image = "image",
+  Audio = "audio",
+  Video = "video",
+  ImageAudio = "image-audio",
+}
+
 export enum MimeTypes {
   ImageJpeg = "image/jpeg",
   ImagePng = "image/png",
@@ -90,6 +98,66 @@ export interface Location {
   lat: number;
   lng: number;
   radius: number;
+}
+
+/** Image media with asset reference */
+export interface ImageMedia {
+  /** Reference to Asset._id */
+  assetId: string;
+  /** Display title (optional) */
+  title?: string;
+  /** Accessibility text for screen readers */
+  alt?: string;
+}
+
+/** Audio media with asset reference */
+export interface AudioMedia {
+  /** Reference to Asset._id */
+  assetId: string;
+  /** Display title (optional) */
+  title?: string;
+  /** Text transcript for accessibility */
+  transcript?: string;
+}
+
+/** Video media with asset reference */
+export interface VideoMedia {
+  /** Reference to Asset._id */
+  assetId: string;
+  /** Display title (optional) */
+  title?: string;
+  /** Accessibility text for screen readers */
+  alt?: string;
+}
+
+/** Combined image and audio media (e.g., image with narration) */
+export interface ImageAudioMedia {
+  /** Reference to image Asset._id */
+  imageAssetId: string;
+  /** Reference to audio Asset._id */
+  audioAssetId: string;
+  /** Display title (optional) */
+  title?: string;
+}
+
+/** Content container for media (discriminated by parent type field) */
+export interface MediaContent {
+  /** Image media with asset reference */
+  image?: ImageMedia;
+  /** Audio media with asset reference */
+  audio?: AudioMedia;
+  /** Video media with asset reference */
+  video?: VideoMedia;
+  /** Combined image and audio media (e.g., image with narration) */
+  imageAudio?: ImageAudioMedia;
+}
+
+/** Step media attachment (normalized - stores asset reference only) */
+export interface Media {
+  /** Type of media attached to a step */
+  type: MediaType;
+  /** Content container for media (discriminated by parent type field) */
+  content: MediaContent;
 }
 
 /** Hunt DTO (merges Hunt master + HuntVersion content for frontend) */
@@ -203,6 +271,8 @@ export interface Step {
   huntId: number;
   type: ChallengeType;
   challenge: Challenge;
+  /** Optional media attachment for this step */
+  media?: Media;
   requiredLocation?: Location;
   hint?: string;
   timeLimit?: number;
@@ -225,6 +295,8 @@ export interface Step {
 export interface StepCreate {
   type: ChallengeType;
   challenge: Challenge;
+  /** Optional media attachment for this step */
+  media?: Media;
   requiredLocation?: Location;
   hint?: string;
   timeLimit?: number;
@@ -235,6 +307,8 @@ export interface StepCreate {
 export interface StepUpdate {
   type: ChallengeType;
   challenge: Challenge;
+  /** Optional media attachment for this step */
+  media?: Media;
   requiredLocation?: Location;
   hint?: string;
   timeLimit?: number;

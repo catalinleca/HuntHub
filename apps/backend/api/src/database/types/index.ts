@@ -2,6 +2,7 @@ export * from './Hunt';
 export * from './User';
 export * from './Step';
 export * from './Asset';
+export * from './AssetUsage';
 export * from './Progress';
 export * from './LiveHunt';
 export * from './HuntAccess';

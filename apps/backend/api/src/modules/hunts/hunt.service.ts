@@ -4,6 +4,7 @@ import { ClientSession, Types } from 'mongoose';
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import StepModel from '@/database/models/Step';
+import AssetUsageModel from '@/database/models/AssetUsage';
 import { HuntMapper, StepMapper } from '@/shared/mappers';
 import { NotFoundError } from '@/shared/errors';
 import { ValidationError } from '@/shared/errors';
@@ -222,6 +223,8 @@ export class HuntService implements IHuntService {
 
       await HuntVersionModel.deleteMany({ huntId }, { session });
       await StepModel.deleteMany({ huntId }, { session });
+      // Clean up asset usage (fixes cascade delete bug - no orphan records)
+      await AssetUsageModel.deleteMany({ huntId }, { session });
     });
   }
 

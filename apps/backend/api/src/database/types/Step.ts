@@ -1,4 +1,5 @@
 import { ILocation } from '@/database/schemas/location.schema';
+import { Media } from '@hunthub/shared';
 
 /**
  * IStep - Database interface for Step documents
@@ -12,6 +13,7 @@ export interface IStep {
   huntVersion: number; // FK to HuntVersion (compound: huntId + huntVersion)
   type: string; // ChallengeType from a shared package
   challenge: unknown; // Flexible: clue, quiz, mission, or task
+  media?: Media; // Optional media attachment (normalized - stores asset references)
   hint?: string;
   requiredLocation?: ILocation;
   timeLimit?: number;

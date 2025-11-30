@@ -15,6 +15,8 @@ export const TYPES = {
   PublishingService: Symbol.for('PublishingService'),
   AuthorizationService: Symbol.for('AuthorizationService'),
   HuntShareService: Symbol.for('HuntShareService'),
+  AssetUsageTracker: Symbol.for('AssetUsageTracker'),
+  AssetValidator: Symbol.for('AssetValidator'),
 };
 
 export interface ISerializer<TModel, TDTO> {

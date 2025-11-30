@@ -48,6 +48,111 @@ components:
       type: string
       enum: [image/jpeg, image/png, image/webp, image/gif, video/mp4, video/webm, audio/mp3, audio/wav, audio/ogg]
 
+    # ============================================================
+    # Media Schemas (Step-level media attachment)
+    # ============================================================
+
+    MediaType:
+      type: string
+      enum: [image, audio, video, image-audio]
+      description: Type of media attached to a step
+
+    ImageMedia:
+      type: object
+      description: Image media with asset reference
+      properties:
+        assetId:
+          type: string
+          description: Reference to Asset._id
+        title:
+          type: string
+          description: Display title (optional)
+        alt:
+          type: string
+          description: Accessibility text for screen readers
+      required:
+        - assetId
+      additionalProperties: false
+
+    AudioMedia:
+      type: object
+      description: Audio media with asset reference
+      properties:
+        assetId:
+          type: string
+          description: Reference to Asset._id
+        title:
+          type: string
+          description: Display title (optional)
+        transcript:
+          type: string
+          description: Text transcript for accessibility
+      required:
+        - assetId
+      additionalProperties: false
+
+    VideoMedia:
+      type: object
+      description: Video media with asset reference
+      properties:
+        assetId:
+          type: string
+          description: Reference to Asset._id
+        title:
+          type: string
+          description: Display title (optional)
+        alt:
+          type: string
+          description: Accessibility text for screen readers
+      required:
+        - assetId
+      additionalProperties: false
+
+    ImageAudioMedia:
+      type: object
+      description: Combined image and audio media (e.g., image with narration)
+      properties:
+        imageAssetId:
+          type: string
+          description: Reference to image Asset._id
+        audioAssetId:
+          type: string
+          description: Reference to audio Asset._id
+        title:
+          type: string
+          description: Display title (optional)
+      required:
+        - imageAssetId
+        - audioAssetId
+      additionalProperties: false
+
+    MediaContent:
+      type: object
+      description: Content container for media (discriminated by parent type field)
+      properties:
+        image:
+          $ref: '#/components/schemas/ImageMedia'
+        audio:
+          $ref: '#/components/schemas/AudioMedia'
+        video:
+          $ref: '#/components/schemas/VideoMedia'
+        imageAudio:
+          $ref: '#/components/schemas/ImageAudioMedia'
+      additionalProperties: false
+
+    Media:
+      type: object
+      description: Step media attachment (normalized - stores asset reference only)
+      properties:
+        type:
+          $ref: '#/components/schemas/MediaType'
+        content:
+          $ref: '#/components/schemas/MediaContent'
+      required:
+        - type
+        - content
+      additionalProperties: false
+
     Hunt:
       type: object
       description: "Hunt DTO (merges Hunt master + HuntVersion content for frontend)"
@@ -189,6 +294,9 @@ components:
           $ref: '#/components/schemas/ChallengeType'
         challenge:
           $ref: '#/components/schemas/Challenge'
+        media:
+          $ref: '#/components/schemas/Media'
+          description: Optional media attachment for this step
         requiredLocation:
           $ref: '#/components/schemas/Location'
         hint:
@@ -224,6 +332,9 @@ components:
           $ref: '#/components/schemas/ChallengeType'
         challenge:
           $ref: '#/components/schemas/Challenge'
+        media:
+          $ref: '#/components/schemas/Media'
+          description: Optional media attachment for this step
         requiredLocation:
           $ref: '#/components/schemas/Location'
         hint:
@@ -245,6 +356,9 @@ components:
           $ref: '#/components/schemas/ChallengeType'
         challenge:
           $ref: '#/components/schemas/Challenge'
+        media:
+          $ref: '#/components/schemas/Media'
+          description: Optional media attachment for this step
         requiredLocation:
           $ref: '#/components/schemas/Location'
         hint:

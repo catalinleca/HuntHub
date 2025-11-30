@@ -18,10 +18,19 @@ export const {
   OptionType,
   MissionType,
   MimeTypes,
+  MediaType,
 
   // Common types
   Location,
   Option,
+
+  // Media types (Step-level media attachment)
+  ImageMedia,
+  AudioMedia,
+  VideoMedia,
+  ImageAudioMedia,
+  MediaContent,
+  Media,
 
   // Challenge types
   Clue,

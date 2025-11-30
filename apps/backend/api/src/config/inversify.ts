@@ -14,6 +14,8 @@ import { IStorageService, StorageService } from '@/services/storage/storage.serv
 import { IPublishingController, PublishingController } from '@/features/publishing/publishing.controller';
 import { IPublishingService, PublishingService } from '@/features/publishing/publishing.service';
 import { AuthorizationService, IAuthorizationService } from '@/services/authorization/authorization.service';
+import { AssetUsageTracker, IAssetUsageTracker } from '@/services/asset-usage';
+import { AssetValidator, IAssetValidator } from '@/services/asset-validation';
 import { HuntShareController, IHuntShareController } from '@/features/sharing/hunt-share.controller';
 import { HuntShareService, IHuntShareService } from '@/features/sharing/hunt-share.service';
 
@@ -34,6 +36,8 @@ container.bind<IAssetService>(TYPES.AssetService).to(AssetService);
 container.bind<IStorageService>(TYPES.StorageService).to(StorageService);
 container.bind<IPublishingService>(TYPES.PublishingService).to(PublishingService);
 container.bind<IAuthorizationService>(TYPES.AuthorizationService).to(AuthorizationService);
+container.bind<IAssetUsageTracker>(TYPES.AssetUsageTracker).to(AssetUsageTracker);
+container.bind<IAssetValidator>(TYPES.AssetValidator).to(AssetValidator);
 container.bind<IHuntShareService>(TYPES.HuntShareService).to(HuntShareService);
 
 export { container };

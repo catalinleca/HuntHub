@@ -27,6 +27,10 @@ const stepSchema: Schema<IStep> = new Schema<IStep>(
       type: Schema.Types.Mixed,
       required: true,
     },
+    media: {
+      type: Schema.Types.Mixed,
+      required: false,
+    },
     hint: String,
     requiredLocation: locationSchema,
     timeLimit: Number, // In seconds

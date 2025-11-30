@@ -1,6 +1,8 @@
 import { inject, injectable } from 'inversify';
 import { IStorageService } from '@/services/storage/storage.service';
+import { IAssetUsageTracker } from '@/services/asset-usage';
 import { NotFoundError, ValidationError } from '@/shared/errors';
+import { ConflictError } from '@/shared/errors/ConflictError';
 import { MimeTypes } from '@/database/types';
 import { AssetCreate, AssetDTO, AssetMapper } from '@/shared/mappers/asset.mapper';
 import { AssetModel } from '@/database/models';
@@ -13,6 +15,7 @@ import {
   calculateSkip,
   buildSortObject,
 } from '@/shared/utils/pagination';
+import { withTransaction } from '@/shared/utils/transaction';
 
 export interface IAssetService {
   requestUpload(userId: string, extension: string): Promise<{ signedUrl: string; publicUrl: string; s3Key: string }>;
@@ -29,7 +32,10 @@ export interface IAssetService {
 export class AssetService implements IAssetService {
   private maxSizeBytes = 10 * 1024 * 1024;
 
-  constructor(@inject(TYPES.StorageService) private storageService: IStorageService) {}
+  constructor(
+    @inject(TYPES.StorageService) private storageService: IStorageService,
+    @inject(TYPES.AssetUsageTracker) private usageTracker: IAssetUsageTracker,
+  ) {}
 
   async requestUpload(
     userId: string,
@@ -106,6 +112,22 @@ export class AssetService implements IAssetService {
       throw new NotFoundError('Asset not found');
     }
 
-    await asset.deleteOne();
+    await withTransaction(async (session) => {
+      const isInUse = await this.usageTracker.isAssetInUse(asset._id.toString());
+
+      if (isInUse) {
+        const huntIds = await this.usageTracker.getHuntsUsingAsset(asset._id.toString());
+        throw new ConflictError(
+          `Cannot delete asset: it is used by ${huntIds.length} hunt(s). Remove references first.`,
+        );
+      }
+
+      // TODO: Add S3 deletion when StorageService.deleteFile is implemented
+      // if (asset.storageLocation?.path) {
+      //   await this.storageService.deleteFile(asset.storageLocation.path);
+      // }
+
+      await asset.deleteOne({ session });
+    });
   }
 }

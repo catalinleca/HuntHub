@@ -7,6 +7,9 @@ import { TYPES } from '@/shared/types';
 import { NotFoundError } from '@/shared/errors';
 import { ConflictError } from '@/shared/errors/ConflictError';
 import { IAuthorizationService } from '@/services/authorization/authorization.service';
+import { IAssetUsageTracker } from '@/services/asset-usage';
+import { IAssetValidator } from '@/services/asset-validation';
+import { AssetExtractor } from '@/utils';
 import { withTransaction } from '@/shared/utils/transaction';
 
 export interface IStepService {
@@ -20,17 +23,24 @@ export class StepService implements IStepService {
   constructor(
     @inject(TYPES.HuntService) private huntService: IHuntService,
     @inject(TYPES.AuthorizationService) private authService: IAuthorizationService,
+    @inject(TYPES.AssetUsageTracker) private usageTracker: IAssetUsageTracker,
+    @inject(TYPES.AssetValidator) private assetValidator: IAssetValidator,
   ) {}
 
   async createStep(stepData: StepCreate, huntId: number, userId: string): Promise<Step> {
     const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
     const huntVersion = huntDoc.latestVersion;
 
+    const extracted = AssetExtractor.fromDTO(stepData);
+    await this.assetValidator.validateOrThrow(extracted, userId);
+
     return withTransaction(async (session) => {
       const docData = StepMapper.toDocument(stepData, huntId, huntVersion);
       const [createdStep] = await StepModel.create([docData], { session });
 
       await this.huntService.addStepToVersion(huntId, huntVersion, createdStep.stepId, session);
+
+      await this.usageTracker.rebuildHuntAssetUsage(huntId, session);
 
       return StepMapper.fromDocument(createdStep);
     });
@@ -40,6 +50,9 @@ export class StepService implements IStepService {
     const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
     const huntVersion = huntDoc.latestVersion;
     const stepUpdateData = StepMapper.toDocumentUpdate(stepData);
+
+    const extracted = AssetExtractor.fromDTO(stepData);
+    await this.assetValidator.validateOrThrow(extracted, userId);
 
     return withTransaction(async (session) => {
       const updatedStep = await StepModel.findOneAndUpdate(
@@ -71,6 +84,8 @@ export class StepService implements IStepService {
         throw new Error('Update failed for unknown reason');
       }
 
+      await this.usageTracker.rebuildHuntAssetUsage(huntId, session);
+
       return StepMapper.fromDocument(updatedStep);
     });
   }
@@ -88,6 +103,8 @@ export class StepService implements IStepService {
       await this.huntService.removeStepFromVersion(huntId, huntVersion, stepId, session);
 
       await step.deleteOne({ session });
+
+      await this.usageTracker.rebuildHuntAssetUsage(huntId, session);
     });
   }
 }

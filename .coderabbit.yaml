@@ -60,7 +60,7 @@ reviews:
         - Memory leaks (missing cleanup)
         - XSS vulnerabilities
         
-        
+        Suggest improvements for:
         - Better component patterns if current approach is problematic
         - Accessibility issues that hurt real users
         
