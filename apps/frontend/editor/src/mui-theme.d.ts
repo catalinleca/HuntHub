@@ -60,6 +60,9 @@ declare module '@mui/material/styles' {
     xsMedium: React.CSSProperties;
     xsBold: React.CSSProperties;
     label: React.CSSProperties;
+    displayH4: React.CSSProperties;
+    displayH6: React.CSSProperties;
+    displayBody2: React.CSSProperties;
   }
 
   interface TypographyVariantsOptions {
@@ -70,6 +73,9 @@ declare module '@mui/material/styles' {
     xsMedium?: React.CSSProperties;
     xsBold?: React.CSSProperties;
     label?: React.CSSProperties;
+    displayH4?: React.CSSProperties;
+    displayH6?: React.CSSProperties;
+    displayBody2?: React.CSSProperties;
   }
 
   interface Theme {
@@ -100,10 +106,6 @@ declare module '@mui/material/Badge' {
 }
 
 declare module '@mui/material/Typography' {
-  interface TypographyOwnProps {
-    textStyle?: 'display' | 'ui';
-  }
-
   interface TypographyPropsVariantOverrides {
     smRegular: true;
     smMedium: true;
@@ -112,6 +114,9 @@ declare module '@mui/material/Typography' {
     xsMedium: true;
     xsBold: true;
     label: true;
+    displayH4: true;
+    displayH6: true;
+    displayBody2: true;
   }
 }
 

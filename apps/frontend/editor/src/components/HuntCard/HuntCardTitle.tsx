@@ -9,9 +9,7 @@ export const HuntCardTitle = ({ icon, count, children }: HuntCardTitleProps) => 
           {icon}
         </Stack>
       )}
-      <Typography variant="h4" textStyle="display">
-        {children}
-      </Typography>
+      <Typography variant="displayH4">{children}</Typography>
       {count !== undefined && (
         <Typography
           variant="h4"
