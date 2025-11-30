@@ -123,6 +123,7 @@ type FieldArrayItem<T> = T & { readonly _id: string };
 interface ArrayActions {
   swap: (indexA: number, indexB: number) => void;
   remove: (index: number) => void;
+  move: (from: number, to: number) => void;
 }
 
 // Item state from useArrayInputItem

@@ -1,6 +1,16 @@
 # CodeRabbit Configuration - Balanced Mode
 # Focus on bugs, security, and meaningful patterns - not nitpicking
 
+# CRITICAL: Before suggesting ANY code changes or library usage, you MUST verify
+# the exact version we have installed and check current documentation.
+# Never suggest deprecated features or outdated APIs.
+#
+# ZERO TOLERANCE for outdated recommendations - especially for React Hook Form,
+# TanStack Query, zustand, Zod, and Material UI.
+#
+# Check package.json versions FIRST, then verify against current docs.
+# If unsure, ask rather than suggest deprecated code.
+
 reviews:
   # Assertive catches more than chill, but we'll tone down instructions
   profile: "assertive"
@@ -43,7 +53,7 @@ reviews:
         - Memory leaks (missing cleanup)
         - XSS vulnerabilities
         
-        Suggest improvements for:
+        
         - Better component patterns if current approach is problematic
         - Accessibility issues that hurt real users
         
