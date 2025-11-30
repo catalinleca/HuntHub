@@ -31,11 +31,6 @@ export interface IAssetUsageTracker {
   rebuildHuntAssetUsage(huntId: number, session?: mongoose.ClientSession): Promise<void>;
 
   /**
-   * Delete all usage for a hunt (called on hunt delete)
-   */
-  deleteHuntUsage(huntId: number, session?: mongoose.ClientSession): Promise<void>;
-
-  /**
    * Check if asset is used by any hunt
    */
   isAssetInUse(assetId: string): Promise<boolean>;
@@ -97,16 +92,6 @@ export class AssetUsageTracker implements IAssetUsageTracker {
       }));
       await AssetUsageModel.insertMany(records, { session });
     }
-  }
-
-  /**
-   * Delete all usage for a hunt (called on hunt delete)
-   *
-   * @param huntId - Hunt ID (numeric)
-   * @param session - MongoDB session for transaction support
-   */
-  async deleteHuntUsage(huntId: number, session?: mongoose.ClientSession): Promise<void> {
-    await AssetUsageModel.deleteMany({ huntId }, { session });
   }
 
   /**
