@@ -15,6 +15,9 @@ reviews:
   # Assertive catches more than chill, but we'll tone down instructions
   profile: "assertive"
 
+  # Keep comments scannable - first line tells you everything
+  tone_instructions: "Lead with severity (bug/security/perf/suggestion) and a one-line summary. Be direct and concise. Skip fluff."
+
   # Just comment, don't force changes (you decide what to fix)
   request_changes_workflow: false
 
