@@ -1,4 +1,4 @@
-import { Box, Stack, TextField, outlinedInputClasses } from '@mui/material';
+import { Box, Stack, outlinedInputClasses } from '@mui/material';
 import styled from 'styled-components';
 import { descendant } from '@/theme/selectors';
 
@@ -18,11 +18,11 @@ export const OptionRow = styled(Stack)(({ theme }) => ({
   transition: 'background-color 0.15s ease',
 }));
 
-interface OptionInputProps {
+interface OptionInputWrapperProps {
   $isTarget?: boolean;
 }
 
-export const OptionInput = styled(TextField)<OptionInputProps>(({ theme, $isTarget }) => ({
+export const OptionInputWrapper = styled(Box)<OptionInputWrapperProps>(({ theme, $isTarget }) => ({
   flex: 1,
   ...($isTarget && {
     [descendant(outlinedInputClasses.notchedOutline)]: {
