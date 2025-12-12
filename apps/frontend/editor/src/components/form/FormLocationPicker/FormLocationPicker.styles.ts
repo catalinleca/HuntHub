@@ -1,25 +1,6 @@
 import styled from 'styled-components';
-import { Card, Box, Stack, Typography, TextField, Paper } from '@mui/material';
+import { Card, Box, Stack, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-
-// Search container with relative positioning for dropdown
-export const SearchContainer = styled(Box)({
-  position: 'relative',
-  width: '100%',
-});
-
-// Suggestions dropdown positioned below input
-export const SuggestionsDropdown = styled(Paper)(({ theme }) => ({
-  position: 'absolute',
-  top: '100%',
-  left: 0,
-  right: 0,
-  zIndex: theme.zIndex.modal,
-  marginTop: theme.spacing(0.5),
-  maxHeight: 300,
-  overflow: 'auto',
-  borderRadius: theme.shape.borderRadius,
-}));
 
 export const CollapsedCard = styled(Card)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -82,19 +63,15 @@ export const SectionLabel = styled(Typography).attrs({
   color: theme.palette.text.secondary,
 }));
 
-export const RadiusContainer = styled(Stack).attrs({
-  direction: 'row',
-  alignItems: 'center',
-})(({ theme }) => ({
-  gap: theme.spacing(2),
-}));
-
 export const RadiusHelper = styled(Typography).attrs({
   variant: 'body2',
 })(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export const RadiusInput = styled(TextField)({
-  width: 180,
-});
+export const RadiusLabel = styled(Typography).attrs({
+  variant: 'body2',
+})(({ theme }) => ({
+  fontWeight: 500,
+  color: theme.palette.text.primary,
+}));

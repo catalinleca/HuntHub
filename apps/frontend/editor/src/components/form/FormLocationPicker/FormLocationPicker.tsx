@@ -1,10 +1,20 @@
-import { useState, useCallback } from 'react';
-import { useFormContext, useWatch } from 'react-hook-form';
-import { Stack, Typography, InputAdornment, FormControlLabel, Checkbox } from '@mui/material';
-import { MapPinIcon } from '@phosphor-icons/react';
-import { useMapsLibrary } from '@vis.gl/react-google-maps';
+import React, { useState, useCallback } from 'react';
+import { useFormContext, useWatch, useController } from 'react-hook-form';
+import {
+  Stack,
+  Typography,
+  FormControlLabel,
+  Checkbox,
+  IconButton,
+  Tooltip,
+  CircularProgress,
+  Box,
+  Slider,
+} from '@mui/material';
+import { MapPinIcon, CrosshairIcon } from '@phosphor-icons/react';
 import { LocationSearch } from './LocationSearch';
 import { LocationMap } from './LocationMap';
+import { useReverseGeocode, useCurrentLocation } from '@/hooks';
 import { DEFAULT_RADIUS } from '@/config/google-maps';
 import * as S from './FormLocationPicker.styles';
 
@@ -21,13 +31,45 @@ export const FormLocationPicker = ({
   description,
   disabled = false,
 }: FormLocationPickerProps) => {
-  const { setValue } = useFormContext();
+  const { setValue, control } = useFormContext();
+  const { reverseGeocode } = useReverseGeocode();
+  const { getCurrentLocation, isLoading: isGettingLocation, error: locationError } = useCurrentLocation();
+
   const [isExpanded, setIsExpanded] = useState(false);
   const [clickToSelectEnabled, setClickToSelectEnabled] = useState(true);
-  const geocoding = useMapsLibrary('geocoding');
 
   const location = useWatch({ name });
   const hasLocation = location?.lat != null && location?.lng != null;
+
+  const { field: radiusField } = useController({
+    name: `${name}.radius`,
+    control,
+  });
+
+  /**
+   * Unified location update function.
+   * Handles setting coordinates, default radius, and reverse geocoding.
+   */
+  const updateLocation = useCallback(
+    async (lat: number, lng: number, options?: { skipAddress?: boolean }) => {
+      setValue(`${name}.lat`, lat, { shouldDirty: true });
+      setValue(`${name}.lng`, lng, { shouldDirty: true });
+
+      // Set default radius if not already set
+      if (location?.radius == null) {
+        setValue(`${name}.radius`, DEFAULT_RADIUS, { shouldDirty: true });
+      }
+
+      // Reverse geocode to get address (unless skipped)
+      if (!options?.skipAddress) {
+        const address = await reverseGeocode(lat, lng);
+        if (address) {
+          setValue(`${name}.address`, address, { shouldDirty: true });
+        }
+      }
+    },
+    [name, setValue, reverseGeocode, location?.radius],
+  );
 
   const handlePlaceSelect = useCallback(
     (place: google.maps.places.PlaceResult) => {
@@ -45,55 +87,21 @@ export const FormLocationPicker = ({
         }
       }
     },
-    [name, setValue, location?.radius]
+    [name, setValue, location?.radius],
   );
 
   const handleMarkerDragEnd = useCallback(
     (lat: number, lng: number) => {
-      setValue(`${name}.lat`, lat, { shouldDirty: true });
-      setValue(`${name}.lng`, lng, { shouldDirty: true });
-
-      if (geocoding) {
-        const geocoder = new geocoding.Geocoder();
-        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-          if (status === 'OK' && results?.[0]) {
-            setValue(`${name}.address`, results[0].formatted_address, { shouldDirty: true });
-          }
-        });
-      }
+      updateLocation(lat, lng);
     },
-    [name, setValue, geocoding],
+    [updateLocation],
   );
 
   const handleMapClick = useCallback(
     (lat: number, lng: number) => {
-      setValue(`${name}.lat`, lat, { shouldDirty: true });
-      setValue(`${name}.lng`, lng, { shouldDirty: true });
-
-      // Set default radius if not already set
-      if (location?.radius == null) {
-        setValue(`${name}.radius`, DEFAULT_RADIUS, { shouldDirty: true });
-      }
-
-      // Reverse geocode to get address
-      if (geocoding) {
-        const geocoder = new geocoding.Geocoder();
-        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-          if (status === 'OK' && results?.[0]) {
-            setValue(`${name}.address`, results[0].formatted_address, { shouldDirty: true });
-          }
-        });
-      }
+      updateLocation(lat, lng);
     },
-    [name, setValue, geocoding, location?.radius],
-  );
-
-  const handleRadiusChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value === '' ? null : Number(e.target.value);
-      setValue(`${name}.radius`, value, { shouldDirty: true });
-    },
-    [name, setValue]
+    [updateLocation],
   );
 
   const handleExpand = () => {
@@ -102,9 +110,17 @@ export const FormLocationPicker = ({
     }
   };
 
+  const handleUseCurrentLocation = async () => {
+    const coords = await getCurrentLocation();
+    if (coords) {
+      await updateLocation(coords.lat, coords.lng);
+    }
+  };
+
+  // Collapsed state - show "Add location" button
   if (!isExpanded && !hasLocation) {
     return (
-      <Stack spacing={1}>
+      <Stack gap={1}>
         <S.SectionLabel>{label}</S.SectionLabel>
         {description && (
           <Typography variant="body2" color="text.secondary">
@@ -117,12 +133,6 @@ export const FormLocationPicker = ({
           tabIndex={disabled ? -1 : 0}
           aria-label="Add starting location"
           aria-disabled={disabled}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              handleExpand();
-            }
-          }}
         >
           <MapPinIcon size={20} aria-hidden="true" />
           <Typography variant="body2">Add starting location</Typography>
@@ -131,8 +141,9 @@ export const FormLocationPicker = ({
     );
   }
 
+  // Expanded state - show full location picker
   return (
-    <Stack spacing={2}>
+    <Stack gap={2}>
       <S.SectionLabel>{label}</S.SectionLabel>
       {description && (
         <Typography variant="body2" color="text.secondary">
@@ -140,7 +151,22 @@ export const FormLocationPicker = ({
         </Typography>
       )}
 
-      <LocationSearch onPlaceSelect={handlePlaceSelect} value={location?.address ?? ''} />
+      <Stack direction="row" gap={1} alignItems="flex-start">
+        <Box sx={{ flex: 1 }}>
+          <LocationSearch onPlaceSelect={handlePlaceSelect} value={location?.address ?? ''} />
+        </Box>
+        <Tooltip title={locationError || 'Use current location'}>
+          <span>
+            <IconButton
+              onClick={handleUseCurrentLocation}
+              disabled={isGettingLocation}
+              color={locationError ? 'error' : 'default'}
+            >
+              {isGettingLocation ? <CircularProgress size={20} /> : <CrosshairIcon size={20} />}
+            </IconButton>
+          </span>
+        </Tooltip>
+      </Stack>
 
       <LocationMap
         lat={location?.lat}
@@ -151,31 +177,22 @@ export const FormLocationPicker = ({
       />
 
       <FormControlLabel
+        sx={{ ml: 0 }}
         control={
-          <Checkbox
-            checked={clickToSelectEnabled}
-            onChange={(e) => setClickToSelectEnabled(e.target.checked)}
-            size="small"
-          />
+          <Checkbox checked={clickToSelectEnabled} onChange={(e) => setClickToSelectEnabled(e.target.checked)} />
         }
         label={<Typography variant="body2">Click on map to select location</Typography>}
       />
 
-      <S.RadiusContainer>
-        <S.RadiusInput
-          label="Check-in radius"
-          type="number"
-          size="small"
-          value={location?.radius ?? ''}
-          onChange={handleRadiusChange}
-          slotProps={{
-            input: {
-              endAdornment: <InputAdornment position="end">meters</InputAdornment>,
-            },
-          }}
-        />
-        <S.RadiusHelper>How close must players be to start</S.RadiusHelper>
-      </S.RadiusContainer>
+      <Stack sx={{ mt: 3 }}>
+        <Stack direction="row" alignItems="baseline" gap={1}>
+          <S.RadiusLabel>Check-in radius: {radiusField.value ?? DEFAULT_RADIUS}m</S.RadiusLabel>
+          <S.RadiusHelper> - How close must players be to start</S.RadiusHelper>
+        </Stack>
+        <Box sx={{ pr: 5 }}>
+          <Slider {...radiusField} value={radiusField.value ?? DEFAULT_RADIUS} min={10} max={100} />
+        </Box>
+      </Stack>
     </Stack>
   );
 };
