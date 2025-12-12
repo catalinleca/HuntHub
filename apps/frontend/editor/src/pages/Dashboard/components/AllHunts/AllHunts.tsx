@@ -7,6 +7,7 @@ import { HuntActionCard } from '@/pages/Dashboard/components/HuntActionCard';
 import { useDeleteHunt } from '@/api/Hunt';
 import { useConfirmationDialog } from '@/hooks';
 import { DialogVariants } from '@/stores/useDialogStore';
+import { useHuntDialogStore } from '@/stores';
 
 interface AllHuntsProps {
   hunts: Hunt[];
@@ -14,7 +15,12 @@ interface AllHuntsProps {
 
 export const AllHunts = ({ hunts }: AllHuntsProps) => {
   const { confirm } = useConfirmationDialog();
+  const { open: openHuntDialog } = useHuntDialogStore();
   const deleteMutation = useDeleteHunt();
+
+  const handleEdit = (huntId: number) => {
+    openHuntDialog(huntId);
+  };
 
   const handleDelete = (huntId: number) => {
     confirm({
@@ -45,6 +51,7 @@ export const AllHunts = ({ hunts }: AllHuntsProps) => {
                 title={hunt.name}
                 subtitle={hunt.description || 'No description'}
                 isPublished={hunt.isPublished}
+                onEdit={() => handleEdit(hunt.huntId)}
                 onDelete={() => handleDelete(hunt.huntId)}
               />
             </Grid2>

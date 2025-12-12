@@ -30,7 +30,7 @@ const PlaceholderSection = ({ icon: Icon, label, message }: PlaceholderSectionPr
   return (
     <Stack>
       <S.SectionLabel>{label}</S.SectionLabel>
-      <S.PlaceholderBox gap={1.5}>
+      <S.PlaceholderBox gap={2}>
         <Icon size={20} />
         <Typography variant="body2" color="text.secondary">
           {message}
@@ -66,7 +66,7 @@ export const HuntDialogForm = ({ hunt }: HuntDialogFormProps) => {
   const isPending = createMutation.isPending || updateMutation.isPending;
   const error = createMutation.error || updateMutation.error;
 
-  const onSubmit = async (data: HuntFormData) => {
+  const onSubmit = (data: HuntFormData) => {
     if (isEditMode && hunt) {
       const updateData: HuntUpdate = {
         name: data.name,
@@ -74,23 +74,37 @@ export const HuntDialogForm = ({ hunt }: HuntDialogFormProps) => {
         updatedAt: hunt.updatedAt,
       };
 
-      await updateMutation.mutateAsync({ huntId: hunt.huntId, data: updateData });
+      // Close immediately - optimistic update handles cache
+      // Frontend validation (Zod) catches most errors
       close();
+
+      updateMutation.mutate(
+        { huntId: hunt.huntId, data: updateData },
+        {
+          onError: () => {
+            // TODO: show toast error - dialog is already closed
+          },
+        },
+      );
     } else {
       const createData: HuntCreate = {
         name: data.name,
         description: data.description || undefined,
       };
 
-      const newHunt = await createMutation.mutateAsync(createData);
-      close();
-      navigate(`/editor/${newHunt.huntId}`);
+      // CREATE still needs to wait for huntId to navigate
+      createMutation.mutate(createData, {
+        onSuccess: (newHunt) => {
+          close();
+          navigate(`/editor/${newHunt.huntId}`);
+        },
+      });
     }
   };
 
   return (
     <FormProvider {...methods}>
-      <S.Form onSubmit={handleSubmit(onSubmit)}>
+      <S.Form component="form" onSubmit={handleSubmit(onSubmit)}>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error.message}

@@ -171,6 +171,45 @@ See: [React Hook Form - useForm values prop](https://react-hook-form.com/docs/us
 
 React Query handles caching, refetching, and synchronization automatically.
 
+**Seeding Detail from List Cache (NO loading state for cached items):**
+
+Use `initialData` to seed detail queries from list cache. This provides instant UI when opening items from a list.
+
+```tsx
+// ✅ CORRECT - seed detail from list cache
+export const useGetHunt = (huntId?: number | null) => {
+  const queryClient = useQueryClient();
+
+  return useQuery({
+    queryKey: huntKeys.detail(huntId!),
+    queryFn: () => fetchHunt(huntId!),
+    enabled: !!huntId,
+    initialData: () => {
+      if (!huntId) return undefined;
+
+      const queries = queryClient.getQueriesData<PaginatedHuntsResponse>({
+        queryKey: huntKeys.lists(),
+      });
+
+      for (const [, data] of queries) {
+        const hunt = data?.data?.find((h) => h.huntId === huntId);
+        if (hunt) return hunt;
+      }
+      return undefined;
+    },
+    initialDataUpdatedAt: () => {
+      return queryClient.getQueryState(huntKeys.lists())?.dataUpdatedAt;
+    },
+  });
+};
+```
+
+**When to use:**
+- `initialData` - when list item structure matches detail structure (same type)
+- `placeholderData` - when structures differ (e.g., list has preview, detail has full data)
+
+See: [TkDodo - Placeholder and Initial Data](https://tkdodo.eu/blog/placeholder-and-initial-data-in-react-query)
+
 ---
 
 ### 4. Unsaved Changes Warning
@@ -334,6 +373,16 @@ Keep related files together (component, styles, tests).
 **⚠️ CRITICAL - READ THIS EVERY TIME:**
 
 **Only allowed `sx` props:** `p`, `m`, `pt`, `pb`, `mt`, `mb`, `px`, `py`, `mx`, `my`, `gap`
+
+**⚠️ INTEGERS ONLY for spacing values.** MUI theme.spacing is array-based. Never use decimals like `1.5`.
+
+```tsx
+// ✅ OK
+<Stack gap={2}>
+
+// ❌ NEVER - decimals break with array-based spacing
+<Stack gap={1.5}>
+```
 
 ```tsx
 // ✅ OK - only spacing
