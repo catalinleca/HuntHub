@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Autocomplete, TextField, InputAdornment, CircularProgress } from '@mui/material';
 import { MagnifyingGlassIcon } from '@phosphor-icons/react';
-import { useAutocompleteSuggestions } from '@/hooks';
+import { useAutocompleteSuggestions, useThrottledValue } from '@/hooks';
 
 interface LocationSearchProps {
   onPlaceSelect: (place: google.maps.places.PlaceResult) => void;
@@ -18,7 +18,8 @@ export const LocationSearch = ({ onPlaceSelect, value = '' }: LocationSearchProp
     setInputValue(value);
   }
 
-  const { suggestions, isLoading, resetSession } = useAutocompleteSuggestions(inputValue);
+  const throttledInput = useThrottledValue(inputValue, 300);
+  const { suggestions, isLoading, resetSession } = useAutocompleteSuggestions(throttledInput);
 
   const handleInputChange = (_event: React.SyntheticEvent, newValue: string, reason: string) => {
     if (reason === 'input' || reason === 'clear') {

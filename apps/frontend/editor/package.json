@@ -27,6 +27,7 @@
     "@vis.gl/react-google-maps": "^1.7.1",
     "axios": "^1.7.9",
     "firebase": "^12.5.0",
+    "lodash-es": "^4.17.21",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.66.1",
@@ -38,6 +39,7 @@
   },
   "devDependencies": {
     "@types/google.maps": "^3.58.1",
+    "@types/lodash-es": "^4.17.12",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/react-transition-group": "^4.4.12",

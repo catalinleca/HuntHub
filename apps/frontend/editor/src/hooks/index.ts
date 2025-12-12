@@ -1,4 +1,5 @@
 export { useConfirmationDialog } from './useConfirmationDialog';
+export { useThrottledValue } from './useThrottledValue';
 
 export { useAutocompleteSuggestions } from './useAutocompleteSuggestions';
 export { useReverseGeocode } from './useReverseGeocode';
