@@ -12,6 +12,7 @@ import {
   Slider,
 } from '@mui/material';
 import { MapPinIcon, CrosshairIcon } from '@phosphor-icons/react';
+import { WithTransition } from '@/components/common';
 import { LocationSearch } from './LocationSearch';
 import { LocationMap } from './LocationMap';
 import { useReverseGeocode, useCurrentLocation } from '@/hooks';
@@ -117,82 +118,76 @@ export const FormLocationPicker = ({
     }
   };
 
-  // Collapsed state - show "Add location" button
-  if (!isExpanded && !hasLocation) {
-    return (
-      <Stack gap={1}>
-        <S.SectionLabel>{label}</S.SectionLabel>
-        {description && (
-          <Typography variant="body2" color="text.secondary">
-            {description}
-          </Typography>
-        )}
-        <S.AddLocationButton
-          onClick={handleExpand}
-          role="button"
-          tabIndex={disabled ? -1 : 0}
-          aria-label="Add starting location"
-          aria-disabled={disabled}
-        >
-          <MapPinIcon size={20} aria-hidden="true" />
-          <Typography variant="body2">Add starting location</Typography>
-        </S.AddLocationButton>
-      </Stack>
-    );
-  }
+  const transitionKey = isExpanded || hasLocation ? 'expanded' : 'collapsed';
 
-  // Expanded state - show full location picker
   return (
-    <Stack gap={2}>
-      <S.SectionLabel>{label}</S.SectionLabel>
-      {description && (
-        <Typography variant="body2" color="text.secondary">
-          {description}
-        </Typography>
-      )}
-
-      <Stack direction="row" gap={1} alignItems="flex-start">
-        <Box sx={{ flex: 1 }}>
-          <LocationSearch onPlaceSelect={handlePlaceSelect} value={location?.address ?? ''} />
-        </Box>
-        <Tooltip title={locationError || 'Use current location'}>
-          <span>
-            <IconButton
-              onClick={handleUseCurrentLocation}
-              disabled={isGettingLocation}
-              color={locationError ? 'error' : 'default'}
-            >
-              {isGettingLocation ? <CircularProgress size={20} /> : <CrosshairIcon size={20} />}
-            </IconButton>
-          </span>
-        </Tooltip>
-      </Stack>
-
-      <LocationMap
-        lat={location?.lat}
-        lng={location?.lng}
-        radius={location?.radius}
-        onMarkerDragEnd={handleMarkerDragEnd}
-        onMapClick={clickToSelectEnabled ? handleMapClick : undefined}
-      />
-
-      <FormControlLabel
-        sx={{ ml: 0 }}
-        control={
-          <Checkbox checked={clickToSelectEnabled} onChange={(e) => setClickToSelectEnabled(e.target.checked)} />
-        }
-        label={<Typography variant="body2">Click on map to select location</Typography>}
-      />
-
-      <Stack sx={{ mt: 3 }}>
-        <Stack direction="row" alignItems="baseline" gap={1}>
-          <S.RadiusLabel>Check-in radius: {radiusField.value ?? DEFAULT_RADIUS}m</S.RadiusLabel>
-          <S.RadiusHelper> - How close must players be to start</S.RadiusHelper>
+    <WithTransition transitionKey={transitionKey} variant="fade-slide-up" duration={100}>
+      {!isExpanded && !hasLocation ? (
+        <Stack gap={1}>
+          <S.SectionLabel>{label}</S.SectionLabel>
+          {description && (
+            <Typography variant="body2" color="text.secondary">
+              {description}
+            </Typography>
+          )}
+          <S.AddLocationButton onClick={handleExpand} tabIndex={disabled ? -1 : 0}>
+            <MapPinIcon size={20} aria-hidden="true" />
+            <Typography variant="body2">Add starting location</Typography>
+          </S.AddLocationButton>
         </Stack>
-        <Box sx={{ pr: 5 }}>
-          <Slider {...radiusField} value={radiusField.value ?? DEFAULT_RADIUS} min={10} max={100} />
-        </Box>
-      </Stack>
-    </Stack>
+      ) : (
+        <Stack gap={2}>
+          <S.SectionLabel>{label}</S.SectionLabel>
+          {description && (
+            <Typography variant="body2" color="text.secondary">
+              {description}
+            </Typography>
+          )}
+
+          <Stack direction="row" gap={1} alignItems="flex-start">
+            <Box sx={{ flex: 1 }}>
+              <LocationSearch onPlaceSelect={handlePlaceSelect} value={location?.address ?? ''} />
+            </Box>
+            <Tooltip title={locationError || 'Use current location'}>
+              <span>
+                <IconButton
+                  onClick={handleUseCurrentLocation}
+                  disabled={isGettingLocation}
+                  color={locationError ? 'error' : 'default'}
+                >
+                  {isGettingLocation ? <CircularProgress size={20} /> : <CrosshairIcon size={20} />}
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Stack>
+
+          <LocationMap
+            lat={location?.lat}
+            lng={location?.lng}
+            radius={location?.radius}
+            onMarkerDragEnd={handleMarkerDragEnd}
+            onMapClick={clickToSelectEnabled ? handleMapClick : undefined}
+          />
+
+          <FormControlLabel
+            sx={{ ml: 0 }}
+            control={
+              <Checkbox checked={clickToSelectEnabled} onChange={(e) => setClickToSelectEnabled(e.target.checked)} />
+            }
+            label={<Typography variant="body2">Click on map to select location</Typography>}
+          />
+
+          <Stack sx={{ mt: 3 }}>
+            <Stack direction="row" alignItems="baseline" gap={1}>
+              <S.RadiusLabel>Check-in radius: {radiusField.value ?? DEFAULT_RADIUS}m</S.RadiusLabel>
+              <S.RadiusHelper> - How close must players be to start</S.RadiusHelper>
+            </Stack>
+            <Box sx={{ pr: 5 }}>
+              <Slider {...radiusField} value={radiusField.value ?? DEFAULT_RADIUS} min={10} max={100} />
+            </Box>
+          </Stack>
+        </Stack>
+      )}
+    </WithTransition>
   );
 };
