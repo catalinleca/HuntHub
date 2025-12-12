@@ -136,6 +136,28 @@ Bridge components wrap MUI components with React Hook Form integration:
 - Display validation errors
 - Maintain controlled component behavior
 
+**Syncing External Data (NO useEffect):**
+
+Use the `values` prop to sync form with external data. Do NOT use useEffect + reset.
+
+```tsx
+// ✅ CORRECT - values prop auto-syncs with external data
+const methods = useForm<FormData>({
+  resolver: zodResolver(schema),
+  values: hunt ? { name: hunt.name, description: hunt.description ?? '' } : undefined,
+  defaultValues: { name: '', description: '' },
+});
+
+// ❌ WRONG - useEffect is unnecessary
+useEffect(() => {
+  if (hunt) {
+    reset({ name: hunt.name, description: hunt.description ?? '' });
+  }
+}, [hunt, reset]);
+```
+
+See: [React Hook Form - useForm values prop](https://react-hook-form.com/docs/useform)
+
 ---
 
 ### 3. Data Fetching Pattern
@@ -309,19 +331,37 @@ Keep related files together (component, styles, tests).
 
 ### NO Inline CSS in Components
 
-**Only allowed inline:** Simple spacing props like `sx={{ p: 2, gap: 1, m: 1 }}`
+**⚠️ CRITICAL - READ THIS EVERY TIME:**
+
+**Only allowed `sx` props:** `p`, `m`, `pt`, `pb`, `mt`, `mb`, `px`, `py`, `mx`, `my`, `gap`
 
 ```tsx
-// ✅ OK - trivial spacing
-<Stack sx={{ gap: 2, p: 1 }}>
+// ✅ OK - only spacing
+<Stack sx={{ gap: 2, p: 1, mt: 2 }}>
 
-// ❌ NEVER - complex styles inline
-<Box sx={{
-  backgroundColor: 'primary.main',
-  borderRadius: 2,
-  '&:hover': { transform: 'scale(1.02)' }
-}}>
+// ❌ NEVER - any other style property inline
+<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+<Box sx={{ backgroundColor: 'primary.main' }}>
+<Box sx={{ textAlign: 'left' }}>
+<DialogContent sx={{ textAlign: 'left' }}>
 ```
+
+### Stack vs Box
+
+**USE STACK, NOT BOX** for layout:
+
+```tsx
+// ✅ ALWAYS - Stack handles flex layout
+<Stack direction="row" justifyContent="space-between" alignItems="center">
+
+// ❌ NEVER - Box with flex styles
+<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+```
+
+**Box is only for:**
+- Wrapping a single element with spacing
+- `component="form"` or `component="section"` semantic wrappers
+- When you genuinely need a non-flex container
 
 ```javascript
 // ❌ NEVER - do not write inline styled-components like this
@@ -332,11 +372,11 @@ export const Header = styled(Box)`
  gap: ${({ theme }) => theme.spacing(2)};
 `;
 
-// ✅ OK - just use Stack Mui component and pass native MUI props
-
+// ✅ OK - just use Stack MUI component with native props
+<Stack direction="row" alignItems="center" justifyContent="space-between" gap={2}>
 ```
 
-**For anything beyond trivial spacing → create a styled component.**
+**For anything beyond trivial spacing → create a styled component or use Stack props.**
 
 ---
 

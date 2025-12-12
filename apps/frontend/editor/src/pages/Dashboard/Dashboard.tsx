@@ -1,26 +1,15 @@
-import { Dialog, Stack, Typography } from '@mui/material';
-import { useState } from 'react';
+import { Stack, Typography } from '@mui/material';
 import { useDashboardHunts } from '@/api/Hunt';
 import { RECENT_HUNTS_COUNT } from '@/api/Hunt/config';
+import { useHuntDialogStore } from '@/stores';
 import { DashboardNavBar, DashboardHero, EmptyState, ErrorState, RecentHunts, AllHunts } from './components';
 import { DashboardContainer, ContentContainer } from './Dashboard.styles';
-import { CreateHuntForm } from '@/components';
-
-const CreateHuntDialog = ({ open, onClose }: any) => {
-  return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <CreateHuntForm />
-    </Dialog>
-  );
-};
 
 const Dashboard = () => {
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-
+  const { open: openHuntDialog } = useHuntDialogStore();
   const { hunts, isLoading, error } = useDashboardHunts();
 
-  const handleCreateClick = () => setIsCreateDialogOpen(true);
-  const handleCloseDialog = () => setIsCreateDialogOpen(false);
+  const handleCreateClick = () => openHuntDialog();
 
   const recentHunts = hunts.slice(0, RECENT_HUNTS_COUNT);
   const hasHunts = hunts.length > 0;
@@ -43,8 +32,6 @@ const Dashboard = () => {
             <AllHunts hunts={hunts} />
           </Stack>
         )}
-
-        <CreateHuntDialog open={isCreateDialogOpen} onClose={handleCloseDialog} />
       </ContentContainer>
     </DashboardContainer>
   );

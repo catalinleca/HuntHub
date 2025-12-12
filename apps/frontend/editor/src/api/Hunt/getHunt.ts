@@ -8,7 +8,7 @@ const fetchHunt = async (huntId: number): Promise<Hunt> => {
   return response.data;
 };
 
-export const useGetHunt = (huntId: number | undefined) => {
+export const useGetHunt = (huntId?: number | null) => {
   return useQuery({
     queryKey: huntKeys.detail(huntId!),
     queryFn: () => fetchHunt(huntId!),
