@@ -47,12 +47,7 @@ export const HuntDialogForm = ({ hunt }: HuntDialogFormProps) => {
 
   const methods = useForm<HuntDialogFormData>({
     resolver: zodResolver(isEditMode ? HuntUpdateSchema : HuntCreateSchema),
-    values: hunt ? transformHuntToDialogFormData(hunt) : undefined,
-    defaultValues: {
-      name: '',
-      description: '',
-      startLocation: { lat: null, lng: null, radius: null, address: null },
-    },
+    values: transformHuntToDialogFormData(hunt),
   });
 
   const {

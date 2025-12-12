@@ -1,19 +1,19 @@
 import { useEffect, useRef } from 'react';
 
-export function useMapPan(map: google.maps.Map | null, center: { lat: number; lng: number } | null): void {
-  const prevCenterRef = useRef<{ lat: number; lng: number } | null>(null);
+export function useMapPan(map: google.maps.Map | null, lat?: number | null, lng?: number | null): void {
+  const prevRef = useRef<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
-    if (!map || !center) {
+    if (!map || lat == null || lng == null) {
       return;
     }
 
-    const prev = prevCenterRef.current;
-    const changed = !prev || prev.lat !== center.lat || prev.lng !== center.lng;
+    const prev = prevRef.current;
+    const changed = !prev || prev.lat !== lat || prev.lng !== lng;
 
     if (changed) {
-      map.panTo(center);
-      prevCenterRef.current = center;
+      map.panTo({ lat, lng });
+      prevRef.current = { lat, lng };
     }
-  }, [map, center?.lat, center?.lng]);
+  }, [map, lat, lng]);
 }

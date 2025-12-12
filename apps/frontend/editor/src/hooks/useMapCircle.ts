@@ -1,19 +1,20 @@
 import { useEffect, useRef } from 'react';
+import { getColor } from '@/utils';
 
 const CIRCLE_STYLE = {
-  strokeColor: '#B6591B',
+  strokeColor: getColor('primary.main'),
   strokeOpacity: 0.8,
   strokeWeight: 2,
-  fillColor: '#B6591B',
+  fillColor: getColor('primary.main'),
   fillOpacity: 0.15,
 } as const;
 
-export interface UseMapCircleOptions {
-  center: { lat: number; lng: number } | null;
-  radius: number | null;
-}
-
-export function useMapCircle(map: google.maps.Map | null, { center, radius }: UseMapCircleOptions): void {
+export function useMapCircle(
+  map: google.maps.Map | null,
+  lat?: number | null,
+  lng?: number | null,
+  radius?: number | null,
+): void {
   const circleRef = useRef<google.maps.Circle | null>(null);
 
   useEffect(() => {
@@ -21,7 +22,7 @@ export function useMapCircle(map: google.maps.Map | null, { center, radius }: Us
       return;
     }
 
-    if (!center || !radius) {
+    if (lat == null || lng == null || radius == null) {
       circleRef.current?.setMap(null);
       circleRef.current = null;
       return;
@@ -31,12 +32,12 @@ export function useMapCircle(map: google.maps.Map | null, { center, radius }: Us
       circleRef.current = new google.maps.Circle({ map, ...CIRCLE_STYLE });
     }
 
-    circleRef.current.setCenter(center);
+    circleRef.current.setCenter({ lat, lng });
     circleRef.current.setRadius(radius);
 
     return () => {
       circleRef.current?.setMap(null);
       circleRef.current = null;
     };
-  }, [map, center?.lat, center?.lng, radius]);
+  }, [map, lat, lng, radius]);
 }

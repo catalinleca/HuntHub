@@ -47,21 +47,15 @@ export const FormLocationPicker = ({
     control,
   });
 
-  /**
-   * Unified location update function.
-   * Handles setting coordinates, default radius, and reverse geocoding.
-   */
   const updateLocation = useCallback(
     async (lat: number, lng: number, options?: { skipAddress?: boolean }) => {
       setValue(`${name}.lat`, lat, { shouldDirty: true });
       setValue(`${name}.lng`, lng, { shouldDirty: true });
 
-      // Set default radius if not already set
       if (location?.radius == null) {
         setValue(`${name}.radius`, DEFAULT_RADIUS, { shouldDirty: true });
       }
 
-      // Reverse geocode to get address (unless skipped)
       if (!options?.skipAddress) {
         const address = await reverseGeocode(lat, lng);
         if (address) {
@@ -113,6 +107,7 @@ export const FormLocationPicker = ({
 
   const handleUseCurrentLocation = async () => {
     const coords = await getCurrentLocation();
+
     if (coords) {
       await updateLocation(coords.lat, coords.lng);
     }

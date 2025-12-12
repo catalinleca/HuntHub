@@ -2,6 +2,7 @@ import { Map, AdvancedMarker, Pin, useApiIsLoaded, useMap, MapMouseEvent } from 
 import { CircularProgress, Typography } from '@mui/material';
 import { useMapPan, useMapCircle } from '@/hooks';
 import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, GOOGLE_MAP_ID } from '@/config/google-maps';
+import { getColor } from '@/utils';
 import * as S from './FormLocationPicker.styles';
 
 interface LocationMapProps {
@@ -17,10 +18,9 @@ export const LocationMap = ({ lat, lng, radius, onMarkerDragEnd, onMapClick }: L
   const map = useMap();
 
   const hasLocation = lat != null && lng != null;
-  const center = hasLocation ? { lat, lng } : null;
 
-  useMapPan(map, center);
-  useMapCircle(map, { center, radius: radius ?? null });
+  useMapPan(map, lat, lng);
+  useMapCircle(map, lat, lng, radius);
 
   const handleDragEnd = (e: google.maps.MapMouseEvent) => {
     if (e.latLng && onMarkerDragEnd) {
@@ -36,7 +36,7 @@ export const LocationMap = ({ lat, lng, radius, onMarkerDragEnd, onMapClick }: L
 
   if (!isLoaded) {
     return (
-      <S.MapContainer role="region" aria-label="Map loading">
+      <S.MapContainer>
         <S.MapPlaceholder gap={1}>
           <CircularProgress size={24} />
           <Typography variant="body2" color="text.secondary">
@@ -48,7 +48,7 @@ export const LocationMap = ({ lat, lng, radius, onMarkerDragEnd, onMapClick }: L
   }
 
   return (
-    <S.MapContainer role="region" aria-label="Location map">
+    <S.MapContainer>
       <Map
         defaultCenter={DEFAULT_MAP_CENTER}
         defaultZoom={DEFAULT_MAP_ZOOM}
@@ -59,8 +59,8 @@ export const LocationMap = ({ lat, lng, radius, onMarkerDragEnd, onMapClick }: L
         style={{ cursor: onMapClick ? 'crosshair' : 'grab' }}
       >
         {hasLocation && (
-          <AdvancedMarker position={{ lat, lng }} draggable onDragEnd={handleDragEnd} title="Drag to adjust location">
-            <Pin background="#B6591B" borderColor="#8B4513" glyphColor="#FFFFFF" />
+          <AdvancedMarker position={{ lat, lng }} draggable onDragEnd={handleDragEnd}>
+            <Pin background={getColor('primary.main')} borderColor={getColor('secondary.main')} glyphColor={getColor('common.white')} />
           </AdvancedMarker>
         )}
       </Map>

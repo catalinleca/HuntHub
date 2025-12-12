@@ -108,9 +108,10 @@ export const transformHuntToFormData = (hunt: Hunt): HuntFormData => {
 /**
  * Transform Hunt to HuntDialogFormData (for create/edit dialog)
  * Only includes basic metadata fields, no steps
+ * Returns defaults when hunt is undefined (create mode)
  */
-export const transformHuntToDialogFormData = (hunt: Hunt): HuntDialogFormData => ({
-  name: hunt.name,
-  description: hunt.description ?? '',
-  startLocation: transformLocationToFormData(hunt.startLocation),
+export const transformHuntToDialogFormData = (hunt?: Hunt): HuntDialogFormData => ({
+  name: hunt?.name ?? '',
+  description: hunt?.description ?? '',
+  startLocation: transformLocationToFormData(hunt?.startLocation),
 });
