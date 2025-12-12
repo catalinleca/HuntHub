@@ -7,12 +7,14 @@ export const enableLocation = (setValue: SetValue, basePath: string) => {
   setValue(`${basePath}.lat`, LOCATION_DEFAULTS.enabled.lat, { shouldDirty: true });
   setValue(`${basePath}.lng`, LOCATION_DEFAULTS.enabled.lng, { shouldDirty: true });
   setValue(`${basePath}.radius`, LOCATION_DEFAULTS.enabled.radius, { shouldDirty: true });
+  setValue(`${basePath}.address`, LOCATION_DEFAULTS.enabled.address, { shouldDirty: true });
 };
 
 export const disableLocation = (setValue: SetValue, basePath: string) => {
   setValue(`${basePath}.lat`, LOCATION_DEFAULTS.disabled.lat, { shouldDirty: true });
   setValue(`${basePath}.lng`, LOCATION_DEFAULTS.disabled.lng, { shouldDirty: true });
   setValue(`${basePath}.radius`, LOCATION_DEFAULTS.disabled.radius, { shouldDirty: true });
+  setValue(`${basePath}.address`, LOCATION_DEFAULTS.disabled.address, { shouldDirty: true });
 };
 
 export const enableHint = (setValue: SetValue, path: string) => {

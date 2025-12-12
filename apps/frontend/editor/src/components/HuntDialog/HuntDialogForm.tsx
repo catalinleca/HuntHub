@@ -3,21 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { useForm, FormProvider, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Stack, Button, Alert, Typography, Divider } from '@mui/material';
-import { MapPinIcon, ImageIcon, UsersIcon } from '@phosphor-icons/react';
+import { ImageIcon, UsersIcon } from '@phosphor-icons/react';
 import type { Hunt, HuntCreate, HuntUpdate } from '@hunthub/shared';
 import { HuntCreate as HuntCreateSchema, HuntUpdate as HuntUpdateSchema } from '@hunthub/shared/schemas';
-import { FormInput, FormTextArea } from '@/components/form';
+import { FormInput, FormTextArea, FormLocationPicker } from '@/components/form';
 import { useCreateHunt, useUpdateHunt } from '@/api/Hunt';
 import { useHuntDialogStore } from '@/stores';
+import { HuntDialogFormData } from '@/types/editor';
+import { transformHuntToDialogFormData } from '@/utils/transformers/huntInput';
 import * as S from './HuntDialogForm.styles';
 
 interface HuntDialogFormProps {
   hunt?: Hunt;
-}
-
-interface HuntFormData {
-  name: string;
-  description: string;
 }
 
 interface PlaceholderSectionProps {
@@ -48,10 +45,14 @@ export const HuntDialogForm = ({ hunt }: HuntDialogFormProps) => {
   const createMutation = useCreateHunt();
   const updateMutation = useUpdateHunt();
 
-  const methods = useForm<HuntFormData>({
+  const methods = useForm<HuntDialogFormData>({
     resolver: zodResolver(isEditMode ? HuntUpdateSchema : HuntCreateSchema),
-    values: hunt ? { name: hunt.name, description: hunt.description ?? '' } : undefined,
-    defaultValues: { name: '', description: '' },
+    values: hunt ? transformHuntToDialogFormData(hunt) : undefined,
+    defaultValues: {
+      name: '',
+      description: '',
+      startLocation: { lat: null, lng: null, radius: null, address: null },
+    },
   });
 
   const {
@@ -66,11 +67,24 @@ export const HuntDialogForm = ({ hunt }: HuntDialogFormProps) => {
   const isPending = createMutation.isPending || updateMutation.isPending;
   const error = createMutation.error || updateMutation.error;
 
-  const onSubmit = (data: HuntFormData) => {
+  const onSubmit = (data: HuntDialogFormData) => {
+    const hasLocation =
+      data.startLocation.lat != null && data.startLocation.lng != null && data.startLocation.radius != null;
+
+    const startLocation = hasLocation
+      ? {
+          lat: data.startLocation.lat!,
+          lng: data.startLocation.lng!,
+          radius: data.startLocation.radius!,
+          address: data.startLocation.address ?? undefined,
+        }
+      : undefined;
+
     if (isEditMode && hunt) {
       const updateData: HuntUpdate = {
         name: data.name,
         description: data.description || undefined,
+        startLocation,
         updatedAt: hunt.updatedAt,
       };
 
@@ -90,6 +104,7 @@ export const HuntDialogForm = ({ hunt }: HuntDialogFormProps) => {
       const createData: HuntCreate = {
         name: data.name,
         description: data.description || undefined,
+        startLocation,
       };
 
       // CREATE still needs to wait for huntId to navigate
@@ -134,7 +149,11 @@ export const HuntDialogForm = ({ hunt }: HuntDialogFormProps) => {
 
           <Divider />
 
-          <PlaceholderSection icon={MapPinIcon} label="Starting Point" message="Add starting location after creating" />
+          <FormLocationPicker
+            name="startLocation"
+            label="STARTING POINT"
+            description="Where does this adventure begin?"
+          />
 
           <Divider />
 

@@ -1,7 +1,30 @@
-import { Hunt, Step, Quiz, OptionType } from '@hunthub/shared';
-import { HuntFormData, StepFormData, LocationFormData, QuizFormData, QuizOptionFormData } from '@/types/editor';
+import { Hunt, Step, Quiz, OptionType, Location } from '@hunthub/shared';
+import {
+  HuntFormData,
+  HuntDialogFormData,
+  StepFormData,
+  LocationFormData,
+  QuizFormData,
+  QuizOptionFormData,
+} from '@/types/editor';
 import { LOCATION_DEFAULTS } from '@/utils/stepSettings';
 import { createInitialQuizOptions } from '@/pages/Hunt/HuntSteps/components/Quiz';
+
+/**
+ * Transform API Location to form LocationFormData
+ * Handles undefined → all nulls (disabled state)
+ */
+const transformLocationToFormData = (location?: Location): LocationFormData => {
+  if (!location) {
+    return { lat: null, lng: null, radius: null, address: null };
+  }
+  return {
+    lat: location.lat,
+    lng: location.lng,
+    radius: location.radius,
+    address: location.address ?? null,
+  };
+};
 
 const transformStepSettings = (
   step: Step,
@@ -11,6 +34,7 @@ const transformStepSettings = (
         lat: step.requiredLocation.lat,
         lng: step.requiredLocation.lng,
         radius: step.requiredLocation.radius,
+        address: step.requiredLocation.address ?? null,
       }
     : { ...LOCATION_DEFAULTS.disabled };
 
@@ -80,3 +104,13 @@ export const transformHuntToFormData = (hunt: Hunt): HuntFormData => {
     steps: stepsWithId,
   };
 };
+
+/**
+ * Transform Hunt to HuntDialogFormData (for create/edit dialog)
+ * Only includes basic metadata fields, no steps
+ */
+export const transformHuntToDialogFormData = (hunt: Hunt): HuntDialogFormData => ({
+  name: hunt.name,
+  description: hunt.description ?? '',
+  startLocation: transformLocationToFormData(hunt.startLocation),
+});

@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, TextField, Typography, Stack } from '@mui/material';
-import { FloppyDisk } from '@phosphor-icons/react';
+import { FloppyDiskIcon } from '@phosphor-icons/react';
 import type { HuntCreate } from '@hunthub/shared';
 import { HuntCreate as HuntCreateSchema } from '@hunthub/shared/schemas';
 import { useCreateHunt } from '@/api/Hunt';
@@ -56,9 +56,8 @@ export const CreateHuntForm = () => {
             required
             error={!!errors.name}
             helperText={errors.name?.message || 'Minimum 1 character, maximum 100'}
-            inputProps={{
-              minLength: 1,
-              maxLength: 100,
+            slotProps={{
+              htmlInput: { minLength: 1, maxLength: 100 },
             }}
           />
 
@@ -71,8 +70,8 @@ export const CreateHuntForm = () => {
             rows={4}
             error={!!errors.description}
             helperText={errors.description?.message || 'Maximum 500 characters (optional)'}
-            inputProps={{
-              maxLength: 500,
+            slotProps={{
+              htmlInput: { maxLength: 500 },
             }}
           />
 
@@ -87,7 +86,7 @@ export const CreateHuntForm = () => {
               size="large"
               fullWidth
               disabled={isSubmitting || createHuntMutation.isPending}
-              startIcon={<FloppyDisk size={20} />}
+              startIcon={<FloppyDiskIcon size={20} />}
             >
               {createHuntMutation.isPending ? 'Creating...' : 'Create Hunt'}
             </Button>

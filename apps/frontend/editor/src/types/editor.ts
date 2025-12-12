@@ -19,6 +19,17 @@ export type LocationFormData = {
   lat: number | null;
   lng: number | null;
   radius: number | null;
+  address: string | null;
+};
+
+/**
+ * Form data for HuntDialog (create/edit basic hunt metadata)
+ * Simpler than HuntFormData - no steps, just basic fields
+ */
+export type HuntDialogFormData = {
+  name: string;
+  description: string;
+  startLocation: LocationFormData;
 };
 
 export type QuizOptionFormData = WithRHFInternalId<{
