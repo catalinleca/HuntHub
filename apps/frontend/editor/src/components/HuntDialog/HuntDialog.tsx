@@ -6,7 +6,7 @@ import { HuntDialogForm } from './HuntDialogForm';
 import * as S from './HuntDialog.styles';
 
 export const HuntDialog = () => {
-  const { isOpen, huntId, close } = useHuntDialogStore();
+  const { isOpen, huntId, close, clearData } = useHuntDialogStore();
   const isEditMode = huntId !== null;
 
   const { data: hunt, isLoading } = useGetHunt(huntId);
@@ -14,7 +14,7 @@ export const HuntDialog = () => {
   const title = isEditMode ? 'Edit Hunt' : 'Create New Hunt';
 
   return (
-    <S.Dialog open={isOpen} onClose={close} maxWidth="sm" fullWidth>
+    <S.Dialog open={isOpen} onClose={close} maxWidth="sm" fullWidth slotProps={{ transition: { onExited: clearData } }}>
       <S.Title>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Typography variant="h5">{title}</Typography>

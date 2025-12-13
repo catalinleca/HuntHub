@@ -6,6 +6,7 @@ interface HuntDialogStore {
 
   open: (huntId?: number) => void;
   close: () => void;
+  clearData: () => void;
 }
 
 export const useHuntDialogStore = create<HuntDialogStore>((set) => ({
@@ -20,9 +21,10 @@ export const useHuntDialogStore = create<HuntDialogStore>((set) => ({
   },
 
   close: () => {
-    set({
-      isOpen: false,
-      huntId: null,
-    });
+    set({ isOpen: false });
+  },
+
+  clearData: () => {
+    set({ huntId: null });
   },
 }));

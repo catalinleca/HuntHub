@@ -429,6 +429,19 @@ export const Header = styled(Box)`
 
 ---
 
+### MUI v6 Slots API
+
+**Use `slotProps`, not deprecated `*Props`:**
+```tsx
+// ❌ DEPRECATED
+<Dialog TransitionProps={{ onExited: fn }} PaperProps={{ elevation: 0 }} />
+
+// ✅ CORRECT
+<Dialog slotProps={{ transition: { onExited: fn }, paper: { elevation: 0 } }} />
+```
+
+---
+
 ### Styled Components Pattern
 
 **Import pattern:**
