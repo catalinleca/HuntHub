@@ -102,59 +102,71 @@ export interface Location {
   address?: string;
 }
 
-/** Image media with asset reference */
+/** Snapshot of asset data (copied at selection time) */
+export interface AssetSnapshot {
+  /** Reference to Asset.assetId */
+  id: string;
+  /** CDN URL for preview */
+  url: string;
+  /** Original filename */
+  name: string;
+  /** File size in bytes */
+  sizeBytes: number;
+}
+
+/** Image media with nested asset snapshot */
 export interface ImageMedia {
-  /** Reference to Asset._id */
-  assetId: string;
-  /** Display title (optional) */
+  /** Snapshot of asset data */
+  asset: AssetSnapshot;
+  /** Display title (user-provided) */
   title?: string;
   /** Accessibility text for screen readers */
   alt?: string;
 }
 
-/** Audio media with asset reference */
+/** Audio media with nested asset snapshot */
 export interface AudioMedia {
-  /** Reference to Asset._id */
-  assetId: string;
-  /** Display title (optional) */
+  /** Snapshot of asset data */
+  asset: AssetSnapshot;
+  /** Display title (user-provided) */
   title?: string;
   /** Text transcript for accessibility */
   transcript?: string;
 }
 
-/** Video media with asset reference */
+/** Video media with nested asset snapshot */
 export interface VideoMedia {
-  /** Reference to Asset._id */
-  assetId: string;
-  /** Display title (optional) */
+  /** Snapshot of asset data */
+  asset: AssetSnapshot;
+  /** Display title (user-provided) */
   title?: string;
   /** Accessibility text for screen readers */
   alt?: string;
 }
 
-/** Combined image and audio media (e.g., image with narration) */
+/** Combined image + audio (composes ImageMedia and AudioMedia) */
 export interface ImageAudioMedia {
-  /** Reference to image Asset._id */
-  imageAssetId: string;
-  /** Reference to audio Asset._id */
-  audioAssetId: string;
-  /** Display title (optional) */
+  /** Image media */
+  image: ImageMedia;
+  /** Audio media */
+  audio: AudioMedia;
+  /** Overall title for the combined media */
   title?: string;
 }
 
 /** Content container for media (discriminated by parent type field) */
 export interface MediaContent {
-  /** Image media with asset reference */
+  /** Image media with nested asset snapshot */
   image?: ImageMedia;
-  /** Audio media with asset reference */
+  /** Audio media with nested asset snapshot */
   audio?: AudioMedia;
-  /** Video media with asset reference */
+  /** Video media with nested asset snapshot */
   video?: VideoMedia;
-  /** Combined image and audio media (e.g., image with narration) */
+  /** Combined image + audio (composes ImageMedia and AudioMedia) */
   imageAudio?: ImageAudioMedia;
 }
 
-/** Step media attachment (normalized - stores asset reference only) */
+/** Step media attachment (self-contained snapshot with asset data) */
 export interface Media {
   /** Type of media attached to a step */
   type: MediaType;

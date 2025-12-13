@@ -1,11 +1,17 @@
 import { MediaType } from '@hunthub/shared';
-import type { Asset } from '@hunthub/shared';
 import { ImagePreview } from './ImagePreview';
 import { AudioPreview } from './AudioPreview';
 import { VideoPreview } from './VideoPreview';
 
+interface PreviewAsset {
+  url: string;
+  name?: string;
+  originalFilename?: string;
+  mimeType?: string;
+}
+
 export interface MediaPreviewProps {
-  asset?: Asset | null;
+  asset?: PreviewAsset | null;
   mediaType?: MediaType;
   onClick?: () => void;
   emptyText?: string;
@@ -14,11 +20,7 @@ export interface MediaPreviewProps {
 
 type PreviewType = 'image' | 'audio' | 'video';
 
-/**
- * Routes to the correct preview component based on asset mimeType or explicit mediaType
- */
 export const MediaPreview = ({ asset, mediaType, onClick, emptyText, height }: MediaPreviewProps) => {
-  // Determine type from asset mimeType or explicit mediaType prop
   const type = getPreviewType(asset, mediaType);
 
   switch (type) {
@@ -32,7 +34,7 @@ export const MediaPreview = ({ asset, mediaType, onClick, emptyText, height }: M
   }
 };
 
-function getPreviewType(asset?: Asset | null, explicitType?: MediaType): PreviewType {
+const getPreviewType = (asset?: PreviewAsset | null, explicitType?: MediaType): PreviewType => {
   if (explicitType) {
     switch (explicitType) {
       case MediaType.Audio:
@@ -42,7 +44,7 @@ function getPreviewType(asset?: Asset | null, explicitType?: MediaType): Preview
       case MediaType.Image:
       case MediaType.ImageAudio:
       default:
-        return 'image'; // For image-audio, default to showing image
+        return 'image';
     }
   }
 
@@ -57,4 +59,4 @@ function getPreviewType(asset?: Asset | null, explicitType?: MediaType): Preview
     return 'video';
   }
   return 'image';
-}
+};

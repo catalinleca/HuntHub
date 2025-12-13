@@ -1,9 +1,14 @@
 import { Box, Typography, Stack } from '@mui/material';
 import { ImageIcon } from '@phosphor-icons/react';
-import type { Asset } from '@hunthub/shared';
+
+interface PreviewAsset {
+  url: string;
+  name?: string;
+  originalFilename?: string;
+}
 
 export interface ImagePreviewProps {
-  asset?: Asset | null;
+  asset?: PreviewAsset | null;
   onClick?: () => void;
   emptyText?: string;
   height?: number | string;
@@ -66,7 +71,7 @@ export const ImagePreview = ({
       <Box
         component="img"
         src={asset.url}
-        alt={asset.originalFilename || 'Image preview'}
+        alt={asset.name || asset.originalFilename || 'Image preview'}
         sx={{
           width: '100%',
           height: '100%',

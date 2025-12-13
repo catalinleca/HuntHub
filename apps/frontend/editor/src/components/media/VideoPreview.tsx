@@ -1,10 +1,13 @@
 import { Box, Typography, Stack, IconButton } from '@mui/material';
 import { VideoIcon, PlayIcon } from '@phosphor-icons/react';
 import { useState, useRef } from 'react';
-import type { Asset } from '@hunthub/shared';
+
+interface PreviewAsset {
+  url: string;
+}
 
 export interface VideoPreviewProps {
-  asset?: Asset | null;
+  asset?: PreviewAsset | null;
   onClick?: () => void;
   emptyText?: string;
   height?: number | string;

@@ -2,10 +2,13 @@ import { Box, Typography, Stack, IconButton, LinearProgress } from '@mui/materia
 import { WaveformIcon, PlayIcon, PauseIcon } from '@phosphor-icons/react';
 import { useState, useRef, useEffect } from 'react';
 import WaveSurfer from 'wavesurfer.js';
-import type { Asset } from '@hunthub/shared';
+
+interface PreviewAsset {
+  url: string;
+}
 
 export interface AudioPreviewProps {
-  asset?: Asset | null;
+  asset?: PreviewAsset | null;
   onClick?: () => void;
   emptyText?: string;
   height?: number | string;
