@@ -30,9 +30,12 @@ export function useCurrentLocation(): UseCurrentLocationReturn {
         },
         (err) => {
           setIsLoading(false);
-          setError(
-            err.code === 1 ? 'Permission denied' : err.code === 3 ? 'Request timed out' : 'Could not get location',
-          );
+          const errorMessages: Record<number, string> = {
+            1: 'Permission denied',
+            2: 'Location unavailable',
+            3: 'Request timed out',
+          };
+          setError(errorMessages[err.code] || 'Could not get location');
           resolve(null);
         },
         { enableHighAccuracy: true, timeout: 10000 },

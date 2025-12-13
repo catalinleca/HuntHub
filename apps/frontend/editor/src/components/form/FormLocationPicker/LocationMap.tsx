@@ -1,4 +1,11 @@
-import { Map, AdvancedMarker, Pin, useApiIsLoaded, useMap, MapMouseEvent } from '@vis.gl/react-google-maps';
+import {
+  Map as GoogleMap,
+  AdvancedMarker,
+  Pin,
+  useApiIsLoaded,
+  useMap,
+  MapMouseEvent,
+} from '@vis.gl/react-google-maps';
 import { CircularProgress, Typography } from '@mui/material';
 import { useMapPan, useMapCircle } from '@/hooks';
 import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, GOOGLE_MAP_ID } from '@/config/google-maps';
@@ -49,7 +56,7 @@ export const LocationMap = ({ lat, lng, radius, onMarkerDragEnd, onMapClick }: L
 
   return (
     <S.MapContainer>
-      <Map
+      <GoogleMap
         defaultCenter={DEFAULT_MAP_CENTER}
         defaultZoom={DEFAULT_MAP_ZOOM}
         disableDefaultUI
@@ -60,10 +67,14 @@ export const LocationMap = ({ lat, lng, radius, onMarkerDragEnd, onMapClick }: L
       >
         {hasLocation && (
           <AdvancedMarker position={{ lat, lng }} draggable onDragEnd={handleDragEnd}>
-            <Pin background={getColor('primary.main')} borderColor={getColor('secondary.main')} glyphColor={getColor('common.white')} />
+            <Pin
+              background={getColor('primary.main')}
+              borderColor={getColor('secondary.main')}
+              glyphColor={getColor('common.white')}
+            />
           </AdvancedMarker>
         )}
-      </Map>
+      </GoogleMap>
     </S.MapContainer>
   );
 };

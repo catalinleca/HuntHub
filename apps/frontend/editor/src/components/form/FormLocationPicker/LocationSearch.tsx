@@ -35,19 +35,23 @@ export const LocationSearch = ({ onPlaceSelect, value = '' }: LocationSearchProp
       return;
     }
 
-    const place = suggestion.placePrediction.toPlace();
-    await place.fetchFields({ fields: ['location', 'formattedAddress', 'displayName'] });
+    try {
+      const place = suggestion.placePrediction.toPlace();
+      await place.fetchFields({ fields: ['location', 'formattedAddress', 'displayName'] });
 
-    setInputValue(place.formattedAddress || place.displayName || '');
+      setInputValue(place.formattedAddress || place.displayName || '');
 
-    // Reset session token after fetchFields (billing optimization)
-    resetSession();
+      // Reset session token after fetchFields (billing optimization)
+      resetSession();
 
-    onPlaceSelect({
-      geometry: place.location ? { location: place.location } : undefined,
-      formatted_address: place.formattedAddress ?? undefined,
-      name: place.displayName ?? undefined,
-    });
+      onPlaceSelect({
+        geometry: place.location ? { location: place.location } : undefined,
+        formatted_address: place.formattedAddress ?? undefined,
+        name: place.displayName ?? undefined,
+      });
+    } catch (error) {
+      console.error('Failed to fetch place details:', error);
+    }
   };
 
   return (

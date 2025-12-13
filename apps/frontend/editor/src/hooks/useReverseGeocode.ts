@@ -11,7 +11,9 @@ export function useReverseGeocode(): UseReverseGeocodeReturn {
 
   const reverseGeocode = useCallback(
     async (lat: number, lng: number): Promise<string | null> => {
-      if (!geocoding) return null;
+      if (!geocoding) {
+        return null;
+      }
 
       return new Promise((resolve) => {
         const geocoder = new geocoding.Geocoder();

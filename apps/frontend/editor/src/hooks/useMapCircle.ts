@@ -22,22 +22,26 @@ export function useMapCircle(
       return;
     }
 
-    if (lat == null || lng == null || radius == null) {
-      circleRef.current?.setMap(null);
-      circleRef.current = null;
-      return;
-    }
-
-    if (!circleRef.current) {
-      circleRef.current = new google.maps.Circle({ map, ...CIRCLE_STYLE });
-    }
-
-    circleRef.current.setCenter({ lat, lng });
-    circleRef.current.setRadius(radius);
+    circleRef.current = new google.maps.Circle({ map, ...CIRCLE_STYLE });
 
     return () => {
       circleRef.current?.setMap(null);
       circleRef.current = null;
     };
-  }, [map, lat, lng, radius]);
+  }, [map]);
+
+  useEffect(() => {
+    if (!circleRef.current) {
+      return;
+    }
+
+    if (lat == null || lng == null || radius == null) {
+      circleRef.current.setVisible(false);
+      return;
+    }
+
+    circleRef.current.setCenter({ lat, lng });
+    circleRef.current.setRadius(radius);
+    circleRef.current.setVisible(true);
+  }, [lat, lng, radius]);
 }

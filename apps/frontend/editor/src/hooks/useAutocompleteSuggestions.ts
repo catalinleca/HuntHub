@@ -42,7 +42,6 @@ export function useAutocompleteSuggestions(
       sessionToken: sessionTokenRef.current,
     };
 
-    // Clear suggestions if input is empty
     if (inputString === '') {
       if (suggestions.length > 0) setSuggestions([]);
       return;

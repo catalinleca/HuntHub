@@ -90,8 +90,9 @@ export const HuntDialogForm = ({ hunt }: HuntDialogFormProps) => {
       updateMutation.mutate(
         { huntId: hunt.huntId, data: updateData },
         {
-          onError: () => {
+          onError: (error) => {
             // TODO: show toast error - dialog is already closed
+            console.error('Failed to update hunt:', error);
           },
         },
       );
@@ -107,6 +108,10 @@ export const HuntDialogForm = ({ hunt }: HuntDialogFormProps) => {
         onSuccess: (newHunt) => {
           close();
           navigate(`/editor/${newHunt.huntId}`);
+        },
+        onError: (error) => {
+          // TODO: show toast error
+          console.error('Failed to create hunt:', error);
         },
       });
     }

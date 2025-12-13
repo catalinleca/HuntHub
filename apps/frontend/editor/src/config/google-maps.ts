@@ -1,4 +1,10 @@
-export const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
+const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
+if (!apiKey && import.meta.env.DEV) {
+  console.warn('VITE_GOOGLE_MAPS_API_KEY is not set. Google Maps features will not work.');
+}
+
+export const GOOGLE_MAPS_API_KEY = apiKey as string | undefined;
 
 export const GOOGLE_MAP_ID = import.meta.env.VITE_GOOGLE_MAP_ID as string | undefined;
 
