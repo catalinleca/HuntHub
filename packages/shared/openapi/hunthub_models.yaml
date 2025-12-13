@@ -22,6 +22,9 @@ components:
           type: number
         radius:
           type: number
+        address:
+          type: string
+          description: Cached address from geocoding
       required:
         - lat
         - lng

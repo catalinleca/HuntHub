@@ -59,6 +59,7 @@ export class StepMapper {
             lat: doc.requiredLocation.lat,
             lng: doc.requiredLocation.lng,
             radius: doc.requiredLocation.radius,
+            address: doc.requiredLocation.address,
           }
         : undefined,
       timeLimit: doc.timeLimit,

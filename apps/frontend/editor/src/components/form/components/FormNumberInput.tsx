@@ -43,7 +43,7 @@ export const FormNumberInput = ({
         disabled={disabled}
         label={null}
         fullWidth
-        inputProps={{ min, max, step }}
+        slotProps={{ htmlInput: { min, max, step } }}
         {...props}
       />
       {error && <FormHelperText error>{error}</FormHelperText>}

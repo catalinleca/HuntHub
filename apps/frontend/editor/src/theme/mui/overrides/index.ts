@@ -1,6 +1,8 @@
 export { getMuiButtonOverrides } from './MuiButton';
+export { getMuiCheckboxOverrides } from './MuiCheckbox';
 export { getMuiCardOverrides } from './MuiCard';
 export { getMuiChipOverrides } from './MuiChip';
+export { getMuiCssBaselineOverrides } from './MuiCssBaseline';
 export { getMuiDialogOverrides } from './MuiDialog';
 export { getMuiDialogActionsOverrides } from './MuiDialogActions';
 export { getMuiDialogContentOverrides } from './MuiDialogContent';

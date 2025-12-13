@@ -69,6 +69,7 @@ export class HuntMapper {
             lat: versionDoc.startLocation.lat,
             lng: versionDoc.startLocation.lng,
             radius: versionDoc.startLocation.radius,
+            address: versionDoc.startLocation.address,
           }
         : undefined,
       stepOrder: versionDoc.stepOrder,

@@ -1,7 +1,8 @@
 import { LocationFormData } from '@/types/editor';
+import { hasValidCoordinates } from '@/utils/location';
 
 export const isLocationEnabled = (location: LocationFormData | null | undefined): boolean => {
-  return location?.lat !== null && location?.lat !== undefined;
+  return hasValidCoordinates(location);
 };
 
 export const isHintEnabled = (hint: string | null | undefined): boolean => {

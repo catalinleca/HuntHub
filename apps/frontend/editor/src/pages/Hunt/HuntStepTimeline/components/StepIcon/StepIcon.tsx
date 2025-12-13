@@ -1,4 +1,4 @@
-import { MapTrifold, Question, Camera, CheckSquare } from '@phosphor-icons/react';
+import { MapTrifoldIcon, QuestionIcon, CameraIcon, CheckSquareIcon } from '@phosphor-icons/react';
 import { ChallengeType } from '@hunthub/shared';
 import * as S from './StepIcon.styles';
 
@@ -9,11 +9,11 @@ interface StepIconProps {
   onClick: () => void;
 }
 
-const STEP_ICONS: Record<ChallengeType, typeof MapTrifold> = {
-  [ChallengeType.Clue]: MapTrifold,
-  [ChallengeType.Quiz]: Question,
-  [ChallengeType.Mission]: Camera,
-  [ChallengeType.Task]: CheckSquare,
+const STEP_ICONS: Record<ChallengeType, typeof MapTrifoldIcon> = {
+  [ChallengeType.Clue]: MapTrifoldIcon,
+  [ChallengeType.Quiz]: QuestionIcon,
+  [ChallengeType.Mission]: CameraIcon,
+  [ChallengeType.Task]: CheckSquareIcon,
 };
 
 export const StepIcon = ({ stepNumber, type, isSelected, onClick }: StepIconProps) => {

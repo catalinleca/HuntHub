@@ -10,15 +10,25 @@ export type WithRHFInternalId<T> = T & {
 };
 
 /**
- * Location for form - object always exists, leaves can be null (disabled state)
- * When all leaves are null = setting disabled
- * When all leaves are numbers = setting enabled
- * Invariant: updaters always set ALL fields together
+ * Location for form
+ * - lat/lng can be null when location is enabled but not yet selected
+ * - radius/address populated when location is picked
  */
 export type LocationFormData = {
   lat: number | null;
   lng: number | null;
   radius: number | null;
+  address: string | null;
+};
+
+/**
+ * Form data for HuntDialog (create/edit basic hunt metadata)
+ * Simpler than HuntFormData - no steps, just basic fields
+ */
+export type HuntDialogFormData = {
+  name: string;
+  description: string;
+  startLocation: LocationFormData;
 };
 
 export type QuizOptionFormData = WithRHFInternalId<{
@@ -58,7 +68,7 @@ export type StepFormData = WithRHFInternalId<
     stepId?: number; // Optional - assigned by backend when step is saved
     challenge: ChallengeFormData; // Use form version with QuizFormData
     // Settings - null means disabled
-    requiredLocation: LocationFormData;
+    requiredLocation: LocationFormData | null;
     hint: string | null;
     timeLimit: number | null;
     maxAttempts: number | null;

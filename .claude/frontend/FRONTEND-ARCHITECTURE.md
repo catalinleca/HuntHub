@@ -136,6 +136,28 @@ Bridge components wrap MUI components with React Hook Form integration:
 - Display validation errors
 - Maintain controlled component behavior
 
+**Syncing External Data (NO useEffect):**
+
+Use the `values` prop to sync form with external data. Do NOT use useEffect + reset.
+
+```tsx
+// ✅ CORRECT - values prop auto-syncs with external data
+const methods = useForm<FormData>({
+  resolver: zodResolver(schema),
+  values: hunt ? { name: hunt.name, description: hunt.description ?? '' } : undefined,
+  defaultValues: { name: '', description: '' },
+});
+
+// ❌ WRONG - useEffect is unnecessary
+useEffect(() => {
+  if (hunt) {
+    reset({ name: hunt.name, description: hunt.description ?? '' });
+  }
+}, [hunt, reset]);
+```
+
+See: [React Hook Form - useForm values prop](https://react-hook-form.com/docs/useform)
+
 ---
 
 ### 3. Data Fetching Pattern
@@ -148,6 +170,45 @@ Bridge components wrap MUI components with React Hook Form integration:
 - `useDeleteHunt()` - Delete mutation
 
 React Query handles caching, refetching, and synchronization automatically.
+
+**Seeding Detail from List Cache (NO loading state for cached items):**
+
+Use `initialData` to seed detail queries from list cache. This provides instant UI when opening items from a list.
+
+```tsx
+// ✅ CORRECT - seed detail from list cache
+export const useGetHunt = (huntId?: number | null) => {
+  const queryClient = useQueryClient();
+
+  return useQuery({
+    queryKey: huntKeys.detail(huntId!),
+    queryFn: () => fetchHunt(huntId!),
+    enabled: !!huntId,
+    initialData: () => {
+      if (!huntId) return undefined;
+
+      const queries = queryClient.getQueriesData<PaginatedHuntsResponse>({
+        queryKey: huntKeys.lists(),
+      });
+
+      for (const [, data] of queries) {
+        const hunt = data?.data?.find((h) => h.huntId === huntId);
+        if (hunt) return hunt;
+      }
+      return undefined;
+    },
+    initialDataUpdatedAt: () => {
+      return queryClient.getQueryState(huntKeys.lists())?.dataUpdatedAt;
+    },
+  });
+};
+```
+
+**When to use:**
+- `initialData` - when list item structure matches detail structure (same type)
+- `placeholderData` - when structures differ (e.g., list has preview, detail has full data)
+
+See: [TkDodo - Placeholder and Initial Data](https://tkdodo.eu/blog/placeholder-and-initial-data-in-react-query)
 
 ---
 
@@ -309,19 +370,47 @@ Keep related files together (component, styles, tests).
 
 ### NO Inline CSS in Components
 
-**Only allowed inline:** Simple spacing props like `sx={{ p: 2, gap: 1, m: 1 }}`
+**⚠️ CRITICAL - READ THIS EVERY TIME:**
+
+**Only allowed `sx` props:** `p`, `m`, `pt`, `pb`, `mt`, `mb`, `px`, `py`, `mx`, `my`, `gap`
+
+**⚠️ INTEGERS ONLY for spacing values.** MUI theme.spacing is array-based. Never use decimals like `1.5`.
 
 ```tsx
-// ✅ OK - trivial spacing
-<Stack sx={{ gap: 2, p: 1 }}>
+// ✅ OK
+<Stack gap={2}>
 
-// ❌ NEVER - complex styles inline
-<Box sx={{
-  backgroundColor: 'primary.main',
-  borderRadius: 2,
-  '&:hover': { transform: 'scale(1.02)' }
-}}>
+// ❌ NEVER - decimals break with array-based spacing
+<Stack gap={1.5}>
 ```
+
+```tsx
+// ✅ OK - only spacing
+<Stack sx={{ gap: 2, p: 1, mt: 2 }}>
+
+// ❌ NEVER - any other style property inline
+<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+<Box sx={{ backgroundColor: 'primary.main' }}>
+<Box sx={{ textAlign: 'left' }}>
+<DialogContent sx={{ textAlign: 'left' }}>
+```
+
+### Stack vs Box
+
+**USE STACK, NOT BOX** for layout:
+
+```tsx
+// ✅ ALWAYS - Stack handles flex layout
+<Stack direction="row" justifyContent="space-between" alignItems="center">
+
+// ❌ NEVER - Box with flex styles
+<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+```
+
+**Box is only for:**
+- Wrapping a single element with spacing
+- `component="form"` or `component="section"` semantic wrappers
+- When you genuinely need a non-flex container
 
 ```javascript
 // ❌ NEVER - do not write inline styled-components like this
@@ -332,11 +421,24 @@ export const Header = styled(Box)`
  gap: ${({ theme }) => theme.spacing(2)};
 `;
 
-// ✅ OK - just use Stack Mui component and pass native MUI props
-
+// ✅ OK - just use Stack MUI component with native props
+<Stack direction="row" alignItems="center" justifyContent="space-between" gap={2}>
 ```
 
-**For anything beyond trivial spacing → create a styled component.**
+**For anything beyond trivial spacing → create a styled component or use Stack props.**
+
+---
+
+### MUI v6 Slots API
+
+**Use `slotProps`, not deprecated `*Props`:**
+```tsx
+// ❌ DEPRECATED
+<Dialog TransitionProps={{ onExited: fn }} PaperProps={{ elevation: 0 }} />
+
+// ✅ CORRECT
+<Dialog slotProps={{ transition: { onExited: fn }, paper: { elevation: 0 } }} />
+```
 
 ---
 

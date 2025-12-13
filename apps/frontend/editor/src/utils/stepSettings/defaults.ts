@@ -1,7 +1,7 @@
-// Location defaults: enabled uses 0,0 as placeholder requiring user to set via map picker
+// Location defaults: enabled uses null values, user picks location via map picker
 export const LOCATION_DEFAULTS = {
-  enabled: { lat: 0, lng: 0, radius: 100 },
-  disabled: { lat: null, lng: null, radius: null },
+  enabled: { lat: null, lng: null, radius: null, address: null },
+  disabled: { lat: null, lng: null, radius: null, address: null },
 } as const;
 
 export const HINT_DEFAULTS = {

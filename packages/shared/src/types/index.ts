@@ -98,6 +98,8 @@ export interface Location {
   lat: number;
   lng: number;
   radius: number;
+  /** Cached address from geocoding */
+  address?: string;
 }
 
 /** Image media with asset reference */

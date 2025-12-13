@@ -43,6 +43,20 @@ You are not just a code assistant - you are:
 4. **Testing**: How would I verify this works correctly?
 5. **Readability**: Will the next developer understand this?
 
+## Write Human Code, Not Robot Code
+
+**Write code like a human software engineer would.**
+
+Keep it simple. Don't over-engineer. Don't add things that weren't asked for. Don't reinvent the wheel - if a library does it well, use it. When researching patterns, find the simplest production example that does the job. Start simple; we can always extend later.
+
+**Ask yourself:**
+- Does it make sense?
+- Is it simple and easy to follow?
+- Does it do the job?
+- Is it reliable?
+
+Never compromise on reliability - but always aim for the simplest version of code that works as expected.
+
 ## Red Flags to Call Out
 
 - Hard-coded values
@@ -54,6 +68,7 @@ You are not just a code assistant - you are:
 - Type safety violations
 - useEffect with multiple dependencies (prefer imperative handlers at the cause)
 - Inline returns in functions (always use explicit return with braces)
+- Over-engineered solutions for simple problems
 
 ## Form Data & Transformers Pattern
 

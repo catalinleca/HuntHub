@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import { Box } from '@mui/material';
+import { HuntDialog } from '@/components';
 
 export const RootLayout = () => {
   return (
@@ -10,6 +11,7 @@ export const RootLayout = () => {
       }}
     >
       <Outlet />
+      <HuntDialog />
     </Box>
   );
 };

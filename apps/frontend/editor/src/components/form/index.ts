@@ -35,3 +35,5 @@ export {
   type ArrayInputElementProps,
   type ArrayInputContextValue,
 } from './ArrayInput';
+
+export { FormLocationPicker, LocationMapContent } from './FormLocationPicker';
