@@ -18,13 +18,17 @@ export function useReverseGeocode(): UseReverseGeocodeReturn {
       }
 
       return new Promise((resolve) => {
-        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-          if (status === 'OK' && results?.[0]) {
-            resolve(results[0].formatted_address);
-          } else {
-            resolve(null);
-          }
-        });
+        try {
+          geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+            if (status === 'OK' && results?.[0]) {
+              resolve(results[0].formatted_address);
+            } else {
+              resolve(null);
+            }
+          });
+        } catch {
+          resolve(null);
+        }
       });
     },
     [geocoder],
