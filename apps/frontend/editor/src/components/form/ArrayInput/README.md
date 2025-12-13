@@ -3,6 +3,7 @@
 ## Why?
 
 React Hook Form's `useFieldArray` is powerful but requires boilerplate for common patterns:
+
 - Passing `swap`/`remove` actions through props (prop drilling)
 - Tracking array length for first/last item logic
 - Repeating move up/down/remove UI in every array item
@@ -49,9 +50,7 @@ const QuizOptions = () => {
         )}
       />
 
-      <Button onClick={() => append({ text: '', isCorrect: false })}>
-        Add Option
-      </Button>
+      <Button onClick={() => append({ text: '', isCorrect: false })}>Add Option</Button>
     </Stack>
   );
 };
@@ -84,13 +83,7 @@ const CustomItem = ({ index }: { index: number }) => {
 const ItemList = () => {
   const { fields, arrayActions, append } = useArrayInput<Item>('items');
 
-  return (
-    <ArrayInput
-      fields={fields}
-      {...arrayActions}
-      render={({ index }) => <CustomItem index={index} />}
-    />
-  );
+  return <ArrayInput fields={fields} {...arrayActions} render={({ index }) => <CustomItem index={index} />} />;
 };
 ```
 
@@ -104,14 +97,14 @@ const ItemList = () => {
 
 ## Exports
 
-| Export | Type | Purpose |
-|--------|------|---------|
-| `useArrayInput` | Hook | Wraps useFieldArray, returns fields + arrayActions |
-| `ArrayInput` | Component | Provides context, renders items with render prop |
-| `ArrayInputElement` | Component | UI wrapper with move/remove buttons |
-| `useArrayInputItem` | Hook | Gets isFirst/isLast/onMove/onRemove for an index |
-| `ArrayInputProvider` | Component | Context provider (used internally) |
-| `useArrayInputContext` | Hook | Access context directly (advanced) |
+| Export                 | Type      | Purpose                                            |
+| ---------------------- | --------- | -------------------------------------------------- |
+| `useArrayInput`        | Hook      | Wraps useFieldArray, returns fields + arrayActions |
+| `ArrayInput`           | Component | Provides context, renders items with render prop   |
+| `ArrayInputElement`    | Component | UI wrapper with move/remove buttons                |
+| `useArrayInputItem`    | Hook      | Gets isFirst/isLast/onMove/onRemove for an index   |
+| `ArrayInputProvider`   | Component | Context provider (used internally)                 |
+| `useArrayInputContext` | Hook      | Access context directly (advanced)                 |
 
 ## Types
 

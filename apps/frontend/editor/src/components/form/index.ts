@@ -37,3 +37,5 @@ export {
 } from './ArrayInput';
 
 export { FormLocationPicker, LocationMapContent } from './FormLocationPicker';
+
+export { FormMediaInput, type FormMediaInputProps } from './FormMediaInput';
