@@ -1,4 +1,4 @@
-import { Divider, Typography } from '@mui/material';
+import { Divider, Stack, Typography } from '@mui/material';
 import { useWatch } from 'react-hook-form';
 import { ChallengeType, OptionType } from '@hunthub/shared';
 import { FormInput, FormTextArea, FormToggleButtonGroup, getFieldPath } from '@/components/form';
@@ -50,7 +50,7 @@ export const QuizInput = ({ stepIndex }: QuizInputProps) => {
 
       <Section $color={color}>
         <WithTransition transitionKey={quizType} variant="fade-slide-down">
-          <>
+          <Stack gap={2}>
             <SectionTitle $color={color}>{text}</SectionTitle>
 
             {isMultipleChoice ? (
@@ -63,7 +63,7 @@ export const QuizInput = ({ stepIndex }: QuizInputProps) => {
                 helperText="The answer players need to provide"
               />
             )}
-          </>
+          </Stack>
         </WithTransition>
       </Section>
 
