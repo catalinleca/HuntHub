@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useMapsLibrary } from '@vis.gl/react-google-maps';
 
 export interface UseReverseGeocodeReturn {
@@ -9,14 +9,15 @@ export interface UseReverseGeocodeReturn {
 export function useReverseGeocode(): UseReverseGeocodeReturn {
   const geocoding = useMapsLibrary('geocoding');
 
+  const geocoder = useMemo(() => (geocoding ? new geocoding.Geocoder() : null), [geocoding]);
+
   const reverseGeocode = useCallback(
     async (lat: number, lng: number): Promise<string | null> => {
-      if (!geocoding) {
+      if (!geocoder) {
         return null;
       }
 
       return new Promise((resolve) => {
-        const geocoder = new geocoding.Geocoder();
         geocoder.geocode({ location: { lat, lng } }, (results, status) => {
           if (status === 'OK' && results?.[0]) {
             resolve(results[0].formatted_address);
@@ -26,8 +27,8 @@ export function useReverseGeocode(): UseReverseGeocodeReturn {
         });
       });
     },
-    [geocoding],
+    [geocoder],
   );
 
-  return { reverseGeocode, isReady: !!geocoding };
+  return { reverseGeocode, isReady: !!geocoder };
 }
