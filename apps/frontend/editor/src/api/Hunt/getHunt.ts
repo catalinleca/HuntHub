@@ -1,4 +1,4 @@
-import { QueryKey, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { Hunt, PaginatedHuntsResponse } from '@hunthub/shared';
 import { apiClient } from '@/services/http-client';
 import { huntKeys } from './keys';
@@ -10,7 +10,6 @@ const fetchHunt = async (huntId: number): Promise<Hunt> => {
 
 export const useGetHunt = (huntId?: number | null) => {
   const queryClient = useQueryClient();
-  let listKeyContainingHunt: QueryKey | undefined;
 
   return useQuery({
     queryKey: huntKeys.detail(huntId!),
@@ -29,10 +28,9 @@ export const useGetHunt = (huntId?: number | null) => {
         queryKey: huntKeys.lists(),
       });
 
-      for (const [queryKey, data] of queries) {
+      for (const [, data] of queries) {
         const hunt = data?.data?.find((h) => h.huntId === huntId);
         if (hunt) {
-          listKeyContainingHunt = queryKey;
           return hunt;
         }
       }
@@ -40,12 +38,21 @@ export const useGetHunt = (huntId?: number | null) => {
       return undefined;
     },
     initialDataUpdatedAt: () => {
-      // When returning the value from cache, we should also return its initial dataUpdatedAt. Otherwise, it will think it's fresh data
-      if (!listKeyContainingHunt) {
+      if (!huntId) {
         return undefined;
       }
 
-      return queryClient.getQueryState(listKeyContainingHunt)?.dataUpdatedAt;
+      const queries = queryClient.getQueriesData<PaginatedHuntsResponse>({
+        queryKey: huntKeys.lists(),
+      });
+
+      for (const [queryKey, data] of queries) {
+        if (data?.data?.some((h) => h.huntId === huntId)) {
+          return queryClient.getQueryState(queryKey)?.dataUpdatedAt;
+        }
+      }
+
+      return undefined;
     },
   });
 };

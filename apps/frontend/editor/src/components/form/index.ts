@@ -36,4 +36,4 @@ export {
   type ArrayInputContextValue,
 } from './ArrayInput';
 
-export { FormLocationPicker } from './FormLocationPicker';
+export { FormLocationPicker, LocationMapContent } from './FormLocationPicker';

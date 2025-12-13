@@ -48,6 +48,9 @@ export const HuntDialogForm = ({ hunt }: HuntDialogFormProps) => {
   const methods = useForm<HuntDialogFormData>({
     resolver: zodResolver(isEditMode ? HuntUpdateSchema : HuntCreateSchema),
     values: transformHuntToDialogFormData(hunt),
+    resetOptions: {
+      keepDirtyValues: true,
+    },
   });
 
   const {

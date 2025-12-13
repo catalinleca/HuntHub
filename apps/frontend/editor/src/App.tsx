@@ -24,7 +24,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <APIProvider apiKey={GOOGLE_MAPS_API_KEY} version="beta">
+        <APIProvider apiKey={GOOGLE_MAPS_API_KEY ?? ''} version="beta">
           <AuthProvider>
             <AppWithAuth />
           </AuthProvider>

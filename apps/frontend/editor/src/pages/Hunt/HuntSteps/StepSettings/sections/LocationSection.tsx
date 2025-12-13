@@ -1,4 +1,4 @@
-import { FormLocationPicker, getFieldPath } from '@/components/form';
+import { LocationMapContent, getFieldPath } from '@/components/form';
 import * as S from '../StepSettings.styles';
 
 interface LocationSectionProps {
@@ -10,7 +10,7 @@ export const LocationSection = ({ stepIndex }: LocationSectionProps) => {
 
   return (
     <S.SectionCard>
-      <FormLocationPicker name={locationPath} label="REQUIRED LOCATION" description="Where must the player be?" />
+      <LocationMapContent name={locationPath} label="REQUIRED LOCATION" description="Where must the player be?" />
     </S.SectionCard>
   );
 };

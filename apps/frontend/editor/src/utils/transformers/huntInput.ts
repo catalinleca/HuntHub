@@ -7,8 +7,8 @@ import {
   QuizFormData,
   QuizOptionFormData,
 } from '@/types/editor';
-import { LOCATION_DEFAULTS } from '@/utils/stepSettings';
 import { createInitialQuizOptions } from '@/pages/Hunt/HuntSteps/components/Quiz';
+import { hasValidCoordinates } from '@/utils/location';
 
 /**
  * Transform API Location to form LocationFormData
@@ -29,14 +29,14 @@ const transformLocationToFormData = (location?: Location): LocationFormData => {
 const transformStepSettings = (
   step: Step,
 ): Pick<StepFormData, 'requiredLocation' | 'hint' | 'timeLimit' | 'maxAttempts'> => {
-  const requiredLocation: LocationFormData = step.requiredLocation
+  const requiredLocation: LocationFormData | null = hasValidCoordinates(step.requiredLocation)
     ? {
         lat: step.requiredLocation.lat,
         lng: step.requiredLocation.lng,
         radius: step.requiredLocation.radius,
         address: step.requiredLocation.address ?? null,
       }
-    : { ...LOCATION_DEFAULTS.disabled };
+    : null;
 
   return {
     requiredLocation,

@@ -50,7 +50,12 @@ export const MissionInput = ({ stepIndex }: MissionInputProps) => {
 
       <WithTransition transitionKey={missionType} variant="fade-slide-down">
         {isMatchLocation && (
-          <LocationSection title="Target Location (Where players must go)" buttonLabel="Pick on map" color={color} />
+          <LocationSection
+            stepIndex={stepIndex}
+            title="Target Location"
+            description="Where players must go to complete this mission"
+            color={color}
+          />
         )}
       </WithTransition>
 
