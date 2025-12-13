@@ -5,7 +5,7 @@ export const getMuiDialogContentOverrides = (): Components<Theme>['MuiDialogCont
     root: ({ theme }) => ({
       padding: `0 ${theme.spacing(5)} ${theme.spacing(4)}`,
       color: theme.palette.text.secondary,
-      textAlign: 'left',
+      textAlign: 'center',
     }),
   },
 });

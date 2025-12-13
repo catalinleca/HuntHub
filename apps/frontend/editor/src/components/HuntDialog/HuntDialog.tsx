@@ -1,10 +1,10 @@
-import { Dialog, DialogTitle, DialogContent, Stack, IconButton, CircularProgress } from '@mui/material';
+import { Stack, IconButton, CircularProgress, Typography } from '@mui/material';
 import { XIcon } from '@phosphor-icons/react';
 import { useHuntDialogStore } from '@/stores';
 import { useGetHunt } from '@/api/Hunt';
 import { HuntDialogForm } from './HuntDialogForm';
+import * as S from './HuntDialog.styles';
 
-// TODO: improve this and HuntDialogForm once you add functinality. Apply recommnded appraoc
 export const HuntDialog = () => {
   const { isOpen, huntId, close } = useHuntDialogStore();
   const isEditMode = huntId !== null;
@@ -14,25 +14,25 @@ export const HuntDialog = () => {
   const title = isEditMode ? 'Edit Hunt' : 'Create New Hunt';
 
   return (
-    <Dialog open={isOpen} onClose={close} maxWidth="sm" fullWidth>
-      <DialogTitle>
+    <S.Dialog open={isOpen} onClose={close} maxWidth="sm" fullWidth>
+      <S.Title>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
-          {title}
-          <IconButton onClick={close} edge="end" aria-label="close">
+          <Typography variant="h5">{title}</Typography>
+          <IconButton onClick={close} edge="end" sx={{ color: 'common.white' }}>
             <XIcon size={24} />
           </IconButton>
         </Stack>
-      </DialogTitle>
+      </S.Title>
 
-      <DialogContent>
+      <S.Content>
         {isEditMode && isLoading ? (
           <Stack justifyContent="center" alignItems="center" sx={{ py: 4 }}>
             <CircularProgress />
           </Stack>
         ) : (
-          <HuntDialogForm hunt={isEditMode ? hunt : undefined} />
+          <HuntDialogForm hunt={hunt} />
         )}
-      </DialogContent>
-    </Dialog>
+      </S.Content>
+    </S.Dialog>
   );
 };

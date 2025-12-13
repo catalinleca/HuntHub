@@ -99,9 +99,16 @@ export const FormLocationPicker = ({
     [updateLocation],
   );
 
-  const handleExpand = () => {
-    if (!disabled) {
-      setIsExpanded(true);
+  const handleExpand = async () => {
+    if (disabled) {
+      return;
+    }
+
+    setIsExpanded(true);
+
+    const coords = await getCurrentLocation();
+    if (coords) {
+      await updateLocation(coords.lat, coords.lng);
     }
   };
 
@@ -139,7 +146,7 @@ export const FormLocationPicker = ({
             </Typography>
           )}
 
-          <Stack direction="row" gap={1} alignItems="flex-start">
+          <Stack direction="row" gap={1} alignItems="center">
             <Box sx={{ flex: 1 }}>
               <LocationSearch onPlaceSelect={handlePlaceSelect} value={location?.address ?? ''} />
             </Box>

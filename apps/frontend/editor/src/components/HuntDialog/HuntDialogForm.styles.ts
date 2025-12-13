@@ -8,6 +8,7 @@ export const Form = styled(Stack)`
 export const FormContent = styled(Stack)`
   flex: 1;
   overflow-y: auto;
+  padding: ${({ theme }) => theme.spacing(4)} 0;
 `;
 
 export const SectionLabel = styled(Typography).attrs({
