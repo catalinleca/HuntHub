@@ -40,7 +40,6 @@ export const MediaDetailsDrawer = ({ open, onClose, onSave, initialMedia }: Medi
 
   const handleTypeChange = (newType: MediaType) => {
     setMediaType(newType);
-    formMethods.reset({ media: MediaParser.toFormData(null) });
   };
 
   return (
