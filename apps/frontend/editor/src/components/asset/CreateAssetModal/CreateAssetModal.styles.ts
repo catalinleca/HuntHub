@@ -1,10 +1,6 @@
 import { styled, alpha } from '@mui/material/styles';
 import { Box, LinearProgress as MuiLinearProgress } from '@mui/material';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// DropZone
-// ─────────────────────────────────────────────────────────────────────────────
-
 interface DropZoneContainerProps {
   $isDragActive?: boolean;
   $isDragReject?: boolean;
@@ -37,10 +33,6 @@ export const DropZoneContainer = styled(Box, {
     padding: theme.spacing(4),
   };
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
-// UploadProgress
-// ─────────────────────────────────────────────────────────────────────────────
 
 export const FileItem = styled(Box, {
   shouldForwardProp: (prop) => prop !== '$hasError',

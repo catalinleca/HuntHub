@@ -2,7 +2,7 @@ import { Typography, Stack } from '@mui/material';
 import { CloudArrowUpIcon } from '@phosphor-icons/react';
 import { useDropzone, type Accept, type FileRejection } from 'react-dropzone';
 import { useCallback } from 'react';
-import * as S from './DropZone.styles';
+import * as S from './CreateAssetModal.styles';
 
 export interface DropZoneProps {
   onFilesAccepted: (files: File[]) => void;
@@ -19,7 +19,7 @@ const DEFAULT_ACCEPT: Accept = {
   'video/*': ['.mp4', '.webm'],
 };
 
-const DEFAULT_MAX_SIZE = 10 * 1024 * 1024; // 10MB
+const DEFAULT_MAX_SIZE = 10 * 1024 * 1024;
 
 export const DropZone = ({
   onFilesAccepted,
@@ -51,7 +51,12 @@ export const DropZone = ({
   });
 
   return (
-    <S.Container {...getRootProps()} $isDragActive={isDragActive} $isDragReject={isDragReject} $disabled={disabled}>
+    <S.DropZoneContainer
+      {...getRootProps()}
+      $isDragActive={isDragActive}
+      $isDragReject={isDragReject}
+      $disabled={disabled}
+    >
       <input {...getInputProps()} />
 
       <Stack alignItems="center" gap={2}>
@@ -78,6 +83,6 @@ export const DropZone = ({
           Max file size: {Math.round(maxSize / (1024 * 1024))}MB
         </Typography>
       </Stack>
-    </S.Container>
+    </S.DropZoneContainer>
   );
 };

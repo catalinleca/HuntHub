@@ -4,7 +4,7 @@ import { ArrowLeftIcon, MagnifyingGlassIcon, PlusIcon } from '@phosphor-icons/re
 import type { Asset } from '@hunthub/shared';
 import { useAssetsQuery } from '@/api/Asset';
 import { AssetGrid } from './AssetGrid';
-import { CreateAssetModal } from '../CreateAssetModal';
+import { CreateAssetModal } from '@/components/asset';
 import * as S from './AssetLibraryDrawer.styles';
 
 export interface AssetLibraryDrawerProps {

@@ -14,7 +14,6 @@ export const useCreateAsset = () => {
   return useMutation({
     mutationFn: createAsset,
     onSuccess: () => {
-      // Invalidate all asset lists to refetch with the new asset
       queryClient.invalidateQueries({ queryKey: assetKeys.lists() });
     },
   });

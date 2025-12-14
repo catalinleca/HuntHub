@@ -1,6 +1,7 @@
 import { styled } from '@mui/material/styles';
 import { Stack, Box } from '@mui/material';
 
+// TODO - unify previews
 export const EmptyState = styled(Stack, {
   shouldForwardProp: (prop) => prop !== '$clickable' && prop !== '$height',
 })<{ $clickable?: boolean; $height?: number | string }>(({ theme, $clickable, $height }) => ({

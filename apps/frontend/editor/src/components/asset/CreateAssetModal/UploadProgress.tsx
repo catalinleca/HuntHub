@@ -10,7 +10,7 @@ import {
   ArrowClockwiseIcon,
 } from '@phosphor-icons/react';
 import { getColor } from '@/utils';
-import * as S from './UploadProgress.styles';
+import * as S from './CreateAssetModal.styles';
 
 export type UploadStatus = 'pending' | 'uploading' | 'success' | 'error';
 
@@ -31,6 +31,7 @@ export interface UploadProgressProps {
   onRetry?: (id: string) => void;
 }
 
+// TODO - repeat
 const formatFileSize = (bytes: number): string => {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;

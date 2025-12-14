@@ -8,12 +8,6 @@ export interface UploadProgress {
 
 export type ProgressCallback = (progress: UploadProgress) => void;
 
-/**
- * Upload a file directly to S3 using a presigned URL
- * @param signedUrl - Presigned S3 URL from requestUpload
- * @param file - File to upload
- * @param onProgress - Optional progress callback
- */
 export const uploadToS3 = async (signedUrl: string, file: File, onProgress?: ProgressCallback): Promise<void> => {
   await axios.put(signedUrl, file, {
     headers: {

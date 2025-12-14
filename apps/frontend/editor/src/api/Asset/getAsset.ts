@@ -13,6 +13,6 @@ export const useGetAsset = (assetId: number | null | undefined) => {
     queryKey: assetKeys.detail(assetId!),
     queryFn: () => fetchAsset(assetId!),
     enabled: !!assetId,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5,
   });
 };

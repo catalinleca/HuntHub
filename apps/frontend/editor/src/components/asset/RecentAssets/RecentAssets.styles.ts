@@ -22,6 +22,7 @@ export const ThumbnailSkeleton = styled(MuiSkeleton)({
   flexShrink: 0,
 });
 
+// TODO - unify previews
 export const ThumbnailItem = styled(Box, {
   shouldForwardProp: (prop) => prop !== '$selected',
 })<{ $selected?: boolean }>(({ theme, $selected }) => ({
