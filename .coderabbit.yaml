@@ -10,6 +10,7 @@
 #
 # Check package.json versions FIRST, then verify against current docs.
 # If unsure, ask rather than suggest deprecated code.
+# Ignore TODOs
 
 reviews:
   # Assertive catches more than chill, but we'll tone down instructions
