@@ -81,8 +81,13 @@ export const AudioPreview = ({
     wavesurferRef.current = ws;
 
     // Single cleanup function - destroy and nullify ref to help GC
+    // Try-catch handles AbortError from React StrictMode double-mount
     return () => {
-      ws.destroy();
+      try {
+        ws.destroy();
+      } catch {
+        // WaveSurfer throws AbortError if destroyed while loading - safe to ignore
+      }
       wavesurferRef.current = null;
     };
   }, [asset?.url]);

@@ -84,7 +84,7 @@ export const DropZone = ({
           color={isDragActive ? 'inherit' : undefined}
         />
 
-        <Stack alignItems="center" gap={0.5}>
+        <Stack alignItems="center" gap={1}>
           <Typography variant="body1" fontWeight={500}>
             {isDragActive
               ? isDragReject

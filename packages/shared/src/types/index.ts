@@ -60,7 +60,7 @@ export enum MimeTypes {
   ImageGif = "image/gif",
   VideoMp4 = "video/mp4",
   VideoWebm = "video/webm",
-  AudioMp3 = "audio/mp3",
+  AudioMpeg = "audio/mpeg",
   AudioWav = "audio/wav",
   AudioOgg = "audio/ogg",
 }

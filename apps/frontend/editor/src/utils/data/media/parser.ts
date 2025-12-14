@@ -1,4 +1,3 @@
-import { MediaType } from '@hunthub/shared';
 import type { Media } from '@hunthub/shared';
 import type { MediaFormData, MediaImageFormData, MediaAudioFormData, MediaVideoFormData } from './types';
 
@@ -31,7 +30,6 @@ const parseVideoMedia = (media?: Media | null): MediaVideoFormData => {
 
 export const MediaParser = {
   toFormData: (media?: Media | null): MediaFormData => ({
-    type: media?.type ?? MediaType.Image,
     image: parseImageMedia(media),
     audio: parseAudioMedia(media),
     video: parseVideoMedia(media),

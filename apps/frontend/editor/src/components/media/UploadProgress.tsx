@@ -126,14 +126,14 @@ const UploadFileItem = ({ file, onRemove, onRetry }: UploadFileItemProps) => {
 
           {/* Error message */}
           {file.status === 'error' && file.error && (
-            <Typography variant="caption" color="error.main" mt={0.5}>
+            <Typography variant="caption" color="error.main" mt={1}>
               {file.error}
             </Typography>
           )}
         </Box>
 
         {/* Status icon or actions */}
-        <Stack direction="row" alignItems="center" gap={0.5}>
+        <Stack direction="row" alignItems="center" gap={1}>
           {file.status === 'success' && (
             <CheckCircleIcon size={20} weight="fill" color="var(--mui-palette-success-main)" />
           )}

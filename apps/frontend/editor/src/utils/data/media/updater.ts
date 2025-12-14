@@ -1,61 +1,66 @@
 import { MediaType } from '@hunthub/shared';
-import type { Media } from '@hunthub/shared';
-import type { MediaFormData } from './types';
+import type { Media, ImageMedia, AudioMedia, VideoMedia, AssetSnapshot } from '@hunthub/shared';
+import type { MediaFormData, MediaImageFormData, MediaAudioFormData, MediaVideoFormData } from './types';
+import { MediaGenerator } from './generator';
 
-const updateImageMedia = (formData: MediaFormData): Media => ({
-  type: MediaType.Image,
-  content: {
-    image: {
-      asset: formData.image.asset!,
-      title: formData.image.title || undefined,
-      alt: formData.image.alt || undefined,
-    },
-  },
-});
+interface BaseMediaContent {
+  asset: AssetSnapshot;
+  title?: string;
+}
 
-const updateAudioMedia = (formData: MediaFormData): Media => ({
-  type: MediaType.Audio,
-  content: {
-    audio: {
-      asset: formData.audio.asset!,
-      title: formData.audio.title || undefined,
-      transcript: formData.audio.transcript || undefined,
-    },
-  },
-});
+interface BaseMediaFormData {
+  asset: AssetSnapshot | null;
+  title: string;
+}
 
-const updateVideoMedia = (formData: MediaFormData): Media => ({
-  type: MediaType.Video,
-  content: {
-    video: {
-      asset: formData.video.asset!,
-      title: formData.video.title || undefined,
-      alt: formData.video.alt || undefined,
-    },
-  },
-});
+const fillBaseContent = (target: BaseMediaContent, source: BaseMediaFormData): void => {
+  target.asset = source.asset!;
+  target.title = source.title || undefined;
+};
 
-const updateImageAudioMedia = (formData: MediaFormData): Media => ({
-  type: MediaType.ImageAudio,
-  content: {
-    imageAudio: {
-      image: {
-        asset: formData.image.asset!,
-        title: formData.image.title || undefined,
-        alt: formData.image.alt || undefined,
-      },
-      audio: {
-        asset: formData.audio.asset!,
-        title: formData.audio.title || undefined,
-        transcript: formData.audio.transcript || undefined,
-      },
-    },
-  },
-});
+const fillImageContent = (target: ImageMedia, source: MediaImageFormData): void => {
+  fillBaseContent(target, source);
+  target.alt = source.alt || undefined;
+};
+
+const fillAudioContent = (target: AudioMedia, source: MediaAudioFormData): void => {
+  fillBaseContent(target, source);
+  target.transcript = source.transcript || undefined;
+};
+
+const fillVideoContent = (target: VideoMedia, source: MediaVideoFormData): void => {
+  fillBaseContent(target, source);
+  target.alt = source.alt || undefined;
+};
+
+const updateImageMedia = (formData: MediaFormData): Media => {
+  const media = MediaGenerator.createTemplate(MediaType.Image);
+  fillImageContent(media.content.image!, formData.image);
+  return media;
+};
+
+const updateAudioMedia = (formData: MediaFormData): Media => {
+  const media = MediaGenerator.createTemplate(MediaType.Audio);
+  fillAudioContent(media.content.audio!, formData.audio);
+  return media;
+};
+
+const updateVideoMedia = (formData: MediaFormData): Media => {
+  const media = MediaGenerator.createTemplate(MediaType.Video);
+  fillVideoContent(media.content.video!, formData.video);
+  return media;
+};
+
+const updateImageAudioMedia = (formData: MediaFormData): Media => {
+  const media = MediaGenerator.createTemplate(MediaType.ImageAudio);
+  fillImageContent(media.content.imageAudio!.image, formData.image);
+  fillAudioContent(media.content.imageAudio!.audio, formData.audio);
+  return media;
+};
 
 export const MediaUpdater = {
-  toMedia: (formData: MediaFormData): Media => {
-    switch (formData.type) {
+  toMedia: (formData: MediaFormData, type: MediaType): Media => {
+    switch (type) {
       case MediaType.Image:
         return updateImageMedia(formData);
       case MediaType.Audio:

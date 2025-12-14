@@ -1,4 +1,4 @@
-import type { MediaType, AssetSnapshot } from '@hunthub/shared';
+import type { AssetSnapshot } from '@hunthub/shared';
 
 export interface MediaImageFormData {
   asset: AssetSnapshot | null;
@@ -19,7 +19,6 @@ export interface MediaVideoFormData {
 }
 
 export interface MediaFormData {
-  type: MediaType;
   image: MediaImageFormData;
   audio: MediaAudioFormData;
   video: MediaVideoFormData;

@@ -65,7 +65,7 @@ export const AssetCard = ({ asset, selected = false, onClick, onDoubleClick }: A
         </Box>
 
         {/* Filename & Size */}
-        <Stack mt={1} gap={0.5}>
+        <Stack mt={1} gap={1}>
           <Typography variant="body2" noWrap title={asset.originalFilename || undefined} sx={{ fontWeight: 500 }}>
             {asset.originalFilename || `Asset ${asset.assetId}`}
           </Typography>

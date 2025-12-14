@@ -10,8 +10,12 @@ export const MediaHelper = {
     sizeBytes: asset.size || 0,
   }),
 
-  canSave: (formData: MediaFormData): boolean => {
-    switch (formData.type) {
+  hasData: (formData?: MediaFormData, type?: MediaType | null): boolean => {
+    if (!formData || !type) {
+      return false;
+    }
+
+    switch (type) {
       case MediaType.Image:
         return !!formData.image?.asset;
       case MediaType.Audio:
@@ -20,6 +24,27 @@ export const MediaHelper = {
         return !!formData.video?.asset;
       case MediaType.ImageAudio:
         return !!formData.image?.asset && !!formData.audio?.asset;
+      default:
+        return false;
+    }
+  },
+
+  isMediaValid: (media?: Media | null): boolean => {
+    if (!media?.content || !media.type) {
+      return false;
+    }
+
+    switch (media.type) {
+      case MediaType.Image:
+        return !!media.content.image?.asset?.url;
+      case MediaType.Audio:
+        return !!media.content.audio?.asset?.url;
+      case MediaType.Video:
+        return !!media.content.video?.asset?.url;
+      case MediaType.ImageAudio:
+        return !!media.content.imageAudio?.image?.asset?.url && !!media.content.imageAudio?.audio?.asset?.url;
+      default:
+        return false;
     }
   },
 
@@ -55,6 +80,65 @@ export const MediaHelper = {
       default:
         return undefined;
     }
+  },
+
+  getDisplayName: (media?: Media | null): string | undefined => {
+    const title = MediaHelper.getTitle(media);
+    if (title) {
+      return title;
+    }
+
+    const asset = MediaHelper.getPrimaryAsset(media);
+    return asset?.name;
+  },
+
+  getAlt: (media?: Media | null): string | undefined => {
+    if (!media?.content) {
+      return undefined;
+    }
+
+    switch (media.type) {
+      case MediaType.Image:
+        return media.content.image?.alt;
+      case MediaType.Video:
+        return media.content.video?.alt;
+      case MediaType.ImageAudio:
+        return media.content.imageAudio?.image?.alt;
+      default:
+        return undefined;
+    }
+  },
+
+  getTranscript: (media?: Media | null): string | undefined => {
+    if (!media?.content) {
+      return undefined;
+    }
+
+    switch (media.type) {
+      case MediaType.Audio:
+        return media.content.audio?.transcript;
+      case MediaType.ImageAudio:
+        return media.content.imageAudio?.audio?.transcript;
+      default:
+        return undefined;
+    }
+  },
+
+  getUrl: (media?: Media | null): string | undefined => {
+    const asset = MediaHelper.getPrimaryAsset(media);
+    return asset?.url;
+  },
+
+  getSecondaryAsset: (media?: Media | null): AssetSnapshot | undefined => {
+    if (!media?.content) {
+      return undefined;
+    }
+
+    if (media.type === MediaType.ImageAudio) {
+      return media.content.imageAudio?.audio?.asset;
+    }
+
+    return undefined;
   },
 
   getPrimaryAsset: (media?: Media | null): AssetSnapshot | undefined => {

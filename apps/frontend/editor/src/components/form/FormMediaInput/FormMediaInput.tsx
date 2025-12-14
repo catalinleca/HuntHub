@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Stack, Typography } from '@mui/material';
+import { MediaType } from '@hunthub/shared';
 import type { Media } from '@hunthub/shared';
-import { MediaUpdater } from '@/utils/data/media';
+import { MediaUpdater, MediaHelper } from '@/utils/data/media';
 import type { MediaFormData } from '@/utils/data/media';
+import { useConfirmationDialog } from '@/hooks';
+import { DialogVariants } from '@/stores/useDialogStore';
 import { MediaDetailsDrawer } from '@/components/media/MediaDetailsDrawer';
 import { MediaCardPreview } from './MediaCardPreview';
 import { AddMediaPlaceholder } from './AddMediaPlaceholder';
@@ -18,10 +21,11 @@ export interface FormMediaInputProps {
 
 export const FormMediaInput = ({ name, label = 'Media', description, disabled = false }: FormMediaInputProps) => {
   const { setValue } = useFormContext();
+  const { confirm } = useConfirmationDialog();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const media: Media | null | undefined = useWatch({ name });
-  const hasMedia = media?.type != null;
+  const hasMedia = MediaHelper.isMediaValid(media);
 
   const handleOpenDrawer = () => {
     setDrawerOpen(true);
@@ -31,14 +35,22 @@ export const FormMediaInput = ({ name, label = 'Media', description, disabled = 
     setDrawerOpen(false);
   };
 
-  const handleSave = (formData: MediaFormData) => {
-    const apiMedia = MediaUpdater.toMedia(formData);
+  const handleSave = (formData: MediaFormData, type: MediaType) => {
+    const apiMedia = MediaUpdater.toMedia(formData, type);
     setValue(name, apiMedia, { shouldDirty: true });
     setDrawerOpen(false);
   };
 
   const handleRemove = () => {
-    setValue(name, null, { shouldDirty: true });
+    confirm({
+      title: 'Remove Media',
+      message: 'Are you sure you want to remove this media?',
+      confirmText: 'Remove',
+      variant: DialogVariants.Danger,
+      onConfirm: () => {
+        setValue(name, null, { shouldDirty: true });
+      },
+    });
   };
 
   return (
@@ -51,7 +63,7 @@ export const FormMediaInput = ({ name, label = 'Media', description, disabled = 
           </Typography>
         )}
 
-        {hasMedia ? (
+        {hasMedia && media ? (
           <MediaCardPreview media={media} disabled={disabled} onEdit={handleOpenDrawer} onRemove={handleRemove} />
         ) : (
           <AddMediaPlaceholder disabled={disabled} onAdd={handleOpenDrawer} />
