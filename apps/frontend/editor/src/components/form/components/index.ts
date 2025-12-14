@@ -6,3 +6,6 @@ export type { SelectOption as FormSelectOption } from '@/components/common';
 export { FormCheckbox, type FormCheckboxProps } from './FormCheckbox';
 export { FormToggleButtonGroup, type FormToggleButtonGroupProps } from './FormToggleButtonGroup';
 export type { ToggleButtonOption as FormToggleButtonOption } from '@/components/common';
+export { FormAssetInput, type FormAssetInputProps } from './FormAssetInput';
+export { FormMediaInput, type FormMediaInputProps } from './FormMediaInput';
+export { FormLocationPicker, type FormLocationPickerProps } from './FormLocationPicker';

@@ -1,7 +1,6 @@
 import { MediaType } from '@hunthub/shared';
-import { ImagePreview } from './ImagePreview';
-import { AudioPreview } from './AudioPreview';
-import { VideoPreview } from './VideoPreview';
+import { ImagePreview, AudioPreview, VideoPreview } from '@/components/asset';
+import { getPreviewType } from './data';
 
 interface PreviewAsset {
   url: string;
@@ -18,8 +17,6 @@ export interface MediaPreviewProps {
   height?: number | string;
 }
 
-type PreviewType = 'image' | 'audio' | 'video';
-
 export const MediaPreview = ({ asset, mediaType, onClick, emptyText, height }: MediaPreviewProps) => {
   const type = getPreviewType(asset, mediaType);
 
@@ -32,31 +29,4 @@ export const MediaPreview = ({ asset, mediaType, onClick, emptyText, height }: M
     default:
       return <ImagePreview asset={asset} onClick={onClick} emptyText={emptyText} height={height} />;
   }
-};
-
-const getPreviewType = (asset?: PreviewAsset | null, explicitType?: MediaType): PreviewType => {
-  if (explicitType) {
-    switch (explicitType) {
-      case MediaType.Audio:
-        return 'audio';
-      case MediaType.Video:
-        return 'video';
-      case MediaType.Image:
-      case MediaType.ImageAudio:
-      default:
-        return 'image';
-    }
-  }
-
-  if (!asset?.mimeType) {
-    return 'image';
-  }
-
-  if (asset.mimeType.startsWith('audio/')) {
-    return 'audio';
-  }
-  if (asset.mimeType.startsWith('video/')) {
-    return 'video';
-  }
-  return 'image';
 };

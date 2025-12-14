@@ -24,3 +24,11 @@ export const Content = styled(Box)(({ theme }) => ({
   overflow: 'auto',
   padding: theme.spacing(2),
 }));
+
+export const Footer = styled(Stack)(({ theme }) => ({
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+  gap: theme.spacing(1),
+  padding: theme.spacing(2),
+  borderTop: `1px solid ${theme.palette.divider}`,
+}));

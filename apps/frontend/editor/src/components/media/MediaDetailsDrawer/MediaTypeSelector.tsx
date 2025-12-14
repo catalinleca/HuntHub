@@ -1,4 +1,5 @@
-import { ToggleButtonGroup, ToggleButton, Stack, Typography } from '@mui/material';
+import React from 'react';
+import { ToggleButtonGroup, ToggleButton, Stack, Typography, Tooltip } from '@mui/material';
 import { ImageIcon, WaveformIcon, VideoIcon, ImagesIcon } from '@phosphor-icons/react';
 import { MediaType } from '@hunthub/shared';
 
@@ -16,25 +17,23 @@ const MEDIA_TYPES: { value: MediaType; label: string; icon: React.ReactNode }[] 
 
 export const MediaTypeSelector = ({ value, onChange }: MediaTypeSelectorProps) => {
   const handleChange = (_: React.MouseEvent, newValue: MediaType | null) => {
-    // Don't allow deselection
     if (newValue) {
       onChange(newValue);
     }
   };
 
   return (
-    <Stack gap={1}>
+    <Stack gap={1} alignItems="flex-start">
       <Typography variant="body2" color="text.secondary">
         Media Type
       </Typography>
-      <ToggleButtonGroup value={value} exclusive onChange={handleChange} fullWidth size="small">
+      <ToggleButtonGroup value={value} exclusive onChange={handleChange} size="small">
         {MEDIA_TYPES.map((type) => (
-          <ToggleButton key={type.value} value={type.value}>
-            <Stack direction="row" alignItems="center" gap={1}>
+          <Tooltip key={type.value} title={type.label}>
+            <ToggleButton value={type.value} aria-label={type.label}>
               {type.icon}
-              <Typography variant="body2">{type.label}</Typography>
-            </Stack>
-          </ToggleButton>
+            </ToggleButton>
+          </Tooltip>
         ))}
       </ToggleButtonGroup>
     </Stack>
