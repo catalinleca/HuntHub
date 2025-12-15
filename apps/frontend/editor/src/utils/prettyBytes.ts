@@ -1,5 +1,5 @@
 export const prettyBytes = (bytes?: number): string => {
-  if (!bytes) {
+  if (bytes === undefined || bytes === null) {
     return '';
   }
 
