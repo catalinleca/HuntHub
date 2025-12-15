@@ -20,6 +20,7 @@ export const AssetLibraryDrawer = ({ open, onClose, onSelect, filterType }: Asse
   const [selectedAssetId, setSelectedAssetId] = useState<number | null>(null);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
+  // TODO: Implement pagination or infinite scroll for users with more than 100 assets
   const {
     data: assetsResponse,
     isLoading,

@@ -23,7 +23,7 @@ export const AssetGrid = ({
   if (assets.length === 0) {
     return (
       <S.EmptyState gap={1}>
-        <FolderOpenIcon size={48} weight="light" />
+        <FolderOpenIcon size={48} weight="light" aria-hidden="true" />
         <Typography color="text.secondary">{emptyMessage}</Typography>
       </S.EmptyState>
     );
