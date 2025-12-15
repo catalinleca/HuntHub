@@ -28,6 +28,9 @@ export const FormMediaInput = ({ name, label = 'Media', description, disabled = 
   const hasMedia = MediaHelper.isMediaValid(media);
 
   const handleOpenDrawer = () => {
+    if (disabled) {
+      return;
+    }
     setDrawerOpen(true);
   };
 
