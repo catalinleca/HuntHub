@@ -18,13 +18,19 @@ export const AssetPreview = ({ asset, onClick, height }: AssetPreviewProps) => {
       return <AudioPreview asset={asset} onClick={onClick} height={height} />;
     case 'video':
       return <VideoPreview asset={asset} onClick={onClick} height={height} />;
-    default:
+    default: {
+      const imageUrl = asset.thumbnailUrl || asset.url;
+      if (!imageUrl) {
+        return null;
+      }
+
       return (
         <ImagePreview
-          asset={{ url: asset.thumbnailUrl || asset.url, name: asset.originalFilename }}
+          asset={{ url: imageUrl, name: asset.originalFilename || 'Untitled' }}
           onClick={onClick}
           height={height}
         />
       );
+    }
   }
 };
