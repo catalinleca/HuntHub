@@ -8,14 +8,8 @@ export interface AddMediaPlaceholderProps {
 }
 
 export const AddMediaPlaceholder = ({ disabled, onAdd }: AddMediaPlaceholderProps) => {
-  const handleClick = () => {
-    if (!disabled) {
-      onAdd();
-    }
-  };
-
   return (
-    <S.AddMediaButton onClick={handleClick} $disabled={disabled}>
+    <S.AddMediaButton onClick={onAdd} disabled={disabled}>
       <ImageIcon size={20} aria-hidden="true" />
       <Typography variant="body2">Add media</Typography>
     </S.AddMediaButton>

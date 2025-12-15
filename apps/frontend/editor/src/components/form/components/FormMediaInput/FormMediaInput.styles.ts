@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Stack, Typography, Card } from '@mui/material';
+import { Stack, Typography, Card, ButtonBase } from '@mui/material';
 
 export const SectionLabel = styled(Typography).attrs({
   variant: 'overline',
@@ -9,24 +9,27 @@ export const SectionLabel = styled(Typography).attrs({
   color: theme.palette.text.secondary,
 }));
 
-export const AddMediaButton = styled(Stack).attrs({
-  direction: 'row',
+export const AddMediaButton = styled(ButtonBase)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
   alignItems: 'center',
-})<{ $disabled?: boolean }>(({ theme, $disabled }) => ({
   gap: theme.spacing(1),
-  color: $disabled ? theme.palette.text.disabled : theme.palette.primary.main,
+  color: theme.palette.primary.main,
   padding: theme.spacing(2),
   borderRadius: theme.shape.borderRadius,
   border: `2px dashed ${theme.palette.divider}`,
   justifyContent: 'center',
-  cursor: $disabled ? 'not-allowed' : 'pointer',
+  width: '100%',
   transition: 'border-color 0.2s ease-in-out',
 
-  ...(!$disabled && {
-    '&:hover': {
-      borderColor: theme.palette.primary.main,
-    },
-  }),
+  '&:hover:not(:disabled)': {
+    borderColor: theme.palette.primary.main,
+  },
+
+  '&:disabled': {
+    color: theme.palette.text.disabled,
+    cursor: 'not-allowed',
+  },
 }));
 
 export const MediaCard = styled(Card)<{ $disabled?: boolean }>(({ theme, $disabled }) => ({
