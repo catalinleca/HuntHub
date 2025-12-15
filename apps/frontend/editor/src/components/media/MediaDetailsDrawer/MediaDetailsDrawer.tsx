@@ -39,9 +39,7 @@ export const MediaDetailsDrawer = ({
   initialMedia,
   restrictToTypes,
 }: MediaDetailsDrawerProps) => {
-  const [mediaType, setMediaType] = useState<MediaType>(() =>
-    getDefaultType(initialMedia, restrictToTypes)
-  );
+  const [mediaType, setMediaType] = useState<MediaType>(() => getDefaultType(initialMedia, restrictToTypes));
 
   const formMethods = useForm<MediaDrawerForm>({
     defaultValues: { media: MediaParser.toFormData(null) },

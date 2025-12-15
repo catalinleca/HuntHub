@@ -1,12 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, FormProvider, useWatch } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Stack, Button, Alert, Typography, Divider } from '@mui/material';
 import { UsersIcon } from '@phosphor-icons/react';
 import type { Hunt, HuntCreate, HuntUpdate } from '@hunthub/shared';
 import { MediaType } from '@hunthub/shared';
-import { HuntCreate as HuntCreateSchema, HuntUpdate as HuntUpdateSchema } from '@hunthub/shared/schemas';
 import { FormInput, FormTextArea, FormLocationPicker, FormMediaInput } from '@/components/form';
 import { useCreateHunt, useUpdateHunt } from '@/api/Hunt';
 import { useHuntDialogStore } from '@/stores';
@@ -47,7 +45,6 @@ export const HuntDialogForm = ({ hunt }: HuntDialogFormProps) => {
   const updateMutation = useUpdateHunt();
 
   const methods = useForm<HuntDialogFormData>({
-    resolver: zodResolver(isEditMode ? HuntUpdateSchema : HuntCreateSchema),
     values: transformHuntToDialogFormData(hunt),
     resetOptions: {
       keepDirtyValues: true,
