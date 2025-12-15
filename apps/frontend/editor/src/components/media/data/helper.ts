@@ -46,6 +46,10 @@ export const typeToMediaType = (type: SimpleAssetType): MediaType => {
       return MediaType.Audio;
     case 'video':
       return MediaType.Video;
+    default: {
+      const exhaustiveCheck: never = type;
+      throw new Error(`Unsupported SimpleAssetType: ${exhaustiveCheck}`);
+    }
   }
 };
 
@@ -53,7 +57,7 @@ export const MediaHelper = {
   assetToSnapshot: (asset: Asset): AssetSnapshot => ({
     id: asset.assetId.toString(),
     url: asset.url,
-    name: asset.originalFilename || '',
+    name: asset.originalFilename || asset.url.split('/').pop() || 'Untitled',
     sizeBytes: asset.size || 0,
   }),
 
