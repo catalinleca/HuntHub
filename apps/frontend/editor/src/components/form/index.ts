@@ -5,6 +5,9 @@ export {
   FormSelect,
   FormCheckbox,
   FormToggleButtonGroup,
+  FormAssetInput,
+  FormMediaInput,
+  FormLocationPicker,
   type FormInputProps,
   type FormTextAreaProps,
   type FormNumberInputProps,
@@ -13,6 +16,9 @@ export {
   type FormCheckboxProps,
   type FormToggleButtonGroupProps,
   type FormToggleButtonOption,
+  type FormAssetInputProps,
+  type FormMediaInputProps,
+  type FormLocationPickerProps,
 } from './components';
 
 export { getNestedError, nameToId, getFieldPath } from './utils';
@@ -36,4 +42,4 @@ export {
   type ArrayInputContextValue,
 } from './ArrayInput';
 
-export { FormLocationPicker, LocationMapContent } from './FormLocationPicker';
+export { LocationMapContent } from './components/FormLocationPicker';

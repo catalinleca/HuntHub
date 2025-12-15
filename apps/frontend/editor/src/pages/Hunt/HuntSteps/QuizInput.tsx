@@ -1,7 +1,7 @@
 import { Divider, Stack, Typography } from '@mui/material';
 import { useWatch } from 'react-hook-form';
 import { ChallengeType, OptionType } from '@hunthub/shared';
-import { FormInput, FormTextArea, FormToggleButtonGroup, getFieldPath } from '@/components/form';
+import { FormInput, FormTextArea, FormToggleButtonGroup, FormMediaInput, getFieldPath } from '@/components/form';
 import { WithTransition } from '@/components/common';
 import { Section, SectionTitle, StepCard } from './components';
 import { StepSettings } from './StepSettings';
@@ -20,6 +20,7 @@ const getQuizFieldNames = (stepIndex: number) => ({
   targetText: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.target.text),
   options: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.options),
   targetId: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.targetId),
+  media: getFieldPath((h) => h.hunt.steps[stepIndex].media),
 });
 
 const QUIZ_TYPE_OPTIONS = [
@@ -66,6 +67,10 @@ export const QuizInput = ({ stepIndex }: QuizInputProps) => {
           </Stack>
         </WithTransition>
       </Section>
+
+      <Divider sx={{ my: 2 }} />
+
+      <FormMediaInput name={fields.media} label="Media" description="Optional image, audio, or video for this quiz" />
 
       <Divider sx={{ my: 2 }} />
 

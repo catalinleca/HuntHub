@@ -8,7 +8,7 @@ import { useCurrentLocation } from '@/hooks';
 import { DEFAULT_RADIUS } from '@/config/google-maps';
 import * as S from './FormLocationPicker.styles';
 
-interface FormLocationPickerProps {
+export interface FormLocationPickerProps {
   name: string;
   label?: string;
   description?: string;

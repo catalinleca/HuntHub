@@ -29,43 +29,43 @@ export const AssetExtractor = {
 
     switch (mediaType) {
       case 'image':
-        if (media.content.image?.assetId) {
+        if (media.content.image?.asset?.id) {
           sources.push({
-            assetId: media.content.image.assetId,
-            path: `${basePath}.content.image.assetId`,
+            assetId: media.content.image.asset.id,
+            path: `${basePath}.content.image.asset.id`,
           });
         }
         break;
 
       case 'audio':
-        if (media.content.audio?.assetId) {
+        if (media.content.audio?.asset?.id) {
           sources.push({
-            assetId: media.content.audio.assetId,
-            path: `${basePath}.content.audio.assetId`,
+            assetId: media.content.audio.asset.id,
+            path: `${basePath}.content.audio.asset.id`,
           });
         }
         break;
 
       case 'video':
-        if (media.content.video?.assetId) {
+        if (media.content.video?.asset?.id) {
           sources.push({
-            assetId: media.content.video.assetId,
-            path: `${basePath}.content.video.assetId`,
+            assetId: media.content.video.asset.id,
+            path: `${basePath}.content.video.asset.id`,
           });
         }
         break;
 
       case 'image-audio':
-        if (media.content.imageAudio?.imageAssetId) {
+        if (media.content.imageAudio?.image?.asset?.id) {
           sources.push({
-            assetId: media.content.imageAudio.imageAssetId,
-            path: `${basePath}.content.imageAudio.imageAssetId`,
+            assetId: media.content.imageAudio.image.asset.id,
+            path: `${basePath}.content.imageAudio.image.asset.id`,
           });
         }
-        if (media.content.imageAudio?.audioAssetId) {
+        if (media.content.imageAudio?.audio?.asset?.id) {
           sources.push({
-            assetId: media.content.imageAudio.audioAssetId,
-            path: `${basePath}.content.imageAudio.audioAssetId`,
+            assetId: media.content.imageAudio.audio.asset.id,
+            path: `${basePath}.content.imageAudio.audio.asset.id`,
           });
         }
         break;

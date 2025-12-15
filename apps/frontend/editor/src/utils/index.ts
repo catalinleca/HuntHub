@@ -1,3 +1,6 @@
 export { getColor } from './getColor';
 export * from './stepSettings';
-export * from './location';
+export { hasValidCoordinates } from './hasValidCoordinates';
+export { queryFnOrSkip } from './queryFnOrSkip';
+export { prettyBytes } from './prettyBytes';
+export { assertNever } from './assertNever';

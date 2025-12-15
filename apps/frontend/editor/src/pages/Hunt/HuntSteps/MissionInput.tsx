@@ -1,6 +1,6 @@
 import { Divider, Typography } from '@mui/material';
 import { ChallengeType, MissionType } from '@hunthub/shared';
-import { FormInput, FormTextArea, getFieldPath, FormToggleButtonGroup } from '@/components/form';
+import { FormInput, FormTextArea, FormMediaInput, getFieldPath, FormToggleButtonGroup } from '@/components/form';
 import { LocationSection, StepCard } from './components';
 import { StepSettings } from './StepSettings';
 import { STEP_TYPE_CONFIG } from '@/pages/Hunt/HuntSteps/stepTypeConfig';
@@ -17,6 +17,7 @@ const getMissionFieldNames = (stepIndex: number) => ({
   description: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.mission.description),
   type: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.mission.type),
   aiInstructions: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.mission.aiInstructions),
+  media: getFieldPath((h) => h.hunt.steps[stepIndex].media),
 });
 
 const MISSION_TYPE_OPTIONS = [
@@ -58,6 +59,14 @@ export const MissionInput = ({ stepIndex }: MissionInputProps) => {
           />
         )}
       </WithTransition>
+
+      <Divider sx={{ my: 2 }} />
+
+      <FormMediaInput
+        name={fields.media}
+        label="Media"
+        description="Optional image, audio, or video for this mission"
+      />
 
       <Divider sx={{ my: 2 }} />
 

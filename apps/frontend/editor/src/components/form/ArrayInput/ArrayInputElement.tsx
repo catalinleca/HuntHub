@@ -10,12 +10,7 @@ export interface ArrayInputElementProps {
   showActions?: boolean;
 }
 
-export const ArrayInputElement = ({
-  index,
-  title,
-  children,
-  showActions = true,
-}: ArrayInputElementProps) => {
+export const ArrayInputElement = ({ index, title, children, showActions = true }: ArrayInputElementProps) => {
   const { isFirst, isLast, onMoveUp, onMoveDown, onRemove } = useArrayInputItem(index);
 
   return (

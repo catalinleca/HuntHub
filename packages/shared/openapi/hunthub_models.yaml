@@ -49,7 +49,7 @@ components:
 
     MimeTypes:
       type: string
-      enum: [image/jpeg, image/png, image/webp, image/gif, video/mp4, video/webm, audio/mp3, audio/wav, audio/ogg]
+      enum: [image/jpeg, image/png, image/webp, image/gif, video/mp4, video/webm, audio/mpeg, audio/wav, audio/ogg]
 
     # ============================================================
     # Media Schemas (Step-level media attachment)
@@ -60,73 +60,91 @@ components:
       enum: [image, audio, video, image-audio]
       description: Type of media attached to a step
 
+    AssetSnapshot:
+      type: object
+      description: Snapshot of asset data (copied at selection time)
+      properties:
+        id:
+          type: string
+          description: Stringified Asset.assetId for storage flexibility
+        url:
+          type: string
+          description: CDN URL for preview
+        name:
+          type: string
+          description: Original filename
+        sizeBytes:
+          type: integer
+          description: File size in bytes
+      required:
+        - id
+        - url
+        - name
+        - sizeBytes
+      additionalProperties: false
+
     ImageMedia:
       type: object
-      description: Image media with asset reference
+      description: Image media with nested asset snapshot
       properties:
-        assetId:
-          type: string
-          description: Reference to Asset._id
+        asset:
+          $ref: '#/components/schemas/AssetSnapshot'
         title:
           type: string
-          description: Display title (optional)
+          description: Display title (user-provided)
         alt:
           type: string
           description: Accessibility text for screen readers
       required:
-        - assetId
+        - asset
       additionalProperties: false
 
     AudioMedia:
       type: object
-      description: Audio media with asset reference
+      description: Audio media with nested asset snapshot
       properties:
-        assetId:
-          type: string
-          description: Reference to Asset._id
+        asset:
+          $ref: '#/components/schemas/AssetSnapshot'
         title:
           type: string
-          description: Display title (optional)
+          description: Display title (user-provided)
         transcript:
           type: string
           description: Text transcript for accessibility
       required:
-        - assetId
+        - asset
       additionalProperties: false
 
     VideoMedia:
       type: object
-      description: Video media with asset reference
+      description: Video media with nested asset snapshot
       properties:
-        assetId:
-          type: string
-          description: Reference to Asset._id
+        asset:
+          $ref: '#/components/schemas/AssetSnapshot'
         title:
           type: string
-          description: Display title (optional)
+          description: Display title (user-provided)
         alt:
           type: string
           description: Accessibility text for screen readers
       required:
-        - assetId
+        - asset
       additionalProperties: false
 
     ImageAudioMedia:
       type: object
-      description: Combined image and audio media (e.g., image with narration)
+      description: Combined image + audio (composes ImageMedia and AudioMedia)
       properties:
-        imageAssetId:
-          type: string
-          description: Reference to image Asset._id
-        audioAssetId:
-          type: string
-          description: Reference to audio Asset._id
+        image:
+          $ref: '#/components/schemas/ImageMedia'
+        audio:
+          $ref: '#/components/schemas/AudioMedia'
         title:
           type: string
-          description: Display title (optional)
+          description: Overall title for the combined media
       required:
-        - imageAssetId
-        - audioAssetId
+        - image
+        - audio
       additionalProperties: false
 
     MediaContent:
@@ -145,7 +163,7 @@ components:
 
     Media:
       type: object
-      description: Step media attachment (normalized - stores asset reference only)
+      description: Step media attachment (self-contained snapshot with asset data)
       properties:
         type:
           $ref: '#/components/schemas/MediaType'

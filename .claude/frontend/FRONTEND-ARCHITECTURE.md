@@ -551,6 +551,10 @@ const Component = memo(({ items }) => {
 });
 ```
 
+** Small components, break sections or parts from JSX and move into separate component **
+- Especially if we can collocate the state or make it easier to follow and less verbose
+- No big JSX components
+
 ---
 
 ## Development Workflow

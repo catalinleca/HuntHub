@@ -1,6 +1,6 @@
 import { Divider, Typography } from '@mui/material';
 import { ChallengeType } from '@hunthub/shared';
-import { FormInput, FormTextArea, getFieldPath } from '@/components/form';
+import { FormInput, FormTextArea, FormMediaInput, getFieldPath } from '@/components/form';
 import { StepCard } from './components';
 import { StepSettings } from './StepSettings';
 
@@ -12,6 +12,7 @@ const getTaskFieldNames = (stepIndex: number) => ({
   title: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.task.title),
   instructions: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.task.instructions),
   aiInstructions: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.task.aiInstructions),
+  media: getFieldPath((h) => h.hunt.steps[stepIndex].media),
 });
 
 export const TaskInput = ({ stepIndex }: TaskInputProps) => {
@@ -39,6 +40,10 @@ export const TaskInput = ({ stepIndex }: TaskInputProps) => {
         rows={3}
         helperText="Example: 'Accept if player mentions at least 2 architectural features'"
       />
+
+      <Divider sx={{ my: 2 }} />
+
+      <FormMediaInput name={fields.media} label="Media" description="Optional image, audio, or video for this task" />
 
       <Divider sx={{ my: 2 }} />
 

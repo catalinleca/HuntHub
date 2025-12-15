@@ -1,5 +1,5 @@
 import { LocationFormData } from '@/types/editor';
-import { hasValidCoordinates } from '@/utils/location';
+import { hasValidCoordinates } from '@/utils';
 
 export const isLocationEnabled = (location: LocationFormData | null | undefined): boolean => {
   return hasValidCoordinates(location);

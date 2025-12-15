@@ -1,6 +1,6 @@
 import { Divider, Typography } from '@mui/material';
 import { ChallengeType } from '@hunthub/shared';
-import { FormInput, FormTextArea, getFieldPath } from '@/components/form';
+import { FormInput, FormTextArea, FormMediaInput, getFieldPath } from '@/components/form';
 import { StepCard } from './components';
 import { StepSettings } from './StepSettings';
 
@@ -11,6 +11,7 @@ interface ClueInputProps {
 const getClueFieldNames = (stepIndex: number) => ({
   title: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.clue.title),
   description: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.clue.description),
+  media: getFieldPath((h) => h.hunt.steps[stepIndex].media),
 });
 
 export const ClueInput = ({ stepIndex }: ClueInputProps) => {
@@ -30,6 +31,10 @@ export const ClueInput = ({ stepIndex }: ClueInputProps) => {
         placeholder="Start your journey at the historic fountain in the town square..."
         rows={4}
       />
+
+      <Divider sx={{ my: 2 }} />
+
+      <FormMediaInput name={fields.media} label="Media" description="Optional image, audio, or video for this clue" />
 
       <Divider sx={{ my: 2 }} />
 

@@ -14,4 +14,3 @@ export const IconWrapper = styled(Box)<{ $bgColor: PaletteColor }>(({ theme, $bg
   color: theme.palette.common.white,
   boxShadow: theme.shadows[3],
 }));
-
