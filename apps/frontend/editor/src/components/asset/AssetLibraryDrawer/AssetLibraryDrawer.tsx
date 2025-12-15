@@ -21,11 +21,7 @@ export const AssetLibraryDrawer = ({ open, onClose, onSelect, filterType }: Asse
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
   // TODO: Implement pagination or infinite scroll for users with more than 100 assets
-  const {
-    data: assetsResponse,
-    isLoading,
-    refetch,
-  } = useAssetsQuery({
+  const { data: assetsResponse, isLoading } = useAssetsQuery({
     limit: 100,
     sortBy: AssetSortField.CreatedAt,
     sortOrder: SortOrder.Desc,
@@ -69,7 +65,6 @@ export const AssetLibraryDrawer = ({ open, onClose, onSelect, filterType }: Asse
 
   const handleUploadComplete = () => {
     setUploadModalOpen(false);
-    refetch();
   };
 
   return (
