@@ -1,4 +1,4 @@
-import { Step, Hunt, Location, Quiz, Challenge } from '@hunthub/shared';
+import { Step, Hunt, Location, Quiz, Challenge, Media } from '@hunthub/shared';
 
 /**
  * Generic type that adds RHF internal tracking ID to any type.
@@ -29,6 +29,7 @@ export type HuntDialogFormData = {
   name: string;
   description: string;
   startLocation: LocationFormData;
+  coverImage: Media | null;
 };
 
 export type QuizOptionFormData = WithRHFInternalId<{

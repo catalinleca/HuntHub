@@ -28,6 +28,10 @@ const huntVersionSchema: Schema<IHuntVersion> = new Schema<IHuntVersion>(
       type: [Number],
       default: [],
     },
+    coverImage: {
+      type: Schema.Types.Mixed,
+      default: null,
+    },
     isPublished: {
       type: Boolean,
       default: false,

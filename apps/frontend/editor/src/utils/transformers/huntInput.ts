@@ -114,4 +114,5 @@ export const transformHuntToDialogFormData = (hunt?: Hunt): HuntDialogFormData =
   name: hunt?.name ?? '',
   description: hunt?.description ?? '',
   startLocation: transformLocationToFormData(hunt?.startLocation),
+  coverImage: hunt?.coverImage ?? null,
 });

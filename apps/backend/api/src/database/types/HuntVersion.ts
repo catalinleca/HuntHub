@@ -1,3 +1,4 @@
+import type { Media } from '@hunthub/shared';
 import { ILocation } from '../schemas/location.schema';
 
 export interface IHuntVersion {
@@ -8,6 +9,7 @@ export interface IHuntVersion {
   description?: string;
   startLocation?: ILocation;
   stepOrder: number[];
+  coverImage?: Media | null;
 
   isPublished: boolean; // true = read-only
 

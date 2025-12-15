@@ -42,6 +42,7 @@ export class HuntMapper {
       description: dto.description,
       startLocation: dto.startLocation,
       stepOrder: [],
+      coverImage: dto.coverImage,
       isPublished: false,
     };
   }
@@ -73,6 +74,7 @@ export class HuntMapper {
           }
         : undefined,
       stepOrder: versionDoc.stepOrder,
+      coverImage: versionDoc.coverImage,
 
       // Publishing metadata from HuntVersion
       isPublished: versionDoc.isPublished,
@@ -112,6 +114,7 @@ export class HuntMapper {
       name: dto.name,
       description: dto.description,
       startLocation: dto.startLocation,
+      coverImage: dto.coverImage,
     };
   }
 
@@ -128,6 +131,7 @@ export class HuntMapper {
       description: sourceDoc.description,
       startLocation: sourceDoc.startLocation,
       stepOrder: [...sourceDoc.stepOrder], // Clone array
+      coverImage: sourceDoc.coverImage,
       isPublished: false,
     };
   }
