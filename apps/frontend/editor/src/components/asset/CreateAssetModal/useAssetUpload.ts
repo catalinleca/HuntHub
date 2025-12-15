@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { Asset, AssetCreate } from '@hunthub/shared';
 import { requestUpload, uploadToS3, assetKeys } from '@/api/Asset';
 import { apiClient } from '@/services/http-client';
-import type { UploadingFile, UploadStatus } from './UploadProgress';
+import type { UploadingFile } from './UploadProgress';
 
 interface UseAssetUploadReturn {
   files: UploadingFile[];
@@ -18,8 +18,6 @@ interface UseAssetUploadReturn {
 }
 
 const generateId = () => crypto.randomUUID();
-
-// TODO - check file
 
 const getExtension = (filename: string): string => {
   const parts = filename.split('.');
@@ -42,7 +40,7 @@ export const useAssetUpload = (): UseAssetUploadReturn => {
       size: file.size,
       type: file.type,
       progress: 0,
-      status: 'pending' as UploadStatus,
+      status: 'pending',
     }));
     setFiles((prev) => [...prev, ...uploadingFiles]);
   }, []);
@@ -60,6 +58,9 @@ export const useAssetUpload = (): UseAssetUploadReturn => {
 
         // Step 1: Get presigned URL
         const extension = getExtension(file.name);
+        if (!extension) {
+          throw new Error('File must have an extension (e.g. .png, .mp3)');
+        }
         const { signedUrl, publicUrl, s3Key } = await requestUpload(extension);
 
         // Step 2: Upload to S3
