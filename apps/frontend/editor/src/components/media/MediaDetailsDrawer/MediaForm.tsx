@@ -1,4 +1,5 @@
 import { MediaType } from '@hunthub/shared';
+import { assertNever } from '@/utils';
 import { MediaImageInput, MediaAudioInput, MediaVideoInput, MediaImageAudioInput } from '../inputs';
 
 export interface MediaFormProps {
@@ -15,10 +16,7 @@ export const MediaForm = ({ type }: MediaFormProps) => {
       return <MediaVideoInput />;
     case MediaType.ImageAudio:
       return <MediaImageAudioInput />;
-    default: {
-      const exhaustiveCheck: never = type;
-      console.error(`Unhandled MediaType: ${exhaustiveCheck}`);
-      return null;
-    }
+    default:
+      return assertNever(type);
   }
 };

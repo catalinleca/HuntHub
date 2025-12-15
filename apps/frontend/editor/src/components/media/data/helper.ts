@@ -1,6 +1,7 @@
 import { MediaType } from '@hunthub/shared';
 import type { Media, Asset, AssetSnapshot } from '@hunthub/shared';
 import type { MediaFormData } from './types';
+import { assertNever } from '@/utils';
 
 export type SimpleAssetType = 'image' | 'audio' | 'video';
 
@@ -25,10 +26,8 @@ export const typeToMediaType = (type: SimpleAssetType): MediaType => {
       return MediaType.Audio;
     case 'video':
       return MediaType.Video;
-    default: {
-      const exhaustiveCheck: never = type;
-      throw new Error(`Unsupported SimpleAssetType: ${exhaustiveCheck}`);
-    }
+    default:
+      return assertNever(type);
   }
 };
 
