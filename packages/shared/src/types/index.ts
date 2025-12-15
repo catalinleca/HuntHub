@@ -247,6 +247,8 @@ export interface Hunt {
    * @example "2024-02-01T10:12:45Z"
    */
   updatedAt?: string;
+  /** Optional cover image for the hunt */
+  coverImage?: Media | null;
 }
 
 export interface HuntCreate {
@@ -259,6 +261,8 @@ export interface HuntCreate {
   description?: string;
   startLocation?: Location;
   steps?: StepCreate[];
+  /** Optional cover image for the hunt */
+  coverImage?: Media | null;
 }
 
 /** Hunt content update (updates draft HuntVersion internally) */
@@ -276,6 +280,8 @@ export interface HuntUpdate {
    * @format date-time
    */
   updatedAt?: string;
+  /** Optional cover image for the hunt */
+  coverImage?: Media | null;
 }
 
 export interface Step {
