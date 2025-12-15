@@ -31,7 +31,7 @@ export const MediaDetailsDrawer = ({ open, onClose, onSave, initialMedia }: Medi
       formMethods.reset({ media: parsedData });
       setMediaType(initialMedia?.type ?? MediaType.Image);
     }
-  }, [open, initialMedia, formMethods]);
+  }, [open, initialMedia]);
 
   const handleSave = () => {
     const data = formMethods.getValues('media');

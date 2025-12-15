@@ -2,8 +2,10 @@ import { styled } from '@mui/material/styles';
 import { Drawer as MuiDrawer, Stack, Box } from '@mui/material';
 
 const DRAWER_WIDTH = 400;
+const DRAWER_Z_INDEX = 1200;
 
 export const Drawer = styled(MuiDrawer)({
+  zIndex: DRAWER_Z_INDEX,
   '& .MuiDrawer-paper': {
     width: DRAWER_WIDTH,
     boxSizing: 'border-box',
