@@ -86,7 +86,12 @@ export const generateStepDataWithMedia = (assetId: string): Partial<IStep> => ({
     type: MediaType.Image,
     content: {
       image: {
-        assetId,
+        asset: {
+          id: assetId,
+          url: faker.internet.url(),
+          name: faker.system.fileName(),
+          sizeBytes: faker.number.int({ min: 1000, max: 10000000 }),
+        },
         title: 'Test image',
         alt: 'Test image alt text',
       },

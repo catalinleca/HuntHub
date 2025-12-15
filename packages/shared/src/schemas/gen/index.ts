@@ -2,7 +2,9 @@ import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
 const HuntStatus = z.enum(['draft', 'published']);
-const Location = z.object({ lat: z.number(), lng: z.number(), radius: z.number() }).strict();
+const Location = z
+  .object({ lat: z.number(), lng: z.number(), radius: z.number(), address: z.string().optional() })
+  .strict();
 const HuntAccessType = z.enum(['creator', 'viewer', 'editor']);
 const ChallengeType = z.enum(['clue', 'quiz', 'mission', 'task']);
 const OptionType = z.enum(['choice', 'input']);
@@ -14,19 +16,22 @@ const MimeTypes = z.enum([
   'image/gif',
   'video/mp4',
   'video/webm',
-  'audio/mp3',
+  'audio/mpeg',
   'audio/wav',
   'audio/ogg',
 ]);
 const MediaType = z.enum(['image', 'audio', 'video', 'image-audio']);
-const ImageMedia = z.object({ assetId: z.string(), title: z.string().optional(), alt: z.string().optional() }).strict();
+const AssetSnapshot = z.object({ id: z.string(), url: z.string(), name: z.string(), sizeBytes: z.number() }).strict();
+const ImageMedia = z
+  .object({ asset: AssetSnapshot, title: z.string().optional(), alt: z.string().optional() })
+  .strict();
 const AudioMedia = z
-  .object({ assetId: z.string(), title: z.string().optional(), transcript: z.string().optional() })
+  .object({ asset: AssetSnapshot, title: z.string().optional(), transcript: z.string().optional() })
   .strict();
-const VideoMedia = z.object({ assetId: z.string(), title: z.string().optional(), alt: z.string().optional() }).strict();
-const ImageAudioMedia = z
-  .object({ imageAssetId: z.string(), audioAssetId: z.string(), title: z.string().optional() })
+const VideoMedia = z
+  .object({ asset: AssetSnapshot, title: z.string().optional(), alt: z.string().optional() })
   .strict();
+const ImageAudioMedia = z.object({ image: ImageMedia, audio: AudioMedia, title: z.string().optional() }).strict();
 const MediaContent = z
   .object({ image: ImageMedia, audio: AudioMedia, video: VideoMedia, imageAudio: ImageAudioMedia })
   .partial()
@@ -343,6 +348,7 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   MissionType,
   MimeTypes,
   MediaType,
+  AssetSnapshot,
   ImageMedia,
   AudioMedia,
   VideoMedia,
