@@ -4,12 +4,12 @@ import { useWavesurfer } from '@wavesurfer/react';
 import { WaveformIcon, PlayIcon, PauseIcon } from '@phosphor-icons/react';
 import * as S from './AudioPreview.styles';
 
-interface PreviewAsset {
+interface PreviewableAsset {
   url: string;
 }
 
 export interface AudioPreviewProps {
-  asset?: PreviewAsset | null;
+  asset?: PreviewableAsset | null;
   onClick?: () => void;
   emptyText?: string;
   height?: number | string;

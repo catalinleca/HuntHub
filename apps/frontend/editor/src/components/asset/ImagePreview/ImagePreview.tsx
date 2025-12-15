@@ -2,14 +2,13 @@ import { Typography } from '@mui/material';
 import { ImageIcon } from '@phosphor-icons/react';
 import * as S from './ImagePreview.styles';
 
-interface PreviewAsset {
+interface PreviewableAsset {
   url: string;
   name?: string;
-  originalFilename?: string;
 }
 
 export interface ImagePreviewProps {
-  asset?: PreviewAsset | null;
+  asset?: PreviewableAsset | null;
   onClick?: () => void;
   emptyText?: string;
   height?: number | string;
@@ -36,7 +35,7 @@ export const ImagePreview = ({
 
   return (
     <S.ImageContainer onClick={onClick} $clickable={isClickable} $height={height}>
-      <S.Image src={asset.url} alt={asset.name || asset.originalFilename || 'Image preview'} />
+      <S.Image src={asset.url} alt={asset.name || 'Image preview'} />
     </S.ImageContainer>
   );
 };

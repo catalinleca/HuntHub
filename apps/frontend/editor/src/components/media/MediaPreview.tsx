@@ -1,16 +1,10 @@
 import { MediaType } from '@hunthub/shared';
+import type { AssetSnapshot } from '@hunthub/shared';
 import { ImagePreview, AudioPreview, VideoPreview } from '@/components/asset';
 import { getPreviewType } from './data';
 
-interface PreviewAsset {
-  url: string;
-  name?: string;
-  originalFilename?: string;
-  mimeType?: string;
-}
-
 export interface MediaPreviewProps {
-  asset?: PreviewAsset | null;
+  asset?: AssetSnapshot | null;
   mediaType?: MediaType;
   onClick?: () => void;
   emptyText?: string;
@@ -18,7 +12,7 @@ export interface MediaPreviewProps {
 }
 
 export const MediaPreview = ({ asset, mediaType, onClick, emptyText, height }: MediaPreviewProps) => {
-  const type = getPreviewType(asset, mediaType);
+  const type = getPreviewType(mediaType);
 
   switch (type) {
     case 'audio':

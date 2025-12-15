@@ -3,12 +3,12 @@ import { VideoIcon, PlayIcon } from '@phosphor-icons/react';
 import { useState, useRef } from 'react';
 import * as S from './VideoPreview.styles';
 
-interface PreviewAsset {
+interface PreviewableAsset {
   url: string;
 }
 
 export interface VideoPreviewProps {
-  asset?: PreviewAsset | null;
+  asset?: PreviewableAsset | null;
   onClick?: () => void;
   emptyText?: string;
   height?: number | string;

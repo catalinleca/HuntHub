@@ -15,7 +15,10 @@ export const MediaForm = ({ type }: MediaFormProps) => {
       return <MediaVideoInput />;
     case MediaType.ImageAudio:
       return <MediaImageAudioInput />;
-    default:
+    default: {
+      const exhaustiveCheck: never = type;
+      console.error(`Unhandled MediaType: ${exhaustiveCheck}`);
       return null;
+    }
   }
 };

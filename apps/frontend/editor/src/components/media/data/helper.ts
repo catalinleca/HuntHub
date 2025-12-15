@@ -4,38 +4,17 @@ import type { MediaFormData } from './types';
 
 export type SimpleAssetType = 'image' | 'audio' | 'video';
 
-interface PreviewAsset {
-  url: string;
-  name?: string;
-  originalFilename?: string;
-  mimeType?: string;
-}
-
-export const getPreviewType = (asset?: PreviewAsset | null, explicitType?: MediaType): SimpleAssetType => {
-  if (explicitType) {
-    switch (explicitType) {
-      case MediaType.Audio:
-        return 'audio';
-      case MediaType.Video:
-        return 'video';
-      case MediaType.Image:
-      case MediaType.ImageAudio:
-      default:
-        return 'image';
-    }
+export const getPreviewType = (mediaType?: MediaType): SimpleAssetType => {
+  switch (mediaType) {
+    case MediaType.Audio:
+      return 'audio';
+    case MediaType.Video:
+      return 'video';
+    case MediaType.Image:
+    case MediaType.ImageAudio:
+    default:
+      return 'image';
   }
-
-  if (!asset?.mimeType) {
-    return 'image';
-  }
-
-  if (asset.mimeType.startsWith('audio/')) {
-    return 'audio';
-  }
-  if (asset.mimeType.startsWith('video/')) {
-    return 'video';
-  }
-  return 'image';
 };
 
 export const typeToMediaType = (type: SimpleAssetType): MediaType => {
