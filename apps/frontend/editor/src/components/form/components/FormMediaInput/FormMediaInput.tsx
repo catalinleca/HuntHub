@@ -40,6 +40,9 @@ export const FormMediaInput = ({ name, label = 'Media', description, disabled = 
 
   const handleSave = (formData: MediaFormData, type: MediaType) => {
     const apiMedia = MediaUpdater.toMedia(formData, type);
+    if (!apiMedia) {
+      return;
+    }
     setValue(name, apiMedia, { shouldDirty: true });
     setDrawerOpen(false);
   };
