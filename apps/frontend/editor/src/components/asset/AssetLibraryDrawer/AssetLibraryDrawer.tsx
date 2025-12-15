@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Typography, IconButton, TextField, InputAdornment, Button, CircularProgress } from '@mui/material';
 import { ArrowLeftIcon, MagnifyingGlassIcon, PlusIcon } from '@phosphor-icons/react';
+import { AssetSortField, SortOrder } from '@hunthub/shared';
 import type { Asset } from '@hunthub/shared';
 import { useAssetsQuery } from '@/api/Asset';
 import { AssetGrid } from './AssetGrid';
@@ -25,8 +26,8 @@ export const AssetLibraryDrawer = ({ open, onClose, onSelect, filterType }: Asse
     refetch,
   } = useAssetsQuery({
     limit: 100,
-    sortBy: 'createdAt',
-    sortOrder: 'desc',
+    sortBy: AssetSortField.CreatedAt,
+    sortOrder: SortOrder.Desc,
   });
 
   const filteredAssets = useMemo(() => {

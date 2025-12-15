@@ -1,5 +1,5 @@
 export { assetKeys } from './keys';
-export { useAssetsQuery, type GetAssetsParams } from './getAssets';
+export { useAssetsQuery } from './getAssets';
 export { useGetAsset } from './getAsset';
 export { useCreateAsset } from './createAsset';
 export { useDeleteAsset } from './deleteAsset';
