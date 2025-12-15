@@ -479,6 +479,14 @@ components:
             type: array
             items:
                 $ref: '#/components/schemas/Option'
+        displayOrder:
+          type: array
+          items:
+            type: string
+          description: Order of option IDs for display (preserves arrangement)
+        randomizeOrder:
+          type: boolean
+          description: Whether to randomize option order when displayed to player
         validation:
           $ref: '#/components/schemas/QuizValidation'
           description: Optional validation rules (future feature)

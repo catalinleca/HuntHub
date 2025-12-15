@@ -57,6 +57,8 @@ const Quiz = z
     target: Option,
     type: OptionType,
     distractors: z.array(Option),
+    displayOrder: z.array(z.string()),
+    randomizeOrder: z.boolean(),
     validation: QuizValidation,
   })
   .partial()
