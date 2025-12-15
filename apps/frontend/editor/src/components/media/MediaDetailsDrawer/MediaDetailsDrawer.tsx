@@ -16,10 +16,32 @@ export interface MediaDetailsDrawerProps {
   onClose: () => void;
   onSave: (formData: MediaFormData, type: MediaType) => void;
   initialMedia?: Media | null;
+  restrictToTypes?: MediaType[];
 }
 
-export const MediaDetailsDrawer = ({ open, onClose, onSave, initialMedia }: MediaDetailsDrawerProps) => {
-  const [mediaType, setMediaType] = useState<MediaType>(initialMedia?.type ?? MediaType.Image);
+const getDefaultType = (initialMedia?: Media | null, restrictToTypes?: MediaType[]): MediaType => {
+  const initialType = initialMedia?.type;
+
+  if (restrictToTypes && restrictToTypes.length > 0) {
+    if (initialType && restrictToTypes.includes(initialType)) {
+      return initialType;
+    }
+    return restrictToTypes[0];
+  }
+
+  return initialType ?? MediaType.Image;
+};
+
+export const MediaDetailsDrawer = ({
+  open,
+  onClose,
+  onSave,
+  initialMedia,
+  restrictToTypes,
+}: MediaDetailsDrawerProps) => {
+  const [mediaType, setMediaType] = useState<MediaType>(() =>
+    getDefaultType(initialMedia, restrictToTypes)
+  );
 
   const formMethods = useForm<MediaDrawerForm>({
     defaultValues: { media: MediaParser.toFormData(null) },
@@ -29,7 +51,7 @@ export const MediaDetailsDrawer = ({ open, onClose, onSave, initialMedia }: Medi
     if (open) {
       const parsedData = MediaParser.toFormData(initialMedia);
       formMethods.reset({ media: parsedData });
-      setMediaType(initialMedia?.type ?? MediaType.Image);
+      setMediaType(getDefaultType(initialMedia, restrictToTypes));
     }
   }, [open, initialMedia]);
 
@@ -55,7 +77,7 @@ export const MediaDetailsDrawer = ({ open, onClose, onSave, initialMedia }: Medi
 
           <S.Content>
             <Stack gap={3}>
-              <MediaTypeSelector value={mediaType} onChange={handleTypeChange} />
+              <MediaTypeSelector value={mediaType} onChange={handleTypeChange} restrictToTypes={restrictToTypes} />
               <Divider />
               <MediaForm type={mediaType} />
             </Stack>
