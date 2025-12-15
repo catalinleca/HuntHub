@@ -8,7 +8,7 @@ import {
   QuizOptionFormData,
 } from '@/types/editor';
 import { createInitialQuizOptions } from '@/pages/Hunt/HuntSteps/components/Quiz';
-import { hasValidCoordinates } from '@/utils/location';
+import { hasValidCoordinates } from '@/utils';
 
 /**
  * Transform API Location to form LocationFormData

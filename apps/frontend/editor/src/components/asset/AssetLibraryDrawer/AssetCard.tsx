@@ -1,7 +1,7 @@
 import { CardActionArea, Stack, Typography } from '@mui/material';
 import { CheckCircleIcon } from '@phosphor-icons/react';
 import type { Asset } from '@hunthub/shared';
-import { formatFileSize } from '../data';
+import { prettyBytes } from '@/utils';
 import { AssetPreview } from '../AssetPreview';
 import * as S from './AssetLibraryDrawer.styles';
 
@@ -27,7 +27,7 @@ export const AssetCard = ({ asset, selected = false, onClick, onDoubleClick }: A
             {asset.originalFilename || `Asset ${asset.assetId}`}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            {formatFileSize(asset.size)}
+            {prettyBytes(asset.size)}
           </Typography>
         </Stack>
 
