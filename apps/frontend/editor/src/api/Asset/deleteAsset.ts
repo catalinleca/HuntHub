@@ -11,8 +11,9 @@ export const useDeleteAsset = () => {
 
   return useMutation({
     mutationFn: deleteAsset,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: assetKeys.all() });
+    onSuccess: (_data, assetId) => {
+      queryClient.invalidateQueries({ queryKey: assetKeys.lists() });
+      queryClient.removeQueries({ queryKey: assetKeys.detail(assetId) });
     },
   });
 };
