@@ -60,14 +60,15 @@ reviews:
         - Unhandled errors that crash the UI
         - Memory leaks (missing cleanup)
         - XSS vulnerabilities
-        
+
         Suggest improvements for:
         - Better component patterns if current approach is problematic
-        - Accessibility issues that hurt real users
-        
+
         Skip:
         - Formatting and style preferences
         - Overly opinionated component structure suggestions
+        - Accessibility suggestions (aria-hidden, aria-label, keyboard navigation, screen readers, focus management)
+        - a11y related comments
 
     # Shared Code - Prevent integration bugs
     - path: "packages/shared/src/**/*.ts"
