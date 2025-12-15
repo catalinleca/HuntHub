@@ -21,7 +21,9 @@ const MimeTypes = z.enum([
   'audio/ogg',
 ]);
 const MediaType = z.enum(['image', 'audio', 'video', 'image-audio']);
-const AssetSnapshot = z.object({ id: z.string(), url: z.string(), name: z.string(), sizeBytes: z.number() }).strict();
+const AssetSnapshot = z
+  .object({ id: z.string(), url: z.string(), name: z.string(), sizeBytes: z.number().int() })
+  .strict();
 const ImageMedia = z
   .object({ asset: AssetSnapshot, title: z.string().optional(), alt: z.string().optional() })
   .strict();

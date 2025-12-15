@@ -66,7 +66,7 @@ components:
       properties:
         id:
           type: string
-          description: Reference to Asset.assetId
+          description: Stringified Asset.assetId for storage flexibility
         url:
           type: string
           description: CDN URL for preview
@@ -74,7 +74,7 @@ components:
           type: string
           description: Original filename
         sizeBytes:
-          type: number
+          type: integer
           description: File size in bytes
       required:
         - id

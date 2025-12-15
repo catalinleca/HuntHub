@@ -104,7 +104,7 @@ export interface Location {
 
 /** Snapshot of asset data (copied at selection time) */
 export interface AssetSnapshot {
-  /** Reference to Asset.assetId */
+  /** Stringified Asset.assetId for storage flexibility */
   id: string;
   /** CDN URL for preview */
   url: string;
@@ -116,7 +116,7 @@ export interface AssetSnapshot {
 
 /** Image media with nested asset snapshot */
 export interface ImageMedia {
-  /** Snapshot of asset data */
+  /** Snapshot of asset data (copied at selection time) */
   asset: AssetSnapshot;
   /** Display title (user-provided) */
   title?: string;
@@ -126,7 +126,7 @@ export interface ImageMedia {
 
 /** Audio media with nested asset snapshot */
 export interface AudioMedia {
-  /** Snapshot of asset data */
+  /** Snapshot of asset data (copied at selection time) */
   asset: AssetSnapshot;
   /** Display title (user-provided) */
   title?: string;
@@ -136,7 +136,7 @@ export interface AudioMedia {
 
 /** Video media with nested asset snapshot */
 export interface VideoMedia {
-  /** Snapshot of asset data */
+  /** Snapshot of asset data (copied at selection time) */
   asset: AssetSnapshot;
   /** Display title (user-provided) */
   title?: string;
@@ -146,9 +146,9 @@ export interface VideoMedia {
 
 /** Combined image + audio (composes ImageMedia and AudioMedia) */
 export interface ImageAudioMedia {
-  /** Image media */
+  /** Image media with nested asset snapshot */
   image: ImageMedia;
-  /** Audio media */
+  /** Audio media with nested asset snapshot */
   audio: AudioMedia;
   /** Overall title for the combined media */
   title?: string;
@@ -363,10 +363,6 @@ export interface Quiz {
   target?: Option;
   type?: OptionType;
   distractors?: Option[];
-  /** Order of option IDs for display (used by player) */
-  displayOrder?: string[];
-  /** If true, player shuffles options on each play */
-  randomizeOrder?: boolean;
   /** Optional validation rules (future feature) */
   validation?: QuizValidation;
 }
