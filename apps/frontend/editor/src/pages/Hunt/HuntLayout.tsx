@@ -37,16 +37,20 @@ export const HuntLayout = ({ huntFormData }: HuntLayoutProps) => {
   const onSubmit = async (data: { hunt: HuntFormData }) => {
     const unsavedSelectedStepPosition = getUnsavedSelectedStepPosition(data.hunt.steps, selectedFormKey);
 
-    const savedHunt = await saveHuntMutation.mutateAsync(prepareHuntForSave(data.hunt));
+    try {
+      const savedHunt = await saveHuntMutation.mutateAsync(prepareHuntForSave(data.hunt));
 
-    const newFormData = transformHuntToFormData(savedHunt);
-    reset({ hunt: newFormData });
+      const newFormData = transformHuntToFormData(savedHunt);
+      reset({ hunt: newFormData });
 
-    if (unsavedSelectedStepPosition >= 0) {
-      const newFormKey = newFormData.steps[unsavedSelectedStepPosition]?.formKey;
-      if (newFormKey) {
-        setSelectedFormKey(newFormKey);
+      if (unsavedSelectedStepPosition >= 0) {
+        const newFormKey = newFormData.steps[unsavedSelectedStepPosition]?.formKey;
+        if (newFormKey) {
+          setSelectedFormKey(newFormKey);
+        }
       }
+    } catch (error) {
+      console.error('Failed to save hunt:', error);
     }
   };
 
