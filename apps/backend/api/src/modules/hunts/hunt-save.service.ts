@@ -87,12 +87,12 @@ export class HuntSaveService implements IHuntSaveService {
         }
       }
 
-      // 3e. Create new steps
+      // 3e. Create new steps sequentially to guarantee order and trigger pre-save hooks
       const createdStepIds: number[] = [];
-      if (diff.toCreate.length > 0) {
-        const newDocs = diff.toCreate.map((step) => StepMapper.toDocument(step, huntId, huntVersion));
-        const created = await StepModel.create(newDocs, { session });
-        createdStepIds.push(...created.map((s) => s.stepId));
+      for (const step of diff.toCreate) {
+        const doc = StepMapper.toDocument(step, huntId, huntVersion);
+        const [created] = await StepModel.create([doc], { session });
+        createdStepIds.push(created.stepId);
       }
 
       // 3f. Update stepOrder (preserve incoming order, map new steps to their generated IDs)
