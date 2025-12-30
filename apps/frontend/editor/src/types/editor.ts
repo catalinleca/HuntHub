@@ -1,12 +1,12 @@
 import { Step, Hunt, Location, Quiz, Challenge, Media } from '@hunthub/shared';
 
 /**
- * Generic type that adds RHF internal tracking ID to any type.
- * The _id field is ONLY for React Hook Form's useFieldArray to track items.
- * It has nothing to do with the API or database.
+ * Generic type that adds a form key to any type.
+ * The formKey field is for React Hook Form's useFieldArray and UI selection.
+ * It is stable for the edit session and never sent to the API.
  */
-export type WithRHFInternalId<T> = T & {
-  _id: string; // RHF useFieldArray tracking ID (UI-only, never sent to API)
+export type WithFormKey<T> = T & {
+  formKey: string;
 };
 
 /**
@@ -32,7 +32,7 @@ export type HuntDialogFormData = {
   coverImage: Media | null;
 };
 
-export type QuizOptionFormData = WithRHFInternalId<{
+export type QuizOptionFormData = WithFormKey<{
   id: string;
   text: string;
 }>;
@@ -56,7 +56,7 @@ export type ChallengeFormData = Omit<Challenge, 'quiz'> & {
 };
 
 /**
- * Step data for form - keeps ALL Step fields + adds _id for RHF tracking
+ * Step data for form - keeps ALL Step fields + adds formKey for RHF tracking
  * huntId is required (we know it from the parent Hunt)
  * stepId is optional (assigned by backend on save)
  *
@@ -64,7 +64,7 @@ export type ChallengeFormData = Omit<Challenge, 'quiz'> & {
  * - null = setting disabled (not sent to API)
  * - non-null = setting enabled (required to fill)
  */
-export type StepFormData = WithRHFInternalId<
+export type StepFormData = WithFormKey<
   Omit<Step, 'stepId' | 'requiredLocation' | 'hint' | 'timeLimit' | 'maxAttempts' | 'challenge'> & {
     stepId?: number; // Optional - assigned by backend when step is saved
     challenge: ChallengeFormData; // Use form version with QuizFormData
@@ -77,8 +77,8 @@ export type StepFormData = WithRHFInternalId<
 >;
 
 /**
- * Hunt data for form - keeps ALL Hunt fields, but steps have _id added for RHF
- * Matches API data exactly, plus _id on each step for RHF useFieldArray
+ * Hunt data for form - keeps ALL Hunt fields, but steps have formKey added
+ * Matches API data exactly, plus formKey on each step for RHF useFieldArray
  */
 export type HuntFormData = Omit<Hunt, 'steps'> & {
   steps: StepFormData[];

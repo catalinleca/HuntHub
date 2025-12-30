@@ -54,7 +54,7 @@ const transformQuizToFormData = (quiz?: Quiz): QuizFormData | undefined => {
   if (quiz.type === OptionType.Choice && quiz.target) {
     const { target, distractors = [], displayOrder = [] } = quiz;
 
-    const allOptions: Omit<QuizOptionFormData, '_id'>[] = [
+    const allOptions: Omit<QuizOptionFormData, 'formKey'>[] = [
       { id: target.id, text: target.text },
       ...distractors.map((d) => ({ id: d.id, text: d.text })),
     ];
@@ -63,10 +63,10 @@ const transformQuizToFormData = (quiz?: Quiz): QuizFormData | undefined => {
       displayOrder.length > 0
         ? displayOrder
             .map((id: string) => allOptions.find((o) => o.id === id))
-            .filter((o): o is Omit<QuizOptionFormData, '_id'> => o !== undefined)
+            .filter((o): o is Omit<QuizOptionFormData, 'formKey'> => o !== undefined)
         : allOptions;
 
-    const options: QuizOptionFormData[] = sortedOptions.map((o) => ({ ...o, _id: o.id }));
+    const options: QuizOptionFormData[] = sortedOptions.map((o) => ({ ...o, formKey: o.id }));
 
     return {
       ...quiz,
@@ -91,17 +91,21 @@ const transformStepChallenge = (challenge: Step['challenge']): Step['challenge']
   };
 };
 
+/**
+ * Transform API Hunt to form HuntFormData
+ * formKey is deterministic: stepId-based for saved steps, UUID for new steps
+ */
 export const transformHuntToFormData = (hunt: Hunt): HuntFormData => {
-  const stepsWithId: StepFormData[] = (hunt.steps || []).map((step) => ({
+  const steps: StepFormData[] = (hunt.steps || []).map((step) => ({
     ...step,
     ...transformStepSettings(step),
     challenge: transformStepChallenge(step.challenge),
-    _id: step.stepId?.toString() || crypto.randomUUID(),
+    formKey: step.stepId?.toString() ?? crypto.randomUUID(),
   }));
 
   return {
     ...hunt,
-    steps: stepsWithId,
+    steps,
   };
 };
 
