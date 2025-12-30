@@ -9,7 +9,7 @@ import { NotFoundError, ValidationError } from '@/shared/errors';
 import { ConflictError } from '@/shared/errors/ConflictError';
 import { TYPES } from '@/shared/types';
 import { IAuthorizationService } from '@/services/authorization/authorization.service';
-import { IAssetUsageTracker } from '@/services/asset-usage';
+import { IAssetUsageTracker, AssetSource } from '@/services/asset-usage';
 import { IAssetValidator } from '@/services/asset-validation';
 import { AssetExtractor } from '@/utils';
 import { withTransaction } from '@/shared/utils/transaction';
@@ -112,7 +112,7 @@ export class HuntSaveService implements IHuntSaveService {
   }
 
   private async validateAllAssets(huntData: Hunt, userId: string): Promise<void> {
-    const sources: Array<{ assetId: string; path: string }> = [];
+    const sources: AssetSource[] = [];
 
     // Extract from coverImage
     if (huntData.coverImage) {
