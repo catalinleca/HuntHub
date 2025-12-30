@@ -5,7 +5,7 @@ import { HuntFormData } from '@/types/editor';
 import { StepFactory } from '@/utils/factories/StepFactory';
 
 export const useHuntSteps = (formMethods: UseFormReturn<{ hunt: HuntFormData }>) => {
-  const [selectedStepId, setSelectedStepId] = useState<string | null>(null);
+  const [selectedFormKey, setSelectedFormKey] = useState<string | null>(null);
 
   const {
     fields: steps,
@@ -16,17 +16,17 @@ export const useHuntSteps = (formMethods: UseFormReturn<{ hunt: HuntFormData }>)
     name: 'hunt.steps',
   });
 
-  const effectiveSelectedId = selectedStepId ?? steps[0]?._id ?? null;
+  const effectiveSelectedKey = selectedFormKey ?? steps[0]?.formKey ?? null;
 
   const handleCreateStep = (type: ChallengeType) => {
     const huntId = formMethods.getValues('hunt.huntId');
     const newStep = StepFactory.create(type, huntId);
     append(newStep);
-    setSelectedStepId(newStep._id);
+    setSelectedFormKey(newStep.formKey);
   };
 
-  const handleDeleteStep = (stepId: string) => {
-    const index = steps.findIndex((s) => s._id === stepId);
+  const handleDeleteStep = (formKey: string) => {
+    const index = steps.findIndex((s) => s.formKey === formKey);
     if (index === -1) {
       return;
     }
@@ -40,16 +40,16 @@ export const useHuntSteps = (formMethods: UseFormReturn<{ hunt: HuntFormData }>)
 
     // steps array still has OLD values here (remove is async)
     // So steps[index + 1] correctly refers to the step after deleted one
-    if (effectiveSelectedId === stepId) {
+    if (effectiveSelectedKey === formKey) {
       const nextStep = steps[index + 1] ?? steps[index - 1];
-      setSelectedStepId(nextStep?._id ?? null);
+      setSelectedFormKey(nextStep?.formKey ?? null);
     }
   };
 
   return {
     steps,
-    selectedStepId: effectiveSelectedId,
-    setSelectedStepId,
+    selectedFormKey: effectiveSelectedKey,
+    setSelectedFormKey,
     handleCreateStep,
     handleDeleteStep,
   };

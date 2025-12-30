@@ -3,8 +3,8 @@ import { NavBar } from '@/components';
 import { useSaveHunt } from '@/api/Hunt';
 import { useHuntSteps } from '@/pages/Hunt/hooks';
 import { StepFormProvider } from '@/pages/Hunt/context';
-import { transformHuntToFormData } from '@/utils/transformers/huntInput';
 import { prepareHuntForSave } from '@/utils/transformers/huntOutput';
+import { transformHuntToFormData } from '@/utils/transformers/huntInput';
 import { HuntFormData } from '@/types/editor';
 import { HuntHeader } from './HuntHeader';
 import { HuntStepTimeline } from './HuntStepTimeline';
@@ -15,32 +15,51 @@ interface HuntLayoutProps {
   huntFormData: HuntFormData;
 }
 
+const getUnsavedSelectedStepPosition = (steps: HuntFormData['steps'], formKey: string | null): number => {
+  const selectedStep = steps.find((s) => s.formKey === formKey);
+  const isUnsaved = selectedStep && !selectedStep.stepId;
+
+  return isUnsaved ? steps.indexOf(selectedStep) : -1;
+};
+
 export const HuntLayout = ({ huntFormData }: HuntLayoutProps) => {
   const formMethods = useForm<{ hunt: HuntFormData }>({
-    values: { hunt: huntFormData },
-    resetOptions: { keepDirtyValues: true },
+    defaultValues: { hunt: huntFormData },
     mode: 'onBlur',
   });
 
   const { handleSubmit, reset } = formMethods;
 
-  const { steps, selectedStepId, setSelectedStepId, handleCreateStep, handleDeleteStep } = useHuntSteps(formMethods);
+  const { steps, selectedFormKey, setSelectedFormKey, handleCreateStep, handleDeleteStep } = useHuntSteps(formMethods);
 
   const saveHuntMutation = useSaveHunt();
 
   const onSubmit = async (data: { hunt: HuntFormData }) => {
-    const huntData = prepareHuntForSave(data.hunt);
-    const savedHunt = await saveHuntMutation.mutateAsync(huntData);
+    const unsavedSelectedStepPosition = getUnsavedSelectedStepPosition(data.hunt.steps, selectedFormKey);
 
-    reset({ hunt: transformHuntToFormData(savedHunt) }, { keepDirty: false });
+    try {
+      const savedHunt = await saveHuntMutation.mutateAsync(prepareHuntForSave(data.hunt));
+
+      const newFormData = transformHuntToFormData(savedHunt);
+      reset({ hunt: newFormData });
+
+      if (unsavedSelectedStepPosition >= 0) {
+        const newFormKey = newFormData.steps[unsavedSelectedStepPosition]?.formKey;
+        if (newFormKey) {
+          setSelectedFormKey(newFormKey);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to save hunt:', error);
+    }
   };
 
-  const selectedStepIndex = selectedStepId ? steps.findIndex((s) => s._id === selectedStepId) : -1;
+  const selectedStepIndex = selectedFormKey ? steps.findIndex((s) => s.formKey === selectedFormKey) : -1;
 
   const selectedStepType = selectedStepIndex >= 0 ? steps[selectedStepIndex]?.type : undefined;
 
   return (
-    <StepFormProvider onDeleteStep={() => selectedStepId && handleDeleteStep(selectedStepId)}>
+    <StepFormProvider onDeleteStep={() => selectedFormKey && handleDeleteStep(selectedFormKey)}>
       <FormProvider {...formMethods}>
         <S.Container>
           <NavBar />
@@ -49,8 +68,8 @@ export const HuntLayout = ({ huntFormData }: HuntLayoutProps) => {
 
           <HuntStepTimeline
             steps={steps}
-            selectedStepId={selectedStepId}
-            onSelectStep={setSelectedStepId}
+            selectedFormKey={selectedFormKey}
+            onSelectStep={setSelectedFormKey}
             onAddStep={handleCreateStep}
           />
 

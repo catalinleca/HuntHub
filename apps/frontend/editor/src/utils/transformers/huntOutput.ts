@@ -73,14 +73,14 @@ const transformChallengeForApi = (challenge: StepFormData['challenge']): Step['c
 
 /**
  * Transform form step to API step:
- * - Strip _id (RHF internal)
+ * - Strip formKey (client-side form key)
  * - Strip createdAt/updatedAt (server-managed)
  * - Convert null settings to undefined
  * - Clean location and media
  */
 const transformStepForApi = (formStep: StepFormData): Step => {
   const {
-    _id,
+    formKey: _formKey,
     challenge,
     requiredLocation,
     hint,

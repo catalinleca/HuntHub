@@ -3,7 +3,7 @@ import { StepFormData, QuizFormData } from '@/types/editor';
 
 const createBaseStep = (type: ChallengeType, huntId: number): StepFormData => {
   return {
-    _id: crypto.randomUUID(), // RHF tracking ID
+    formKey: crypto.randomUUID(),
     huntId,
     type,
     challenge: {},
@@ -39,8 +39,8 @@ const createQuiz = (huntId: number): StepFormData => {
 
     // Form-only: options[] for ArrayInput, targetId for correct answer
     options: [
-      { id: targetId, text: '', _id: targetId },
-      { id: option2Id, text: '', _id: option2Id },
+      { id: targetId, text: '', formKey: targetId },
+      { id: option2Id, text: '', formKey: option2Id },
     ],
     targetId,
   };
