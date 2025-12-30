@@ -127,8 +127,11 @@ export class HuntSaveService implements IHuntSaveService {
         { new: true, session },
       ).exec();
 
-      if (!result && data.updatedAt) {
-        throw new ConflictError(`Step ${stepId} was modified by another user. Please refresh and try again.`);
+      if (!result) {
+        if (data.updatedAt) {
+          throw new ConflictError(`Step ${stepId} was modified by another user. Please refresh and try again.`);
+        }
+        throw new Error(`Failed to update step ${stepId}: step not found within transaction`);
       }
     }
   }
