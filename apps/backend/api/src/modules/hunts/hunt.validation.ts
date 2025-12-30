@@ -5,7 +5,7 @@
  * for backend-specific hunt validation.
  */
 
-import { z } from 'zod';
+import { z, type ZodObject, type ZodRawShape } from 'zod';
 import {
   HuntCreate,
   HuntUpdate,
@@ -14,6 +14,7 @@ import {
   HuntAccessType,
   Hunt,
   HuntAccess,
+  Step,
 } from '@hunthub/shared/schemas';
 
 // Re-export base schemas
@@ -28,8 +29,24 @@ export const huntLocationSchema = Location;
 export const createHuntSchema = HuntCreate;
 export const updateHuntSchema = HuntUpdate;
 
-// Save schema - accepts full Hunt with steps array (service extracts needed fields)
-export const saveHuntSchema = Hunt;
+// Type assertion helpers for extending generated schemas
+const StepSchema = Step as unknown as ZodObject<ZodRawShape>;
+const HuntSchema = Hunt as unknown as ZodObject<ZodRawShape>;
+const LocationSchema = Location as unknown as ZodObject<ZodRawShape>;
+
+// Location for save - allow empty object (all fields optional)
+const LocationSave = LocationSchema.partial();
+
+// Step for save - stepId optional (new steps don't have one)
+const StepSave = StepSchema.extend({
+  stepId: z.number().int().optional(),
+  requiredLocation: LocationSave.optional(),
+});
+
+// Save schema - accepts full Hunt with flexible steps array
+export const saveHuntSchema = HuntSchema.extend({
+  steps: z.array(StepSave).optional(),
+});
 
 export const reorderStepsSchema = z.object({
   stepOrder: z.array(z.number().int()).min(1, 'Step order array cannot be empty'),
