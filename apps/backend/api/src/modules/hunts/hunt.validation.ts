@@ -28,6 +28,9 @@ export const huntLocationSchema = Location;
 export const createHuntSchema = HuntCreate;
 export const updateHuntSchema = HuntUpdate;
 
+// Save schema - accepts full Hunt with steps array (service extracts needed fields)
+export const saveHuntSchema = Hunt;
+
 export const reorderStepsSchema = z.object({
   stepOrder: z.array(z.number().int()).min(1, 'Step order array cannot be empty'),
 });

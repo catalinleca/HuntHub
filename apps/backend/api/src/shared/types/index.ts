@@ -9,6 +9,7 @@ export const TYPES = {
   AuthService: Symbol.for('AuthService'),
   UserService: Symbol.for('UserService'),
   HuntService: Symbol.for('HuntService'),
+  HuntSaveService: Symbol.for('HuntSaveService'),
   StepService: Symbol.for('StepService'),
   AssetService: Symbol.for('AssetService'),
   StorageService: Symbol.for('StorageService'),

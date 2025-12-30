@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/shared/types';
 import { IHuntService } from './hunt.service';
+import { IHuntSaveService } from './hunt-save.service';
 import { parseNumericId } from '@/shared/utils/parseId';
 import { ValidatedHuntQuery } from '@/shared/validation/query-params.validation';
 
@@ -10,13 +11,17 @@ export interface IHuntController {
   getAllUserHunts(req: Request, res: Response): Promise<Response>;
   getUserHuntById(req: Request, res: Response): Promise<Response>;
   updateHunt(req: Request, res: Response): Promise<Response>;
+  saveHunt(req: Request, res: Response): Promise<Response>;
   deleteHunt(req: Request, res: Response): Promise<Response>;
   reorderSteps(req: Request, res: Response): Promise<Response>;
 }
 
 @injectable()
 export class HuntController implements IHuntController {
-  constructor(@inject(TYPES.HuntService) private huntService: IHuntService) {}
+  constructor(
+    @inject(TYPES.HuntService) private huntService: IHuntService,
+    @inject(TYPES.HuntSaveService) private huntSaveService: IHuntSaveService,
+  ) {}
 
   async createHunt(req: Request, res: Response) {
     const hunt = req.body;
@@ -47,6 +52,13 @@ export class HuntController implements IHuntController {
     const huntData = req.body;
     const updatedHunt = await this.huntService.updateHunt(huntId, huntData, req.user.id);
     return res.status(200).json(updatedHunt);
+  }
+
+  async saveHunt(req: Request, res: Response) {
+    const huntId = parseNumericId(req.params.id);
+    const huntData = req.body;
+    const savedHunt = await this.huntSaveService.saveHunt(huntId, huntData, req.user.id);
+    return res.status(200).json(savedHunt);
   }
 
   async deleteHunt(req: Request, res: Response) {
