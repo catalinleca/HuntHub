@@ -34,82 +34,135 @@ export class HuntSaveService implements IHuntSaveService {
   ) {}
 
   async saveHunt(huntId: number, huntData: Hunt, userId: string): Promise<Hunt> {
-    // 1. Authorization
     const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
     const huntVersion = huntDoc.latestVersion;
 
-    // 2. Validate all assets upfront (fail fast before transaction)
     await this.validateAllAssets(huntData, userId);
 
-    // 3. Execute transaction
     return withTransaction(async (session) => {
-      // 3a. Query existing steps inside transaction to avoid TOCTOU race
-      const existingSteps = await StepModel.find({ huntId, huntVersion }).session(session).lean();
-      const diff = this.calculateStepDiff(huntData.steps || [], existingSteps);
+      const diff = await this.computeStepChanges(huntId, huntVersion, huntData.steps || [], session);
 
-      // 3b. Update hunt version metadata
-      const huntUpdateData = HuntMapper.toVersionUpdate(huntData);
-      const updatedVersion = await HuntVersionModel.findOneAndUpdate(
+      await this.updateHuntMetadata(huntId, huntVersion, huntData, session);
+
+      const createdStepIds = await this.applyStepChanges(diff, huntId, huntVersion, session);
+      await this.updateStepOrder(huntId, huntVersion, huntData.steps || [], createdStepIds, session);
+
+      await this.usageTracker.rebuildHuntAssetUsage(huntId, session);
+
+      return this.fetchHuntWithSteps(huntId, huntVersion, session);
+    });
+  }
+
+  private async computeStepChanges(
+    huntId: number,
+    huntVersion: number,
+    incomingSteps: Step[],
+    session: ClientSession,
+  ): Promise<StepDiff> {
+    const existingSteps = await StepModel.find({ huntId, huntVersion }).session(session).lean();
+    return this.calculateStepDiff(incomingSteps, existingSteps);
+  }
+
+  private async updateHuntMetadata(
+    huntId: number,
+    huntVersion: number,
+    huntData: Hunt,
+    session: ClientSession,
+  ): Promise<void> {
+    const huntUpdateData = HuntMapper.toVersionUpdate(huntData);
+    const updatedVersion = await HuntVersionModel.findOneAndUpdate(
+      {
+        huntId,
+        version: huntVersion,
+        isPublished: false,
+        ...(huntData.updatedAt && { updatedAt: new Date(huntData.updatedAt) }),
+      },
+      huntUpdateData,
+      { new: true, session },
+    ).exec();
+
+    if (!updatedVersion) {
+      await this.handleUpdateFailure(huntId, huntVersion, huntData.updatedAt, session);
+    }
+  }
+
+  private async applyStepChanges(
+    diff: StepDiff,
+    huntId: number,
+    huntVersion: number,
+    session: ClientSession,
+  ): Promise<number[]> {
+    await this.deleteRemovedSteps(diff.toDelete, huntId, huntVersion, session);
+    await this.updateModifiedSteps(diff.toUpdate, huntId, huntVersion, session);
+    return this.createNewSteps(diff.toCreate, huntId, huntVersion, session);
+  }
+
+  private async deleteRemovedSteps(
+    stepIds: number[],
+    huntId: number,
+    huntVersion: number,
+    session: ClientSession,
+  ): Promise<void> {
+    if (stepIds.length > 0) {
+      await StepModel.deleteMany({ stepId: { $in: stepIds }, huntId, huntVersion }, { session });
+    }
+  }
+
+  private async updateModifiedSteps(
+    steps: StepDiff['toUpdate'],
+    huntId: number,
+    huntVersion: number,
+    session: ClientSession,
+  ): Promise<void> {
+    for (const { stepId, data } of steps) {
+      const updateData = StepMapper.toDocumentUpdate(data);
+      const result = await StepModel.findOneAndUpdate(
         {
+          stepId,
           huntId,
-          version: huntVersion,
-          isPublished: false,
-          ...(huntData.updatedAt && { updatedAt: new Date(huntData.updatedAt) }),
+          huntVersion,
+          ...(data.updatedAt && { updatedAt: new Date(data.updatedAt) }),
         },
-        huntUpdateData,
+        updateData,
         { new: true, session },
       ).exec();
 
-      if (!updatedVersion) {
-        await this.handleUpdateFailure(huntId, huntVersion, huntData.updatedAt, session);
+      if (!result && data.updatedAt) {
+        throw new ConflictError(`Step ${stepId} was modified by another user. Please refresh and try again.`);
       }
+    }
+  }
 
-      // 3c. Delete removed steps
-      if (diff.toDelete.length > 0) {
-        await StepModel.deleteMany({ stepId: { $in: diff.toDelete }, huntId, huntVersion }, { session });
-      }
+  private async createNewSteps(
+    steps: StepCreate[],
+    huntId: number,
+    huntVersion: number,
+    session: ClientSession,
+  ): Promise<number[]> {
+    const createdStepIds: number[] = [];
 
-      // 3d. Update existing steps
-      for (const { stepId, data } of diff.toUpdate) {
-        const updateData = StepMapper.toDocumentUpdate(data);
-        const result = await StepModel.findOneAndUpdate(
-          {
-            stepId,
-            huntId,
-            huntVersion,
-            ...(data.updatedAt && { updatedAt: new Date(data.updatedAt) }),
-          },
-          updateData,
-          { new: true, session },
-        ).exec();
+    for (const step of steps) {
+      const doc = StepMapper.toDocument(step, huntId, huntVersion);
+      const [created] = await StepModel.create([doc], { session });
+      createdStepIds.push(created.stepId);
+    }
 
-        if (!result && data.updatedAt) {
-          throw new ConflictError(`Step ${stepId} was modified by another user. Please refresh and try again.`);
-        }
-      }
+    return createdStepIds;
+  }
 
-      // 3e. Create new steps sequentially to guarantee order and trigger pre-save hooks
-      const createdStepIds: number[] = [];
-      for (const step of diff.toCreate) {
-        const doc = StepMapper.toDocument(step, huntId, huntVersion);
-        const [created] = await StepModel.create([doc], { session });
-        createdStepIds.push(created.stepId);
-      }
-
-      // 3f. Update stepOrder (preserve incoming order, map new steps to their generated IDs)
-      const newStepOrder = this.buildStepOrder(huntData.steps || [], createdStepIds);
-      await HuntVersionModel.findOneAndUpdate(
-        { huntId, version: huntVersion },
-        { stepOrder: newStepOrder },
-        { session },
-      ).exec();
-
-      // 3g. Rebuild asset usage
-      await this.usageTracker.rebuildHuntAssetUsage(huntId, session);
-
-      // 4. Fetch and return updated hunt with steps
-      return this.fetchHuntWithSteps(huntId, huntVersion, session);
-    });
+  private async updateStepOrder(
+    huntId: number,
+    huntVersion: number,
+    steps: Step[],
+    createdStepIds: number[],
+    session: ClientSession,
+  ): Promise<void> {
+    const newStepOrder = this.buildStepOrder(steps, createdStepIds);
+    await HuntVersionModel.findOneAndUpdate(
+      { huntId, version: huntVersion },
+      { stepOrder: newStepOrder },
+      { session },
+    ).exec();
   }
 
   private async validateAllAssets(huntData: Hunt, userId: string): Promise<void> {
