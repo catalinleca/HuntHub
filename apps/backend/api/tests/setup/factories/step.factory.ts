@@ -74,7 +74,7 @@ export const generateStepData = (options: CreateStepOptions = {}): Partial<IStep
   };
 };
 
-export const generateStepDataWithMedia = (assetId: string): Partial<IStep> => ({
+export const generateStepDataWithMedia = (assetId: number): Partial<IStep> => ({
   type: ChallengeType.Clue,
   challenge: {
     clue: {

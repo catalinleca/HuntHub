@@ -22,7 +22,7 @@ const MimeTypes = z.enum([
 ]);
 const MediaType = z.enum(['image', 'audio', 'video', 'image-audio']);
 const AssetSnapshot = z
-  .object({ id: z.string(), url: z.string(), name: z.string(), sizeBytes: z.number().int() })
+  .object({ id: z.number().int(), url: z.string(), name: z.string(), sizeBytes: z.number().int() })
   .strict();
 const ImageMedia = z
   .object({ asset: AssetSnapshot, title: z.string().optional(), alt: z.string().optional() })
@@ -67,7 +67,7 @@ const Mission = z
   .object({
     title: z.string(),
     description: z.string(),
-    referenceAssetIds: z.array(z.string()),
+    referenceAssetIds: z.array(z.number().int()),
     targetLocation: Location,
     type: MissionType,
     aiInstructions: z.string(),

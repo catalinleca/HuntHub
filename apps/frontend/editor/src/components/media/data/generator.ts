@@ -2,7 +2,7 @@ import { MediaType } from '@hunthub/shared';
 import type { Media, AssetSnapshot, ImageMedia, AudioMedia, VideoMedia, ImageAudioMedia } from '@hunthub/shared';
 
 const createEmptyAsset = (): AssetSnapshot => ({
-  id: '',
+  id: 0,
   url: '',
   name: '',
   sizeBytes: 0,

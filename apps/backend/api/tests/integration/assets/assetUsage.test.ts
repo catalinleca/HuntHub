@@ -17,7 +17,6 @@ import { generateStepDataWithMedia } from '../../setup/factories/step.factory';
 import { mockFirebaseAuth, createTestAuthToken, clearFirebaseAuthMocks } from '../../helpers/authHelper';
 import { AssetUsageModel } from '@/database/models';
 import { IUser } from '@/database/types/User';
-import { Types } from 'mongoose';
 
 describe('Asset Usage Tracking', () => {
   let app: Express;
@@ -47,7 +46,7 @@ describe('Asset Usage Tracking', () => {
     const asset = await createTestAsset({ ownerId: testUser.id });
     const hunt = await createTestHunt({ creatorId: testUser.id });
 
-    const stepData = generateStepDataWithMedia(asset.id);
+    const stepData = generateStepDataWithMedia(asset.assetId);
     await request(app)
       .post(`/api/hunts/${hunt.huntId}/steps`)
       .set('Authorization', `Bearer ${authToken}`)
@@ -66,7 +65,7 @@ describe('Asset Usage Tracking', () => {
     const asset = await createTestAsset({ ownerId: testUser.id });
     const hunt = await createTestHunt({ creatorId: testUser.id });
 
-    const stepData = generateStepDataWithMedia(asset.id);
+    const stepData = generateStepDataWithMedia(asset.assetId);
     const createResponse = await request(app)
       .post(`/api/hunts/${hunt.huntId}/steps`)
       .set('Authorization', `Bearer ${authToken}`)
@@ -87,7 +86,7 @@ describe('Asset Usage Tracking', () => {
     const asset = await createTestAsset({ ownerId: testUser.id });
     const hunt = await createTestHunt({ creatorId: testUser.id });
 
-    const stepData = generateStepDataWithMedia(asset.id);
+    const stepData = generateStepDataWithMedia(asset.assetId);
     await request(app)
       .post(`/api/hunts/${hunt.huntId}/steps`)
       .set('Authorization', `Bearer ${authToken}`)
@@ -106,7 +105,7 @@ describe('Asset Usage Tracking', () => {
     const hunt1 = await createTestHunt({ creatorId: testUser.id });
     const hunt2 = await createTestHunt({ creatorId: testUser.id });
 
-    const stepData = generateStepDataWithMedia(asset.id);
+    const stepData = generateStepDataWithMedia(asset.assetId);
 
     await request(app)
       .post(`/api/hunts/${hunt1.huntId}/steps`)
@@ -138,7 +137,7 @@ describe('Asset Usage Tracking', () => {
     const asset = await createTestAsset({ ownerId: testUser.id });
     const hunt = await createTestHunt({ creatorId: testUser.id });
 
-    const stepData = generateStepDataWithMedia(asset.id);
+    const stepData = generateStepDataWithMedia(asset.assetId);
 
     await request(app)
       .post(`/api/hunts/${hunt.huntId}/steps`)
@@ -153,7 +152,7 @@ describe('Asset Usage Tracking', () => {
       .expect(201);
 
     const usageRecords = await AssetUsageModel.find({
-      assetId: new Types.ObjectId(asset.id),
+      assetId: asset.assetId,
       huntId: hunt.huntId,
     }).lean();
 

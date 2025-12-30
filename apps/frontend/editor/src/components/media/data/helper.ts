@@ -33,7 +33,7 @@ export const typeToMediaType = (type: SimpleAssetType): MediaType => {
 
 export const MediaHelper = {
   assetToSnapshot: (asset: Asset): AssetSnapshot => ({
-    id: asset.assetId.toString(),
+    id: asset.assetId,
     url: asset.url,
     name: asset.originalFilename || asset.url.split('/').pop() || 'Untitled',
     sizeBytes: asset.size || 0,

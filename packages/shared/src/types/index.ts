@@ -104,8 +104,8 @@ export interface Location {
 
 /** Snapshot of asset data (copied at selection time) */
 export interface AssetSnapshot {
-  /** Stringified Asset.assetId for storage flexibility */
-  id: string;
+  /** Asset.assetId reference */
+  id: number;
   /** CDN URL for preview */
   url: string;
   /** Original filename */
@@ -381,7 +381,7 @@ export interface Mission {
   title?: string;
   description?: string;
   /** Author's reference images/media shown to player */
-  referenceAssetIds?: string[];
+  referenceAssetIds?: number[];
   targetLocation?: Location;
   type?: MissionType;
   /** Instructions for AI to validate player's upload (future feature) */

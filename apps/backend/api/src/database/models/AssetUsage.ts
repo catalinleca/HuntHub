@@ -4,8 +4,7 @@ import { IAssetUsage } from '@/database/types';
 const assetUsageSchema: Schema<IAssetUsage> = new Schema<IAssetUsage>(
   {
     assetId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Asset',
+      type: Number,
       required: true,
     },
     huntId: {
