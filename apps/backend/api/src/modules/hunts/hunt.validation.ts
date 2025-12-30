@@ -29,21 +29,15 @@ export const huntLocationSchema = Location;
 export const createHuntSchema = HuntCreate;
 export const updateHuntSchema = HuntUpdate;
 
-// Type assertion helpers for extending generated schemas
+// Type assertion for extending generated schemas
 const StepSchema = Step as unknown as ZodObject<ZodRawShape>;
 const HuntSchema = Hunt as unknown as ZodObject<ZodRawShape>;
-const LocationSchema = Location as unknown as ZodObject<ZodRawShape>;
 
-// Location for save - allow empty object (all fields optional)
-const LocationSave = LocationSchema.partial();
-
-// Step for save - stepId optional (new steps don't have one)
+// Save schema - extends Hunt to allow creating new steps (without stepId)
 const StepSave = StepSchema.extend({
   stepId: z.number().int().optional(),
-  requiredLocation: LocationSave.optional(),
 });
 
-// Save schema - accepts full Hunt with flexible steps array
 export const saveHuntSchema = HuntSchema.extend({
   steps: z.array(StepSave).optional(),
 });
