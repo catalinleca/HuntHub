@@ -140,14 +140,18 @@ export class HuntService implements IHuntService {
     const stepDocs = await StepModel.find({
       huntId: huntDoc.huntId,
       huntVersion: huntDoc.latestVersion,
-    })
-      .sort({ stepId: 1 })
-      .exec();
+    }).exec();
+
+    // Reorder steps according to stepOrder from version document
+    const stepMap = new Map(stepDocs.map((doc) => [doc.stepId, doc]));
+    const orderedSteps = (versionDoc.stepOrder || [])
+      .map((stepId) => stepMap.get(stepId))
+      .filter((doc) => doc != null);
 
     const hunt = HuntMapper.fromDocuments(huntDoc, versionDoc);
     return {
       ...hunt,
-      steps: StepMapper.fromDocuments(stepDocs),
+      steps: StepMapper.fromDocuments(orderedSteps),
       permission,
     };
   }
