@@ -207,13 +207,7 @@ export class HuntSaveService implements IHuntSaveService {
       throw new NotFoundError('Hunt version not found');
     }
 
-    const stepDocs = await StepModel.find({ huntId, huntVersion }).session(session).exec();
-
-    // Reorder steps according to stepOrder from version document
-    const stepMap = new Map(stepDocs.map((doc) => [doc.stepId, doc]));
-    const orderedSteps = (versionDoc.stepOrder || [])
-      .map((stepId) => stepMap.get(stepId))
-      .filter((doc) => doc != null);
+    const orderedSteps = await StepModel.findOrdered(huntId, huntVersion, versionDoc.stepOrder || [], session);
 
     const hunt = HuntMapper.fromDocuments(huntDoc, versionDoc);
     return {

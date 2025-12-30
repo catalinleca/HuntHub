@@ -137,16 +137,7 @@ export class HuntService implements IHuntService {
       throw new NotFoundError();
     }
 
-    const stepDocs = await StepModel.find({
-      huntId: huntDoc.huntId,
-      huntVersion: huntDoc.latestVersion,
-    }).exec();
-
-    // Reorder steps according to stepOrder from version document
-    const stepMap = new Map(stepDocs.map((doc) => [doc.stepId, doc]));
-    const orderedSteps = (versionDoc.stepOrder || [])
-      .map((stepId) => stepMap.get(stepId))
-      .filter((doc) => doc != null);
+    const orderedSteps = await StepModel.findOrdered(huntDoc.huntId, huntDoc.latestVersion, versionDoc.stepOrder || []);
 
     const hunt = HuntMapper.fromDocuments(huntDoc, versionDoc);
     return {
