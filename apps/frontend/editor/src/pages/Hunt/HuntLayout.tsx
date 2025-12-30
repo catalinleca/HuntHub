@@ -14,6 +14,26 @@ interface HuntLayoutProps {
   huntFormData: HuntFormData;
 }
 
+const getUnsavedSelectedStepPosition = (steps: HuntFormData['steps'], formKey: string | null): number => {
+  const selectedStep = steps.find((s) => s.formKey === formKey);
+  const isUnsaved = selectedStep && !selectedStep.stepId;
+
+  return isUnsaved ? steps.indexOf(selectedStep) : -1;
+};
+
+const syncSelectionAfterSave = (
+  savedSteps: Array<{ stepId?: number }> | undefined,
+  position: number,
+  setFormKey: (key: string | null) => void,
+): void => {
+  if (position < 0 || !savedSteps?.[position]) {
+    return;
+  }
+
+  const newFormKey = savedSteps[position].stepId?.toString() ?? null;
+  setFormKey(newFormKey);
+};
+
 export const HuntLayout = ({ huntFormData }: HuntLayoutProps) => {
   const formMethods = useForm<{ hunt: HuntFormData }>({
     values: { hunt: huntFormData },
@@ -33,26 +53,6 @@ export const HuntLayout = ({ huntFormData }: HuntLayoutProps) => {
     const savedHunt = await saveHuntMutation.mutateAsync(prepareHuntForSave(data.hunt));
 
     syncSelectionAfterSave(savedHunt.steps, unsavedSelectedStepPosition, setSelectedFormKey);
-  };
-
-  const getUnsavedSelectedStepPosition = (steps: HuntFormData['steps'], formKey: string | null): number => {
-    const selectedStep = steps.find((s) => s.formKey === formKey);
-    const isUnsaved = selectedStep && !selectedStep.stepId;
-
-    return isUnsaved ? steps.indexOf(selectedStep) : -1;
-  };
-
-  const syncSelectionAfterSave = (
-    savedSteps: Array<{ stepId?: number }> | undefined,
-    position: number,
-    setFormKey: (key: string | null) => void,
-  ): void => {
-    if (position < 0 || !savedSteps?.[position]) {
-      return;
-    }
-
-    const newFormKey = savedSteps[position].stepId?.toString() ?? null;
-    setFormKey(newFormKey);
   };
 
   const selectedStepIndex = selectedFormKey ? steps.findIndex((s) => s.formKey === selectedFormKey) : -1;
