@@ -28,7 +28,7 @@ const createClue = (huntId: number): StepFormData => {
 };
 
 const createQuiz = (huntId: number): StepFormData => {
-  const targetId = crypto.randomUUID();
+  const option1Id = crypto.randomUUID();
   const option2Id = crypto.randomUUID();
 
   const quiz: QuizFormData = {
@@ -37,12 +37,13 @@ const createQuiz = (huntId: number): StepFormData => {
     type: OptionType.Choice,
     randomizeOrder: true,
 
-    // Form-only: options[] for ArrayInput, targetId for correct answer
+    target: { id: crypto.randomUUID(), text: '' },
+
     options: [
-      { id: targetId, text: '', formKey: targetId },
+      { id: option1Id, text: '', formKey: option1Id },
       { id: option2Id, text: '', formKey: option2Id },
     ],
-    targetId,
+    targetId: option1Id,
   };
 
   return {
