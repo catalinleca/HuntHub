@@ -40,13 +40,13 @@ export class HuntSaveService implements IHuntSaveService {
     // 2. Validate all assets upfront (fail fast before transaction)
     await this.validateAllAssets(huntData, userId);
 
-    // 3. Prepare step diff
-    const existingSteps = await StepModel.find({ huntId, huntVersion }).lean();
-    const diff = this.calculateStepDiff(huntData.steps || [], existingSteps);
-
-    // 4. Execute transaction
+    // 3. Execute transaction
     return withTransaction(async (session) => {
-      // 4a. Update hunt version metadata
+      // 3a. Query existing steps inside transaction to avoid TOCTOU race
+      const existingSteps = await StepModel.find({ huntId, huntVersion }).session(session).lean();
+      const diff = this.calculateStepDiff(huntData.steps || [], existingSteps);
+
+      // 3b. Update hunt version metadata
       const huntUpdateData = HuntMapper.toVersionUpdate(huntData);
       const updatedVersion = await HuntVersionModel.findOneAndUpdate(
         {
@@ -63,12 +63,12 @@ export class HuntSaveService implements IHuntSaveService {
         await this.handleUpdateFailure(huntId, huntVersion, huntData.updatedAt, session);
       }
 
-      // 4b. Delete removed steps
+      // 3c. Delete removed steps
       if (diff.toDelete.length > 0) {
         await StepModel.deleteMany({ stepId: { $in: diff.toDelete }, huntId, huntVersion }, { session });
       }
 
-      // 4c. Update existing steps
+      // 3d. Update existing steps
       for (const { stepId, data } of diff.toUpdate) {
         const updateData = StepMapper.toDocumentUpdate(data);
         const result = await StepModel.findOneAndUpdate(
@@ -87,7 +87,7 @@ export class HuntSaveService implements IHuntSaveService {
         }
       }
 
-      // 4d. Create new steps
+      // 3e. Create new steps
       const createdStepIds: number[] = [];
       if (diff.toCreate.length > 0) {
         const newDocs = diff.toCreate.map((step) => StepMapper.toDocument(step, huntId, huntVersion));
@@ -95,7 +95,7 @@ export class HuntSaveService implements IHuntSaveService {
         createdStepIds.push(...created.map((s) => s.stepId));
       }
 
-      // 4e. Update stepOrder (preserve incoming order, map new steps to their generated IDs)
+      // 3f. Update stepOrder (preserve incoming order, map new steps to their generated IDs)
       const newStepOrder = this.buildStepOrder(huntData.steps || [], createdStepIds);
       await HuntVersionModel.findOneAndUpdate(
         { huntId, version: huntVersion },
@@ -103,10 +103,10 @@ export class HuntSaveService implements IHuntSaveService {
         { session },
       ).exec();
 
-      // 4f. Rebuild asset usage
+      // 3g. Rebuild asset usage
       await this.usageTracker.rebuildHuntAssetUsage(huntId, session);
 
-      // 5. Fetch and return updated hunt with steps
+      // 4. Fetch and return updated hunt with steps
       return this.fetchHuntWithSteps(huntId, huntVersion, session);
     });
   }
