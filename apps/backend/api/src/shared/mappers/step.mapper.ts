@@ -38,6 +38,18 @@ export class StepMapper {
     };
   }
 
+  static toComparableData(doc: IStep): Partial<IStep> {
+    return {
+      type: doc.type,
+      challenge: doc.challenge,
+      media: doc.media,
+      hint: doc.hint,
+      requiredLocation: doc.requiredLocation,
+      timeLimit: doc.timeLimit,
+      maxAttempts: doc.maxAttempts,
+    };
+  }
+
   static fromDocument(doc: HydratedDocument<IStep>): Step {
     // Runtime validation: Check enum
     if (!this.isChallengeType(doc.type)) {

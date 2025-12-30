@@ -4,6 +4,7 @@ import { ClientSession } from 'mongoose';
 import StepModel from '@/database/models/Step';
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
+import { IStep } from '@/database/types/Step';
 import { HuntMapper, StepMapper } from '@/shared/mappers';
 import { NotFoundError, ValidationError } from '@/shared/errors';
 import { ConflictError } from '@/shared/errors/ConflictError';
@@ -132,16 +133,30 @@ export class HuntSaveService implements IHuntSaveService {
     }
   }
 
-  private calculateStepDiff(incoming: Step[], existing: Array<{ stepId: number }>): StepDiff {
-    const existingIds = new Set(existing.map((s) => s.stepId));
+  private calculateStepDiff(incoming: Step[], existing: IStep[]): StepDiff {
+    const existingMap = new Map(existing.map((s) => [s.stepId, s]));
     const incomingWithIds = incoming.filter((s) => s.stepId != null);
     const incomingIds = new Set(incomingWithIds.map((s) => s.stepId));
 
+    const toUpdate: StepDiff['toUpdate'] = [];
+    for (const step of incomingWithIds) {
+      const existingStep = existingMap.get(step.stepId!);
+      if (existingStep && this.hasStepChanged(step, existingStep)) {
+        toUpdate.push({ stepId: step.stepId!, data: step });
+      }
+    }
+
     return {
       toCreate: incoming.filter((s) => s.stepId == null) as StepCreate[],
-      toUpdate: incomingWithIds.map((s) => ({ stepId: s.stepId, data: s })),
-      toDelete: [...existingIds].filter((id) => !incomingIds.has(id)),
+      toUpdate,
+      toDelete: [...existingMap.keys()].filter((id) => !incomingIds.has(id)),
     };
+  }
+
+  private hasStepChanged(incoming: Step, existing: IStep): boolean {
+    const incomingData = StepMapper.toDocumentUpdate(incoming);
+    const existingData = StepMapper.toComparableData(existing);
+    return JSON.stringify(incomingData) !== JSON.stringify(existingData);
   }
 
   private buildStepOrder(steps: Step[], createdIds: number[]): number[] {
@@ -150,7 +165,7 @@ export class HuntSaveService implements IHuntSaveService {
       if (step.stepId != null) {
         return step.stepId;
       }
-      // New step - use generated ID in order
+
       return createdIds[createIndex++];
     });
   }
