@@ -8,6 +8,7 @@ import { useDeleteHunt } from '@/api/Hunt';
 import { useConfirmationDialog } from '@/hooks';
 import { DialogVariants } from '@/stores/useDialogStore';
 import { useHuntDialogStore } from '@/stores';
+import { MediaHelper } from '@/components/media/data';
 
 interface AllHuntsProps {
   hunts: Hunt[];
@@ -35,7 +36,9 @@ export const AllHunts = ({ hunts }: AllHuntsProps) => {
     });
   };
 
-  if (hunts.length === 0) return null;
+  if (hunts.length === 0) {
+    return null;
+  }
 
   return (
     <HuntCard transition={false}>
@@ -48,6 +51,8 @@ export const AllHunts = ({ hunts }: AllHuntsProps) => {
           {hunts.map((hunt) => (
             <Grid2 size={{ xs: 12, sm: 6, md: 4 }} key={hunt.huntId}>
               <HuntActionCard
+                image={MediaHelper.getUrl(hunt.coverImage)}
+                imageAlt={MediaHelper.getAlt(hunt.coverImage) || hunt.name}
                 title={hunt.name}
                 subtitle={hunt.description || 'No description'}
                 isPublished={hunt.isPublished}

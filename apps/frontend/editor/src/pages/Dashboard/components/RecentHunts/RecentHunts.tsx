@@ -5,6 +5,7 @@ import { HuntCard, HuntCardTitle } from '@/components/HuntCard';
 import type { Hunt } from '@hunthub/shared/types';
 import { getColor } from '@/utils';
 import { HuntActionCard } from '@/pages/Dashboard/components/HuntActionCard';
+import { MediaHelper } from '@/components/media/data';
 
 interface RecentHuntsProps {
   hunts: Hunt[];
@@ -28,6 +29,8 @@ export const RecentHunts = ({ hunts }: RecentHuntsProps) => {
           {hunts.map((hunt) => (
             <Grid2 size={{ xs: 12, md: 6 }} key={hunt.huntId}>
               <HuntActionCard
+                image={MediaHelper.getUrl(hunt.coverImage)}
+                imageAlt={MediaHelper.getAlt(hunt.coverImage) || hunt.name}
                 title={hunt.name}
                 subtitle={hunt.description || 'No description'}
                 isPublished={hunt.isPublished}

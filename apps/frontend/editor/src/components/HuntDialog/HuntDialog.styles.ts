@@ -1,7 +1,11 @@
 import styled from 'styled-components';
 import { Dialog as MuiDialog, DialogTitle, DialogContent } from '@mui/material';
 
+const HUNT_DIALOG_Z_INDEX = 1100;
+
 export const Dialog = styled(MuiDialog)`
+  z-index: ${HUNT_DIALOG_Z_INDEX};
+
   .MuiDialog-paper {
     border: none;
     overflow: hidden;

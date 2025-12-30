@@ -17,9 +17,16 @@ export interface FormMediaInputProps {
   label?: string;
   description?: string;
   disabled?: boolean;
+  restrictToTypes?: MediaType[];
 }
 
-export const FormMediaInput = ({ name, label = 'Media', description, disabled = false }: FormMediaInputProps) => {
+export const FormMediaInput = ({
+  name,
+  label = 'Media',
+  description,
+  disabled = false,
+  restrictToTypes,
+}: FormMediaInputProps) => {
   const { setValue } = useFormContext();
   const { confirm } = useConfirmationDialog();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -76,7 +83,13 @@ export const FormMediaInput = ({ name, label = 'Media', description, disabled = 
         )}
       </Stack>
 
-      <MediaDetailsDrawer open={drawerOpen} onClose={handleCloseDrawer} onSave={handleSave} initialMedia={media} />
+      <MediaDetailsDrawer
+        open={drawerOpen}
+        onClose={handleCloseDrawer}
+        onSave={handleSave}
+        initialMedia={media}
+        restrictToTypes={restrictToTypes}
+      />
     </>
   );
 };

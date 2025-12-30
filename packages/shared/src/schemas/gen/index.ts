@@ -57,6 +57,8 @@ const Quiz = z
     target: Option,
     type: OptionType,
     distractors: z.array(Option),
+    displayOrder: z.array(z.string()),
+    randomizeOrder: z.boolean(),
     validation: QuizValidation,
   })
   .partial()
@@ -121,6 +123,7 @@ const Hunt = z
     permission: z.enum(['owner', 'admin', 'view']).optional(),
     createdAt: z.string().datetime({ offset: true }).optional(),
     updatedAt: z.string().datetime({ offset: true }).optional(),
+    coverImage: Media.nullish(),
   })
   .strict();
 const StepCreate = z
@@ -140,6 +143,7 @@ const HuntCreate = z
     description: z.string().max(500).optional(),
     startLocation: Location.optional(),
     steps: z.array(StepCreate).optional(),
+    coverImage: Media.nullish(),
   })
   .strict();
 const HuntUpdate = z
@@ -148,6 +152,7 @@ const HuntUpdate = z
     description: z.string().max(500),
     startLocation: Location,
     updatedAt: z.string().datetime({ offset: true }),
+    coverImage: Media.nullable(),
   })
   .partial()
   .strict();
