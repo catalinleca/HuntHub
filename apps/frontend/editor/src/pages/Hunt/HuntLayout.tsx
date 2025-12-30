@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { NavBar } from '@/components';
 import { useSaveHunt } from '@/api/Hunt';
 import { useHuntSteps } from '@/pages/Hunt/hooks';
 import { StepFormProvider } from '@/pages/Hunt/context';
 import { prepareHuntForSave } from '@/utils/transformers/huntOutput';
-import { HuntFormData, StepFormData } from '@/types/editor';
+import { transformHuntToFormData } from '@/utils/transformers/huntInput';
+import { HuntFormData } from '@/types/editor';
 import { HuntHeader } from './HuntHeader';
 import { HuntStepTimeline } from './HuntStepTimeline';
 import { HuntForm } from './HuntForm';
@@ -15,11 +15,6 @@ interface HuntLayoutProps {
   huntFormData: HuntFormData;
 }
 
-interface PendingSelection {
-  position: number;
-  expectedStepId: number;
-}
-
 const getUnsavedSelectedStepPosition = (steps: HuntFormData['steps'], formKey: string | null): number => {
   const selectedStep = steps.find((s) => s.formKey === formKey);
   const isUnsaved = selectedStep && !selectedStep.stepId;
@@ -27,65 +22,35 @@ const getUnsavedSelectedStepPosition = (steps: HuntFormData['steps'], formKey: s
   return isUnsaved ? steps.indexOf(selectedStep) : -1;
 };
 
-const getExpectedStepId = (savedSteps: Array<{ stepId?: number }> | undefined, position: number): number | null => {
-  return savedSteps?.[position]?.stepId ?? null;
-};
-
-const shouldUpdateSelection = (
-  steps: StepFormData[],
-  pending: PendingSelection | null,
-): string | null => {
-  if (!pending) {
-    return null;
-  }
-
-  const step = steps[pending.position];
-  if (step?.stepId === pending.expectedStepId) {
-    return step.formKey;
-  }
-
-  return null;
-};
-
 export const HuntLayout = ({ huntFormData }: HuntLayoutProps) => {
   const formMethods = useForm<{ hunt: HuntFormData }>({
-    values: { hunt: huntFormData },
-    resetOptions: { keepDirtyValues: true },
+    defaultValues: { hunt: huntFormData },
     mode: 'onBlur',
   });
 
-  const { handleSubmit } = formMethods;
+  const { handleSubmit, reset } = formMethods;
 
   const { steps, selectedFormKey, setSelectedFormKey, handleCreateStep, handleDeleteStep } = useHuntSteps(formMethods);
 
   const saveHuntMutation = useSaveHunt();
-
-  const [pendingSelection, setPendingSelection] = useState<PendingSelection | null>(null);
-
-  useEffect(() => {
-    const newFormKey = shouldUpdateSelection(steps, pendingSelection);
-    if (newFormKey) {
-      setSelectedFormKey(newFormKey);
-      setPendingSelection(null);
-    }
-  }, [steps, pendingSelection, setSelectedFormKey]);
 
   const onSubmit = async (data: { hunt: HuntFormData }) => {
     const unsavedSelectedStepPosition = getUnsavedSelectedStepPosition(data.hunt.steps, selectedFormKey);
 
     const savedHunt = await saveHuntMutation.mutateAsync(prepareHuntForSave(data.hunt));
 
-    const expectedStepId = getExpectedStepId(savedHunt.steps, unsavedSelectedStepPosition);
-    if (unsavedSelectedStepPosition >= 0 && expectedStepId) {
-      setPendingSelection({ position: unsavedSelectedStepPosition, expectedStepId });
+    const newFormData = transformHuntToFormData(savedHunt);
+    reset({ hunt: newFormData });
+
+    if (unsavedSelectedStepPosition >= 0) {
+      const newFormKey = newFormData.steps[unsavedSelectedStepPosition]?.formKey;
+      if (newFormKey) {
+        setSelectedFormKey(newFormKey);
+      }
     }
   };
 
-  const selectedStepIndex = pendingSelection
-    ? pendingSelection.position
-    : selectedFormKey
-      ? steps.findIndex((s) => s.formKey === selectedFormKey)
-      : -1;
+  const selectedStepIndex = selectedFormKey ? steps.findIndex((s) => s.formKey === selectedFormKey) : -1;
 
   const selectedStepType = selectedStepIndex >= 0 ? steps[selectedStepIndex]?.type : undefined;
 
