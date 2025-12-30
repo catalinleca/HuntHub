@@ -113,10 +113,10 @@ export class AssetService implements IAssetService {
     }
 
     await withTransaction(async (session) => {
-      const isInUse = await this.usageTracker.isAssetInUse(asset._id.toString());
+      const isInUse = await this.usageTracker.isAssetInUse(asset.assetId);
 
       if (isInUse) {
-        const huntIds = await this.usageTracker.getHuntsUsingAsset(asset._id.toString());
+        const huntIds = await this.usageTracker.getHuntsUsingAsset(asset.assetId);
         throw new ConflictError(
           `Cannot delete asset: it is used by ${huntIds.length} hunt(s). Remove references first.`,
         );

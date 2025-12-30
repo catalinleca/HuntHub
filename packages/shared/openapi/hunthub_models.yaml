@@ -65,8 +65,8 @@ components:
       description: Snapshot of asset data (copied at selection time)
       properties:
         id:
-          type: string
-          description: Stringified Asset.assetId for storage flexibility
+          type: integer
+          description: Asset.assetId reference
         url:
           type: string
           description: CDN URL for preview
@@ -502,7 +502,7 @@ components:
         referenceAssetIds:
           type: array
           items:
-            type: string
+            type: integer
           description: Author's reference images/media shown to player
         targetLocation:
           $ref: '#/components/schemas/Location'

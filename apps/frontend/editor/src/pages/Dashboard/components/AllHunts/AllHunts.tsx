@@ -9,18 +9,25 @@ import { useConfirmationDialog } from '@/hooks';
 import { DialogVariants } from '@/stores/useDialogStore';
 import { useHuntDialogStore } from '@/stores';
 import { MediaHelper } from '@/components/media/data';
+import { useNavigate } from 'react-router-dom';
 
 interface AllHuntsProps {
   hunts: Hunt[];
 }
 
 export const AllHunts = ({ hunts }: AllHuntsProps) => {
+  const navigate = useNavigate();
+
   const { confirm } = useConfirmationDialog();
   const { open: openHuntDialog } = useHuntDialogStore();
   const deleteMutation = useDeleteHunt();
 
   const handleEdit = (huntId: number) => {
     openHuntDialog(huntId);
+  };
+
+  const handleNavigateToHunt = (huntId: number) => {
+    navigate(`/editor/${huntId}`);
   };
 
   const handleDelete = (huntId: number) => {
@@ -58,6 +65,7 @@ export const AllHunts = ({ hunts }: AllHuntsProps) => {
                 isPublished={hunt.isPublished}
                 onEdit={() => handleEdit(hunt.huntId)}
                 onDelete={() => handleDelete(hunt.huntId)}
+                onClick={() => handleNavigateToHunt(hunt.huntId)}
               />
             </Grid2>
           ))}

@@ -3,6 +3,7 @@ import { Container } from 'inversify';
 import { UserService, IUserService } from '@/modules/users/user.service';
 import { TYPES } from '@/shared/types';
 import { HuntService, IHuntService } from '@/modules/hunts/hunt.service';
+import { HuntSaveService, IHuntSaveService } from '@/modules/hunts/hunt-save.service';
 import { HuntController, IHuntController } from '@/modules/hunts/hunt.controller';
 import { StepService, IStepService } from '@/modules/steps/step.service';
 import { StepController, IStepController } from '@/modules/steps/step.controller';
@@ -31,6 +32,7 @@ container.bind<IHuntShareController>(TYPES.HuntShareController).to(HuntShareCont
 container.bind<IAuthService>(TYPES.AuthService).to(AuthService);
 container.bind<IUserService>(TYPES.UserService).to(UserService);
 container.bind<IHuntService>(TYPES.HuntService).to(HuntService);
+container.bind<IHuntSaveService>(TYPES.HuntSaveService).to(HuntSaveService);
 container.bind<IStepService>(TYPES.StepService).to(StepService);
 container.bind<IAssetService>(TYPES.AssetService).to(AssetService);
 container.bind<IStorageService>(TYPES.StorageService).to(StorageService);

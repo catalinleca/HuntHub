@@ -3,7 +3,7 @@ import { TYPES } from '@/shared/types';
 import { container } from '@/config/inversify';
 import { IHuntController } from './hunt.controller';
 import { validateRequest, validateQuery } from '@/shared/middlewares';
-import { createHuntSchema, updateHuntSchema, reorderStepsSchema } from './hunt.validation';
+import { createHuntSchema, updateHuntSchema, saveHuntSchema, reorderStepsSchema } from './hunt.validation';
 import { HuntQueryParamsValidation } from '@/shared/validation/query-params.validation';
 
 const huntRouter = express.Router();
@@ -23,6 +23,10 @@ huntRouter.get('/:id', (req, res, next) => {
 
 huntRouter.put('/:id', validateRequest(updateHuntSchema), (req, res, next) => {
   controller.updateHunt(req, res).catch(next);
+});
+
+huntRouter.put('/:id/save', validateRequest(saveHuntSchema), (req, res, next) => {
+  controller.saveHunt(req, res).catch(next);
 });
 
 huntRouter.delete('/:id', (req, res, next) => {

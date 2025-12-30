@@ -1,4 +1,4 @@
-import { Schema, model, Model, HydratedDocument } from 'mongoose';
+import { Schema, model, Model, HydratedDocument, ClientSession } from 'mongoose';
 import { IStep } from '../types/Step';
 import { locationSchema } from '@/database/schemas/location.schema';
 import { ChallengeType } from '@hunthub/shared';
@@ -61,6 +61,13 @@ interface IStepModel extends Model<IStep> {
 
   findByHuntVersionAndType(huntId: number, version: number, type: ChallengeType): Promise<HydratedDocument<IStep>[]>;
 
+  findOrdered(
+    huntId: number,
+    huntVersion: number,
+    stepOrder: number[],
+    session?: ClientSession,
+  ): Promise<HydratedDocument<IStep>[]>;
+
   countByHuntVersion(huntId: number, version: number): Promise<number>;
 
   hasSteps(huntId: number, version: number): Promise<boolean>;
@@ -72,6 +79,20 @@ stepSchema.statics.findByHuntVersion = function (huntId: number, version: number
 
 stepSchema.statics.findByHuntVersionAndType = function (huntId: number, version: number, type: ChallengeType) {
   return this.find({ huntId, huntVersion: version, type }).sort({ createdAt: 1 }).exec();
+};
+
+stepSchema.statics.findOrdered = async function (
+  huntId: number,
+  huntVersion: number,
+  stepOrder: number[],
+  session?: ClientSession,
+): Promise<HydratedDocument<IStep>[]> {
+  const docs = await this.find({ huntId, huntVersion })
+    .session(session ?? null)
+    .exec();
+  const stepMap = new Map(docs.map((doc: HydratedDocument<IStep>) => [doc.stepId, doc]));
+
+  return stepOrder.map((stepId) => stepMap.get(stepId)).filter((doc): doc is HydratedDocument<IStep> => doc != null);
 };
 
 stepSchema.statics.countByHuntVersion = async function (huntId: number, version: number): Promise<number> {

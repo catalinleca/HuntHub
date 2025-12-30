@@ -1,11 +1,10 @@
 import { injectable } from 'inversify';
-import mongoose from 'mongoose';
 import { AssetModel } from '@/database/models';
-import { NotFoundError, ForbiddenError, ValidationError } from '@/shared/errors';
+import { NotFoundError, ForbiddenError } from '@/shared/errors';
 import { ExtractedAssets } from '@/services/asset-usage';
 
 export interface AssetValidationResult {
-  assetId: string;
+  assetId: number;
   path: string;
   exists: boolean;
   isOwned: boolean;
@@ -21,8 +20,8 @@ export interface BulkValidationResult {
 export interface IAssetValidator {
   validateOrThrow(extracted: ExtractedAssets, userId: string): Promise<void>;
   validateBulk(extracted: ExtractedAssets, userId: string): Promise<BulkValidationResult>;
-  assetExists(assetId: string): Promise<boolean>;
-  userOwnsAsset(assetId: string, userId: string): Promise<boolean>;
+  assetExists(assetId: number): Promise<boolean>;
+  userOwnsAsset(assetId: number, userId: string): Promise<boolean>;
 }
 
 @injectable()
@@ -30,23 +29,14 @@ export class AssetValidator implements IAssetValidator {
   async validateOrThrow(extracted: ExtractedAssets, userId: string): Promise<void> {
     if (extracted.sources.length === 0) return;
 
-    for (const source of extracted.sources) {
-      if (!mongoose.Types.ObjectId.isValid(source.assetId)) {
-        throw new ValidationError(`Invalid asset ID format at ${source.path}: "${source.assetId}"`, [
-          { field: source.path, message: `Invalid asset ID format: "${source.assetId}"` },
-        ]);
-      }
-    }
-
-    const objectIds = extracted.assetIds.map((id) => new mongoose.Types.ObjectId(id));
     const ownedAssets = await AssetModel.find({
-      _id: { $in: objectIds },
+      assetId: { $in: extracted.assetIds },
       ownerId: userId,
     })
-      .select('_id')
+      .select('assetId')
       .lean();
 
-    const ownedIds = new Set(ownedAssets.map((a) => a._id.toString()));
+    const ownedIds = new Set(ownedAssets.map((a) => a.assetId));
 
     const unownedSources = extracted.sources.filter((s) => !ownedIds.has(s.assetId));
     if (unownedSources.length === 0) {
@@ -55,12 +45,12 @@ export class AssetValidator implements IAssetValidator {
 
     const unownedIds = [...new Set(unownedSources.map((s) => s.assetId))];
     const existingAssets = await AssetModel.find({
-      _id: { $in: unownedIds.map((id) => new mongoose.Types.ObjectId(id)) },
+      assetId: { $in: unownedIds },
     })
-      .select('_id')
+      .select('assetId')
       .lean();
 
-    const existingIds = new Set(existingAssets.map((a) => a._id.toString()));
+    const existingIds = new Set(existingAssets.map((a) => a.assetId));
 
     for (const source of unownedSources) {
       if (!existingIds.has(source.assetId)) {
@@ -78,45 +68,24 @@ export class AssetValidator implements IAssetValidator {
       return { valid: true, results, errors };
     }
 
-    const validSources: typeof extracted.sources = [];
-    for (const source of extracted.sources) {
-      if (!mongoose.Types.ObjectId.isValid(source.assetId)) {
-        results.push({
-          assetId: source.assetId,
-          path: source.path,
-          exists: false,
-          isOwned: false,
-          error: 'Invalid asset ID format',
-        });
-        errors.push(`Invalid asset ID format at ${source.path}`);
-      } else {
-        validSources.push(source);
-      }
-    }
-
-    if (validSources.length === 0) {
-      return { valid: errors.length === 0, results, errors };
-    }
-
-    const validObjectIds = validSources.map((s) => new mongoose.Types.ObjectId(s.assetId));
     const ownedAssets = await AssetModel.find({
-      _id: { $in: validObjectIds },
+      assetId: { $in: extracted.assetIds },
       ownerId: userId,
     })
-      .select('_id')
+      .select('assetId')
       .lean();
 
-    const ownedIds = new Set(ownedAssets.map((a) => a._id.toString()));
+    const ownedIds = new Set(ownedAssets.map((a) => a.assetId));
 
     const allAssets = await AssetModel.find({
-      _id: { $in: validObjectIds },
+      assetId: { $in: extracted.assetIds },
     })
-      .select('_id')
+      .select('assetId')
       .lean();
 
-    const existingIds = new Set(allAssets.map((a) => a._id.toString()));
+    const existingIds = new Set(allAssets.map((a) => a.assetId));
 
-    for (const source of validSources) {
+    for (const source of extracted.sources) {
       const exists = existingIds.has(source.assetId);
       const isOwned = ownedIds.has(source.assetId);
 
@@ -141,24 +110,13 @@ export class AssetValidator implements IAssetValidator {
     return { valid: errors.length === 0, results, errors };
   }
 
-  async assetExists(assetId: string): Promise<boolean> {
-    if (!mongoose.Types.ObjectId.isValid(assetId)) {
-      return false;
-    }
-    const exists = await AssetModel.exists({
-      _id: new mongoose.Types.ObjectId(assetId),
-    });
+  async assetExists(assetId: number): Promise<boolean> {
+    const exists = await AssetModel.exists({ assetId });
     return !!exists;
   }
 
-  async userOwnsAsset(assetId: string, userId: string): Promise<boolean> {
-    if (!mongoose.Types.ObjectId.isValid(assetId)) {
-      return false;
-    }
-    const exists = await AssetModel.exists({
-      _id: new mongoose.Types.ObjectId(assetId),
-      ownerId: userId,
-    });
+  async userOwnsAsset(assetId: number, userId: string): Promise<boolean> {
+    const exists = await AssetModel.exists({ assetId, ownerId: userId });
     return !!exists;
   }
 }

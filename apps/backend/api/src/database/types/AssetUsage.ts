@@ -1,5 +1,3 @@
-import mongoose from 'mongoose';
-
 /**
  * IAssetUsage - Database interface for AssetUsage documents
  *
@@ -15,7 +13,7 @@ import mongoose from 'mongoose';
  * (preventing asset deletion while in use), hunt-level is sufficient.
  */
 export interface IAssetUsage {
-  assetId: mongoose.Types.ObjectId;
+  assetId: number; // FK to Asset.assetId (numeric)
   huntId: number; // FK to Hunt.huntId
   createdAt?: Date;
 }

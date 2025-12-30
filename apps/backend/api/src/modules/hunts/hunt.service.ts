@@ -137,17 +137,12 @@ export class HuntService implements IHuntService {
       throw new NotFoundError();
     }
 
-    const stepDocs = await StepModel.find({
-      huntId: huntDoc.huntId,
-      huntVersion: huntDoc.latestVersion,
-    })
-      .sort({ stepId: 1 })
-      .exec();
+    const orderedSteps = await StepModel.findOrdered(huntDoc.huntId, huntDoc.latestVersion, versionDoc.stepOrder || []);
 
     const hunt = HuntMapper.fromDocuments(huntDoc, versionDoc);
     return {
       ...hunt,
-      steps: StepMapper.fromDocuments(stepDocs),
+      steps: StepMapper.fromDocuments(orderedSteps),
       permission,
     };
   }

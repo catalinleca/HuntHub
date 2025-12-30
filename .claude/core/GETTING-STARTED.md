@@ -31,7 +31,7 @@ This installs all dependencies for the monorepo (root + all workspaces).
 **Create Firebase service account:**
 1. Go to Firebase Console → Project Settings → Service Accounts
 2. Click "Generate new private key"
-3. Save as `apps/backend/api/firebaseService.json`
+3. Save as `apps/backend/api/src/firebaseService.json`
 
 **Example file structure:**
 ```json
@@ -90,6 +90,23 @@ NODE_ENV=development
 
 ---
 
+## Build Shared Package
+
+**Before running the API for the first time**, you must build the shared package:
+
+```bash
+npm run build:shared
+```
+
+This compiles TypeScript in `packages/shared/` to the `dist/` folder that the API imports from.
+
+**When to rebuild:**
+- After `npm install` or fresh clone
+- After modifying files in `packages/shared/`
+- If you see "Cannot find module '@hunthub/shared'" errors
+
+---
+
 ## Running the Application
 
 ### Development Mode
@@ -97,7 +114,7 @@ NODE_ENV=development
 **Backend API:**
 ```bash
 # From root
-npm run dev:backend
+npm run dev:api
 
 # Or from apps/backend/api
 cd apps/backend/api
