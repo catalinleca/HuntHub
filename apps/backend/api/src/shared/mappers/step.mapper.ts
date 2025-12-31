@@ -18,10 +18,10 @@ export class StepMapper {
       type: dto.type,
       challenge: dto.challenge,
       media: dto.media,
-      hint: dto.hint,
-      requiredLocation: dto.requiredLocation,
-      timeLimit: dto.timeLimit,
-      maxAttempts: dto.maxAttempts,
+      hint: dto.hint ?? undefined,
+      requiredLocation: dto.requiredLocation ?? undefined,
+      timeLimit: dto.timeLimit ?? undefined,
+      maxAttempts: dto.maxAttempts ?? undefined,
       // Mongoose provides defaults for metadata
     };
   }
@@ -31,10 +31,10 @@ export class StepMapper {
       type: dto.type,
       challenge: dto.challenge,
       media: dto.media,
-      hint: dto.hint,
-      requiredLocation: dto.requiredLocation,
-      timeLimit: dto.timeLimit,
-      maxAttempts: dto.maxAttempts,
+      hint: dto.hint ?? undefined,
+      requiredLocation: dto.requiredLocation ?? undefined,
+      timeLimit: dto.timeLimit ?? undefined,
+      maxAttempts: dto.maxAttempts ?? undefined,
     };
   }
 
@@ -77,8 +77,8 @@ export class StepMapper {
       timeLimit: doc.timeLimit,
       maxAttempts: doc.maxAttempts,
       metadata: doc.metadata,
-      createdAt: doc.createdAt?.toString(),
-      updatedAt: doc.updatedAt?.toString(),
+      createdAt: doc.createdAt?.toISOString(),
+      updatedAt: doc.updatedAt?.toISOString(),
     };
   }
 

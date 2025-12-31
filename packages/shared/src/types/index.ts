@@ -293,10 +293,10 @@ export interface Step {
   challenge: Challenge;
   /** Optional media attachment for this step */
   media?: Media;
-  requiredLocation?: Location;
-  hint?: string;
-  timeLimit?: number;
-  maxAttempts?: number;
+  requiredLocation?: Location | null;
+  hint?: string | null;
+  timeLimit?: number | null;
+  maxAttempts?: number | null;
   /** Flexible key-value storage for extensibility */
   metadata?: Record<string, any>;
   /**
@@ -317,10 +317,10 @@ export interface StepCreate {
   challenge: Challenge;
   /** Optional media attachment for this step */
   media?: Media;
-  requiredLocation?: Location;
-  hint?: string;
-  timeLimit?: number;
-  maxAttempts?: number;
+  requiredLocation?: Location | null;
+  hint?: string | null;
+  timeLimit?: number | null;
+  maxAttempts?: number | null;
 }
 
 /** Step update (only editable fields, no id/huntId/timestamps) */
@@ -329,10 +329,10 @@ export interface StepUpdate {
   challenge: Challenge;
   /** Optional media attachment for this step */
   media?: Media;
-  requiredLocation?: Location;
-  hint?: string;
-  timeLimit?: number;
-  maxAttempts?: number;
+  requiredLocation?: Location | null;
+  hint?: string | null;
+  timeLimit?: number | null;
+  maxAttempts?: number | null;
 }
 
 export interface Challenge {

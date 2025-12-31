@@ -19,6 +19,7 @@ export interface IStep {
   timeLimit?: number;
   maxAttempts?: number;
   metadata?: Record<string, unknown>;
-  createdAt?: string;
-  updatedAt?: string;
+  // Mongoose provides Date objects; mappers convert to ISO strings for API
+  createdAt?: Date;
+  updatedAt?: Date;
 }

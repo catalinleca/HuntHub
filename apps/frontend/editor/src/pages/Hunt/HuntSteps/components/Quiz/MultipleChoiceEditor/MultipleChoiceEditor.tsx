@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
-import { Box, Stack } from '@mui/material';
+import { Box, FormHelperText, Stack } from '@mui/material';
 import { PlusIcon } from '@phosphor-icons/react';
 import { DndContext, PointerSensor, closestCenter, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { SortableOptionItem } from '../OptionItem/SortableOptionItem';
 import { useMultipleChoiceOptions } from './useMultipleChoiceOptions';
 import { SectionButton } from '../../Section/Section.styles';
+import { useFieldError } from '@/hooks';
 
 interface MultipleChoiceEditorProps {
   stepIndex: number;
@@ -16,6 +17,8 @@ const pointerSensorOptions = { activationConstraint: { distance: 5 } };
 export const MultipleChoiceEditor = ({ stepIndex }: MultipleChoiceEditorProps) => {
   const { fields, arrayActions, optionsPath, targetId, handleMarkTarget, handleRemove, handleAdd, canAdd, canRemove } =
     useMultipleChoiceOptions(stepIndex);
+
+  const optionsError = useFieldError(optionsPath);
 
   const sensors = useSensors(useSensor(PointerSensor, pointerSensorOptions));
 
@@ -61,6 +64,7 @@ export const MultipleChoiceEditor = ({ stepIndex }: MultipleChoiceEditorProps) =
         >
           Add Option
         </SectionButton>
+        {optionsError && <FormHelperText error>{optionsError}</FormHelperText>}
       </Box>
     </Stack>
   );

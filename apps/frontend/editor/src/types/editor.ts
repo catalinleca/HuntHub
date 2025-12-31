@@ -32,10 +32,10 @@ export type HuntDialogFormData = {
   coverImage: Media | null;
 };
 
-export type QuizOptionFormData = WithFormKey<{
+export type QuizOptionFormData = {
   id: string;
   text: string;
-}>;
+};
 
 /**
  * Quiz form model = API model + options[] + targetId

@@ -334,13 +334,18 @@ components:
           $ref: '#/components/schemas/Media'
           description: Optional media attachment for this step
         requiredLocation:
-          $ref: '#/components/schemas/Location'
+          allOf:
+            - $ref: '#/components/schemas/Location'
+          nullable: true
         hint:
           type: string
+          nullable: true
         timeLimit:
           type: number
+          nullable: true
         maxAttempts:
           type: number
+          nullable: true
         metadata:
           type: object
           additionalProperties: true
@@ -372,13 +377,18 @@ components:
           $ref: '#/components/schemas/Media'
           description: Optional media attachment for this step
         requiredLocation:
-          $ref: '#/components/schemas/Location'
+          allOf:
+            - $ref: '#/components/schemas/Location'
+          nullable: true
         hint:
           type: string
+          nullable: true
         timeLimit:
           type: number
+          nullable: true
         maxAttempts:
           type: number
+          nullable: true
       required:
         - type
         - challenge
@@ -396,13 +406,18 @@ components:
           $ref: '#/components/schemas/Media'
           description: Optional media attachment for this step
         requiredLocation:
-          $ref: '#/components/schemas/Location'
+          allOf:
+            - $ref: '#/components/schemas/Location'
+          nullable: true
         hint:
           type: string
+          nullable: true
         timeLimit:
           type: number
+          nullable: true
         maxAttempts:
           type: number
+          nullable: true
       required:
         - type
         - challenge

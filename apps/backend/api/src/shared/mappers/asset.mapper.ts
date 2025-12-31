@@ -44,8 +44,8 @@ export class AssetMapper {
             path: doc.storageLocation.path,
           }
         : undefined,
-      createdAt: doc.createdAt?.toString(),
-      updatedAt: doc.updatedAt?.toString(),
+      createdAt: doc.createdAt?.toISOString(),
+      updatedAt: doc.updatedAt?.toISOString(),
     };
   }
 

@@ -1,4 +1,5 @@
 export { useConfirmationDialog } from './useConfirmationDialog';
+export { useFieldError } from './useFieldError';
 export { useThrottledValue } from './useThrottledValue';
 
 export { useAutocompleteSuggestions } from './useAutocompleteSuggestions';

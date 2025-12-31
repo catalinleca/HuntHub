@@ -4,13 +4,11 @@
  * Re-export schemas from auto-generated file (gen/index.ts).
  * This file is NOT auto-generated, so it's safe to edit.
  *
- * When you add new schemas to OpenAPI, add them here for clean imports.
+ * Direct re-exports from gen preserve proper TypeScript types.
  */
 
-import { schemas } from './gen';
-
-// Individual named exports for clean imports
-export const {
+// Re-export all schemas directly (preserves proper Zod types)
+export {
   // Enums
   HuntStatus,
   HuntAccessType,
@@ -84,7 +82,5 @@ export const {
   PaginationMeta,
   PaginatedHuntsResponse,
   PaginatedAssetsResponse,
-} = schemas;
-
-// Also export the schemas object for bulk imports if needed
-export { schemas };
+  schemas,
+} from './gen';
