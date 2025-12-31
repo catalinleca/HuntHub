@@ -37,8 +37,7 @@ const createQuiz = (huntId: number): StepFormData => {
     type: OptionType.Choice,
     randomizeOrder: true,
 
-    target: { id: crypto.randomUUID(), text: '' },
-
+    target: { id: option1Id, text: '' },
     options: [
       { id: option1Id, text: '' },
       { id: option2Id, text: '' },

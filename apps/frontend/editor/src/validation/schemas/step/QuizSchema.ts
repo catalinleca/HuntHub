@@ -26,13 +26,14 @@ const QuizChoiceSchema = QuizBaseSchema.extend({
 });
 
 // Input type: requires target.text as the answer
+// Options are ignored (may exist from switching types, but not validated)
 const QuizInputSchema = QuizBaseSchema.extend({
   type: z.literal('input'),
   target: z.object({
     id: z.string(),
     text: z.string().min(1, errorMessage('Correct answer').required),
   }),
-  options: z.array(QuizOptionFormSchema).optional(),
+  options: z.array(z.object({ id: z.string(), text: z.string() })).optional(),
   targetId: z.string().optional(),
 });
 

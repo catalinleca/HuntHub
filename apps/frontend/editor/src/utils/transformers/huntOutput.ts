@@ -30,8 +30,8 @@ const cleanMediaForApi = (media?: Media | null): Media | undefined => {
 };
 
 /**
- * For 'input' type: strips options, keeps target as-is
- * For 'choice' type: splits options[] back to target + distractors + displayOrder
+ * For 'input' type: strips options and targetId, keeps target object as-is
+ * For 'choice' type: strips options and targetId, derives target from option matching targetId
  */
 const transformQuizForApi = (quizForm?: QuizFormData): Quiz | undefined => {
   if (!quizForm) {
