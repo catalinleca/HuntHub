@@ -17,6 +17,7 @@ const pointerSensorOptions = { activationConstraint: { distance: 5 } };
 export const MultipleChoiceEditor = ({ stepIndex }: MultipleChoiceEditorProps) => {
   const { fields, arrayActions, optionsPath, targetId, handleMarkTarget, handleRemove, handleAdd, canAdd, canRemove } =
     useMultipleChoiceOptions(stepIndex);
+
   const optionsError = useFieldError(optionsPath);
 
   const sensors = useSensors(useSensor(PointerSensor, pointerSensorOptions));
@@ -63,7 +64,7 @@ export const MultipleChoiceEditor = ({ stepIndex }: MultipleChoiceEditorProps) =
         >
           Add Option
         </SectionButton>
-        {optionsError && <FormHelperText error>{optionsError.message}</FormHelperText>}
+        {optionsError && <FormHelperText error>{optionsError}</FormHelperText>}
       </Box>
     </Stack>
   );

@@ -1,16 +1,15 @@
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, FieldError } from 'react-hook-form';
 import get from 'lodash/get';
 
-type FieldErrorResult = { message?: string } | undefined;
-
 /**
- * Get field error from form context by path.
- * Useful for displaying errors on deeply nested fields.
+ * Get field error message from form context by path.
+ * Returns the error message string or undefined.
  */
-export const useFieldError = (name: string): FieldErrorResult => {
+export const useFieldError = (name: string): string | undefined => {
   const {
     formState: { errors },
   } = useFormContext();
 
-  return get(errors, name);
+  const error = get(errors, name) as FieldError | undefined;
+  return error?.message;
 };
