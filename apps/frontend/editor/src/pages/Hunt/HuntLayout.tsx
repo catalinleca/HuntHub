@@ -24,9 +24,13 @@ const getUnsavedSelectedStepPosition = (steps: HuntFormData['steps'], formKey: s
 };
 
 const findFirstStepIndexWithError = (errors: FieldErrors<{ hunt: HuntFormData }>): number => {
-  const stepErrors = errors?.hunt?.steps || [];
+  const stepErrors = errors?.hunt?.steps;
 
-  return (stepErrors as unknown[]).findIndex((err) => !!err);
+  if (!Array.isArray(stepErrors)) {
+    return -1;
+  }
+
+  return stepErrors.findIndex((err) => err != null);
 };
 
 const logFormErrors = (errors: FieldErrors<{ hunt: HuntFormData }>, values: { hunt: HuntFormData }) => {
