@@ -1,4 +1,4 @@
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider, FieldErrors } from 'react-hook-form';
 import { NavBar } from '@/components';
 import { useSaveHunt } from '@/api/Hunt';
 import { useHuntSteps } from '@/pages/Hunt/hooks';
@@ -6,6 +6,7 @@ import { StepFormProvider } from '@/pages/Hunt/context';
 import { prepareHuntForSave } from '@/utils/transformers/huntOutput';
 import { transformHuntToFormData } from '@/utils/transformers/huntInput';
 import { HuntFormData } from '@/types/editor';
+import { HuntFormResolver } from '@/validation';
 import { HuntHeader } from './HuntHeader';
 import { HuntStepTimeline } from './HuntStepTimeline';
 import { HuntForm } from './HuntForm';
@@ -22,15 +23,37 @@ const getUnsavedSelectedStepPosition = (steps: HuntFormData['steps'], formKey: s
   return isUnsaved ? steps.indexOf(selectedStep) : -1;
 };
 
+const findFirstStepIndexWithError = (errors: FieldErrors<{ hunt: HuntFormData }>): number => {
+  const stepErrors = errors?.hunt?.steps || [];
+
+  return (stepErrors as unknown[]).findIndex((err) => !!err);
+};
+
+const logFormErrors = (errors: FieldErrors<{ hunt: HuntFormData }>) => {
+  console.info(`Form validation failed: `, errors);
+};
+
 export const HuntLayout = ({ huntFormData }: HuntLayoutProps) => {
   const formMethods = useForm<{ hunt: HuntFormData }>({
     defaultValues: { hunt: huntFormData },
     mode: 'onBlur',
+    resolver: HuntFormResolver,
   });
 
   const { handleSubmit, reset } = formMethods;
 
   const { steps, selectedFormKey, setSelectedFormKey, handleCreateStep, handleDeleteStep } = useHuntSteps(formMethods);
+
+  const onInvalid = (errors: FieldErrors<{ hunt: HuntFormData }>) => {
+    logFormErrors(errors);
+
+    const errorIndex = findFirstStepIndexWithError(errors);
+    const formKey = steps[errorIndex]?.formKey;
+
+    if (formKey) {
+      setSelectedFormKey(formKey);
+    }
+  };
 
   const saveHuntMutation = useSaveHunt();
 
@@ -64,7 +87,7 @@ export const HuntLayout = ({ huntFormData }: HuntLayoutProps) => {
         <S.Container>
           <NavBar />
 
-          <HuntHeader huntName={huntFormData.name} lastUpdatedBy="You" onSave={handleSubmit(onSubmit)} />
+          <HuntHeader huntName={huntFormData.name} lastUpdatedBy="You" onSave={handleSubmit(onSubmit, onInvalid)} />
 
           <HuntStepTimeline
             steps={steps}

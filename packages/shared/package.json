@@ -22,13 +22,19 @@
       "import": "./src/schemas/index.ts",
       "require": "./dist/schemas/index.js",
       "default": "./src/schemas/index.ts"
+    },
+    "./schemas/gen": {
+      "types": "./dist/schemas/gen/index.d.ts",
+      "import": "./src/schemas/gen/index.ts",
+      "require": "./dist/schemas/gen/index.js",
+      "default": "./src/schemas/gen/index.ts"
     }
   },
   "scripts": {
     "build": "tsc",
     "generate": "npm run generate:types && npm run generate:zod",
     "generate:types": "tsx scripts/generate.ts",
-    "generate:zod": "openapi-zod-client ./openapi/hunthub_models.yaml -o ./src/schemas/gen/index.ts --export-schemas --strict-objects && node scripts/fix-schemas.js",
+    "generate:zod": "openapi-zod-client ./openapi/hunthub_models.yaml -o ./src/schemas/gen/index.ts --export-schemas --strict-objects && node scripts/fix-schemas.js && npx prettier --write ./src/schemas/gen/index.ts",
     "watch": "tsc --watch"
   },
   "dependencies": {

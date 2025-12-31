@@ -1,15 +1,15 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
-const HuntStatus = z.enum(['draft', 'published']);
-const Location = z
+export const HuntStatus = z.enum(['draft', 'published']);
+export const Location = z
   .object({ lat: z.number(), lng: z.number(), radius: z.number(), address: z.string().optional() })
   .strict();
-const HuntAccessType = z.enum(['creator', 'viewer', 'editor']);
-const ChallengeType = z.enum(['clue', 'quiz', 'mission', 'task']);
-const OptionType = z.enum(['choice', 'input']);
-const MissionType = z.enum(['upload-media', 'match-location']);
-const MimeTypes = z.enum([
+export const HuntAccessType = z.enum(['creator', 'viewer', 'editor']);
+export const ChallengeType = z.enum(['clue', 'quiz', 'mission', 'task']);
+export const OptionType = z.enum(['choice', 'input']);
+export const MissionType = z.enum(['upload-media', 'match-location']);
+export const MimeTypes = z.enum([
   'image/jpeg',
   'image/png',
   'image/webp',
@@ -20,28 +20,30 @@ const MimeTypes = z.enum([
   'audio/wav',
   'audio/ogg',
 ]);
-const MediaType = z.enum(['image', 'audio', 'video', 'image-audio']);
-const AssetSnapshot = z
+export const MediaType = z.enum(['image', 'audio', 'video', 'image-audio']);
+export const AssetSnapshot = z
   .object({ id: z.number().int(), url: z.string(), name: z.string(), sizeBytes: z.number().int() })
   .strict();
-const ImageMedia = z
+export const ImageMedia = z
   .object({ asset: AssetSnapshot, title: z.string().optional(), alt: z.string().optional() })
   .strict();
-const AudioMedia = z
+export const AudioMedia = z
   .object({ asset: AssetSnapshot, title: z.string().optional(), transcript: z.string().optional() })
   .strict();
-const VideoMedia = z
+export const VideoMedia = z
   .object({ asset: AssetSnapshot, title: z.string().optional(), alt: z.string().optional() })
   .strict();
-const ImageAudioMedia = z.object({ image: ImageMedia, audio: AudioMedia, title: z.string().optional() }).strict();
-const MediaContent = z
+export const ImageAudioMedia = z
+  .object({ image: ImageMedia, audio: AudioMedia, title: z.string().optional() })
+  .strict();
+export const MediaContent = z
   .object({ image: ImageMedia, audio: AudioMedia, video: VideoMedia, imageAudio: ImageAudioMedia })
   .partial()
   .strict();
-const Media = z.object({ type: MediaType, content: MediaContent }).strict();
-const Clue = z.object({ title: z.string(), description: z.string() }).partial().strict();
-const Option = z.object({ id: z.string(), text: z.string() }).strict();
-const QuizValidation = z
+export const Media = z.object({ type: MediaType, content: MediaContent }).strict();
+export const Clue = z.object({ title: z.string(), description: z.string() }).partial().strict();
+export const Option = z.object({ id: z.string(), text: z.string() }).strict();
+export const QuizValidation = z
   .object({
     mode: z.enum(['exact', 'fuzzy', 'contains', 'numeric-range']),
     caseSensitive: z.boolean(),
@@ -50,7 +52,7 @@ const QuizValidation = z
   })
   .partial()
   .strict();
-const Quiz = z
+export const Quiz = z
   .object({
     title: z.string(),
     description: z.string(),
@@ -63,7 +65,7 @@ const Quiz = z
   })
   .partial()
   .strict();
-const Mission = z
+export const Mission = z
   .object({
     title: z.string(),
     description: z.string(),
@@ -75,7 +77,7 @@ const Mission = z
   })
   .partial()
   .strict();
-const Task = z
+export const Task = z
   .object({
     title: z.string(),
     instructions: z.string(),
@@ -84,8 +86,8 @@ const Task = z
   })
   .partial()
   .strict();
-const Challenge = z.object({ clue: Clue, quiz: Quiz, mission: Mission, task: Task }).partial().strict();
-const Step = z
+export const Challenge = z.object({ clue: Clue, quiz: Quiz, mission: Mission, task: Task }).partial().strict();
+export const Step = z
   .object({
     stepId: z.number().int(),
     huntId: z.number().int(),
@@ -101,7 +103,7 @@ const Step = z
     updatedAt: z.string().datetime({ offset: true }).optional(),
   })
   .strict();
-const Hunt = z
+export const Hunt = z
   .object({
     huntId: z.number().int(),
     creatorId: z.string(),
@@ -126,7 +128,7 @@ const Hunt = z
     coverImage: Media.nullish(),
   })
   .strict();
-const StepCreate = z
+export const StepCreate = z
   .object({
     type: ChallengeType,
     challenge: Challenge,
@@ -137,7 +139,7 @@ const StepCreate = z
     maxAttempts: z.number().optional(),
   })
   .strict();
-const HuntCreate = z
+export const HuntCreate = z
   .object({
     name: z.string().min(1).max(100),
     description: z.string().max(500).optional(),
@@ -146,7 +148,7 @@ const HuntCreate = z
     coverImage: Media.nullish(),
   })
   .strict();
-const HuntUpdate = z
+export const HuntUpdate = z
   .object({
     name: z.string().min(1).max(100),
     description: z.string().max(500),
@@ -156,7 +158,7 @@ const HuntUpdate = z
   })
   .partial()
   .strict();
-const StepUpdate = z
+export const StepUpdate = z
   .object({
     type: ChallengeType,
     challenge: Challenge,
@@ -167,7 +169,7 @@ const StepUpdate = z
     maxAttempts: z.number().optional(),
   })
   .strict();
-const User = z
+export const User = z
   .object({
     id: z.string(),
     firebaseUid: z.string(),
@@ -181,7 +183,7 @@ const User = z
     updatedAt: z.string().datetime({ offset: true }).optional(),
   })
   .strict();
-const HuntAccess = z
+export const HuntAccess = z
   .object({
     huntId: z.string(),
     userId: z.string(),
@@ -189,9 +191,9 @@ const HuntAccess = z
     sharedAt: z.string().datetime({ offset: true }),
   })
   .strict();
-const AssetUsage = z.object({ model: z.string(), field: z.string(), documentId: z.string() }).strict();
-const StorageLocation = z.object({ bucket: z.string(), path: z.string() }).partial().strict();
-const Asset = z
+export const AssetUsage = z.object({ model: z.string(), field: z.string(), documentId: z.string() }).strict();
+export const StorageLocation = z.object({ bucket: z.string(), path: z.string() }).partial().strict();
+export const Asset = z
   .object({
     id: z.string(),
     assetId: z.number().int(),
@@ -207,7 +209,7 @@ const Asset = z
     updatedAt: z.string().datetime({ offset: true }).optional(),
   })
   .strict();
-const AssetCreate = z
+export const AssetCreate = z
   .object({
     name: z.string().min(1),
     mime: z.string().min(1),
@@ -216,15 +218,15 @@ const AssetCreate = z
     s3Key: z.string().min(1),
   })
   .strict();
-const PublishResult = z
+export const PublishResult = z
   .object({
     publishedVersion: z.number().int(),
     newDraftVersion: z.number().int(),
     publishedAt: z.string().datetime({ offset: true }),
   })
   .strict();
-const HuntProgressStatus = z.enum(['in_progress', 'completed', 'abandoned']);
-const Submission = z
+export const HuntProgressStatus = z.enum(['in_progress', 'completed', 'abandoned']);
+export const Submission = z
   .object({
     timestamp: z.string().datetime({ offset: true }),
     content: z.unknown(),
@@ -234,7 +236,7 @@ const Submission = z
     metadata: z.object({}).partial().strict().passthrough().optional(),
   })
   .strict();
-const StepProgress = z
+export const StepProgress = z
   .object({
     stepId: z.number().int(),
     attempts: z.number().int().optional().default(0),
@@ -245,7 +247,7 @@ const StepProgress = z
     duration: z.number().optional(),
   })
   .strict();
-const Progress = z
+export const Progress = z
   .object({
     id: z.string(),
     userId: z.string().optional(),
@@ -265,7 +267,7 @@ const Progress = z
     updatedAt: z.string().datetime({ offset: true }).optional(),
   })
   .strict();
-const LiveHunt = z
+export const LiveHunt = z
   .object({
     huntId: z.number().int(),
     huntVersion: z.number().int(),
@@ -275,7 +277,7 @@ const LiveHunt = z
     updatedAt: z.string().datetime({ offset: true }).optional(),
   })
   .strict();
-const ReleaseResult = z
+export const ReleaseResult = z
   .object({
     huntId: z.number().int(),
     liveVersion: z.number().int(),
@@ -284,14 +286,14 @@ const ReleaseResult = z
     releasedBy: z.string(),
   })
   .strict();
-const TakeOfflineResult = z
+export const TakeOfflineResult = z
   .object({
     huntId: z.number().int(),
     previousLiveVersion: z.number().int(),
     takenOfflineAt: z.string().datetime({ offset: true }),
   })
   .strict();
-const Collaborator = z
+export const Collaborator = z
   .object({
     userId: z.string(),
     displayName: z.string(),
@@ -302,7 +304,7 @@ const Collaborator = z
     sharedBy: z.string().optional(),
   })
   .strict();
-const ShareResult = z
+export const ShareResult = z
   .object({
     huntId: z.number().int(),
     sharedWithId: z.string(),
@@ -311,17 +313,17 @@ const ShareResult = z
     sharedBy: z.string(),
   })
   .strict();
-const ReleaseHuntRequest = z
+export const ReleaseHuntRequest = z
   .object({ version: z.number().int(), currentLiveVersion: z.number().int().nullable() })
   .partial()
   .strict();
-const TakeOfflineRequest = z.object({ currentLiveVersion: z.number().int().nullable() }).strict();
-const ShareHuntRequest = z.object({ email: z.string().email(), permission: z.enum(['admin', 'view']) }).strict();
-const UpdatePermissionRequest = z.object({ permission: z.enum(['admin', 'view']) }).strict();
-const SortOrder = z.enum(['asc', 'desc']);
-const HuntSortField = z.enum(['createdAt', 'updatedAt']);
-const AssetSortField = z.enum(['createdAt', 'originalFilename', 'size']);
-const PaginationQueryParams = z
+export const TakeOfflineRequest = z.object({ currentLiveVersion: z.number().int().nullable() }).strict();
+export const ShareHuntRequest = z.object({ email: z.string().email(), permission: z.enum(['admin', 'view']) }).strict();
+export const UpdatePermissionRequest = z.object({ permission: z.enum(['admin', 'view']) }).strict();
+export const SortOrder = z.enum(['asc', 'desc']);
+export const HuntSortField = z.enum(['createdAt', 'updatedAt']);
+export const AssetSortField = z.enum(['createdAt', 'originalFilename', 'size']);
+export const PaginationQueryParams = z
   .object({
     page: z.number().int().gte(1).default(1),
     limit: z.number().int().gte(1).lte(100).default(10),
@@ -329,11 +331,11 @@ const PaginationQueryParams = z
   })
   .partial()
   .strict();
-const HuntQueryParams = PaginationQueryParams.and(z.object({ sortBy: HuntSortField }).partial().strict());
-const AssetQueryParams = PaginationQueryParams.and(
+export const HuntQueryParams = PaginationQueryParams.and(z.object({ sortBy: HuntSortField }).partial().strict());
+export const AssetQueryParams = PaginationQueryParams.and(
   z.object({ sortBy: AssetSortField, mimeType: MimeTypes }).partial().strict(),
 );
-const PaginationMeta = z
+export const PaginationMeta = z
   .object({
     total: z.number().int(),
     page: z.number().int().gte(1),
@@ -343,8 +345,8 @@ const PaginationMeta = z
     hasPrev: z.boolean(),
   })
   .strict();
-const PaginatedHuntsResponse = z.object({ data: z.array(Hunt), pagination: PaginationMeta }).strict();
-const PaginatedAssetsResponse = z.object({ data: z.array(Asset), pagination: PaginationMeta }).strict();
+export const PaginatedHuntsResponse = z.object({ data: z.array(Hunt), pagination: PaginationMeta }).strict();
+export const PaginatedAssetsResponse = z.object({ data: z.array(Asset), pagination: PaginationMeta }).strict();
 
 export const schemas: Record<string, z.ZodTypeAny> = {
   HuntStatus,
