@@ -1,52 +1,39 @@
 import { z } from 'zod';
-import { Quiz, OptionType } from '@hunthub/shared/schemas';
+import { Quiz } from '@hunthub/shared/schemas';
 import { errorMessage } from '../../messages';
 
 const QuizOptionFormSchema = z.object({
   id: z.string(),
-  text: z.string(),
+  text: z.string().min(1, 'Option text is required'),
 });
 
-export const QuizFormSchema = Quiz.extend({
+const QuizBaseSchema = Quiz.pick({
+  description: true,
+  randomizeOrder: true,
+  validation: true,
+  distractors: true,
+  displayOrder: true,
+}).extend({
   title: z.string().min(1, errorMessage('Question').required),
-  type: OptionType,
+});
+
+// Choice type: requires options with text + targetId
+const QuizChoiceSchema = QuizBaseSchema.extend({
+  type: z.literal('choice'),
+  target: Quiz.shape.target,
+  options: z.array(QuizOptionFormSchema).min(2, errorMessage('Answer options').minCount(2)),
+  targetId: z.string().min(1, 'Select the correct answer'),
+});
+
+// Input type: requires target.text as the answer
+const QuizInputSchema = QuizBaseSchema.extend({
+  type: z.literal('input'),
+  target: z.object({
+    id: z.string(),
+    text: z.string().min(1, errorMessage('Correct answer').required),
+  }),
   options: z.array(QuizOptionFormSchema).optional(),
   targetId: z.string().optional(),
-}).superRefine((data, ctx) => {
-  if (data.type === 'input') {
-    if (!data.target?.text?.trim()) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['target', 'text'],
-        message: errorMessage('Correct answer').required,
-      });
-    }
-  }
-
-  if (data.type === 'choice') {
-    if (!data.options?.length || data.options.length < 2) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['options'],
-        message: errorMessage('Answer options').minCount(2),
-      });
-    }
-
-    const emptyOptions = data.options?.filter((o) => !o.text?.trim());
-    if (emptyOptions?.length) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['options'],
-        message: 'All options must have text',
-      });
-    }
-
-    if (!data.targetId) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['targetId'],
-        message: 'Select the correct answer',
-      });
-    }
-  }
 });
+
+export const QuizFormSchema = z.discriminatedUnion('type', [QuizChoiceSchema, QuizInputSchema]);
