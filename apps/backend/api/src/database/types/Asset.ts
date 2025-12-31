@@ -28,6 +28,7 @@ export interface IAsset {
   size?: number;
   thumbnailUrl?: string;
   storageLocation?: IStorageLocation;
-  createdAt?: string;
-  updatedAt?: string;
+  // Mongoose provides Date objects; mappers convert to ISO strings for API
+  createdAt?: Date;
+  updatedAt?: Date;
 }

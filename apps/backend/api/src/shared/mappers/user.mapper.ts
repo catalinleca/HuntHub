@@ -35,8 +35,8 @@ export class UserMapper {
       displayName: doc.displayName,
       profilePicture: doc.profilePicture,
       bio: doc.bio,
-      createdAt: doc.createdAt?.toString(),
-      updatedAt: doc.updatedAt?.toString(),
+      createdAt: doc.createdAt?.toISOString(),
+      updatedAt: doc.updatedAt?.toISOString(),
     };
   }
 

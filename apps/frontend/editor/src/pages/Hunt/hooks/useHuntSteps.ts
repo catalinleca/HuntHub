@@ -26,22 +26,22 @@ export const useHuntSteps = (formMethods: UseFormReturn<{ hunt: HuntFormData }>)
   };
 
   const handleDeleteStep = (formKey: string) => {
-    const index = steps.findIndex((s) => s.formKey === formKey);
+    const currentSteps = formMethods.getValues('hunt.steps');
+    const index = currentSteps.findIndex((s) => s.formKey === formKey);
+
     if (index === -1) {
       return;
     }
 
-    if (steps.length <= 1) {
+    if (currentSteps.length <= 1) {
       alert('Cannot delete the last step');
       return;
     }
 
     remove(index);
 
-    // steps array still has OLD values here (remove is async)
-    // So steps[index + 1] correctly refers to the step after deleted one
     if (effectiveSelectedKey === formKey) {
-      const nextStep = steps[index + 1] ?? steps[index - 1];
+      const nextStep = currentSteps[index + 1] ?? currentSteps[index - 1];
       setSelectedFormKey(nextStep?.formKey ?? null);
     }
   };

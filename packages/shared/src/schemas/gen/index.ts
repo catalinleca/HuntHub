@@ -94,10 +94,10 @@ export const Step = z
     type: ChallengeType,
     challenge: Challenge,
     media: Media.optional(),
-    requiredLocation: Location.optional(),
-    hint: z.string().optional(),
-    timeLimit: z.number().optional(),
-    maxAttempts: z.number().optional(),
+    requiredLocation: Location.nullish(),
+    hint: z.string().nullish(),
+    timeLimit: z.number().nullish(),
+    maxAttempts: z.number().nullish(),
     metadata: z.object({}).partial().strict().passthrough().optional(),
     createdAt: z.string().datetime({ offset: true }).optional(),
     updatedAt: z.string().datetime({ offset: true }).optional(),
@@ -133,10 +133,10 @@ export const StepCreate = z
     type: ChallengeType,
     challenge: Challenge,
     media: Media.optional(),
-    requiredLocation: Location.optional(),
-    hint: z.string().optional(),
-    timeLimit: z.number().optional(),
-    maxAttempts: z.number().optional(),
+    requiredLocation: Location.nullish(),
+    hint: z.string().nullish(),
+    timeLimit: z.number().nullish(),
+    maxAttempts: z.number().nullish(),
   })
   .strict();
 export const HuntCreate = z
@@ -163,10 +163,10 @@ export const StepUpdate = z
     type: ChallengeType,
     challenge: Challenge,
     media: Media.optional(),
-    requiredLocation: Location.optional(),
-    hint: z.string().optional(),
-    timeLimit: z.number().optional(),
-    maxAttempts: z.number().optional(),
+    requiredLocation: Location.nullish(),
+    hint: z.string().nullish(),
+    timeLimit: z.number().nullish(),
+    maxAttempts: z.number().nullish(),
   })
   .strict();
 export const User = z

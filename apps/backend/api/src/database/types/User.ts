@@ -7,6 +7,7 @@ export interface IUser {
   displayName?: string;
   profilePicture?: string;
   bio?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  // Mongoose provides Date objects; mappers convert to ISO strings for API
+  createdAt?: Date;
+  updatedAt?: Date;
 }

@@ -1,13 +1,18 @@
 import { z } from 'zod';
-import { Quiz, OptionType, Option } from '@hunthub/shared/schemas';
+import { Quiz, OptionType } from '@hunthub/shared/schemas';
 import { errorMessage } from '../../messages';
+
+// Form-specific option schema (includes formKey for RHF useFieldArray)
+const QuizOptionFormSchema = z.object({
+  id: z.string(),
+  text: z.string(),
+  formKey: z.string(),
+});
 
 export const QuizFormSchema = Quiz.extend({
   title: z.string().min(1, errorMessage('Question').required),
   type: OptionType,
-
-  // Form-only fields (not in API schema)
-  options: z.array(Option).optional(),
+  options: z.array(QuizOptionFormSchema).optional(),
   targetId: z.string().optional(),
 }).superRefine((data, ctx) => {
   if (data.type === 'choice') {

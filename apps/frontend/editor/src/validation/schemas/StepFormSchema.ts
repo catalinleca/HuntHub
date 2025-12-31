@@ -12,7 +12,5 @@ const ChallengeFormSchema = Challenge.extend({
 export const StepFormSchema = Step.omit({ stepId: true }).extend({
   stepId: z.number().int().optional(),
   challenge: ChallengeFormSchema,
-
-  // Form-only field (UI identifier for React keys)
   formKey: z.string(),
 });

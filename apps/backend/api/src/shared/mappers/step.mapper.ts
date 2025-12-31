@@ -77,8 +77,8 @@ export class StepMapper {
       timeLimit: doc.timeLimit,
       maxAttempts: doc.maxAttempts,
       metadata: doc.metadata,
-      createdAt: doc.createdAt?.toString(),
-      updatedAt: doc.updatedAt?.toString(),
+      createdAt: doc.createdAt?.toISOString(),
+      updatedAt: doc.updatedAt?.toISOString(),
     };
   }
 

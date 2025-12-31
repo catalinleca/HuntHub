@@ -29,8 +29,9 @@ const findFirstStepIndexWithError = (errors: FieldErrors<{ hunt: HuntFormData }>
   return (stepErrors as unknown[]).findIndex((err) => !!err);
 };
 
-const logFormErrors = (errors: FieldErrors<{ hunt: HuntFormData }>) => {
+const logFormErrors = (errors: FieldErrors<{ hunt: HuntFormData }>, values: { hunt: HuntFormData }) => {
   console.info(`Form validation failed: `, errors);
+  console.info(`Form values`, values);
 };
 
 export const HuntLayout = ({ huntFormData }: HuntLayoutProps) => {
@@ -45,7 +46,7 @@ export const HuntLayout = ({ huntFormData }: HuntLayoutProps) => {
   const { steps, selectedFormKey, setSelectedFormKey, handleCreateStep, handleDeleteStep } = useHuntSteps(formMethods);
 
   const onInvalid = (errors: FieldErrors<{ hunt: HuntFormData }>) => {
-    logFormErrors(errors);
+    logFormErrors(errors, formMethods.getValues());
 
     const errorIndex = findFirstStepIndexWithError(errors);
     const formKey = steps[errorIndex]?.formKey;
