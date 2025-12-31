@@ -1,5 +1,5 @@
 import { useFormContext } from 'react-hook-form';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 type FieldErrorResult = { message?: string } | undefined;
 
