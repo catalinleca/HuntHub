@@ -19,7 +19,6 @@ export const MultipleChoiceEditor = ({ stepIndex }: MultipleChoiceEditorProps) =
     useMultipleChoiceOptions(stepIndex);
   const optionsError = useFieldError(optionsPath);
 
-  console.log('===optionsError: ', optionsError);
   const sensors = useSensors(useSensor(PointerSensor, pointerSensorOptions));
 
   const handleDragEnd = (event: DragEndEvent) => {
