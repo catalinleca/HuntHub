@@ -22,12 +22,6 @@
       "import": "./src/schemas/index.ts",
       "require": "./dist/schemas/index.js",
       "default": "./src/schemas/index.ts"
-    },
-    "./schemas/gen": {
-      "types": "./dist/schemas/gen/index.d.ts",
-      "import": "./src/schemas/gen/index.ts",
-      "require": "./dist/schemas/gen/index.js",
-      "default": "./src/schemas/gen/index.ts"
     }
   },
   "scripts": {
