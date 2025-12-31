@@ -40,8 +40,8 @@ const createQuiz = (huntId: number): StepFormData => {
     target: { id: crypto.randomUUID(), text: '' },
 
     options: [
-      { id: option1Id, text: '', formKey: option1Id },
-      { id: option2Id, text: '', formKey: option2Id },
+      { id: option1Id, text: '' },
+      { id: option2Id, text: '' },
     ],
     targetId: option1Id,
   };

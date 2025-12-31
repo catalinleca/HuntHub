@@ -54,19 +54,17 @@ const transformQuizToFormData = (quiz?: Quiz): QuizFormData | undefined => {
   if (quiz.type === OptionType.Choice && quiz.target) {
     const { target, distractors = [], displayOrder = [] } = quiz;
 
-    const allOptions: Omit<QuizOptionFormData, 'formKey'>[] = [
+    const allOptions: QuizOptionFormData[] = [
       { id: target.id, text: target.text },
       ...distractors.map((d) => ({ id: d.id, text: d.text })),
     ];
 
-    const sortedOptions =
+    const options: QuizOptionFormData[] =
       displayOrder.length > 0
         ? displayOrder
             .map((id: string) => allOptions.find((o) => o.id === id))
-            .filter((o): o is Omit<QuizOptionFormData, 'formKey'> => o !== undefined)
+            .filter((o): o is QuizOptionFormData => o !== undefined)
         : allOptions;
-
-    const options: QuizOptionFormData[] = sortedOptions.map((o) => ({ ...o, formKey: o.id }));
 
     return {
       ...quiz,

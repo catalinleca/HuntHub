@@ -11,8 +11,8 @@ export const createInitialQuizOptions = (): InitialQuizOptions => {
 
   return {
     options: [
-      { id: targetId, text: '', formKey: targetId },
-      { id: option2Id, text: '', formKey: option2Id },
+      { id: targetId, text: '' },
+      { id: option2Id, text: '' },
     ],
     targetId,
   };
