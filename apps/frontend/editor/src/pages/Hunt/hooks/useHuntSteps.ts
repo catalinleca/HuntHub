@@ -11,10 +11,15 @@ export const useHuntSteps = (formMethods: UseFormReturn<{ hunt: HuntFormData }>)
     fields: steps,
     append,
     remove,
+    move,
   } = useFieldArray({
     control: formMethods.control,
     name: 'hunt.steps',
   });
+
+  const handleMoveStep = (oldIndex: number, newIndex: number) => {
+    move(oldIndex, newIndex);
+  };
 
   const effectiveSelectedKey = selectedFormKey ?? steps[0]?.formKey ?? null;
 
@@ -52,5 +57,6 @@ export const useHuntSteps = (formMethods: UseFormReturn<{ hunt: HuntFormData }>)
     setSelectedFormKey,
     handleCreateStep,
     handleDeleteStep,
+    handleMoveStep,
   };
 };
