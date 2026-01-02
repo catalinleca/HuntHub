@@ -12,7 +12,7 @@ export const InnerWrapper = styled(MuiContainer).attrs({ maxWidth: 'md' })`
   align-items: flex-start;
 `;
 
-export const Container = styled(Stack)`
+export const Container = styled(Stack)<{ $canScrollLeft: boolean; $canScrollRight: boolean }>`
   flex: 1;
   flex-direction: row;
   gap: ${({ theme }) => theme.spacing(1)};
@@ -20,6 +20,9 @@ export const Container = styled(Stack)`
   overflow-x: auto;
   scrollbar-width: none;
   min-width: 0;
+  box-shadow:
+    inset ${({ theme, $canScrollLeft }) => ($canScrollLeft ? `20px 0 16px -8px ${theme.palette.action.hover}` : '0 0 0 0 transparent')},
+    inset ${({ theme, $canScrollRight }) => ($canScrollRight ? `-20px 0 16px -8px ${theme.palette.action.hover}` : '0 0 0 0 transparent')};
 
   &::-webkit-scrollbar {
     display: none;
@@ -27,9 +30,8 @@ export const Container = styled(Stack)`
 `;
 
 export const ScrollButton = styled(IconButton)<{ $visible: boolean }>`
-  height: 68px;
-  margin-top: ${({ theme }) => theme.spacing(3)};
-  border-radius: 0;
+  align-self: center;
+  margin: ${({ theme }) => theme.spacing(0, 1)};
   opacity: ${({ $visible }) => ($visible ? 1 : 0.3)};
   pointer-events: ${({ $visible }) => ($visible ? 'auto' : 'none')};
 `;
@@ -40,7 +42,6 @@ export const Connector = styled('div')`
   width: 28px;
   border-top: 2px dashed ${({ theme }) => theme.palette.divider};
   align-self: center;
-  margin-top: -20px;
 
   &::after {
     content: '';

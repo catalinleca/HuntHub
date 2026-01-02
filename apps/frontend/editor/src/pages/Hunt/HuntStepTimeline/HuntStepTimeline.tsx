@@ -60,7 +60,12 @@ export const HuntStepTimeline = ({ steps, selectedFormKey, onSelectStep, onAddSt
           <CaretLeftIcon size={20} weight="bold" />
         </S.ScrollButton>
 
-        <S.Container ref={scrollRef} onScroll={updateScrollState}>
+        <S.Container
+          ref={scrollRef}
+          onScroll={updateScrollState}
+          $canScrollLeft={canScrollLeft}
+          $canScrollRight={canScrollRight}
+        >
           {steps.map((step, index) => (
             <Fragment key={step.formKey}>
               <StepTile

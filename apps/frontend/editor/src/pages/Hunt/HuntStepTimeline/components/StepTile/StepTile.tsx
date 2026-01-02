@@ -19,12 +19,10 @@ export const StepTile = ({ stepNumber, type, challenge, isSelected, onClick }: S
 
   return (
     <Tooltip title={`${config.label} step`} enterDelay={1500} placement="top">
-      <S.Container onClick={onClick}>
-        <S.IconArea $selected={isSelected} $color={config.color}>
-          <Icon size={28} weight={isSelected ? 'fill' : 'regular'} />
-        </S.IconArea>
+      <S.Container onClick={onClick} $selected={isSelected} $color={config.color}>
+        <Icon size={32} weight={isSelected ? 'fill' : 'regular'} />
+        <S.TitleArea>{title && <S.Title variant="xsMedium">{title}</S.Title>}</S.TitleArea>
         <S.Badge>{stepNumber}</S.Badge>
-        {title && <S.Title noWrap>{title}</S.Title>}
       </S.Container>
     </Tooltip>
   );
