@@ -47,7 +47,8 @@ export const HuntLayout = ({ huntFormData }: HuntLayoutProps) => {
 
   const { handleSubmit, reset } = formMethods;
 
-  const { steps, selectedFormKey, setSelectedFormKey, handleCreateStep, handleDeleteStep } = useHuntSteps(formMethods);
+  const { steps, selectedFormKey, setSelectedFormKey, handleCreateStep, handleDeleteStep, handleMoveStep } =
+    useHuntSteps(formMethods);
 
   const onInvalid = (errors: FieldErrors<{ hunt: HuntFormData }>) => {
     logFormErrors(errors, formMethods.getValues());
@@ -99,6 +100,7 @@ export const HuntLayout = ({ huntFormData }: HuntLayoutProps) => {
             selectedFormKey={selectedFormKey}
             onSelectStep={setSelectedFormKey}
             onAddStep={handleCreateStep}
+            onMoveStep={handleMoveStep}
           />
 
           {selectedStepIndex !== -1 && <HuntForm stepIndex={selectedStepIndex} stepType={selectedStepType} />}
