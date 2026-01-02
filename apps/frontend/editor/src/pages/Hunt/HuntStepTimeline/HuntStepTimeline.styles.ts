@@ -21,8 +21,8 @@ export const Container = styled(Stack)<{ $canScrollLeft: boolean; $canScrollRigh
   scrollbar-width: none;
   min-width: 0;
   box-shadow:
-    inset ${({ theme, $canScrollLeft }) => ($canScrollLeft ? `20px 0 16px -8px ${theme.palette.action.hover}` : '0 0 0 0 transparent')},
-    inset ${({ theme, $canScrollRight }) => ($canScrollRight ? `-20px 0 16px -8px ${theme.palette.action.hover}` : '0 0 0 0 transparent')};
+    ${({ theme, $canScrollLeft }) => ($canScrollLeft ? theme.shadows[12] : 'none')},
+    ${({ theme, $canScrollRight }) => ($canScrollRight ? theme.shadows[13] : 'none')};
 
   &::-webkit-scrollbar {
     display: none;
