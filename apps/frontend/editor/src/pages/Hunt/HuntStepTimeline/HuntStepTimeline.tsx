@@ -43,10 +43,14 @@ export const HuntStepTimeline = ({ steps, selectedFormKey, onSelectStep, onAddSt
   };
 
   useEffect(() => {
-    updateScrollState();
-    window.addEventListener('resize', updateScrollState);
+    const el = scrollRef.current;
+    if (!el) return;
 
-    return () => window.removeEventListener('resize', updateScrollState);
+    const observer = new ResizeObserver(updateScrollState);
+    observer.observe(el);
+    updateScrollState();
+
+    return () => observer.disconnect();
   }, [updateScrollState, steps.length]);
 
   return (
