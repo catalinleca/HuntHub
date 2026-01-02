@@ -7,7 +7,7 @@ type DraggableStepTileProps = Omit<StepTileProps, 'ref' | 'style'>;
 
 const HOVER_LIFT = -2;
 
-export const DraggableStepTile = (props: DraggableStepTileProps) => {
+export const DraggableStepTile = ({ onMouseEnter, onMouseLeave, ...props }: DraggableStepTileProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: props.formKey,
@@ -25,12 +25,22 @@ export const DraggableStepTile = (props: DraggableStepTileProps) => {
     opacity: isDragging ? 0.3 : 1,
   };
 
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    onMouseEnter?.();
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    onMouseLeave?.();
+  };
+
   return (
     <StepTile
       ref={setNodeRef}
       style={style}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       {...attributes}
       {...listeners}
       {...props}
