@@ -4,6 +4,7 @@ import { getColor } from '@/utils';
 import type { PaletteColor } from '@/utils/getColor/types';
 
 export const Container = styled(Stack)`
+  flex-shrink: 0;
   width: 88px;
   align-items: center;
   position: relative;
