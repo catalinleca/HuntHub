@@ -2,16 +2,16 @@ import styled from 'styled-components';
 import { Stack } from '@mui/material';
 
 export const Wrapper = styled(Stack)`
+  flex-direction: row;
+  justify-content: center;
   align-items: center;
+  padding: ${({ theme }) => theme.spacing(3, 0)};
   background: ${({ theme }) => theme.palette.background.defaultLight};
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
 `;
 
 export const InnerWrapper = styled(Stack)`
   flex-direction: row;
-  align-items: flex-start;
-  width: fit-content;
-  min-width: ${({ theme }) => theme.breakpoints.values.md}px;
+  align-items: center;
   max-width: ${({ theme }) => theme.breakpoints.values.lg}px;
-  padding: ${({ theme }) => theme.spacing(0, 3)};
 `;

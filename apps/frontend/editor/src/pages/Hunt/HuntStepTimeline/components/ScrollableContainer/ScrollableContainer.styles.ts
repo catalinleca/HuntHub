@@ -4,7 +4,7 @@ import { Stack, IconButton } from '@mui/material';
 export const Container = styled(Stack)<{ $canScrollLeft: boolean; $canScrollRight: boolean }>`
   flex-direction: row;
   gap: ${({ theme }) => theme.spacing(1)};
-  padding: ${({ theme }) => theme.spacing(3, 0)};
+  padding: ${({ theme }) => theme.spacing(3)};
   overflow-x: auto;
   scrollbar-width: none;
   min-width: 0;

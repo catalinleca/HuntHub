@@ -37,7 +37,6 @@ export const HuntStepTimeline = ({
             onMoveStep={onMoveStep}
           />
         </ScrollableContainer>
-
         <AddStepIcon onAddStep={onAddStep} />
       </S.InnerWrapper>
     </S.Wrapper>
