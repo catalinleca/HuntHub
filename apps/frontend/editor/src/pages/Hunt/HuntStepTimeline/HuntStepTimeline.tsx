@@ -53,6 +53,23 @@ export const HuntStepTimeline = ({ steps, selectedFormKey, onSelectStep, onAddSt
     return () => observer.disconnect();
   }, [updateScrollState, steps.length]);
 
+  useEffect(() => {
+    if (selectedFormKey && scrollRef.current) {
+      const container = scrollRef.current;
+      const el = container.querySelector(`[data-form-key="${selectedFormKey}"]`) as HTMLElement;
+
+      if (el) {
+        const containerRect = container.getBoundingClientRect();
+        const elRect = el.getBoundingClientRect();
+        const isVisible = elRect.left >= containerRect.left && elRect.right <= containerRect.right;
+
+        if (!isVisible) {
+          el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+      }
+    }
+  }, [selectedFormKey]);
+
   return (
     <S.Wrapper>
       <S.InnerWrapper>
@@ -69,6 +86,7 @@ export const HuntStepTimeline = ({ steps, selectedFormKey, onSelectStep, onAddSt
           {steps.map((step, index) => (
             <Fragment key={step.formKey}>
               <StepTile
+                formKey={step.formKey}
                 stepNumber={index + 1}
                 type={step.type}
                 challenge={step.challenge}
