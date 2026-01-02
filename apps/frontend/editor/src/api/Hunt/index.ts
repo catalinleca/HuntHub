@@ -5,5 +5,8 @@ export { useCreateHunt } from './createHunt';
 export { useUpdateHunt } from './updateHunt';
 export { useDeleteHunt } from './deleteHunt';
 export { useSaveHunt } from './saveHunt';
+export { usePublishHunt } from './publishHunt';
+export { useReleaseHunt } from './releaseHunt';
+export { useTakeOfflineHunt } from './takeOfflineHunt';
 export { huntKeys } from './keys';
 export type { GetHuntsParams } from './getHunts';
