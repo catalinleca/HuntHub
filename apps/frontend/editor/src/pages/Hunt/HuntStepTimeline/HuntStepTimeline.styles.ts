@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Stack, Container as MuiContainer } from '@mui/material';
+import { Stack } from '@mui/material';
 
 export const Wrapper = styled(Stack)`
   align-items: center;
@@ -7,7 +7,11 @@ export const Wrapper = styled(Stack)`
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
 `;
 
-export const InnerWrapper = styled(MuiContainer).attrs({ maxWidth: 'md' })`
+export const InnerWrapper = styled(Stack)`
   display: flex;
+  flex-direction: row;
   align-items: flex-start;
+  min-width: ${({ theme }) => theme.breakpoints.values.md}px;
+  max-width: ${({ theme }) => theme.breakpoints.values.lg}px;
+  padding: ${({ theme }) => theme.spacing(0, 3)};
 `;
