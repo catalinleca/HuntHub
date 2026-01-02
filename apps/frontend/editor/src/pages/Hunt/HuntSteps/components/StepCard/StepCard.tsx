@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { Typography, IconButton, Divider, Stack } from '@mui/material';
 import { TrashIcon } from '@phosphor-icons/react';
 import { ChallengeType } from '@hunthub/shared';
-import { useStepFormContext } from '@/pages/Hunt/context';
+import { useHuntStepsContext } from '@/pages/Hunt/context';
 import { STEP_TYPE_CONFIG } from '../../stepTypeConfig';
 import * as S from './StepCard.styles';
 import { getColor } from '@/utils';
@@ -15,7 +15,13 @@ interface StepCardProps {
 }
 
 export const StepCard = ({ stepIndex, type, title, children }: StepCardProps) => {
-  const { onDeleteStep } = useStepFormContext();
+  const { selectedFormKey, handleDeleteStep } = useHuntStepsContext();
+
+  const onDeleteStep = () => {
+    if (selectedFormKey) {
+      handleDeleteStep(selectedFormKey);
+    }
+  };
   const config = STEP_TYPE_CONFIG[type];
   const Icon = config.icon;
 
