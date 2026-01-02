@@ -16,11 +16,10 @@ export const Container = styled(Stack)<{ $selected: boolean; $color: PaletteColo
   gap: 2px;
   background: ${({ theme, $selected, $color }) => ($selected ? getColor($color) : theme.palette.grey[100])};
   color: ${({ theme, $selected, $color }) => ($selected ? theme.palette.common.white : getColor($color))};
-  transition: all 0.2s ease;
+  transition: background 0.2s ease;
 
   &:hover {
     background: ${({ theme, $selected, $color }) => ($selected ? getColor($color) : theme.palette.grey[200])};
-    transform: translateY(-2px);
   }
 `;
 
