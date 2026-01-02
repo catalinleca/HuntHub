@@ -5,6 +5,7 @@ import { STEP_TYPE_CONFIG } from '../../../HuntSteps/stepTypeConfig';
 import * as S from './StepTile.styles';
 
 interface StepTileProps {
+  formKey: string;
   stepNumber: number;
   type: ChallengeType;
   challenge: ChallengeFormData;
@@ -12,19 +13,17 @@ interface StepTileProps {
   onClick: () => void;
 }
 
-export const StepTile = ({ stepNumber, type, challenge, isSelected, onClick }: StepTileProps) => {
+export const StepTile = ({ formKey, stepNumber, type, challenge, isSelected, onClick }: StepTileProps) => {
   const config = STEP_TYPE_CONFIG[type];
   const Icon = config.icon;
   const title = config.getTitle(challenge);
 
   return (
     <Tooltip title={`${config.label} step`} enterDelay={1500} placement="top">
-      <S.Container onClick={onClick}>
-        <S.IconArea $selected={isSelected} $color={config.color}>
-          <Icon size={28} weight={isSelected ? 'fill' : 'regular'} />
-        </S.IconArea>
+      <S.Container data-form-key={formKey} onClick={onClick} $selected={isSelected} $color={config.color}>
+        <Icon size={32} weight={isSelected ? 'fill' : 'regular'} />
+        <S.TitleArea>{title && <S.Title variant="xsMedium">{title}</S.Title>}</S.TitleArea>
         <S.Badge>{stepNumber}</S.Badge>
-        {title && <S.Title noWrap>{title}</S.Title>}
       </S.Container>
     </Tooltip>
   );

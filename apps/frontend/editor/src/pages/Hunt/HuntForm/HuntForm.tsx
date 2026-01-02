@@ -32,7 +32,7 @@ export const HuntForm = ({ stepIndex, stepType }: HuntFormProps) => {
   return (
     <S.FormArea>
       <S.FormCard>
-        <StepInputComponent stepIndex={stepIndex} />
+        <StepInputComponent key={stepIndex} stepIndex={stepIndex} />
       </S.FormCard>
     </S.FormArea>
   );

@@ -8,6 +8,8 @@ export { getMuiDialogActionsOverrides } from './MuiDialogActions';
 export { getMuiDialogContentOverrides } from './MuiDialogContent';
 export { getMuiDialogTitleOverrides } from './MuiDialogTitle';
 export { getMuiInputLabelOverrides } from './MuiInputLabel';
+export { getMuiMenuOverrides } from './MuiMenu';
+export { getMuiMenuItemOverrides } from './MuiMenuItem';
 export { getMuiOutlinedInputOverrides } from './MuiOutlinedInput';
 export { getMuiSelectOverrides } from './MuiSelect';
 export { getMuiTextFieldOverrides } from './MuiTextField';

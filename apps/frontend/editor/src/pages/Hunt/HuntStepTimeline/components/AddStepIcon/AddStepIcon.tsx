@@ -1,4 +1,4 @@
-import { Stack, Menu, MenuItem } from '@mui/material';
+import { Menu, MenuItem } from '@mui/material';
 import { PlusIcon, MapTrifoldIcon, QuestionIcon, CameraIcon, CheckSquareIcon } from '@phosphor-icons/react';
 import { ChallengeType } from '@hunthub/shared';
 import { useState } from 'react';
@@ -27,33 +27,25 @@ export const AddStepIcon = ({ onAddStep }: AddStepIconProps) => {
   return (
     <>
       <S.Container onClick={handleClick}>
-        <PlusIcon size={32} weight="bold" />
+        <PlusIcon size={24} weight="bold" />
       </S.Container>
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
         <MenuItem onClick={() => handleSelect(ChallengeType.Clue)}>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <MapTrifoldIcon size={20} weight="duotone" />
-            Clue
-          </Stack>
+          <MapTrifoldIcon size={20} />
+          Clue
         </MenuItem>
         <MenuItem onClick={() => handleSelect(ChallengeType.Quiz)}>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <QuestionIcon size={20} weight="duotone" />
-            Quiz
-          </Stack>
+          <QuestionIcon size={20} />
+          Quiz
         </MenuItem>
         <MenuItem onClick={() => handleSelect(ChallengeType.Mission)}>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <CameraIcon size={20} weight="duotone" />
-            Mission
-          </Stack>
+          <CameraIcon size={20} />
+          Mission
         </MenuItem>
         <MenuItem onClick={() => handleSelect(ChallengeType.Task)}>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <CheckSquareIcon size={20} weight="duotone" />
-            Task
-          </Stack>
+          <CheckSquareIcon size={20} />
+          Task
         </MenuItem>
       </Menu>
     </>
