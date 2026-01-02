@@ -1,12 +1,13 @@
-import { useForm, FormProvider, FieldErrors } from 'react-hook-form';
+import { useForm, useFormContext, FormProvider, FieldErrors } from 'react-hook-form';
+import { Hunt } from '@hunthub/shared';
 import { NavBar } from '@/components';
 import { useSaveHunt } from '@/api/Hunt';
-import { useHuntSteps } from '@/pages/Hunt/hooks';
-import { StepFormProvider } from '@/pages/Hunt/context';
+import { PublishingProvider, HuntStepsProvider, useHuntStepsContext } from '@/pages/Hunt/context';
 import { prepareHuntForSave } from '@/utils/transformers/huntOutput';
 import { transformHuntToFormData } from '@/utils/transformers/huntInput';
 import { HuntFormData } from '@/types/editor';
 import { HuntFormResolver } from '@/validation';
+import { useSnackbarStore } from '@/stores';
 import { HuntHeader } from './HuntHeader';
 import { HuntStepTimeline } from './HuntStepTimeline';
 import { HuntForm } from './HuntForm';
@@ -14,6 +15,7 @@ import * as S from './HuntLayout.styles';
 
 interface HuntLayoutProps {
   huntFormData: HuntFormData;
+  hunt: Hunt;
 }
 
 const getUnsavedSelectedStepPosition = (steps: HuntFormData['steps'], formKey: string | null): number => {
@@ -38,20 +40,33 @@ const logFormErrors = (errors: FieldErrors<{ hunt: HuntFormData }>, values: { hu
   console.info(`Form values`, values);
 };
 
-export const HuntLayout = ({ huntFormData }: HuntLayoutProps) => {
+export const HuntLayout = ({ huntFormData, hunt }: HuntLayoutProps) => {
   const formMethods = useForm<{ hunt: HuntFormData }>({
     defaultValues: { hunt: huntFormData },
     mode: 'onBlur',
     resolver: HuntFormResolver,
   });
 
-  const { handleSubmit, reset } = formMethods;
+  return (
+    <FormProvider {...formMethods}>
+      <PublishingProvider hunt={hunt}>
+        <HuntStepsProvider>
+          <HuntLayoutContent huntFormData={huntFormData} />
+        </HuntStepsProvider>
+      </PublishingProvider>
+    </FormProvider>
+  );
+};
 
-  const { steps, selectedFormKey, setSelectedFormKey, handleCreateStep, handleDeleteStep, handleMoveStep } =
-    useHuntSteps(formMethods);
+const HuntLayoutContent = ({ huntFormData }: { huntFormData: HuntFormData }) => {
+  const snackbar = useSnackbarStore();
+  const { handleSubmit, reset, getValues } = useFormContext<{ hunt: HuntFormData }>();
+  const { steps, selectedFormKey, setSelectedFormKey } = useHuntStepsContext();
+
+  const saveHuntMutation = useSaveHunt();
 
   const onInvalid = (errors: FieldErrors<{ hunt: HuntFormData }>) => {
-    logFormErrors(errors, formMethods.getValues());
+    logFormErrors(errors, getValues());
 
     const errorIndex = findFirstStepIndexWithError(errors);
     const formKey = steps[errorIndex]?.formKey;
@@ -60,8 +75,6 @@ export const HuntLayout = ({ huntFormData }: HuntLayoutProps) => {
       setSelectedFormKey(formKey);
     }
   };
-
-  const saveHuntMutation = useSaveHunt();
 
   const onSubmit = async (data: { hunt: HuntFormData }) => {
     const unsavedSelectedStepPosition = getUnsavedSelectedStepPosition(data.hunt.steps, selectedFormKey);
@@ -78,34 +91,23 @@ export const HuntLayout = ({ huntFormData }: HuntLayoutProps) => {
           setSelectedFormKey(newFormKey);
         }
       }
+
+      snackbar.success('Changes saved');
     } catch (error) {
       console.error('Failed to save hunt:', error);
+      snackbar.error('Failed to save changes');
     }
   };
 
   const selectedStepIndex = selectedFormKey ? steps.findIndex((s) => s.formKey === selectedFormKey) : -1;
-
   const selectedStepType = selectedStepIndex >= 0 ? steps[selectedStepIndex]?.type : undefined;
 
   return (
-    <StepFormProvider onDeleteStep={() => selectedFormKey && handleDeleteStep(selectedFormKey)}>
-      <FormProvider {...formMethods}>
-        <S.Container>
-          <NavBar />
-
-          <HuntHeader huntName={huntFormData.name} lastUpdatedBy="You" onSave={handleSubmit(onSubmit, onInvalid)} />
-
-          <HuntStepTimeline
-            steps={steps}
-            selectedFormKey={selectedFormKey}
-            onSelectStep={setSelectedFormKey}
-            onAddStep={handleCreateStep}
-            onMoveStep={handleMoveStep}
-          />
-
-          {selectedStepIndex !== -1 && <HuntForm stepIndex={selectedStepIndex} stepType={selectedStepType} />}
-        </S.Container>
-      </FormProvider>
-    </StepFormProvider>
+    <S.Container>
+      <NavBar />
+      <HuntHeader huntName={huntFormData.name} lastUpdatedBy="You" onSave={handleSubmit(onSubmit, onInvalid)} />
+      <HuntStepTimeline />
+      {selectedStepIndex !== -1 && <HuntForm stepIndex={selectedStepIndex} stepType={selectedStepType} />}
+    </S.Container>
   );
 };

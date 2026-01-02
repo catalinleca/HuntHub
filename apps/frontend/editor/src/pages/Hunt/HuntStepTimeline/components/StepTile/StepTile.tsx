@@ -12,6 +12,8 @@ export interface StepTileProps {
   challenge: ChallengeFormData;
   isSelected: boolean;
   onClick: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
   style?: React.CSSProperties;
   ref?: React.Ref<HTMLDivElement>;
 }

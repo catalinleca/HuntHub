@@ -27,9 +27,9 @@ export const HuntPage = () => {
     );
   }
 
-  if (error || !huntFormData) {
+  if (error || !huntFormData || !hunt) {
     return <Box>Error loading hunt</Box>;
   }
 
-  return <HuntLayout huntFormData={huntFormData} />;
+  return <HuntLayout huntFormData={huntFormData} hunt={hunt} />;
 };
