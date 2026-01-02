@@ -18,12 +18,7 @@ export const ScrollableContainer = ({ children, scrollToSelector }: ScrollableCo
         <CaretLeftIcon size={20} weight="bold" />
       </S.ScrollButton>
 
-      <S.Container
-        ref={scrollRef}
-        onScroll={onScroll}
-        $canScrollLeft={canScrollLeft}
-        $canScrollRight={canScrollRight}
-      >
+      <S.Container ref={scrollRef} onScroll={onScroll} $canScrollLeft={canScrollLeft} $canScrollRight={canScrollRight}>
         {children}
       </S.Container>
 

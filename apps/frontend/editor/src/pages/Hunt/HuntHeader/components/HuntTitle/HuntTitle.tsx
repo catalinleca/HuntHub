@@ -14,7 +14,7 @@ interface HuntTitleProps {
 
 const getStatusBadge = (
   latestVersion: number,
-  liveVersion: number | null
+  liveVersion: number | null,
 ): { label: string; color: 'default' | 'primary' | 'success' } => {
   if (liveVersion !== null) {
     return { label: `v${liveVersion} Live`, color: 'success' };
@@ -70,7 +70,11 @@ export const HuntTitle = ({ huntName, lastUpdatedBy, hasUnsavedChanges }: HuntTi
         </Typography>
       </S.TitleSection>
 
-      <VersionPanel anchorEl={versionPanelAnchor} open={Boolean(versionPanelAnchor)} onClose={handleVersionPanelClose} />
+      <VersionPanel
+        anchorEl={versionPanelAnchor}
+        open={Boolean(versionPanelAnchor)}
+        onClose={handleVersionPanelClose}
+      />
     </S.Container>
   );
 };
