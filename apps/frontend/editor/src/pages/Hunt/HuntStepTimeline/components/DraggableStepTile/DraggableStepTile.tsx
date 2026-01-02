@@ -13,8 +13,7 @@ export const DraggableStepTile = (props: DraggableStepTileProps) => {
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 1 : 0,
+    opacity: isDragging ? 0.3 : 1,
   };
 
   return <StepTile ref={setNodeRef} style={style} {...attributes} {...listeners} {...props} />;

@@ -1,6 +1,8 @@
 export { useConfirmationDialog } from './useConfirmationDialog';
 export { useFieldError } from './useFieldError';
 export { useThrottledValue } from './useThrottledValue';
+export { useHorizontalScroll } from './useHorizontalScroll';
+export { useScrollToElement } from './useScrollToElement';
 
 export { useAutocompleteSuggestions } from './useAutocompleteSuggestions';
 export { useReverseGeocode } from './useReverseGeocode';
