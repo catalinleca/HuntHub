@@ -17,15 +17,12 @@ export const IconArea = styled(Stack)<{ $selected: boolean; $color: PaletteColor
   border-radius: 14px;
   align-items: center;
   justify-content: center;
-  background-color: ${({ theme, $selected, $color }) =>
-    $selected ? getColor($color) : theme.palette.grey[100]};
-  color: ${({ theme, $selected, $color }) =>
-    $selected ? theme.palette.common.white : getColor($color)};
+  background: ${({ theme, $selected, $color }) => ($selected ? getColor($color) : theme.palette.grey[100])};
+  color: ${({ theme, $selected, $color }) => ($selected ? theme.palette.common.white : getColor($color))};
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: ${({ theme, $selected, $color }) =>
-      $selected ? getColor($color) : theme.palette.grey[200]};
+    background: ${({ theme, $selected, $color }) => ($selected ? getColor($color) : theme.palette.grey[200])};
     transform: translateY(-2px);
   }
 `;
@@ -37,13 +34,13 @@ export const Badge = styled(Stack)`
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background-color: ${({ theme }) => theme.palette.background.paper};
+  align-items: center;
+  justify-content: center;
+  background: ${({ theme }) => theme.palette.background.paper};
   border: 2px solid ${({ theme }) => theme.palette.primary.main};
   color: ${({ theme }) => theme.palette.grey[500]};
   font-size: 10px;
   font-weight: 700;
-  align-items: center;
-  justify-content: center;
 `;
 
 export const Title = styled(Typography)`
@@ -51,7 +48,4 @@ export const Title = styled(Typography)`
   font-size: 11px;
   text-align: center;
   color: ${({ theme }) => theme.palette.text.secondary};
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 `;
