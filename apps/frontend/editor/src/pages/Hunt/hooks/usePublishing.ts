@@ -89,18 +89,15 @@ export const usePublishing = ({ hunt }: UsePublishingParams) => {
   };
 
   return {
-    // Actions
     handlePublish,
     handlePublishAndRelease,
     handleRelease,
     handleTakeOffline,
 
-    // Loading states
     isPublishing: publishMutation.isPending,
     isReleasing: releaseMutation.isPending,
     isTakingOffline: takeOfflineMutation.isPending,
 
-    // Version info (derived from hunt)
     version: hunt.version,
     latestVersion: hunt.latestVersion,
     liveVersion: hunt.liveVersion ?? null,

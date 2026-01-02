@@ -36,7 +36,6 @@ export const HuntStepsProvider = ({ children }: HuntStepsProviderProps) => {
     name: 'hunt.steps',
   });
 
-  // Cast fields to our StepFormData type (useFieldArray adds 'id' field)
   const steps = fields as unknown as StepFormData[];
 
   const effectiveSelectedKey = selectedFormKey ?? steps[0]?.formKey ?? null;
@@ -52,7 +51,9 @@ export const HuntStepsProvider = ({ children }: HuntStepsProviderProps) => {
     const currentSteps = formMethods.getValues('hunt.steps');
     const index = currentSteps.findIndex((s) => s.formKey === formKey);
 
-    if (index === -1) return;
+    if (index === -1) {
+      return;
+    }
 
     if (currentSteps.length <= 1) {
       alert('Cannot delete the last step');
@@ -80,7 +81,7 @@ export const HuntStepsProvider = ({ children }: HuntStepsProviderProps) => {
       handleDeleteStep,
       handleMoveStep,
     }),
-    [steps, effectiveSelectedKey]
+    [steps, effectiveSelectedKey],
   );
 
   return <HuntStepsContext.Provider value={value}>{children}</HuntStepsContext.Provider>;
