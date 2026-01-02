@@ -1,2 +1,2 @@
-export { StepIcon } from './StepIcon/StepIcon';
+export { StepTile } from './StepTile';
 export { AddStepIcon } from './AddStepIcon/AddStepIcon';

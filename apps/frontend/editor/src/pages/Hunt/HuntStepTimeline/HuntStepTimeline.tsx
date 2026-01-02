@@ -1,10 +1,13 @@
-import { StepIcon, AddStepIcon } from './components';
+import { Fragment } from 'react';
 import { ChallengeType } from '@hunthub/shared';
+import type { ChallengeFormData } from '@/types/editor';
+import { StepTile, AddStepIcon } from './components';
 import * as S from './HuntStepTimeline.styles';
 
 interface TimelineStep {
   formKey: string;
   type: ChallengeType;
+  challenge: ChallengeFormData;
 }
 
 interface HuntStepTimelineProps {
@@ -18,13 +21,16 @@ export const HuntStepTimeline = ({ steps, selectedFormKey, onSelectStep, onAddSt
   return (
     <S.Container>
       {steps.map((step, index) => (
-        <StepIcon
-          key={step.formKey}
-          stepNumber={index + 1}
-          type={step.type}
-          isSelected={selectedFormKey === step.formKey}
-          onClick={() => onSelectStep(step.formKey)}
-        />
+        <Fragment key={step.formKey}>
+          <StepTile
+            stepNumber={index + 1}
+            type={step.type}
+            challenge={step.challenge}
+            isSelected={selectedFormKey === step.formKey}
+            onClick={() => onSelectStep(step.formKey)}
+          />
+          {index < steps.length - 1 && <S.Connector />}
+        </Fragment>
       ))}
       <AddStepIcon onAddStep={onAddStep} />
     </S.Container>
