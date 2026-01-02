@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Popover, Typography, Stack, Divider, List } from '@mui/material';
 import { usePublishingContext } from '@/pages/Hunt/context';
-import { VersionItem } from './VersionItem';
+import { VersionItem, VersionStatus } from './VersionItem';
 import { EmptyVersionState } from './EmptyVersionState';
 
 interface VersionPanelProps {
@@ -9,8 +9,6 @@ interface VersionPanelProps {
   open: boolean;
   onClose: () => void;
 }
-
-type VersionStatus = 'draft' | 'published' | 'live';
 
 interface Version {
   number: number;

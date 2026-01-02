@@ -1,7 +1,8 @@
-import { ListItem, ListItemText, ListItemSecondaryAction, Typography, Stack, Chip, Button, CircularProgress } from '@mui/material';
+import { ReactNode } from 'react';
+import { ListItem, ListItemText, Typography, Stack, Chip, Button, CircularProgress } from '@mui/material';
 import { RocketLaunchIcon, EyeSlashIcon } from '@phosphor-icons/react';
 
-type VersionStatus = 'draft' | 'published' | 'live';
+export type VersionStatus = 'draft' | 'published' | 'live';
 
 interface VersionItemProps {
   version: number;
@@ -47,8 +48,37 @@ export const VersionItem = ({
   const isLoading = isReleasing || isTakingOffline;
   const isThisVersionReleasing = isReleasing && releasingVersion === version;
 
+  const secondaryActionByStatus: Record<VersionStatus, ReactNode> = {
+    published: (
+      <Button
+        size="small"
+        variant="outlined"
+        color="success"
+        startIcon={isThisVersionReleasing ? <CircularProgress size={14} /> : <RocketLaunchIcon size={14} />}
+        onClick={() => onRelease(version)}
+        disabled={isLoading}
+      >
+        Release
+      </Button>
+    ),
+    live: (
+      <Button
+        size="small"
+        variant="outlined"
+        color="warning"
+        startIcon={isTakingOffline ? <CircularProgress size={14} /> : <EyeSlashIcon size={14} />}
+        onClick={onTakeOffline}
+        disabled={isLoading}
+      >
+        Take Offline
+      </Button>
+    ),
+    draft: undefined,
+  };
+
   return (
     <ListItem
+      secondaryAction={secondaryActionByStatus[status]}
       sx={{
         py: 1,
         bgcolor: status === 'live' ? 'success.50' : 'transparent',
@@ -65,32 +95,6 @@ export const VersionItem = ({
         }
         secondary={getSecondaryText(status)}
       />
-      <ListItemSecondaryAction>
-        {status === 'published' && (
-          <Button
-            size="small"
-            variant="outlined"
-            color="success"
-            startIcon={isThisVersionReleasing ? <CircularProgress size={14} /> : <RocketLaunchIcon size={14} />}
-            onClick={() => onRelease(version)}
-            disabled={isLoading}
-          >
-            Release
-          </Button>
-        )}
-        {status === 'live' && (
-          <Button
-            size="small"
-            variant="outlined"
-            color="warning"
-            startIcon={isTakingOffline ? <CircularProgress size={14} /> : <EyeSlashIcon size={14} />}
-            onClick={onTakeOffline}
-            disabled={isLoading}
-          >
-            Take Offline
-          </Button>
-        )}
-      </ListItemSecondaryAction>
     </ListItem>
   );
 };

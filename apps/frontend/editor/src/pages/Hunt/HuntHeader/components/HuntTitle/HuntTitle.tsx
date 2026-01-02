@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Typography, Chip } from '@mui/material';
 import { ArrowLeftIcon, CaretDownIcon } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
