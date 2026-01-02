@@ -60,13 +60,13 @@ export const HuntLayout = ({ huntFormData, hunt }: HuntLayoutProps) => {
 
 const HuntLayoutContent = ({ huntFormData }: { huntFormData: HuntFormData }) => {
   const snackbar = useSnackbarStore();
-  const { handleSubmit, reset } = useFormContext<{ hunt: HuntFormData }>();
+  const { handleSubmit, reset, getValues } = useFormContext<{ hunt: HuntFormData }>();
   const { steps, selectedFormKey, setSelectedFormKey } = useHuntStepsContext();
 
   const saveHuntMutation = useSaveHunt();
 
   const onInvalid = (errors: FieldErrors<{ hunt: HuntFormData }>) => {
-    logFormErrors(errors, { hunt: huntFormData });
+    logFormErrors(errors, getValues());
 
     const errorIndex = findFirstStepIndexWithError(errors);
     const formKey = steps[errorIndex]?.formKey;

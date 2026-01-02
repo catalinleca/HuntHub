@@ -3,6 +3,7 @@ import { useFieldArray, useFormContext } from 'react-hook-form';
 import { ChallengeType } from '@hunthub/shared';
 import { HuntFormData, StepFormData } from '@/types/editor';
 import { StepFactory } from '@/utils/factories/StepFactory';
+import { useSnackbarStore } from '@/stores';
 
 interface HuntStepsContextValue {
   steps: StepFormData[];
@@ -29,6 +30,7 @@ interface HuntStepsProviderProps {
 
 export const HuntStepsProvider = ({ children }: HuntStepsProviderProps) => {
   const formMethods = useFormContext<{ hunt: HuntFormData }>();
+  const snackbar = useSnackbarStore();
   const [selectedFormKey, setSelectedFormKey] = useState<string | null>(null);
 
   const { fields, append, remove, move } = useFieldArray({
@@ -56,7 +58,7 @@ export const HuntStepsProvider = ({ children }: HuntStepsProviderProps) => {
     }
 
     if (currentSteps.length <= 1) {
-      alert('Cannot delete the last step');
+      snackbar.warning('Cannot delete the last step');
       return;
     }
 

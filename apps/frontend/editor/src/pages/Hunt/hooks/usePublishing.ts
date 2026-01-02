@@ -36,15 +36,28 @@ export const usePublishing = ({ hunt }: UsePublishingParams) => {
       cancelText: 'Cancel',
       variant: DialogVariants.Info,
       onConfirm: async () => {
-        const publishResult = await publishMutation.mutateAsync(hunt.huntId);
-        await releaseMutation.mutateAsync({
-          huntId: hunt.huntId,
-          request: {
-            version: publishResult.publishedVersion,
-            currentLiveVersion: hunt.liveVersion ?? null,
-          },
-        });
-        snackbar.success(`v${publishResult.publishedVersion} is now live!`);
+        let publishedVersion: number | null = null;
+
+        try {
+          const publishResult = await publishMutation.mutateAsync(hunt.huntId);
+          publishedVersion = publishResult.publishedVersion;
+        } catch {
+          snackbar.error('Failed to publish');
+          return;
+        }
+
+        try {
+          await releaseMutation.mutateAsync({
+            huntId: hunt.huntId,
+            request: {
+              version: publishedVersion,
+              currentLiveVersion: hunt.liveVersion ?? null,
+            },
+          });
+          snackbar.success(`v${publishedVersion} is now live!`);
+        } catch {
+          snackbar.warning(`Published v${publishedVersion}, but release failed. Try releasing from version panel.`);
+        }
       },
     });
   };
