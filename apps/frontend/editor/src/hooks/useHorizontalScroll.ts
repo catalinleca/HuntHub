@@ -8,6 +8,8 @@ interface UseHorizontalScrollResult {
   onScroll: () => void;
 }
 
+const SCROLL_THRESHOLD = 20;
+
 export const useHorizontalScroll = (): UseHorizontalScrollResult => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -20,8 +22,10 @@ export const useHorizontalScroll = (): UseHorizontalScrollResult => {
       return;
     }
 
-    setCanScrollLeft(el.scrollLeft > 0);
-    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1);
+    const maxScroll = el.scrollWidth - el.clientWidth;
+
+    setCanScrollLeft(el.scrollLeft > SCROLL_THRESHOLD);
+    setCanScrollRight(el.scrollLeft < maxScroll - SCROLL_THRESHOLD);
   }, []);
 
   const scroll = useCallback((direction: 'left' | 'right') => {
