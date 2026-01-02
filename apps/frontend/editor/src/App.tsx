@@ -6,7 +6,7 @@ import { APIProvider } from '@vis.gl/react-google-maps';
 import { AuthProvider } from './contexts/AuthContext';
 import { AppWithAuth } from './AppWithAuth';
 import { theme } from './theme';
-import { ConfirmationDialog } from '@/components';
+import { ConfirmationDialog, Snackbar } from '@/components';
 import { GOOGLE_MAPS_API_KEY } from '@/config/google-maps';
 
 const queryClient = new QueryClient({
@@ -30,6 +30,7 @@ function App() {
           </AuthProvider>
           <ReactQueryDevtools initialIsOpen={false} />
           <ConfirmationDialog />
+          <Snackbar />
         </APIProvider>
       </ThemeProvider>
     </QueryClientProvider>

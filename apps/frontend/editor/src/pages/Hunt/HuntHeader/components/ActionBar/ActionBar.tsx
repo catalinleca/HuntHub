@@ -1,25 +1,18 @@
 import { useState } from 'react';
 import { Button, CircularProgress, Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 import { ShareNetworkIcon, UploadIcon, RocketLaunchIcon, CaretDownIcon } from '@phosphor-icons/react';
+import { usePublishingContext } from '@/pages/Hunt/context';
 import * as S from './ActionBar.styles';
 
 interface ActionBarProps {
   hasUnsavedChanges: boolean;
   isSaving: boolean;
   onSave: () => void;
-  onPublish: () => void;
-  onPublishAndRelease: () => void;
-  isPublishing: boolean;
 }
 
-export const ActionBar = ({
-  hasUnsavedChanges,
-  isSaving,
-  onSave,
-  onPublish,
-  onPublishAndRelease,
-  isPublishing,
-}: ActionBarProps) => {
+export const ActionBar = ({ hasUnsavedChanges, isSaving, onSave }: ActionBarProps) => {
+  const { handlePublish, handlePublishAndRelease, isPublishing } = usePublishingContext();
+
   const [publishMenuAnchor, setPublishMenuAnchor] = useState<HTMLElement | null>(null);
 
   const handlePublishClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -32,18 +25,24 @@ export const ActionBar = ({
 
   const handlePublishOnly = () => {
     handlePublishMenuClose();
-    onPublish();
+    handlePublish();
   };
 
-  const handlePublishAndRelease = () => {
+  const handlePublishAndReleaseClick = () => {
     handlePublishMenuClose();
-    onPublishAndRelease();
+    handlePublishAndRelease();
   };
 
   return (
     <S.Container>
-      <Button variant="outlined" size="small" disabled={!hasUnsavedChanges || isSaving || isPublishing} onClick={onSave}>
-        {isSaving ? 'Saving...' : 'Save'}
+      <Button
+        variant="outlined"
+        size="small"
+        disabled={!hasUnsavedChanges || isSaving || isPublishing}
+        onClick={onSave}
+        startIcon={isSaving ? <CircularProgress size={16} /> : undefined}
+      >
+        Save
       </Button>
 
       <Button variant="outlined" size="small" startIcon={<ShareNetworkIcon size={18} />} disabled={isPublishing}>
@@ -72,19 +71,13 @@ export const ActionBar = ({
           <ListItemIcon>
             <UploadIcon size={18} />
           </ListItemIcon>
-          <ListItemText
-            primary="Publish"
-            secondary="Create version snapshot"
-          />
+          <ListItemText primary="Publish" secondary="Create version snapshot" />
         </MenuItem>
-        <MenuItem onClick={handlePublishAndRelease}>
+        <MenuItem onClick={handlePublishAndReleaseClick}>
           <ListItemIcon>
             <RocketLaunchIcon size={18} />
           </ListItemIcon>
-          <ListItemText
-            primary="Publish & Go Live"
-            secondary="Publish and release to players"
-          />
+          <ListItemText primary="Publish & Go Live" secondary="Publish and release to players" />
         </MenuItem>
       </Menu>
     </S.Container>

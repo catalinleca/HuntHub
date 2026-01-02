@@ -222,11 +222,13 @@ components:
         publishedAt:
           type: string
           format: date-time
-          description: "When this version was published"
+          nullable: true
+          description: "When this version was published (null if not published)"
           example: "2024-02-01T10:12:45Z"
         publishedBy:
           type: string
-          description: "User ID who published this version"
+          nullable: true
+          description: "User ID who published this version (null if not published)"
         isLive:
           type: boolean
           description: "Is this version currently live/active for players? (computed: version === liveVersion)"
@@ -234,11 +236,13 @@ components:
         releasedAt:
           type: string
           format: date-time
-          description: "When hunt was last released/made live"
+          nullable: true
+          description: "When hunt was last released/made live (null if never released)"
           example: "2024-02-01T10:30:00Z"
         releasedBy:
           type: string
-          description: "User ID who released/made the hunt live"
+          nullable: true
+          description: "User ID who released/made the hunt live (null if never released)"
         permission:
           type: string
           enum: [owner, admin, view]

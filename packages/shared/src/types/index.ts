@@ -212,26 +212,26 @@ export interface Hunt {
    */
   isPublished: boolean;
   /**
-   * When this version was published
+   * When this version was published (null if not published)
    * @format date-time
    * @example "2024-02-01T10:12:45Z"
    */
-  publishedAt?: string;
-  /** User ID who published this version */
-  publishedBy?: string;
+  publishedAt?: string | null;
+  /** User ID who published this version (null if not published) */
+  publishedBy?: string | null;
   /**
    * Is this version currently live/active for players? (computed: version === liveVersion)
    * @example false
    */
   isLive?: boolean;
   /**
-   * When hunt was last released/made live
+   * When hunt was last released/made live (null if never released)
    * @format date-time
    * @example "2024-02-01T10:30:00Z"
    */
-  releasedAt?: string;
-  /** User ID who released/made the hunt live */
-  releasedBy?: string;
+  releasedAt?: string | null;
+  /** User ID who released/made the hunt live (null if never released) */
+  releasedBy?: string | null;
   /**
    * Authenticated user's permission level for this hunt (included in user-specific contexts like dashboard)
    * @example "owner"

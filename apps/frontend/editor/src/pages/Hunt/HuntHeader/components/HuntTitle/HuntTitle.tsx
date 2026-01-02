@@ -1,22 +1,20 @@
+import { useState } from 'react';
 import { Typography, Chip } from '@mui/material';
 import { ArrowLeftIcon, CaretDownIcon } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
+import { usePublishingContext } from '@/pages/Hunt/context';
+import { VersionPanel } from '../VersionPanel';
 import * as S from './HuntTitle.styles';
 
 interface HuntTitleProps {
   huntName: string;
   lastUpdatedBy: string;
   hasUnsavedChanges: boolean;
-  version: number;
-  latestVersion: number;
-  liveVersion: number | null;
-  isLive: boolean;
-  onStatusClick: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
 const getStatusBadge = (
   latestVersion: number,
-  liveVersion: number | null,
+  liveVersion: number | null
 ): { label: string; color: 'default' | 'primary' | 'success' } => {
   if (liveVersion !== null) {
     return { label: `v${liveVersion} Live`, color: 'success' };
@@ -29,17 +27,21 @@ const getStatusBadge = (
   return { label: `Draft`, color: 'default' };
 };
 
-export const HuntTitle = ({
-  huntName,
-  lastUpdatedBy,
-  hasUnsavedChanges,
-  latestVersion,
-  liveVersion,
-  onStatusClick,
-}: HuntTitleProps) => {
+export const HuntTitle = ({ huntName, lastUpdatedBy, hasUnsavedChanges }: HuntTitleProps) => {
   const navigate = useNavigate();
+  const { latestVersion, liveVersion } = usePublishingContext();
+
+  const [versionPanelAnchor, setVersionPanelAnchor] = useState<HTMLElement | null>(null);
 
   const statusBadge = getStatusBadge(latestVersion, liveVersion);
+
+  const handleStatusClick = (event: React.MouseEvent<HTMLElement>) => {
+    setVersionPanelAnchor(event.currentTarget);
+  };
+
+  const handleVersionPanelClose = () => {
+    setVersionPanelAnchor(null);
+  };
 
   return (
     <S.Container>
@@ -56,8 +58,8 @@ export const HuntTitle = ({
             label={statusBadge.label}
             size="small"
             color={statusBadge.color}
-            onClick={onStatusClick}
-            onDelete={onStatusClick}
+            onClick={handleStatusClick}
+            onDelete={handleStatusClick}
             deleteIcon={<CaretDownIcon size={14} />}
             sx={{ cursor: 'pointer' }}
           />
@@ -67,6 +69,8 @@ export const HuntTitle = ({
           Last updated by {lastUpdatedBy}
         </Typography>
       </S.TitleSection>
+
+      <VersionPanel anchorEl={versionPanelAnchor} open={Boolean(versionPanelAnchor)} onClose={handleVersionPanelClose} />
     </S.Container>
   );
 };
