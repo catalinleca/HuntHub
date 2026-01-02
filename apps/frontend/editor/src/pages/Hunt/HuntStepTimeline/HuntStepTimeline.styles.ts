@@ -8,9 +8,9 @@ export const Wrapper = styled(Stack)`
 `;
 
 export const InnerWrapper = styled(Stack)`
-  display: flex;
   flex-direction: row;
   align-items: flex-start;
+  width: fit-content;
   min-width: ${({ theme }) => theme.breakpoints.values.md}px;
   max-width: ${({ theme }) => theme.breakpoints.values.lg}px;
   padding: ${({ theme }) => theme.spacing(0, 3)};

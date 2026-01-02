@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import { Stack, IconButton } from '@mui/material';
 
 export const Container = styled(Stack)<{ $canScrollLeft: boolean; $canScrollRight: boolean }>`
-  flex: 1;
   flex-direction: row;
   gap: ${({ theme }) => theme.spacing(1)};
   padding: ${({ theme }) => theme.spacing(3, 2)};
