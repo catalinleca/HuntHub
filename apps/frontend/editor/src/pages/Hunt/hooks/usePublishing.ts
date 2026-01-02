@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Hunt } from '@hunthub/shared';
 import { usePublishHunt, useReleaseHunt, useTakeOfflineHunt } from '@/api/Hunt';
 import { useDialogStore, useSnackbarStore, DialogVariants } from '@/stores';
@@ -9,6 +10,7 @@ interface UsePublishingParams {
 export const usePublishing = ({ hunt }: UsePublishingParams) => {
   const { confirm } = useDialogStore();
   const snackbar = useSnackbarStore();
+  const [releasingVersion, setReleasingVersion] = useState<number | null>(null);
 
   const publishMutation = usePublishHunt();
   const releaseMutation = useReleaseHunt();
@@ -70,14 +72,19 @@ export const usePublishing = ({ hunt }: UsePublishingParams) => {
       cancelText: 'Cancel',
       variant: DialogVariants.Info,
       onConfirm: async () => {
-        await releaseMutation.mutateAsync({
-          huntId: hunt.huntId,
-          request: {
-            version: versionToRelease,
-            currentLiveVersion: hunt.liveVersion ?? null,
-          },
-        });
-        snackbar.success(`v${versionToRelease} is now live!`);
+        setReleasingVersion(versionToRelease);
+        try {
+          await releaseMutation.mutateAsync({
+            huntId: hunt.huntId,
+            request: {
+              version: versionToRelease,
+              currentLiveVersion: hunt.liveVersion ?? null,
+            },
+          });
+          snackbar.success(`v${versionToRelease} is now live!`);
+        } finally {
+          setReleasingVersion(null);
+        }
       },
     });
   };
@@ -110,6 +117,7 @@ export const usePublishing = ({ hunt }: UsePublishingParams) => {
     isPublishing: publishMutation.isPending,
     isReleasing: releaseMutation.isPending,
     isTakingOffline: takeOfflineMutation.isPending,
+    releasingVersion,
 
     version: hunt.version,
     latestVersion: hunt.latestVersion,

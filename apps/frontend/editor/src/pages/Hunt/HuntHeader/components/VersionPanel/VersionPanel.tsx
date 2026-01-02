@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Popover, Typography, Stack, Divider, List } from '@mui/material';
 import { usePublishingContext } from '@/pages/Hunt/context';
 import { VersionItem, VersionStatus } from './VersionItem';
@@ -34,18 +33,18 @@ const buildVersionList = (latestVersion: number, liveVersion: number | null): Ve
 };
 
 export const VersionPanel = ({ anchorEl, open, onClose }: VersionPanelProps) => {
-  const { latestVersion, liveVersion, handleRelease, handleTakeOffline, isReleasing, isTakingOffline } =
-    usePublishingContext();
-
-  const [releasingVersion, setReleasingVersion] = useState<number | null>(null);
+  const {
+    latestVersion,
+    liveVersion,
+    handleRelease,
+    handleTakeOffline,
+    isReleasing,
+    isTakingOffline,
+    releasingVersion,
+  } = usePublishingContext();
 
   const versions = buildVersionList(latestVersion, liveVersion);
   const hasPublishedVersions = latestVersion > 1;
-
-  const onReleaseClick = (version: number) => {
-    setReleasingVersion(version);
-    handleRelease(version);
-  };
 
   return (
     <Popover
@@ -78,7 +77,7 @@ export const VersionPanel = ({ anchorEl, open, onClose }: VersionPanelProps) => 
               key={version.number}
               version={version.number}
               status={version.status}
-              onRelease={onReleaseClick}
+              onRelease={handleRelease}
               onTakeOffline={handleTakeOffline}
               isReleasing={isReleasing}
               isTakingOffline={isTakingOffline}
