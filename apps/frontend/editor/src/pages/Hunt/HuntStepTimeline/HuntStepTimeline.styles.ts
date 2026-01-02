@@ -20,9 +20,10 @@ export const Container = styled(Stack)<{ $canScrollLeft: boolean; $canScrollRigh
   overflow-x: auto;
   scrollbar-width: none;
   min-width: 0;
-  box-shadow:
-    ${({ theme, $canScrollLeft }) => ($canScrollLeft ? theme.shadows[12] : 'none')},
-    ${({ theme, $canScrollRight }) => ($canScrollRight ? theme.shadows[13] : 'none')};
+  box-shadow: ${({ theme, $canScrollLeft, $canScrollRight }) => {
+    const shadows = [$canScrollLeft && theme.shadows[12], $canScrollRight && theme.shadows[13]].filter(Boolean);
+    return shadows.length ? shadows.join(', ') : 'none';
+  }};
 
   &::-webkit-scrollbar {
     display: none;
