@@ -27,7 +27,7 @@ export const AddStepIcon = ({ onAddStep }: AddStepIconProps) => {
   return (
     <>
       <S.Container onClick={handleClick}>
-        <PlusIcon size={32} weight="bold" />
+        <PlusIcon size={24} weight="bold" />
       </S.Container>
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>

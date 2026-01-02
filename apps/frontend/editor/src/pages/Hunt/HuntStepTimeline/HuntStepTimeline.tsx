@@ -78,12 +78,13 @@ export const HuntStepTimeline = ({ steps, selectedFormKey, onSelectStep, onAddSt
               {index < steps.length - 1 && <S.Connector />}
             </Fragment>
           ))}
-          <AddStepIcon onAddStep={onAddStep} />
         </S.Container>
 
         <S.ScrollButton $visible={canScrollRight} onClick={() => scroll('right')}>
           <CaretRightIcon size={20} weight="bold" />
         </S.ScrollButton>
+
+        <AddStepIcon onAddStep={onAddStep} />
       </S.InnerWrapper>
     </S.Wrapper>
   );

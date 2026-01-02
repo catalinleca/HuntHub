@@ -3,19 +3,22 @@ import { Stack } from '@mui/material';
 
 export const Container = styled(Stack)`
   flex-shrink: 0;
-  width: 64px;
-  height: 64px;
-  border-radius: 12px;
-  border: 2px dashed ${({ theme }) => theme.palette.divider};
-  color: ${({ theme }) => theme.palette.text.secondary};
+  align-self: center;
+  margin-left: ${({ theme }) => theme.spacing(1)};
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: ${({ theme }) => theme.palette.primary.main};
+  color: ${({ theme }) => theme.palette.common.white};
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  box-shadow: ${({ theme }) => theme.shadows[3]};
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: ${({ theme }) => theme.palette.primary.main};
-    color: ${({ theme }) => theme.palette.primary.main};
-    background: ${({ theme }) => theme.palette.primary.main}08;
+    background: ${({ theme }) => theme.palette.primary.dark};
+    box-shadow: ${({ theme }) => theme.shadows[4]};
+    transform: scale(1.05);
   }
 `;
