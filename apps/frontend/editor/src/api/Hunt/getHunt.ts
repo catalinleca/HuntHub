@@ -30,7 +30,9 @@ export const useGetHunt = (huntId?: number | null) => {
 
       for (const [, data] of queries) {
         const hunt = data?.data?.find((h) => h.huntId === huntId);
-        if (hunt) {
+        // Only use as initialData if it has steps (complete data from detail API)
+        // List API returns hunts without steps - using that causes empty timeline on first load
+        if (hunt?.steps && hunt.steps.length > 0) {
           return hunt;
         }
       }

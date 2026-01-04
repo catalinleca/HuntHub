@@ -9,6 +9,7 @@ interface UseHorizontalScrollResult {
 }
 
 const SCROLL_THRESHOLD = 20;
+const SCROLL_OFFSET = 125;
 
 export const useHorizontalScroll = (): UseHorizontalScrollResult => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -35,7 +36,7 @@ export const useHorizontalScroll = (): UseHorizontalScrollResult => {
       return;
     }
 
-    el.scrollBy({ left: direction === 'left' ? -120 : 120, behavior: 'smooth' });
+    el.scrollBy({ left: direction === 'left' ? -SCROLL_OFFSET : SCROLL_OFFSET, behavior: 'smooth' });
   }, []);
 
   useEffect(() => {

@@ -36,11 +36,12 @@ const BARCELONA_HUNT = {
 };
 
 // 12-step Barcelona route with varied challenge types
-// Structure matches frontend form expectations:
+// Structure matches API/DB format (transformed by frontend):
 // - Clue: challenge.clue.{title, description}
-// - Quiz: challenge.quiz.{title, description, type, options, targetId}
-// - Mission: challenge.mission.{title, description, type}
-// - Task: challenge.task.{title, instructions}
+// - Quiz (choice): challenge.quiz.{title, description, type, target, distractors, displayOrder}
+// - Quiz (input): challenge.quiz.{title, description, type, target}
+// - Mission: challenge.mission.{title, description, type, targetLocation}
+// - Task: challenge.task.{title, instructions, aiInstructions}
 const BARCELONA_STEPS = [
   // Step 1: Plaça de Catalunya - Starting Point (clue)
   {
@@ -70,13 +71,13 @@ const BARCELONA_STEPS = [
         description:
           "You're walking down one of the world's most famous pedestrian streets. Las Ramblas stretches 1.2 km from Plaça de Catalunya to the sea. But what was this street before it became a promenade?",
         type: 'choice',
-        options: [
-          { id: 'a', label: 'A seasonal riverbed (rambla)' },
-          { id: 'b', label: 'A Roman military road' },
-          { id: 'c', label: 'A medieval market street' },
-          { id: 'd', label: 'A Moorish garden path' },
+        target: { id: 'a', text: 'A seasonal riverbed (rambla)' },
+        distractors: [
+          { id: 'b', text: 'A Roman military road' },
+          { id: 'c', text: 'A medieval market street' },
+          { id: 'd', text: 'A Moorish garden path' },
         ],
-        targetId: 'a',
+        displayOrder: ['a', 'b', 'c', 'd'],
       },
     },
     hint: 'The name "Rambla" comes from Arabic "ramla" meaning sand',
@@ -144,13 +145,13 @@ const BARCELONA_STEPS = [
         description:
           "You've entered the Gothic Quarter, Barcelona's medieval heart. Before you stands the Barcelona Cathedral, dedicated to Santa Eulàlia, the city's patron saint. In the cloister garden, something unusual lives among the palm trees. What will you find there?",
         type: 'choice',
-        options: [
-          { id: 'a', label: '13 white geese' },
-          { id: 'b', label: 'A colony of cats' },
-          { id: 'c', label: 'Peacocks' },
-          { id: 'd', label: 'Koi fish in a pond' },
+        target: { id: 'a', text: '13 white geese' },
+        distractors: [
+          { id: 'b', text: 'A colony of cats' },
+          { id: 'c', text: 'Peacocks' },
+          { id: 'd', text: 'Koi fish in a pond' },
         ],
-        targetId: 'a',
+        displayOrder: ['a', 'b', 'c', 'd'],
       },
     },
     hint: 'The number represents the age at which Santa Eulàlia was martyred',
@@ -207,13 +208,13 @@ const BARCELONA_STEPS = [
         description:
           "Welcome to Passeig de Gràcia and Casa Batlló, one of Gaudí's most fantastical creations (1904-1906). The facade resembles bones and skulls, the roof a dragon's back, and the cross-topped tower represents Saint George's lance. What nickname do locals give to this building because of its skeletal facade?",
         type: 'choice',
-        options: [
-          { id: 'a', label: 'Casa dels Ossos (House of Bones)' },
-          { id: 'b', label: 'Casa del Drac (House of the Dragon)' },
-          { id: 'c', label: 'Casa Màgica (Magic House)' },
-          { id: 'd', label: 'Casa de les Escates (House of Scales)' },
+        target: { id: 'a', text: 'Casa dels Ossos (House of Bones)' },
+        distractors: [
+          { id: 'b', text: 'Casa del Drac (House of the Dragon)' },
+          { id: 'c', text: 'Casa Màgica (Magic House)' },
+          { id: 'd', text: 'Casa de les Escates (House of Scales)' },
         ],
-        targetId: 'a',
+        displayOrder: ['a', 'b', 'c', 'd'],
       },
     },
     hint: 'Look at the balconies - what do they remind you of?',
@@ -283,9 +284,7 @@ const BARCELONA_STEPS = [
         description:
           "You've reached Park Güell, Gaudí's colorful hillside park (1900-1914). Originally planned as a luxury housing development for 60 homes, it was a commercial failure - only 2 houses were ever built! The famous mosaic salamander at the entrance is beloved by visitors. What do locals call this colorful creature?",
         type: 'input',
-        target: {
-          text: 'El Drac',
-        },
+        target: { id: 'answer', text: 'El Drac' },
       },
     },
     hint: 'Locals affectionately call it by a Catalan word meaning "The Dragon"',
