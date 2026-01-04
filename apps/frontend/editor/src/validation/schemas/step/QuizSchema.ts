@@ -1,27 +1,21 @@
 import { z } from 'zod';
+import { Option, QuizValidation } from '@hunthub/shared/schemas';
 import { errorMessage } from '../../messages';
 
 /**
- * Quiz validation - all fields exist, conditional validation based on type.
- * All type-specific validation happens in superRefine where we know the type.
+ * Quiz form validation - extends shared schema with form-specific rules.
+ * Conditional validation based on type happens in superRefine.
  */
 export const QuizFormSchema = z
   .object({
     title: z.string().min(1, errorMessage('Question').required),
     description: z.string().optional(),
     type: z.enum(['choice', 'input']),
-    options: z.array(z.object({ id: z.string(), text: z.string() })).optional(),
+    options: z.array(Option).optional(),
     targetId: z.string().optional(),
     expectedAnswer: z.string().optional(),
     randomizeOrder: z.boolean().optional(),
-    validation: z
-      .object({
-        mode: z.enum(['exact', 'fuzzy', 'contains', 'numeric-range']).optional(),
-        caseSensitive: z.boolean().optional(),
-        range: z.object({ min: z.number().optional(), max: z.number().optional() }).optional(),
-        acceptableAnswers: z.array(z.string()).optional(),
-      })
-      .optional(),
+    validation: QuizValidation.optional(),
   })
   .superRefine((data, ctx) => {
     if (data.type === 'choice') {

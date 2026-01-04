@@ -32,6 +32,7 @@ export {
 
   // Challenge types
   Clue,
+  QuizValidation,
   Quiz,
   Mission,
   Task,
