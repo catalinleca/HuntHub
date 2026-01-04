@@ -3,7 +3,8 @@ import { HuntFormData } from '@/types/editor';
 
 export const getNestedError = (errors: FieldErrors, name: string): string | undefined => {
   const error = get(errors, name);
-  return error?.message as string | undefined;
+  // Check direct message first, then root.message (for array schema-level errors from superRefine)
+  return (error?.message ?? error?.root?.message) as string | undefined;
 };
 
 /**

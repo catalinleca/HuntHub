@@ -1,4 +1,4 @@
-import { Hunt, Step, Quiz, OptionType, Location, Media } from '@hunthub/shared';
+import { Hunt, Step, Quiz, Location, Media } from '@hunthub/shared';
 import { HuntFormData, StepFormData, LocationFormData } from '@/types/editor';
 import { MediaHelper } from '@/components/media/data/helper';
 
@@ -30,22 +30,10 @@ const cleanMediaForApi = (media?: Media | null): Media | undefined => {
 };
 
 /**
- * Transform Quiz for API - now a pass-through.
- * Schema uses options[] + targetId directly for choice type.
- * Input type uses target.text for expected answer.
- * Validates that choice-type quiz has a targetId selected.
+ * Transform Quiz for API - pass through as-is.
+ * All fields are optional in the schema, backend uses what it needs.
  */
 const transformQuizForApi = (quiz?: Quiz): Quiz | undefined => {
-  if (!quiz) {
-    return undefined;
-  }
-
-  // Validate choice type has targetId
-  if (quiz.type === OptionType.Choice && quiz.options?.length && !quiz.targetId) {
-    throw new Error('Target option must be selected for choice-type quiz');
-  }
-
-  // Pass through - schema matches API directly
   return quiz;
 };
 
