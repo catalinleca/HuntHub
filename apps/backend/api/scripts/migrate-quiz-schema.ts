@@ -8,26 +8,28 @@ import mongoose from 'mongoose';
 import { databaseUrl } from '../src/config/env.config';
 import { StepModel } from '../src/database/models';
 
-interface OldQuizFormat {
+// Combined type that covers both old and new formats
+interface QuizData {
   title?: string;
   description?: string;
   type?: 'choice' | 'input';
+  // Old format fields
   target?: { id: string; text: string };
   distractors?: Array<{ id: string; text: string }>;
   displayOrder?: string[];
+  // New format fields
+  options?: Array<{ id: string; text: string }>;
+  targetId?: string;
+  // Common fields
   randomizeOrder?: boolean;
   validation?: unknown;
 }
 
-interface NewQuizFormat {
-  title?: string;
-  description?: string;
-  type?: 'choice' | 'input';
-  options?: Array<{ id: string; text: string }>;
-  targetId?: string;
-  target?: { id: string; text: string };
-  randomizeOrder?: boolean;
-  validation?: unknown;
+interface ChallengeData {
+  quiz?: QuizData;
+  clue?: unknown;
+  mission?: unknown;
+  task?: unknown;
 }
 
 async function migrateQuizSchema() {
@@ -45,7 +47,8 @@ async function migrateQuizSchema() {
     let inputTypeCount = 0;
 
     for (const step of quizSteps) {
-      const quiz = step.challenge?.quiz as OldQuizFormat | undefined;
+      const challenge = step.challenge as ChallengeData | undefined;
+      const quiz = challenge?.quiz;
 
       if (!quiz) {
         console.log(`  Step ${step.stepId}: No quiz data, skipping`);
@@ -82,7 +85,7 @@ async function migrateQuizSchema() {
             .filter((o): o is { id: string; text: string } => Boolean(o));
         }
 
-        const newQuiz: NewQuizFormat = {
+        const newQuiz: QuizData = {
           title: quiz.title,
           description: quiz.description,
           type: quiz.type,
@@ -94,8 +97,8 @@ async function migrateQuizSchema() {
 
         // Remove undefined fields
         Object.keys(newQuiz).forEach((key) => {
-          if (newQuiz[key as keyof NewQuizFormat] === undefined) {
-            delete newQuiz[key as keyof NewQuizFormat];
+          if (newQuiz[key as keyof QuizData] === undefined) {
+            delete newQuiz[key as keyof QuizData];
           }
         });
 
