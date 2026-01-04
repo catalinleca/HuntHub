@@ -14,7 +14,14 @@ export const QuizFormSchema = z
     targetId: z.string().optional(),
     expectedAnswer: z.string().optional(),
     randomizeOrder: z.boolean().optional(),
-    validation: z.any().optional(),
+    validation: z
+      .object({
+        mode: z.enum(['exact', 'fuzzy', 'contains', 'numeric-range']).optional(),
+        caseSensitive: z.boolean().optional(),
+        range: z.object({ min: z.number().optional(), max: z.number().optional() }).optional(),
+        acceptableAnswers: z.array(z.string()).optional(),
+      })
+      .optional(),
   })
   .superRefine((data, ctx) => {
     if (data.type === 'choice') {
