@@ -42,6 +42,12 @@ export const QuizFormSchema = z
           path: ['targetId'],
           message: 'Select the correct answer',
         });
+      } else if (data.options && !data.options.some((o) => o.id === data.targetId)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['targetId'],
+          message: 'Selected answer must be one of the options',
+        });
       }
     }
 
