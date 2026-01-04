@@ -1,140 +1,255 @@
 # HuntHub Player Application
 
-**Status:** Approved, Ready for Implementation
-**Plan File:** `/Users/catalinleca/.claude/plans/drifting-napping-porcupine.md`
+**Status:** Ready for Implementation
 
 ---
 
-## Quick Context for New Session
+## Architecture
 
-The Player Application enables users to play published treasure hunts. It consists of:
+```mermaid
+flowchart LR
+    subgraph Packages
+        Compass["@hunthub/compass<br/>Theme, tokens"]
+        SDK["@hunthub/player-sdk<br/>Engine, primitives"]
+    end
 
-1. **Preview Panel** - Embedded in Editor for real-time testing
-2. **Standalone PWA** - Production player accessed via QR code
+    subgraph Apps
+        Editor["Editor<br/>Preview panel"]
+        Player["Player App<br/>Full UI"]
+    end
 
-Both share UI components via `@hunthub/player-sdk`.
+    Compass --> Editor
+    Compass --> Player
+    SDK --> Editor
+    SDK --> Player
+```
 
----
-
-## Confirmed Decisions (User Approved)
-
-| Decision | Choice |
-|----------|--------|
-| **Platform** | React PWA (not React Native) |
-| **Preview Architecture** | SDK components (not iframe) |
-| **Layout** | Left-right split (form \| preview) |
-| **PWA Features** | MVP-critical (offline support required) |
-| **Photo Handling** | Upload to S3 immediately during gameplay |
-| **Build Order** | Frontend SDK first, then backend |
-
----
-
-## Documentation Index
-
-| Document | Purpose |
-|----------|---------|
-| [PLAYER-ARCHITECTURE.md](./PLAYER-ARCHITECTURE.md) | High-level architecture, diagrams, tech stack |
-| [PREVIEW-SYNC.md](./PREVIEW-SYNC.md) | How form-to-preview sync works (debounce, transform) |
-| [PLAYER-MODES.md](./PLAYER-MODES.md) | Preview vs Production mode differences |
-| [QUICK-REFERENCE.md](./QUICK-REFERENCE.md) | One-page summary for quick lookup |
-| [IMPLEMENTATION-CHECKLIST.md](./IMPLEMENTATION-CHECKLIST.md) | Specific files to create/modify |
-| [decisions/](./decisions/) | Architecture Decision Records (ADRs) |
+**Key principle:** SDK is the engine. Apps decide the UI.
 
 ---
 
-## Related Existing Documentation
+## Build Order
 
-| Document | Location | Content |
-|----------|----------|---------|
-| Player API Design | `.claude/guides/player-api-design.md` | Backend endpoints, sessions, validation |
-| Player UI Design | `.claude/frontend/player/hunthub-player-design.md` | UI/UX specs, colors, animations |
-| Frontend Architecture | `.claude/frontend/FRONTEND-ARCHITECTURE.md` | React patterns, form handling |
+```mermaid
+flowchart TB
+    subgraph Phase1["Phase 1: Compass Library"]
+        A1["Create @hunthub/compass"]
+        A2["Move Editor theme"]
+        A3["Verify Editor works"]
+    end
+
+    subgraph Phase2["Phase 2: Player SDK (POC)"]
+        B1["Create @hunthub/player-sdk"]
+        B2["PlayerProvider + basic state"]
+        B3["StepView + Navigation primitives"]
+    end
+
+    subgraph Phase3["Phase 3: Player App"]
+        C1["Create apps/frontend/player/"]
+        C2["Use compass + player-sdk"]
+        C3["Build full player UI"]
+        C4["Mock hunt data"]
+    end
+
+    subgraph Phase4["Phase 4: Connect to API"]
+        D1["Fetch published hunt"]
+        D2["Display real data"]
+    end
+
+    subgraph Phase5["Phase 5: Backend Player API"]
+        E1["PlaySession model"]
+        E2["Session endpoints"]
+        E3["Challenge validation"]
+    end
+
+    subgraph Phase6["Phase 6: Full Integration"]
+        F1["Player ↔ Session API"]
+        F2["Real validation"]
+        F3["Progress persistence"]
+    end
+
+    subgraph Phase7["Phase 7: Editor Preview"]
+        G1["Add PreviewPanel to Editor"]
+        G2["Use player-sdk with config"]
+        G3["Sync with form data"]
+    end
+
+    Phase1 --> Phase2 --> Phase3 --> Phase4 --> Phase5 --> Phase6 --> Phase7
+```
 
 ---
 
-## Implementation Phases
+## Phase Details
 
-### Phase 1: Foundation ← START HERE
-- Create `packages/ui/` with theme factory and tokens
-- Migrate editor theme to use `@hunthub/ui`
-- Verify editor still works
+### Phase 1: @hunthub/compass Library
 
-### Phase 2: Player SDK
+Create the shared design system.
+
+**What:**
+- Create `packages/compass/`
+- Move tokens, overrides, palettes from Editor
+- Export `treasureMapTheme`
+- Update Editor to import from compass
+
+**Verify:** Editor still works, no visual changes.
+
+**See:** [COMPASS-LIBRARY.md](./COMPASS-LIBRARY.md)
+
+---
+
+### Phase 2: Player SDK (POC)
+
+Create the player engine.
+
+**What:**
 - Create `packages/player-sdk/`
-- Build `PlayerShell`, `StepView`, step components
-- Build `useGeolocation`, `useCamera` hooks
+- `PlayerProvider` - context, holds state
+- `StepView` - renders current step
+- `Navigation` - prev/next buttons
+- Internal hooks: `usePlayer`, `useCurrentStep`, `useNavigation`
 
-### Phase 3: Preview Integration
-- Add `PreviewPanel` to editor
-- Build `usePreviewData` hook
-- Implement 300ms debounce
+**Key:** SDK is the engine. Hooks are internal. Consumer just passes config.
 
-### Phase 4: Player App
-- Create `apps/frontend/player/`
-- Set up routes, theme, PWA config
+**Verify:** Can import and use in a test page
 
-### Phase 5: Backend API
-- Implement endpoints from `.claude/guides/player-api-design.md`
-- PlaySession model, validation services
-
-### Phase 6: Integration
-- Connect player to API
-- End-to-end testing
+**See:** [PLAYER-SDK.md](./PLAYER-SDK.md)
 
 ---
 
-## Key Patterns from Efekta Catalyst
+### Phase 3: Player App
 
-We analyzed the Efekta Catalyst codebase as a production reference:
+Build the player application.
 
-**What we adopted:**
-- 300ms debounce on form-to-preview sync
-- SDK component pattern for reuse
-- Mode prop for dev/prod behavior differences
+**What:**
+- Create `apps/frontend/player/`
+- Vite + React 19 + TypeScript
+- Use `@hunthub/compass` + `@hunthub/player-sdk`
+- Build full player UI around SDK primitives
+- Add: ProgressBar, HintsButton, layout
+- Use mock hunt data
 
-**What we simplified:**
-- No iframe (we're React-to-React, not React-to-Angular)
-- No postMessage (direct props instead)
-- No backend preview endpoint (client-side transform)
+**Verify:** Can click through steps with mock data
+
+**Dev workflow:**
+- Chrome DevTools → device toolbar for mobile view
+- Chrome DevTools → Sensors for GPS simulation
+
+---
+
+### Phase 4: Connect to Existing API
+
+Fetch real hunt data.
+
+**What:**
+- Fetch published hunt: `GET /api/hunts/:id` (existing endpoint)
+- Display real hunt name, description, steps
+- Handle loading/error states
+
+**Verify:** Player shows a real published hunt
+
+---
+
+### Phase 5: Backend Player API
+
+Build session and progress tracking.
+
+**What:**
+- `PlaySession` model (Mongoose)
+- `POST /api/play/:huntId/start` - create session
+- `POST /api/play/sessions/:id/submit` - submit answer
+- `POST /api/play/sessions/:id/hint` - request hint
+- `GET /api/play/sessions/:id` - get session state
+- Challenge validators (Location, Quiz, Photo, Task)
+
+**See:** `.claude/guides/player-api-design.md`
+
+**Verify:** API endpoints work via Postman/curl
+
+---
+
+### Phase 6: Full Integration
+
+Connect player to session API.
+
+**What:**
+- Player calls start session on load
+- Submit answers to API
+- Real validation (GPS radius, quiz answers)
+- Progress persists across refresh
+- Completion screen with stats
+
+**Verify:** Can play a hunt from start to finish
+
+---
+
+### Phase 7: Editor Preview (Later)
+
+Embed player in Editor.
+
+**What:**
+- Add `PreviewPanel` to Editor
+- Import `HuntPlayer` from player app
+- Feed form data instead of API data
+- 300ms debounce on form changes
+- `mode="preview"` to disable validation
+
+**Verify:** Preview updates as you edit
+
+---
+
+## Quick Reference
+
+| Phase | Creates | Depends On |
+|-------|---------|------------|
+| 1 | `@hunthub/compass` | - |
+| 2 | `@hunthub/player-sdk` | Phase 1 |
+| 3 | `apps/frontend/player/` | Phase 1 + 2 |
+| 4 | API integration | Phase 3 + existing backend |
+| 5 | Backend Player API | - (can parallel with 3-4) |
+| 6 | Full player flow | Phase 4 + 5 |
+| 7 | Editor preview | Phase 6 |
+
+---
+
+## Development Workflow
+
+```bash
+# Terminal 1: Backend
+npm run dev:api          # localhost:3000
+
+# Terminal 2: Player
+npm run dev:player       # localhost:5174
+
+# Terminal 3: Editor (when needed)
+npm run dev:editor       # localhost:5173
+```
+
+**Mobile testing:**
+- Chrome DevTools → Toggle device toolbar (Ctrl+Shift+M)
+- Select iPhone 14 Pro Max or similar
+
+**GPS testing:**
+- Chrome DevTools → More tools → Sensors
+- Set custom location
+
+---
+
+## Files in This Folder
+
+| File | Purpose |
+|------|---------|
+| [COMPASS-LIBRARY.md](./COMPASS-LIBRARY.md) | @hunthub/compass - theme library |
+| [PLAYER-SDK.md](./PLAYER-SDK.md) | @hunthub/player-sdk - engine library |
+| [PLAYER-MODES.md](./PLAYER-MODES.md) | Preview vs Production modes |
+| [PREVIEW-SYNC.md](./PREVIEW-SYNC.md) | Form-to-preview sync (Phase 7) |
+| [decisions/](./decisions/) | Architecture Decision Records |
 
 ---
 
 ## Start a New Session
 
-To continue implementation in a new session:
-
 ```
 I'm working on the HuntHub player application.
 Read .claude/player/README.md for context.
-Continue with Phase [N] from the implementation checklist.
-```
-
----
-
-## File Structure After Implementation
-
-```
-packages/
-├── shared/              # Existing - types, schemas
-├── ui/                  # NEW - theme factory, tokens
-│   └── src/
-│       ├── tokens/
-│       ├── createTheme.ts
-│       └── index.ts
-└── player-sdk/          # NEW - player components
-    └── src/
-        ├── components/
-        ├── hooks/
-        └── context/
-
-apps/frontend/
-├── editor/              # Existing
-│   └── src/pages/Hunt/
-│       └── components/
-│           └── PreviewPanel/  # NEW
-└── player/              # NEW - PWA
-    └── src/
-        ├── pages/
-        ├── api/
-        └── theme/
+Continue with Phase [N].
 ```
