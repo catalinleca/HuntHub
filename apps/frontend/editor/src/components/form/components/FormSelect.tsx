@@ -1,9 +1,10 @@
 import { FormHelperText, FormControl } from '@mui/material';
-import { useFormContext, useController, useFormState } from 'react-hook-form';
+import { useFormContext, useController } from 'react-hook-form';
 import { FormFieldProps } from '../types';
-import { getNestedError, nameToId } from '../utils';
+import { nameToId } from '../utils';
 import { InputLabel, FieldContainer } from '../core';
 import { Select, SelectOption, SelectProps } from '@/components/common';
+import { useFieldError } from '@/hooks';
 
 export interface FormSelectProps extends FormFieldProps<Omit<SelectProps, 'options'>> {
   options: SelectOption[];
@@ -22,10 +23,7 @@ export const FormSelect = ({
 }: FormSelectProps) => {
   const { control } = useFormContext();
   const { field } = useController({ name, control });
-
-  const { errors } = useFormState({ name });
-
-  const error = getNestedError(errors, name);
+  const error = useFieldError(name);
   const id = nameToId(name);
 
   return (

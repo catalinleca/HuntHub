@@ -21,7 +21,7 @@ export {
   type FormLocationPickerProps,
 } from './components';
 
-export { getNestedError, nameToId, getFieldPath } from './utils';
+export { nameToId, getFieldPath } from './utils';
 
 export type { FormFieldBaseProps, FormFieldProps } from './types';
 
