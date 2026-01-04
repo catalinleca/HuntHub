@@ -1,4 +1,4 @@
-import { Step, Hunt, Location, Quiz, Challenge, Media } from '@hunthub/shared';
+import { Step, Hunt, Location, Challenge, Media } from '@hunthub/shared';
 
 /**
  * Generic type that adds a form key to any type.
@@ -42,18 +42,6 @@ export type QuizOptionFormData = {
 };
 
 /**
- * Quiz form model = API model (no transformation needed)
- * Schema now uses options[] + targetId directly for choice type.
- * Input type uses target.text for the expected answer.
- */
-export type QuizFormData = Quiz;
-
-/**
- * Challenge for form - same as API Challenge (no quiz transformation needed)
- */
-export type ChallengeFormData = Challenge;
-
-/**
  * Step data for form - keeps ALL Step fields + adds formKey for RHF tracking
  * huntId is required (we know it from the parent Hunt)
  * stepId is optional (assigned by backend on save)
@@ -65,7 +53,7 @@ export type ChallengeFormData = Challenge;
 export type StepFormData = WithFormKey<
   Omit<Step, 'stepId' | 'requiredLocation' | 'hint' | 'timeLimit' | 'maxAttempts' | 'challenge'> & {
     stepId?: number; // Optional - assigned by backend when step is saved
-    challenge: ChallengeFormData; // Use form version with QuizFormData
+    challenge: Challenge;
     // Settings - null means disabled
     requiredLocation: LocationFormData | null;
     hint: string | null;
@@ -90,4 +78,4 @@ export type EditorFormData = {
   hunt: HuntFormData;
 };
 
-export type { Hunt, Step, Location, Quiz };
+export type { Hunt, Step, Location, Challenge };

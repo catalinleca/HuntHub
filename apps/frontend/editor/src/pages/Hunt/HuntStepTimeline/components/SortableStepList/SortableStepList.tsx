@@ -10,8 +10,7 @@ import {
   DragOverlay,
 } from '@dnd-kit/core';
 import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
-import { ChallengeType } from '@hunthub/shared';
-import type { ChallengeFormData } from '@/types/editor';
+import { ChallengeType, Challenge } from '@hunthub/shared';
 import { StepTile } from '../StepTile';
 import { DraggableStepTile } from '../DraggableStepTile';
 import { Connector } from '../Connector';
@@ -19,7 +18,7 @@ import { Connector } from '../Connector';
 interface TimelineStep {
   formKey: string;
   type: ChallengeType;
-  challenge: ChallengeFormData;
+  challenge: Challenge;
 }
 
 interface SortableStepListProps {

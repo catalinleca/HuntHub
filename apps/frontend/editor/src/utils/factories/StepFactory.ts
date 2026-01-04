@@ -1,5 +1,5 @@
-import { ChallengeType, OptionType, MissionType } from '@hunthub/shared';
-import { StepFormData, QuizFormData } from '@/types/editor';
+import { ChallengeType, OptionType, MissionType, Quiz } from '@hunthub/shared';
+import { StepFormData } from '@/types/editor';
 
 const createBaseStep = (type: ChallengeType, huntId: number): StepFormData => {
   return {
@@ -31,7 +31,7 @@ const createQuiz = (huntId: number): StepFormData => {
   const option1Id = crypto.randomUUID();
   const option2Id = crypto.randomUUID();
 
-  const quiz: QuizFormData = {
+  const quiz: Quiz = {
     title: '',
     description: '',
     type: OptionType.Choice,

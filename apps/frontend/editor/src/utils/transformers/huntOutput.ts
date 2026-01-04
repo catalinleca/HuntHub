@@ -1,4 +1,4 @@
-import { Hunt, Step, Quiz, Location, Media } from '@hunthub/shared';
+import { Hunt, Step, Location, Media } from '@hunthub/shared';
 import { HuntFormData, StepFormData, LocationFormData } from '@/types/editor';
 import { MediaHelper } from '@/components/media/data/helper';
 
@@ -29,19 +29,8 @@ const cleanMediaForApi = (media?: Media | null): Media | undefined => {
   return media;
 };
 
-/**
- * Transform Quiz for API - pass through as-is.
- * All fields are optional in the schema, backend uses what it needs.
- */
-const transformQuizForApi = (quiz?: Quiz): Quiz | undefined => {
-  return quiz;
-};
-
 const transformChallengeForApi = (challenge: StepFormData['challenge']): Step['challenge'] => {
-  return {
-    ...challenge,
-    quiz: transformQuizForApi(challenge.quiz),
-  };
+  return challenge;
 };
 
 /**

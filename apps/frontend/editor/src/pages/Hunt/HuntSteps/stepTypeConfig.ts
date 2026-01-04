@@ -1,14 +1,13 @@
 import { MapTrifoldIcon, QuestionIcon, CameraIcon, CheckSquareIcon, Icon } from '@phosphor-icons/react';
-import { ChallengeType } from '@hunthub/shared';
+import { ChallengeType, Challenge } from '@hunthub/shared';
 import type { PaletteColor } from '@/utils/getColor/types';
-import type { ChallengeFormData } from '@/types/editor';
 
 interface StepTypeConfig {
   icon: Icon;
   label: string;
   description: string;
   color: PaletteColor;
-  getTitle: (challenge: ChallengeFormData) => string | undefined;
+  getTitle: (challenge: Challenge) => string | undefined;
 }
 
 export const STEP_TYPE_CONFIG: Record<ChallengeType, StepTypeConfig> = {
