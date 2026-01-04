@@ -18,6 +18,5 @@ export const useFieldError = (name: string): string | undefined => {
 
   const error = get(errors, name) as (FieldError & ArrayFieldError) | undefined;
 
-  // Check direct message first, then root.message (for array schema-level errors)
   return error?.message ?? error?.root?.message;
 };
