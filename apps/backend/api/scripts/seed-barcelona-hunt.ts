@@ -284,7 +284,7 @@ const BARCELONA_STEPS = [
         description:
           "You've reached Park Güell, Gaudí's colorful hillside park (1900-1914). Originally planned as a luxury housing development for 60 homes, it was a commercial failure - only 2 houses were ever built! The famous mosaic salamander at the entrance is beloved by visitors. What do locals call this colorful creature?",
         type: 'input',
-        target: { id: 'answer', text: 'El Drac' },
+        expectedAnswer: 'El Drac',
       },
     },
     hint: 'Locals affectionately call it by a Catalan word meaning "The Dragon"',
