@@ -11,16 +11,13 @@ const QuizBaseSchema = Quiz.pick({
   description: true,
   randomizeOrder: true,
   validation: true,
-  distractors: true,
-  displayOrder: true,
 }).extend({
   title: z.string().min(1, errorMessage('Question').required),
 });
 
-// Choice type: requires options with text + targetId
+// Choice type: requires options[] + targetId (new schema format)
 const QuizChoiceSchema = QuizBaseSchema.extend({
   type: z.literal('choice'),
-  target: Quiz.shape.target,
   options: z.array(QuizOptionFormSchema).min(2, errorMessage('Answer options').minCount(2)),
   targetId: z.string().min(1, 'Select the correct answer'),
 });

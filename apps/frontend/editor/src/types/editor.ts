@@ -32,28 +32,26 @@ export type HuntDialogFormData = {
   coverImage: Media | null;
 };
 
+/**
+ * QuizOptionFormData matches the shared Option type.
+ * Kept for explicit typing in form components.
+ */
 export type QuizOptionFormData = {
   id: string;
   text: string;
 };
 
 /**
- * Quiz form model = API model + options[] + targetId
- * options[] exists ONLY for editing convenience when type='choice'
- * targetId points to the correct option (single source of truth)
- * On save, transforms split options back to target + distractors
+ * Quiz form model = API model (no transformation needed)
+ * Schema now uses options[] + targetId directly for choice type.
+ * Input type uses target.text for the expected answer.
  */
-export type QuizFormData = Quiz & {
-  options?: QuizOptionFormData[];
-  targetId?: string;
-};
+export type QuizFormData = Quiz;
 
 /**
- * Challenge for form - uses QuizFormData instead of Quiz
+ * Challenge for form - same as API Challenge (no quiz transformation needed)
  */
-export type ChallengeFormData = Omit<Challenge, 'quiz'> & {
-  quiz?: QuizFormData;
-};
+export type ChallengeFormData = Challenge;
 
 /**
  * Step data for form - keeps ALL Step fields + adds formKey for RHF tracking

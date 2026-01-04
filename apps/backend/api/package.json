@@ -22,7 +22,8 @@
     "test:coverage": "jest --coverage --runInBand --silent",
     "test:debug": "jest --runInBand --verbose --no-coverage",
     "init-counters": "ts-node -r tsconfig-paths/register scripts/init-counters.ts",
-    "seed:barcelona": "ts-node -r tsconfig-paths/register scripts/seed-barcelona-hunt.ts"
+    "seed:barcelona": "ts-node -r tsconfig-paths/register scripts/seed-barcelona-hunt.ts",
+    "migrate:quiz-schema": "ts-node -r tsconfig-paths/register scripts/migrate-quiz-schema.ts"
   },
   "keywords": [],
   "author": "",

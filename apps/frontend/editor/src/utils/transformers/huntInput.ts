@@ -1,12 +1,5 @@
 import { Hunt, Step, Quiz, OptionType, Location } from '@hunthub/shared';
-import {
-  HuntFormData,
-  HuntDialogFormData,
-  StepFormData,
-  LocationFormData,
-  QuizFormData,
-  QuizOptionFormData,
-} from '@/types/editor';
+import { HuntFormData, HuntDialogFormData, StepFormData, LocationFormData } from '@/types/editor';
 import { createInitialQuizOptions } from '@/pages/Hunt/HuntSteps/components/Quiz';
 import { hasValidCoordinates } from '@/utils';
 
@@ -46,40 +39,28 @@ const transformStepSettings = (
   };
 };
 
-const transformQuizToFormData = (quiz?: Quiz): QuizFormData | undefined => {
+/**
+ * Transform API Quiz to form Quiz
+ * Schema now uses options[] + targetId directly - minimal transformation needed.
+ * Only initializes default options for new choice-type quizzes without options.
+ */
+const transformQuizToFormData = (quiz?: Quiz): Quiz | undefined => {
   if (!quiz) {
     return undefined;
   }
 
-  if (quiz.type === OptionType.Choice && quiz.target) {
-    const { target, distractors = [], displayOrder = [] } = quiz;
-
-    const allOptions: QuizOptionFormData[] = [
-      { id: target.id, text: target.text },
-      ...distractors.map((d) => ({ id: d.id, text: d.text })),
-    ];
-
-    const options: QuizOptionFormData[] =
-      displayOrder.length > 0
-        ? displayOrder
-            .map((id: string) => allOptions.find((o) => o.id === id))
-            .filter((o): o is QuizOptionFormData => o !== undefined)
-        : allOptions;
-
+  // For choice type: ensure options are initialized if missing
+  if (quiz.type === OptionType.Choice && (!quiz.options || quiz.options.length === 0)) {
+    const { options, targetId } = createInitialQuizOptions();
     return {
       ...quiz,
       options,
-      targetId: target.id,
+      targetId,
     };
   }
 
-  const { options, targetId } = createInitialQuizOptions();
-
-  return {
-    ...quiz,
-    options,
-    targetId,
-  };
+  // Data already in correct format - pass through
+  return quiz;
 };
 
 const transformStepChallenge = (challenge: Step['challenge']): Step['challenge'] => {

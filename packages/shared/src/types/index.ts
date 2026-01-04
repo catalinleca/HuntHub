@@ -366,14 +366,16 @@ export interface QuizValidation {
 export interface Quiz {
   title?: string;
   description?: string;
-  target?: Option;
   type?: OptionType;
-  distractors?: Option[];
-  /** Order of option IDs for display (preserves arrangement) */
-  displayOrder?: string[];
+  /** All answer options in display order (choice type) */
+  options?: Option[];
+  /** ID of the correct answer option (choice type) */
+  targetId?: string;
+  /** Expected answer stored in target.text (input type) */
+  target?: Option;
   /** Whether to randomize option order when displayed to player */
   randomizeOrder?: boolean;
-  /** Optional validation rules (future feature) */
+  /** Validation configuration for quiz answers (future feature) */
   validation?: QuizValidation;
 }
 

@@ -1,5 +1,5 @@
 import { Hunt, Step, Quiz, OptionType, Location, Media } from '@hunthub/shared';
-import { HuntFormData, StepFormData, QuizFormData, LocationFormData } from '@/types/editor';
+import { HuntFormData, StepFormData, LocationFormData } from '@/types/editor';
 import { MediaHelper } from '@/components/media/data/helper';
 
 /**
@@ -30,38 +30,23 @@ const cleanMediaForApi = (media?: Media | null): Media | undefined => {
 };
 
 /**
- * For 'input' type: strips options and targetId, keeps target object as-is
- * For 'choice' type: strips options and targetId, derives target from option matching targetId
+ * Transform Quiz for API - now a pass-through.
+ * Schema uses options[] + targetId directly for choice type.
+ * Input type uses target.text for expected answer.
+ * Validates that choice-type quiz has a targetId selected.
  */
-const transformQuizForApi = (quizForm?: QuizFormData): Quiz | undefined => {
-  if (!quizForm) {
+const transformQuizForApi = (quiz?: Quiz): Quiz | undefined => {
+  if (!quiz) {
     return undefined;
   }
 
-  const { options, targetId, ...rest } = quizForm;
-
-  if (quizForm.type === OptionType.Input) {
-    return rest;
-  }
-
-  if (!options?.length) {
-    return rest;
-  }
-
-  const targetOption = options.find((o) => o.id === targetId);
-
-  if (!targetOption && quizForm.type === OptionType.Choice) {
+  // Validate choice type has targetId
+  if (quiz.type === OptionType.Choice && quiz.options?.length && !quiz.targetId) {
     throw new Error('Target option must be selected for choice-type quiz');
   }
 
-  const distractorOptions = options.filter((o) => o.id !== targetId);
-
-  return {
-    ...rest,
-    target: targetOption ? { id: targetOption.id, text: targetOption.text } : undefined,
-    distractors: distractorOptions.map((d) => ({ id: d.id, text: d.text })),
-    displayOrder: options.map((o) => o.id),
-  };
+  // Pass through - schema matches API directly
+  return quiz;
 };
 
 const transformChallengeForApi = (challenge: StepFormData['challenge']): Step['challenge'] => {

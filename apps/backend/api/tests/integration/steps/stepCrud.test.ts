@@ -52,11 +52,12 @@ describe('Step CRUD Integration Tests', () => {
           quiz: {
             title: 'What is the capital of France?',
             type: 'choice',
-            target: { id: '1', text: 'Paris' },
-            distractors: [
+            options: [
+              { id: '1', text: 'Paris' },
               { id: '2', text: 'London' },
               { id: '3', text: 'Berlin' },
             ],
+            targetId: '1',
           },
         },
       });

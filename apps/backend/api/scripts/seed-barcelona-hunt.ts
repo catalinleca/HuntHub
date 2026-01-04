@@ -36,9 +36,9 @@ const BARCELONA_HUNT = {
 };
 
 // 12-step Barcelona route with varied challenge types
-// Structure matches API/DB format (transformed by frontend):
+// Structure matches API/DB format:
 // - Clue: challenge.clue.{title, description}
-// - Quiz (choice): challenge.quiz.{title, description, type, target, distractors, displayOrder}
+// - Quiz (choice): challenge.quiz.{title, description, type, options, targetId}
 // - Quiz (input): challenge.quiz.{title, description, type, target}
 // - Mission: challenge.mission.{title, description, type, targetLocation}
 // - Task: challenge.task.{title, instructions, aiInstructions}
@@ -71,13 +71,13 @@ const BARCELONA_STEPS = [
         description:
           "You're walking down one of the world's most famous pedestrian streets. Las Ramblas stretches 1.2 km from Plaça de Catalunya to the sea. But what was this street before it became a promenade?",
         type: 'choice',
-        target: { id: 'a', text: 'A seasonal riverbed (rambla)' },
-        distractors: [
+        options: [
+          { id: 'a', text: 'A seasonal riverbed (rambla)' },
           { id: 'b', text: 'A Roman military road' },
           { id: 'c', text: 'A medieval market street' },
           { id: 'd', text: 'A Moorish garden path' },
         ],
-        displayOrder: ['a', 'b', 'c', 'd'],
+        targetId: 'a',
       },
     },
     hint: 'The name "Rambla" comes from Arabic "ramla" meaning sand',
@@ -145,13 +145,13 @@ const BARCELONA_STEPS = [
         description:
           "You've entered the Gothic Quarter, Barcelona's medieval heart. Before you stands the Barcelona Cathedral, dedicated to Santa Eulàlia, the city's patron saint. In the cloister garden, something unusual lives among the palm trees. What will you find there?",
         type: 'choice',
-        target: { id: 'a', text: '13 white geese' },
-        distractors: [
+        options: [
+          { id: 'a', text: '13 white geese' },
           { id: 'b', text: 'A colony of cats' },
           { id: 'c', text: 'Peacocks' },
           { id: 'd', text: 'Koi fish in a pond' },
         ],
-        displayOrder: ['a', 'b', 'c', 'd'],
+        targetId: 'a',
       },
     },
     hint: 'The number represents the age at which Santa Eulàlia was martyred',
@@ -208,13 +208,13 @@ const BARCELONA_STEPS = [
         description:
           "Welcome to Passeig de Gràcia and Casa Batlló, one of Gaudí's most fantastical creations (1904-1906). The facade resembles bones and skulls, the roof a dragon's back, and the cross-topped tower represents Saint George's lance. What nickname do locals give to this building because of its skeletal facade?",
         type: 'choice',
-        target: { id: 'a', text: 'Casa dels Ossos (House of Bones)' },
-        distractors: [
+        options: [
+          { id: 'a', text: 'Casa dels Ossos (House of Bones)' },
           { id: 'b', text: 'Casa del Drac (House of the Dragon)' },
           { id: 'c', text: 'Casa Màgica (Magic House)' },
           { id: 'd', text: 'Casa de les Escates (House of Scales)' },
         ],
-        displayOrder: ['a', 'b', 'c', 'd'],
+        targetId: 'a',
       },
     },
     hint: 'Look at the balconies - what do they remind you of?',
