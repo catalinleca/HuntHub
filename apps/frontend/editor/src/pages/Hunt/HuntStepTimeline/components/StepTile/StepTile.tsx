@@ -1,7 +1,6 @@
 import React from 'react';
 import { Tooltip } from '@mui/material';
-import { ChallengeType } from '@hunthub/shared';
-import type { ChallengeFormData } from '@/types/editor';
+import { ChallengeType, Challenge } from '@hunthub/shared';
 import { STEP_TYPE_CONFIG } from '../../../HuntSteps/stepTypeConfig';
 import * as S from './StepTile.styles';
 
@@ -9,7 +8,7 @@ export interface StepTileProps {
   formKey: string;
   stepNumber: number;
   type: ChallengeType;
-  challenge: ChallengeFormData;
+  challenge: Challenge;
   isSelected: boolean;
   onClick: () => void;
   onMouseEnter?: () => void;

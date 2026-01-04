@@ -1,5 +1,5 @@
-import { Hunt, Step, Quiz, OptionType, Location, Media } from '@hunthub/shared';
-import { HuntFormData, StepFormData, QuizFormData, LocationFormData } from '@/types/editor';
+import { Hunt, Step, Location, Media } from '@hunthub/shared';
+import { HuntFormData, StepFormData, LocationFormData } from '@/types/editor';
 import { MediaHelper } from '@/components/media/data/helper';
 
 /**
@@ -29,46 +29,9 @@ const cleanMediaForApi = (media?: Media | null): Media | undefined => {
   return media;
 };
 
-/**
- * For 'input' type: strips options and targetId, keeps target object as-is
- * For 'choice' type: strips options and targetId, derives target from option matching targetId
- */
-const transformQuizForApi = (quizForm?: QuizFormData): Quiz | undefined => {
-  if (!quizForm) {
-    return undefined;
-  }
-
-  const { options, targetId, ...rest } = quizForm;
-
-  if (quizForm.type === OptionType.Input) {
-    return rest;
-  }
-
-  if (!options?.length) {
-    return rest;
-  }
-
-  const targetOption = options.find((o) => o.id === targetId);
-
-  if (!targetOption && quizForm.type === OptionType.Choice) {
-    throw new Error('Target option must be selected for choice-type quiz');
-  }
-
-  const distractorOptions = options.filter((o) => o.id !== targetId);
-
-  return {
-    ...rest,
-    target: targetOption ? { id: targetOption.id, text: targetOption.text } : undefined,
-    distractors: distractorOptions.map((d) => ({ id: d.id, text: d.text })),
-    displayOrder: options.map((o) => o.id),
-  };
-};
-
+/** Placeholder for future challenge transformations */
 const transformChallengeForApi = (challenge: StepFormData['challenge']): Step['challenge'] => {
-  return {
-    ...challenge,
-    quiz: transformQuizForApi(challenge.quiz),
-  };
+  return challenge;
 };
 
 /**

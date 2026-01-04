@@ -490,25 +490,26 @@ components:
           type: string
         description:
           type: string
-        target:
-          $ref: '#/components/schemas/Option'
         type:
           $ref: '#/components/schemas/OptionType'
-        distractors:
-            type: array
-            items:
-                $ref: '#/components/schemas/Option'
-        displayOrder:
+        # For CHOICE type:
+        options:
           type: array
           items:
-            type: string
-          description: Order of option IDs for display (preserves arrangement)
+            $ref: '#/components/schemas/Option'
+          description: All answer options in display order (choice type)
+        targetId:
+          type: string
+          description: ID of the correct answer option (choice type)
+        # For INPUT type:
+        expectedAnswer:
+          type: string
+          description: The correct answer text (input type)
         randomizeOrder:
           type: boolean
           description: Whether to randomize option order when displayed to player
         validation:
           $ref: '#/components/schemas/QuizValidation'
-          description: Optional validation rules (future feature)
       additionalProperties: false
 
     Mission:

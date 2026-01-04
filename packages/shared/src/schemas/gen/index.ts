@@ -56,10 +56,10 @@ export const Quiz = z
   .object({
     title: z.string(),
     description: z.string(),
-    target: Option,
     type: OptionType,
-    distractors: z.array(Option),
-    displayOrder: z.array(z.string()),
+    options: z.array(Option),
+    targetId: z.string(),
+    expectedAnswer: z.string(),
     randomizeOrder: z.boolean(),
     validation: QuizValidation,
   })

@@ -1,4 +1,4 @@
-import { Step, Hunt, Location, Quiz, Challenge, Media } from '@hunthub/shared';
+import { Step, Hunt, Location, Challenge, Media } from '@hunthub/shared';
 
 /**
  * Generic type that adds a form key to any type.
@@ -32,27 +32,13 @@ export type HuntDialogFormData = {
   coverImage: Media | null;
 };
 
+/**
+ * QuizOptionFormData matches the shared Option type.
+ * Kept for explicit typing in form components.
+ */
 export type QuizOptionFormData = {
   id: string;
   text: string;
-};
-
-/**
- * Quiz form model = API model + options[] + targetId
- * options[] exists ONLY for editing convenience when type='choice'
- * targetId points to the correct option (single source of truth)
- * On save, transforms split options back to target + distractors
- */
-export type QuizFormData = Quiz & {
-  options?: QuizOptionFormData[];
-  targetId?: string;
-};
-
-/**
- * Challenge for form - uses QuizFormData instead of Quiz
- */
-export type ChallengeFormData = Omit<Challenge, 'quiz'> & {
-  quiz?: QuizFormData;
 };
 
 /**
@@ -67,7 +53,7 @@ export type ChallengeFormData = Omit<Challenge, 'quiz'> & {
 export type StepFormData = WithFormKey<
   Omit<Step, 'stepId' | 'requiredLocation' | 'hint' | 'timeLimit' | 'maxAttempts' | 'challenge'> & {
     stepId?: number; // Optional - assigned by backend when step is saved
-    challenge: ChallengeFormData; // Use form version with QuizFormData
+    challenge: Challenge;
     // Settings - null means disabled
     requiredLocation: LocationFormData | null;
     hint: string | null;
@@ -92,4 +78,4 @@ export type EditorFormData = {
   hunt: HuntFormData;
 };
 
-export type { Hunt, Step, Location, Quiz };
+export type { Hunt, Step, Location, Challenge };

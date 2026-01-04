@@ -1,40 +1,64 @@
 import { z } from 'zod';
-import { Quiz } from '@hunthub/shared/schemas';
+import { Option, QuizValidation } from '@hunthub/shared/schemas';
 import { errorMessage } from '../../messages';
 
-const QuizOptionFormSchema = z.object({
-  id: z.string(),
-  text: z.string().min(1, 'Option text is required'),
-});
+/**
+ * Quiz form validation - extends shared schema with form-specific rules.
+ * Conditional validation based on type happens in superRefine.
+ */
+export const QuizFormSchema = z
+  .object({
+    title: z.string().min(1, errorMessage('Question').required),
+    description: z.string().optional(),
+    type: z.enum(['choice', 'input']),
+    options: z.array(Option).optional(),
+    targetId: z.string().optional(),
+    expectedAnswer: z.string().optional(),
+    randomizeOrder: z.boolean().optional(),
+    validation: QuizValidation.optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.type === 'choice') {
+      if (!data.options || data.options.length < 2) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['options'],
+          message: errorMessage('Answer options').minCount(2),
+        });
+      }
 
-const QuizBaseSchema = Quiz.pick({
-  description: true,
-  randomizeOrder: true,
-  validation: true,
-  distractors: true,
-  displayOrder: true,
-}).extend({
-  title: z.string().min(1, errorMessage('Question').required),
-});
+      data.options?.forEach((option, index) => {
+        if (!option.text.trim()) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['options', index, 'text'],
+            message: errorMessage('Option text').required,
+          });
+        }
+      });
 
-// Choice type: requires options with text + targetId
-const QuizChoiceSchema = QuizBaseSchema.extend({
-  type: z.literal('choice'),
-  target: Quiz.shape.target,
-  options: z.array(QuizOptionFormSchema).min(2, errorMessage('Answer options').minCount(2)),
-  targetId: z.string().min(1, 'Select the correct answer'),
-});
+      if (!data.targetId) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['targetId'],
+          message: 'Select the correct answer',
+        });
+      } else if (data.options && !data.options.some((o) => o.id === data.targetId)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['targetId'],
+          message: 'Selected answer must be one of the options',
+        });
+      }
+    }
 
-// Input type: requires target.text as the answer
-// Options are ignored (may exist from switching types, but not validated)
-const QuizInputSchema = QuizBaseSchema.extend({
-  type: z.literal('input'),
-  target: z.object({
-    id: z.string(),
-    text: z.string().min(1, errorMessage('Correct answer').required),
-  }),
-  options: z.array(z.object({ id: z.string(), text: z.string() })).optional(),
-  targetId: z.string().optional(),
-});
-
-export const QuizFormSchema = z.discriminatedUnion('type', [QuizChoiceSchema, QuizInputSchema]);
+    if (data.type === 'input') {
+      if (!data.expectedAnswer?.trim()) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['expectedAnswer'],
+          message: errorMessage('Correct answer').required,
+        });
+      }
+    }
+  });

@@ -1,10 +1,4 @@
-import { FieldErrors, get } from 'react-hook-form';
 import { HuntFormData } from '@/types/editor';
-
-export const getNestedError = (errors: FieldErrors, name: string): string | undefined => {
-  const error = get(errors, name);
-  return error?.message as string | undefined;
-};
 
 /**
  * Convert field name to valid HTML ID

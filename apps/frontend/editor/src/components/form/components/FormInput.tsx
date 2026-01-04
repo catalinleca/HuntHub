@@ -1,8 +1,9 @@
 import { TextField, FormHelperText, TextFieldProps } from '@mui/material';
-import { useFormContext, useFormState } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import { FormFieldProps } from '../types';
-import { getNestedError, nameToId } from '../utils';
+import { nameToId } from '../utils';
 import { InputLabel, FieldContainer } from '../core';
+import { useFieldError } from '@/hooks';
 
 export interface FormInputProps extends FormFieldProps<TextFieldProps> {
   placeholder?: string;
@@ -10,9 +11,7 @@ export interface FormInputProps extends FormFieldProps<TextFieldProps> {
 
 export const FormInput = ({ name, label, required, placeholder, helperText, disabled, ...props }: FormInputProps) => {
   const { register } = useFormContext();
-  const { errors } = useFormState({ name });
-
-  const error = getNestedError(errors, name);
+  const error = useFieldError(name);
   const id = nameToId(name);
 
   return (
