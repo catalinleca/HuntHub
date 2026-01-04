@@ -501,10 +501,10 @@ components:
         targetId:
           type: string
           description: ID of the correct answer option (choice type)
-        # For INPUT type (kept):
-        target:
-          $ref: '#/components/schemas/Option'
-          description: Expected answer stored in target.text (input type)
+        # For INPUT type:
+        expectedAnswer:
+          type: string
+          description: The correct answer text (input type)
         randomizeOrder:
           type: boolean
           description: Whether to randomize option order when displayed to player

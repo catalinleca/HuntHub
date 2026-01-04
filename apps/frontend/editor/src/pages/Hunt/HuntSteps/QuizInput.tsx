@@ -17,7 +17,7 @@ const getQuizFieldNames = (stepIndex: number) => ({
   title: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.title),
   description: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.description),
   type: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.type),
-  targetText: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.target.text),
+  expectedAnswer: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.expectedAnswer),
   options: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.options),
   targetId: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.targetId),
   media: getFieldPath((h) => h.hunt.steps[stepIndex].media),
@@ -58,7 +58,7 @@ export const QuizInput = ({ stepIndex }: QuizInputProps) => {
               <MultipleChoiceEditor stepIndex={stepIndex} />
             ) : (
               <FormInput
-                name={fields.targetText}
+                name={fields.expectedAnswer}
                 label="Correct Answer"
                 placeholder="1892"
                 helperText="The answer players need to provide"

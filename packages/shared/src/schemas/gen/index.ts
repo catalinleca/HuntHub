@@ -59,7 +59,7 @@ export const Quiz = z
     type: OptionType,
     options: z.array(Option),
     targetId: z.string(),
-    target: Option,
+    expectedAnswer: z.string(),
     randomizeOrder: z.boolean(),
     validation: QuizValidation,
   })

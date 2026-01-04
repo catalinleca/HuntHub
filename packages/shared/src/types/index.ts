@@ -371,8 +371,8 @@ export interface Quiz {
   options?: Option[];
   /** ID of the correct answer option (choice type) */
   targetId?: string;
-  /** Expected answer stored in target.text (input type) */
-  target?: Option;
+  /** The correct answer text (input type) */
+  expectedAnswer?: string;
   /** Whether to randomize option order when displayed to player */
   randomizeOrder?: boolean;
   /** Validation configuration for quiz answers (future feature) */

@@ -12,13 +12,12 @@ export const QuizFormSchema = z
     type: z.enum(['choice', 'input']),
     options: z.array(z.object({ id: z.string(), text: z.string() })).optional(),
     targetId: z.string().optional(),
-    target: z.object({ id: z.string(), text: z.string() }).optional(),
+    expectedAnswer: z.string().optional(),
     randomizeOrder: z.boolean().optional(),
     validation: z.any().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.type === 'choice') {
-      // Choice type: need at least 2 options
       if (!data.options || data.options.length < 2) {
         ctx.addIssue({
           code: 'custom',
@@ -27,7 +26,6 @@ export const QuizFormSchema = z
         });
       }
 
-      // Each option needs text
       data.options?.forEach((option, index) => {
         if (!option.text.trim()) {
           ctx.addIssue({
@@ -38,7 +36,6 @@ export const QuizFormSchema = z
         }
       });
 
-      // Need targetId selected
       if (!data.targetId) {
         ctx.addIssue({
           code: 'custom',
@@ -49,11 +46,10 @@ export const QuizFormSchema = z
     }
 
     if (data.type === 'input') {
-      // Input type: need target.text
-      if (!data.target?.text?.trim()) {
+      if (!data.expectedAnswer?.trim()) {
         ctx.addIssue({
           code: 'custom',
-          path: ['target', 'text'],
+          path: ['expectedAnswer'],
           message: errorMessage('Correct answer').required,
         });
       }
