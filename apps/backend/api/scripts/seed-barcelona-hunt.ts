@@ -39,7 +39,7 @@ const BARCELONA_HUNT = {
 // Structure matches API/DB format:
 // - Clue: challenge.clue.{title, description}
 // - Quiz (choice): challenge.quiz.{title, description, type, options, targetId}
-// - Quiz (input): challenge.quiz.{title, description, type, target}
+// - Quiz (input): challenge.quiz.{title, description, type, expectedAnswer}
 // - Mission: challenge.mission.{title, description, type, targetLocation}
 // - Task: challenge.task.{title, instructions, aiInstructions}
 const BARCELONA_STEPS = [

@@ -29,6 +29,7 @@ const cleanMediaForApi = (media?: Media | null): Media | undefined => {
   return media;
 };
 
+/** Placeholder for future challenge transformations */
 const transformChallengeForApi = (challenge: StepFormData['challenge']): Step['challenge'] => {
   return challenge;
 };
