@@ -4,7 +4,7 @@ import {
 } from '@mui/material';
 import { ReactNode } from 'react';
 import { ToggleButton } from './ToggleButton';
-import type { PaletteColor } from '@/utils/getColor/types';
+import type { PaletteColor } from '@hunthub/compass';
 
 export interface ToggleButtonOption {
   value: string | number;

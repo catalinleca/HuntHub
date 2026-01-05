@@ -3,7 +3,7 @@ import { ScrollIcon } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { HuntCard, HuntCardTitle } from '@/components/HuntCard';
 import type { Hunt } from '@hunthub/shared/types';
-import { getColor } from '@/utils';
+import { getColor } from '@hunthub/compass';
 import { HuntActionCard } from '@/pages/Dashboard/components/HuntActionCard';
 import { MediaHelper } from '@/components/media/data';
 

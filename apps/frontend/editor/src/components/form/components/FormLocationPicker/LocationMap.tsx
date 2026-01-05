@@ -9,7 +9,7 @@ import {
 import { CircularProgress, Typography } from '@mui/material';
 import { useMapPan, useMapCircle } from '@/hooks';
 import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, GOOGLE_MAP_ID } from '@/config/google-maps';
-import { getColor } from '@/utils';
+import { getColor } from '@hunthub/compass';
 import * as S from './FormLocationPicker.styles';
 
 interface LocationMapProps {

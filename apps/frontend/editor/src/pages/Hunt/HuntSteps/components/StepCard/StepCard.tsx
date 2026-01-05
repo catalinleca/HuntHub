@@ -5,7 +5,7 @@ import { ChallengeType } from '@hunthub/shared';
 import { useHuntStepsContext } from '@/pages/Hunt/context';
 import { STEP_TYPE_CONFIG } from '../../stepTypeConfig';
 import * as S from './StepCard.styles';
-import { getColor } from '@/utils';
+import { getColor } from '@hunthub/compass';
 
 interface StepCardProps {
   stepIndex: number;

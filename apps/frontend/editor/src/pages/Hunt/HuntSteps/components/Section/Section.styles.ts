@@ -1,8 +1,8 @@
 import { Box, Button, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import styled from 'styled-components';
-import { getColor } from '@/utils';
-import type { PaletteColor } from '@/utils/getColor/types';
+import { getColor } from '@hunthub/compass';
+import type { PaletteColor } from '@hunthub/compass';
 
 interface SectionProps {
   $color: PaletteColor;

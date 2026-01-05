@@ -1,5 +1,5 @@
 import { Components, Theme } from '@mui/material';
-import { getColor } from '@/utils';
+import { getColor } from '../utils';
 
 export const getMuiCssBaselineOverrides = (): Components<Theme>['MuiCssBaseline'] => ({
   styleOverrides: {

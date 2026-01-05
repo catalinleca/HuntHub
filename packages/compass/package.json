@@ -1,0 +1,74 @@
+{
+  "name": "@hunthub/compass",
+  "version": "1.0.0",
+  "description": "HuntHub design system - MUI theme library",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.ts",
+      "require": "./dist/index.js",
+      "default": "./src/index.ts"
+    },
+    "./presets": {
+      "types": "./dist/presets/index.d.ts",
+      "import": "./src/presets/index.ts",
+      "require": "./dist/presets/index.js",
+      "default": "./src/presets/index.ts"
+    },
+    "./presets/treasure-map": {
+      "types": "./dist/presets/treasure-map/index.d.ts",
+      "import": "./src/presets/treasure-map/index.ts",
+      "require": "./dist/presets/treasure-map/index.js",
+      "default": "./src/presets/treasure-map/index.ts"
+    },
+    "./tokens": {
+      "types": "./dist/tokens/index.d.ts",
+      "import": "./src/tokens/index.ts",
+      "require": "./dist/tokens/index.js",
+      "default": "./src/tokens/index.ts"
+    },
+    "./mixins": {
+      "types": "./dist/mixins/index.d.ts",
+      "import": "./src/mixins/index.ts",
+      "require": "./dist/mixins/index.js",
+      "default": "./src/mixins/index.ts"
+    },
+    "./selectors": {
+      "types": "./dist/selectors/index.d.ts",
+      "import": "./src/selectors/index.ts",
+      "require": "./dist/selectors/index.js",
+      "default": "./src/selectors/index.ts"
+    },
+    "./overrides": {
+      "types": "./dist/overrides/index.d.ts",
+      "import": "./src/overrides/index.ts",
+      "require": "./dist/overrides/index.js",
+      "default": "./src/overrides/index.ts"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./src/utils/index.ts",
+      "require": "./dist/utils/index.js",
+      "default": "./src/utils/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "type-check": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@mui/material": "^6.0.0",
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@mui/material": "^6.1.8",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@types/react": "^19.0.0",
+    "react": "^19.0.0",
+    "typescript": "^5.6.0"
+  }
+}

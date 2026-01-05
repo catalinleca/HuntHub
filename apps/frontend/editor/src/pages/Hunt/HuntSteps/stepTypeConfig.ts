@@ -1,6 +1,6 @@
 import { MapTrifoldIcon, QuestionIcon, CameraIcon, CheckSquareIcon, Icon } from '@phosphor-icons/react';
 import { ChallengeType, Challenge } from '@hunthub/shared';
-import type { PaletteColor } from '@/utils/getColor/types';
+import type { PaletteColor } from '@hunthub/compass';
 
 interface StepTypeConfig {
   icon: Icon;

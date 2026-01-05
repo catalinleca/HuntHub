@@ -9,7 +9,8 @@ import {
   XIcon,
   ArrowClockwiseIcon,
 } from '@phosphor-icons/react';
-import { getColor, prettyBytes } from '@/utils';
+import { getColor } from '@hunthub/compass';
+import { prettyBytes } from '@/utils';
 import * as S from './CreateAssetModal.styles';
 
 export type UploadStatus = 'pending' | 'uploading' | 'success' | 'error';

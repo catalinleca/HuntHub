@@ -1,6 +1,6 @@
 import { LocationMapContent, getFieldPath } from '@/components/form';
 import { Section, SectionTitle } from '../Section/Section.styles';
-import type { PaletteColor } from '@/utils/getColor/types';
+import type { PaletteColor } from '@hunthub/compass';
 
 interface LocationSectionProps {
   stepIndex: number;

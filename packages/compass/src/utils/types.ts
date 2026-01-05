@@ -1,4 +1,4 @@
-import { treasureMapPaletteConfig } from '@/theme/palettes';
+import { treasureMapPaletteConfig } from '../presets/treasure-map';
 
 /**
  * Recursively extracts all nested keys from an object type as dot-notation strings

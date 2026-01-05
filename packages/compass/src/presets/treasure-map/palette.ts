@@ -1,5 +1,5 @@
 import { ThemeOptions } from '@mui/material';
-import { createFocusRing } from '@/utils/getColor/colorUtils';
+import { createFocusRing } from '../../utils/colorUtils';
 
 export const treasureMapPaletteConfig = {
   mode: 'light' as const,
@@ -60,7 +60,7 @@ export const treasureMapPaletteConfig = {
   },
 } as const;
 
-const treasureMapPalette = {
+export const treasureMapThemeOptions = {
   palette: treasureMapPaletteConfig,
   typography: {
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica", "Arial", sans-serif',
@@ -218,4 +218,5 @@ const treasureMapPalette = {
   },
 } as ThemeOptions;
 
-export default treasureMapPalette;
+// Keep backward compatibility export
+export default treasureMapThemeOptions;
