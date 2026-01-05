@@ -26,6 +26,7 @@ flowchart LR
 
 **Key principle:** SDK is the engine. Apps decide the UI.
 
+
 ---
 
 ## Build Order
