@@ -1,3 +1,5 @@
+import type { Components, Theme } from '@mui/material/styles';
+
 export { getMuiButtonOverrides } from './MuiButton';
 export { getMuiCardOverrides } from './MuiCard';
 export { getMuiCheckboxOverrides } from './MuiCheckbox';
@@ -13,7 +15,8 @@ export { getMuiMenuItemOverrides } from './MuiMenuItem';
 export { getMuiOutlinedInputOverrides } from './MuiOutlinedInput';
 export { getMuiSelectOverrides } from './MuiSelect';
 export { getMuiTextFieldOverrides } from './MuiTextField';
-export { getMuiToggleButtonOverrides, getMuiToggleButtonGroupOverrides } from './MuiToggleButton';
+export { getMuiToggleButtonOverrides } from './MuiToggleButton';
+export { getMuiToggleButtonGroupOverrides } from './MuiToggleButtonGroup';
 
 import { getMuiButtonOverrides } from './MuiButton';
 import { getMuiCardOverrides } from './MuiCard';
@@ -30,9 +33,10 @@ import { getMuiMenuItemOverrides } from './MuiMenuItem';
 import { getMuiOutlinedInputOverrides } from './MuiOutlinedInput';
 import { getMuiSelectOverrides } from './MuiSelect';
 import { getMuiTextFieldOverrides } from './MuiTextField';
-import { getMuiToggleButtonOverrides, getMuiToggleButtonGroupOverrides } from './MuiToggleButton';
+import { getMuiToggleButtonOverrides } from './MuiToggleButton';
+import { getMuiToggleButtonGroupOverrides } from './MuiToggleButtonGroup';
 
-export const getAllOverrides = () => ({
+export const getAllOverrides = (): Components<Theme> => ({
   MuiButton: getMuiButtonOverrides(),
   MuiCard: getMuiCardOverrides(),
   MuiCheckbox: getMuiCheckboxOverrides(),
