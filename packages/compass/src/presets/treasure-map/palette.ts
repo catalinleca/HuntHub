@@ -218,5 +218,4 @@ export const treasureMapThemeOptions = {
   },
 } as ThemeOptions;
 
-// Keep backward compatibility export
 export default treasureMapThemeOptions;
