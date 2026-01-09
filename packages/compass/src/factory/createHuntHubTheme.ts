@@ -27,12 +27,11 @@ export const createHuntHubTheme = (options: CreateHuntHubThemeOptions = {}): The
 
   const baseOptions: ThemeOptions = {
     ...themeOptions,
-    components: getAllOverrides(),
   };
 
   if (overrides) {
-    return createTheme(baseOptions, overrides);
+    return createTheme(baseOptions, { components: getAllOverrides() }, overrides);
   }
 
-  return createTheme(baseOptions);
+  return createTheme(baseOptions, { components: getAllOverrides() });
 };
