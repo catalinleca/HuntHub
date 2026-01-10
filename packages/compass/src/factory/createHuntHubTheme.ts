@@ -4,7 +4,7 @@ import { getAllOverrides } from '../overrides';
 
 /**
  * Creates a HuntHub theme with optional customizations.
- * Base preset to use. Currently only 'treasure-map' is available.
+ * Base preset to use. Currently, only 'treasure-map' is available.
  * */
 
 export enum ThemePresets {
@@ -16,15 +16,15 @@ export interface CreateHuntHubThemeOptions {
   overrides?: ThemeOptions;
 }
 
-const ThemePresetsMap = {
+const ThemePresetsMap: Record<ThemePresets, ThemeOptions> = {
   [ThemePresets.TreasureMap]: treasureMapThemeOptions,
 };
 
 export const createHuntHubTheme = (options: CreateHuntHubThemeOptions = {}): Theme => {
   const { overrides, preset } = options;
 
-  const themeOptions = preset ? ThemePresetsMap[preset] : treasureMapThemeOptions;
-  const componentsOverride = { components: getAllOverrides() };
+  const themeOptions = ThemePresetsMap[preset ?? ThemePresets.TreasureMap];
+  const componentsOverride: ThemeOptions = { components: getAllOverrides() };
 
   if (overrides) {
     return createTheme(themeOptions, componentsOverride, overrides);
