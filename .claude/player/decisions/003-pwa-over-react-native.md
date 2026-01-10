@@ -1,6 +1,6 @@
 # ADR-003: React PWA Over React Native
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-01-04
 **Deciders:** Development Team
 
