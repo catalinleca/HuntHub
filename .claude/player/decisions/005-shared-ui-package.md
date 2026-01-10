@@ -1,6 +1,6 @@
 # ADR-005: Shared UI Package Architecture
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-01-04
 **Deciders:** Development Team
 

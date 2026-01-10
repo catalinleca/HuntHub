@@ -1,8 +1,23 @@
 # ADR-004: Debounced Form-to-Preview Synchronization
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-01-04
 **Deciders:** Development Team
+
+---
+
+## Architecture Note
+
+This ADR applies to the **postMessage communication** between Editor and Player iframe. The Editor debounces form changes before sending `RENDER_HUNT` messages via the PlayerSDK.
+
+```tsx
+// Editor's PreviewPanel uses debounced form data before sending
+const debouncedData = useDebounce(formData, 300);
+
+useEffect(() => {
+  sdk.renderHunt(debouncedData);
+}, [debouncedData]);
+```
 
 ---
 
