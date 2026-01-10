@@ -24,14 +24,11 @@ export const createHuntHubTheme = (options: CreateHuntHubThemeOptions = {}): The
   const { overrides, preset } = options;
 
   const themeOptions = preset ? ThemePresetsMap[preset] : treasureMapThemeOptions;
-
-  const baseOptions: ThemeOptions = {
-    ...themeOptions,
-  };
+  const componentsOverride = { components: getAllOverrides() };
 
   if (overrides) {
-    return createTheme(baseOptions, { components: getAllOverrides() }, overrides);
+    return createTheme(themeOptions, componentsOverride, overrides);
   }
 
-  return createTheme(baseOptions, { components: getAllOverrides() });
+  return createTheme(themeOptions, componentsOverride);
 };
