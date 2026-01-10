@@ -1,6 +1,6 @@
 import { Box, Stack, outlinedInputClasses } from '@mui/material';
 import styled from 'styled-components';
-import { descendant } from '@/theme/selectors';
+import { descendant } from '@hunthub/compass';
 
 export const DragHandle = styled(Box)(({ theme }) => ({
   cursor: 'grab',

@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { Stack, Typography } from '@mui/material';
-import { getColor } from '@/utils';
-import type { PaletteColor } from '@/utils/getColor/types';
+import { getColor } from '@hunthub/compass';
+import type { PaletteColor } from '@hunthub/compass';
 
 export const Container = styled(Stack)<{ $selected: boolean; $color: PaletteColor }>`
   flex-shrink: 0;

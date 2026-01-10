@@ -1,4 +1,4 @@
-import { treasureMapPaletteConfig } from '@/theme/palettes';
+import { treasureMapPaletteConfig } from '../presets/treasure-map';
 import { hexToRgba } from './colorUtils';
 import type { PaletteColor } from './types';
 

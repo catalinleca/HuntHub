@@ -4,7 +4,7 @@ import { DotsThreeOutlineVerticalIcon, PencilSimpleIcon, TrashIcon, CopyIcon } f
 import { HuntCardImageProps } from './types';
 import * as S from './HuntCard.styles';
 import pirateMapFallback from '@/assets/images/pirate-map.webp';
-import { getColor } from '@/utils';
+import { getColor } from '@hunthub/compass';
 
 export const HuntCardImage = ({
   src,

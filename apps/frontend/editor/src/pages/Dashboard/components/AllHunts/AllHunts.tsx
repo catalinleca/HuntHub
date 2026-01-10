@@ -2,7 +2,7 @@ import type { Hunt } from '@hunthub/shared/types';
 import { HuntCard, HuntCardTitle } from '@/components/HuntCard';
 import { Box, Grid2 } from '@mui/material';
 import { StackIcon } from '@phosphor-icons/react';
-import { getColor } from '@/utils';
+import { getColor } from '@hunthub/compass';
 import { HuntActionCard } from '@/pages/Dashboard/components/HuntActionCard';
 import { useDeleteHunt } from '@/api/Hunt';
 import { useConfirmationDialog } from '@/hooks';

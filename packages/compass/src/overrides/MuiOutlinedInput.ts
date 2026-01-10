@@ -1,5 +1,5 @@
 import { Components, Theme } from '@mui/material';
-import { getMuiInputOverrideStyles, getFieldTokens } from '@/theme';
+import { getMuiInputOverrideStyles } from '../selectors';
 
 export const getMuiOutlinedInputOverrides = (): Components<Theme>['MuiOutlinedInput'] => ({
   styleOverrides: {

@@ -2,7 +2,7 @@ import { Typography, Button } from '@mui/material';
 import { HuntCard, HuntCardImage, HuntCardBody } from '@/components/HuntCard';
 import { BookOpenIcon, ClockIcon } from '@phosphor-icons/react';
 import * as S from './HuntActionCard.styled';
-import { getColor } from '@/utils';
+import { getColor } from '@hunthub/compass';
 
 interface HuntActionCardProps {
   image?: string;

@@ -9,6 +9,7 @@
     "packages/*"
   ],
   "scripts": {
+    "build:compass": "npm run build --workspace=@hunthub/compass",
     "build:shared": "npm run build --workspace=@hunthub/shared",
     "build:api": "npm run build --workspace=@hunthub/api",
     "build:backend": "npm run build:api",

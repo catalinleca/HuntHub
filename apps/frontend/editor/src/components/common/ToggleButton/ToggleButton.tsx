@@ -1,7 +1,7 @@
 import { ToggleButtonProps as MuiToggleButtonProps } from '@mui/material';
 import { ReactNode } from 'react';
 import * as S from './ToggleButton.styles';
-import type { PaletteColor } from '@/utils/getColor/types';
+import type { PaletteColor } from '@hunthub/compass';
 
 export interface ToggleButtonProps extends Omit<MuiToggleButtonProps, 'color'> {
   icon?: ReactNode;

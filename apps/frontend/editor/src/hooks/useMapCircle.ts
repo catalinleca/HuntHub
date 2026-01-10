@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { getColor } from '@/utils';
+import { getColor } from '@hunthub/compass';
 
 const CIRCLE_STYLE = {
   strokeColor: getColor('primary.main'),
