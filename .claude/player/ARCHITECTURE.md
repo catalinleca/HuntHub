@@ -16,6 +16,27 @@
 
 ---
 
+## Mental Model
+
+The Player is one component (`<PlayerUI />`) that renders the same UI everywhere. What changes is the **behavior** passed to it:
+
+| Route | GPS | Validation | Progress | Navigation |
+|-------|-----|------------|----------|------------|
+| `/play/:huntId` | Real Geolocation API | Real validation | Saves to backend | Sequential only |
+| `/preview` | Mock (always returns target) | Mock (always passes) | No persistence | Jump to any step |
+
+**The component doesn't know which mode it's in.** It just calls whatever functions it receives. This is dependency injection - same UI, different implementations.
+
+```tsx
+// Production: real everything
+<PlayerUI validateLocation={realGPS} saveProgress={api.save} />
+
+// Preview: mocked everything
+<PlayerUI validateLocation={mockAlwaysPass} saveProgress={noop} />
+```
+
+---
+
 ## Architecture Diagram
 
 ```
