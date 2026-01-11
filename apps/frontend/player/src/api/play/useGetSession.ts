@@ -7,7 +7,7 @@ export const useGetSession = (sessionId: string | null) => {
   return useQuery({
     queryKey: playKeys.session(sessionId ?? SKIP_KEY),
     queryFn: queryFnOrSkip(mockGetSession, sessionId),
-    retry: false,
+    retry: 1,
     staleTime: 5 * 60 * 1000,
   });
 };

@@ -25,6 +25,7 @@ export const useStepValidation = (stepId: number) => {
   const validate = useCallback(
     (answerType: AnswerType, payload: AnswerPayload) => {
       if (!sessionId) {
+        console.warn('validate called without sessionId - this indicates a UI bug');
         return;
       }
 
