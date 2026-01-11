@@ -29,7 +29,7 @@ const PlayPageContent = () => {
   if (!hasSession) {
     return (
       <S.Container>
-        <PlayerIdentification onSubmit={startSession} />
+        <PlayerIdentification onSubmit={startSession} isLoading={isLoading} />
       </S.Container>
     );
   }
@@ -70,8 +70,9 @@ const PlayPageContent = () => {
 export const PlayPage = () => {
   const { huntId } = useParams<{ huntId: string }>();
   const huntIdNum = Number(huntId);
+  const isValidHuntId = Number.isInteger(huntIdNum) && huntIdNum > 0;
 
-  if (!huntIdNum || isNaN(huntIdNum)) {
+  if (!isValidHuntId) {
     return (
       <S.Container>
         <Typography color="error">Invalid hunt ID</Typography>
