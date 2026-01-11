@@ -1093,9 +1093,6 @@ components:
           description: Options to display (may be randomized by backend)
         randomizeOrder:
           type: boolean
-        # NO: targetId (correct answer)
-        # NO: expectedAnswer (correct answer for input type)
-        # NO: validation (internal)
       additionalProperties: false
 
     MissionPF:
@@ -1113,9 +1110,6 @@ components:
           items:
             type: integer
           description: Reference images shown to player
-        # NO: targetLocation (the answer for location missions)
-        # NO: aiInstructions (internal)
-        # NO: aiModel (internal)
       additionalProperties: false
 
     TaskPF:
@@ -1127,8 +1121,6 @@ components:
         instructions:
           type: string
           description: What the player should do
-        # NO: aiInstructions (internal)
-        # NO: aiModel (internal)
       additionalProperties: false
 
     ChallengePF:
@@ -1159,11 +1151,6 @@ components:
         media:
           $ref: '#/components/schemas/Media'
           description: Optional media attachment
-        # NO: hint (controlled via separate API)
-        # NO: requiredLocation (used for GPS validation, not shown)
-        # NO: timeLimit, maxAttempts (handled server-side)
-        # NO: metadata (internal)
-        # NO: timestamps
       required:
         - stepId
         - type
