@@ -114,12 +114,10 @@ export const mockStartSession = async (
   playerName: string,
   email?: string,
 ): Promise<StartSessionResponse> => {
-  // Simulate network delay
   await delay(500);
 
-  const sessionId = `session_${huntId}_${Date.now()}`;
+  const sessionId = generateUUID();
 
-  // Create session in "database"
   const session: MockSession = {
     sessionId,
     huntId,
@@ -224,7 +222,7 @@ export const mockGetNextStep = async (sessionId: string): Promise<StepResponse |
   return {
     step,
     _links: {
-      self: { href: `/play/sessions/${sessionId}/step/current` },
+      self: { href: `/play/sessions/${sessionId}/step/next` },
       ...(isLastStep ? {} : { next: { href: `/play/sessions/${sessionId}/step/next` } }),
       validate: { href: `/play/sessions/${sessionId}/validate` },
     },
@@ -253,6 +251,10 @@ export const mockValidateAnswer = async (
   }
 
   const step = mockSteps[session.currentStepIndex];
+  if (!step) {
+    throw new Error('No current step - session already complete');
+  }
+
   const stepId = step.stepId;
 
   session.attempts[stepId] = (session.attempts[stepId] || 0) + 1;
@@ -295,6 +297,10 @@ export const mockValidateAnswer = async (
 // =============================================================================
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const generateUUID = (): string => {
+  return crypto.randomUUID();
+};
 
 const checkAnswer = (
   step: StepPF,
