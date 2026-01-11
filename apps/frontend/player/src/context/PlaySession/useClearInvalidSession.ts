@@ -6,6 +6,7 @@ interface UseClearInvalidSessionParams {
   savedSessionId: string | null;
   isLoading: boolean;
   hasData: boolean;
+  error: Error | null;
 }
 
 export const useClearInvalidSession = ({
@@ -13,10 +14,14 @@ export const useClearInvalidSession = ({
   savedSessionId,
   isLoading,
   hasData,
+  error,
 }: UseClearInvalidSessionParams) => {
   useEffect(() => {
-    if (savedSessionId && !isLoading && !hasData) {
+    const queryCompleted = !isLoading && !error;
+    const sessionNotFound = !hasData;
+
+    if (savedSessionId && queryCompleted && sessionNotFound) {
       sessionStorage.clear(huntId);
     }
-  }, [savedSessionId, isLoading, hasData, huntId]);
+  }, [savedSessionId, isLoading, hasData, error, huntId]);
 };

@@ -12,6 +12,7 @@ export const useSessionLayer = (huntId: number) => {
     savedSessionId,
     isLoading: sessionQuery.isLoading,
     hasData: !!sessionQuery.data,
+    error: sessionQuery.error,
   });
 
   const startSession = (playerName: string, email?: string) => {
