@@ -30,7 +30,8 @@
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"**/*.{ts,json,md}\"",
     "type-check": "tsc --noEmit --workspaces",
-    "type-check:editor": "npm run type-check --workspace=@hunthub/editor"
+    "type-check:editor": "npm run type-check --workspace=@hunthub/editor",
+    "type-check:player": "npm run type-check --workspace=@hunthub/player"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.0.0",

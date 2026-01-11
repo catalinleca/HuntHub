@@ -320,6 +320,98 @@ export const ReleaseHuntRequest = z
 export const TakeOfflineRequest = z.object({ currentLiveVersion: z.number().int().nullable() }).strict();
 export const ShareHuntRequest = z.object({ email: z.string().email(), permission: z.enum(['admin', 'view']) }).strict();
 export const UpdatePermissionRequest = z.object({ permission: z.enum(['admin', 'view']) }).strict();
+export const CluePF = z.object({ title: z.string(), description: z.string() }).partial().strict();
+export const QuizPF = z
+  .object({
+    title: z.string(),
+    description: z.string(),
+    type: OptionType,
+    options: z.array(Option),
+    randomizeOrder: z.boolean(),
+  })
+  .partial()
+  .strict();
+export const MissionPF = z
+  .object({
+    title: z.string(),
+    description: z.string(),
+    type: MissionType,
+    referenceAssetIds: z.array(z.number().int()),
+  })
+  .partial()
+  .strict();
+export const TaskPF = z.object({ title: z.string(), instructions: z.string() }).partial().strict();
+export const ChallengePF = z
+  .object({ clue: CluePF, quiz: QuizPF, mission: MissionPF, task: TaskPF })
+  .partial()
+  .strict();
+export const StepPF = z
+  .object({ stepId: z.number().int(), type: ChallengeType, challenge: ChallengePF, media: Media.optional() })
+  .strict();
+export const HuntMetaPF = z
+  .object({
+    huntId: z.number().int(),
+    name: z.string(),
+    description: z.string().optional(),
+    totalSteps: z.number().int(),
+    coverImage: Media.nullish(),
+  })
+  .strict();
+export const StartSessionRequest = z
+  .object({ playerName: z.string().min(1).max(50), email: z.string().email().optional() })
+  .strict();
+export const StartSessionResponse = z
+  .object({
+    sessionId: z.string().uuid(),
+    hunt: HuntMetaPF,
+    currentStepIndex: z.number().int().default(0),
+    steps: z.array(StepPF),
+  })
+  .strict();
+export const ValidateAnswerRequest = z
+  .object({
+    stepIndex: z.number().int(),
+    answer: z.union([
+      z
+        .object({ type: z.literal('clue') })
+        .strict()
+        .passthrough(),
+      z
+        .object({ type: z.literal('quiz'), optionId: z.string() })
+        .strict()
+        .passthrough(),
+      z
+        .object({ type: z.literal('quiz-input'), answer: z.string() })
+        .strict()
+        .passthrough(),
+      z
+        .object({ type: z.literal('mission-location'), lat: z.number(), lng: z.number() })
+        .strict()
+        .passthrough(),
+      z
+        .object({ type: z.literal('mission-media'), assetId: z.number().int() })
+        .strict()
+        .passthrough(),
+      z
+        .object({ type: z.literal('task'), response: z.string() })
+        .strict()
+        .passthrough(),
+    ]),
+  })
+  .strict();
+export const ValidateAnswerResponse = z
+  .object({
+    correct: z.boolean(),
+    feedback: z.string().optional(),
+    nextStep: StepPF.optional(),
+    isComplete: z.boolean().optional(),
+    attempts: z.number().int().optional(),
+  })
+  .strict();
+export const HintRequest = z.object({ stepIndex: z.number().int() }).strict();
+export const HintResponse = z
+  .object({ hint: z.string(), hintsUsed: z.number().int(), maxHints: z.number().int() })
+  .strict();
 export const SortOrder = z.enum(['asc', 'desc']);
 export const HuntSortField = z.enum(['createdAt', 'updatedAt']);
 export const AssetSortField = z.enum(['createdAt', 'originalFilename', 'size']);
@@ -397,6 +489,19 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   TakeOfflineRequest,
   ShareHuntRequest,
   UpdatePermissionRequest,
+  CluePF,
+  QuizPF,
+  MissionPF,
+  TaskPF,
+  ChallengePF,
+  StepPF,
+  HuntMetaPF,
+  StartSessionRequest,
+  StartSessionResponse,
+  ValidateAnswerRequest,
+  ValidateAnswerResponse,
+  HintRequest,
+  HintResponse,
   SortOrder,
   HuntSortField,
   AssetSortField,

@@ -1062,6 +1062,291 @@ components:
       additionalProperties: false
 
     # ============================================================
+    # PLAYER FORMAT SCHEMAS (Stripped for Player - no answers)
+    # See: .claude/player/PLAYER-FORMAT.md
+    # ============================================================
+
+    CluePF:
+      type: object
+      description: "Player Format - Clue (same as Clue, no answers to strip)"
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+      additionalProperties: false
+
+    QuizPF:
+      type: object
+      description: "Player Format - Quiz without correct answer"
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          $ref: '#/components/schemas/OptionType'
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+          description: Options to display (may be randomized by backend)
+        randomizeOrder:
+          type: boolean
+        # NO: targetId (correct answer)
+        # NO: expectedAnswer (correct answer for input type)
+        # NO: validation (internal)
+      additionalProperties: false
+
+    MissionPF:
+      type: object
+      description: "Player Format - Mission without target location"
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          $ref: '#/components/schemas/MissionType'
+        referenceAssetIds:
+          type: array
+          items:
+            type: integer
+          description: Reference images shown to player
+        # NO: targetLocation (the answer for location missions)
+        # NO: aiInstructions (internal)
+        # NO: aiModel (internal)
+      additionalProperties: false
+
+    TaskPF:
+      type: object
+      description: "Player Format - Task without AI instructions"
+      properties:
+        title:
+          type: string
+        instructions:
+          type: string
+          description: What the player should do
+        # NO: aiInstructions (internal)
+        # NO: aiModel (internal)
+      additionalProperties: false
+
+    ChallengePF:
+      type: object
+      description: "Player Format - Challenge container (only one populated based on step.type)"
+      properties:
+        clue:
+          $ref: '#/components/schemas/CluePF'
+        quiz:
+          $ref: '#/components/schemas/QuizPF'
+        mission:
+          $ref: '#/components/schemas/MissionPF'
+        task:
+          $ref: '#/components/schemas/TaskPF'
+      additionalProperties: false
+
+    StepPF:
+      type: object
+      description: "Player Format - Step without answers or internal metadata"
+      properties:
+        stepId:
+          type: integer
+          example: 10000
+        type:
+          $ref: '#/components/schemas/ChallengeType'
+        challenge:
+          $ref: '#/components/schemas/ChallengePF'
+        media:
+          $ref: '#/components/schemas/Media'
+          description: Optional media attachment
+        # NO: hint (controlled via separate API)
+        # NO: requiredLocation (used for GPS validation, not shown)
+        # NO: timeLimit, maxAttempts (handled server-side)
+        # NO: metadata (internal)
+        # NO: timestamps
+      required:
+        - stepId
+        - type
+        - challenge
+      additionalProperties: false
+
+    HuntMetaPF:
+      type: object
+      description: "Player Format - Hunt metadata (no steps)"
+      properties:
+        huntId:
+          type: integer
+          example: 1332
+        name:
+          type: string
+        description:
+          type: string
+        totalSteps:
+          type: integer
+          description: Total number of steps in the hunt
+        coverImage:
+          allOf:
+            - $ref: '#/components/schemas/Media'
+          nullable: true
+      required:
+        - huntId
+        - name
+        - totalSteps
+      additionalProperties: false
+
+    # ============================================================
+    # PLAY SESSION SCHEMAS (For Play API)
+    # ============================================================
+
+    StartSessionRequest:
+      type: object
+      description: Request to start a play session
+      properties:
+        playerName:
+          type: string
+          minLength: 1
+          maxLength: 50
+        email:
+          type: string
+          format: email
+      required:
+        - playerName
+      additionalProperties: false
+
+    StartSessionResponse:
+      type: object
+      description: Response from starting a play session
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+        hunt:
+          $ref: '#/components/schemas/HuntMetaPF'
+        currentStepIndex:
+          type: integer
+          default: 0
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/StepPF'
+          description: First batch of steps (typically 2)
+      required:
+        - sessionId
+        - hunt
+        - currentStepIndex
+        - steps
+      additionalProperties: false
+
+    ValidateAnswerRequest:
+      type: object
+      description: Request to validate a player's answer
+      properties:
+        stepIndex:
+          type: integer
+        answer:
+          oneOf:
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum: [clue]
+              required: [type]
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum: [quiz]
+                optionId:
+                  type: string
+              required: [type, optionId]
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum: [quiz-input]
+                answer:
+                  type: string
+              required: [type, answer]
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum: [mission-location]
+                lat:
+                  type: number
+                lng:
+                  type: number
+              required: [type, lat, lng]
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum: [mission-media]
+                assetId:
+                  type: integer
+              required: [type, assetId]
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum: [task]
+                response:
+                  type: string
+              required: [type, response]
+      required:
+        - stepIndex
+        - answer
+      additionalProperties: false
+
+    ValidateAnswerResponse:
+      type: object
+      description: Response from validating an answer
+      properties:
+        correct:
+          type: boolean
+        feedback:
+          type: string
+          description: Hint or explanation message
+        nextStep:
+          $ref: '#/components/schemas/StepPF'
+          description: Next step data (if correct and not last step)
+        isComplete:
+          type: boolean
+          description: Whether the hunt is complete
+        attempts:
+          type: integer
+          description: Number of attempts on this step
+      required:
+        - correct
+      additionalProperties: false
+
+    HintRequest:
+      type: object
+      description: Request for a hint
+      properties:
+        stepIndex:
+          type: integer
+      required:
+        - stepIndex
+      additionalProperties: false
+
+    HintResponse:
+      type: object
+      description: Response with hint data
+      properties:
+        hint:
+          type: string
+        hintsUsed:
+          type: integer
+        maxHints:
+          type: integer
+      required:
+        - hint
+        - hintsUsed
+        - maxHints
+      additionalProperties: false
+
+    # ============================================================
     # Pagination Schemas (Standard Offset-Based REST Pattern)
     # ============================================================
 

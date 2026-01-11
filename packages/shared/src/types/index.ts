@@ -734,6 +734,150 @@ export interface UpdatePermissionRequest {
   permission: "admin" | "view";
 }
 
+/** Player Format - Clue (same as Clue, no answers to strip) */
+export interface CluePF {
+  title?: string;
+  description?: string;
+}
+
+/** Player Format - Quiz without correct answer */
+export interface QuizPF {
+  title?: string;
+  description?: string;
+  type?: OptionType;
+  /** Options to display (may be randomized by backend) */
+  options?: Option[];
+  randomizeOrder?: boolean;
+}
+
+/** Player Format - Mission without target location */
+export interface MissionPF {
+  title?: string;
+  description?: string;
+  type?: MissionType;
+  /** Reference images shown to player */
+  referenceAssetIds?: number[];
+}
+
+/** Player Format - Task without AI instructions */
+export interface TaskPF {
+  title?: string;
+  /** What the player should do */
+  instructions?: string;
+}
+
+/** Player Format - Challenge container (only one populated based on step.type) */
+export interface ChallengePF {
+  /** Player Format - Clue (same as Clue, no answers to strip) */
+  clue?: CluePF;
+  /** Player Format - Quiz without correct answer */
+  quiz?: QuizPF;
+  /** Player Format - Mission without target location */
+  mission?: MissionPF;
+  /** Player Format - Task without AI instructions */
+  task?: TaskPF;
+}
+
+/** Player Format - Step without answers or internal metadata */
+export interface StepPF {
+  /** @example 10000 */
+  stepId: number;
+  type: ChallengeType;
+  /** Player Format - Challenge container (only one populated based on step.type) */
+  challenge: ChallengePF;
+  /** Optional media attachment */
+  media?: Media;
+}
+
+/** Player Format - Hunt metadata (no steps) */
+export interface HuntMetaPF {
+  /** @example 1332 */
+  huntId: number;
+  name: string;
+  description?: string;
+  /** Total number of steps in the hunt */
+  totalSteps: number;
+  coverImage?: Media | null;
+}
+
+/** Request to start a play session */
+export interface StartSessionRequest {
+  /**
+   * @minLength 1
+   * @maxLength 50
+   */
+  playerName: string;
+  /** @format email */
+  email?: string;
+}
+
+/** Response from starting a play session */
+export interface StartSessionResponse {
+  /** @format uuid */
+  sessionId: string;
+  /** Player Format - Hunt metadata (no steps) */
+  hunt: HuntMetaPF;
+  /** @default 0 */
+  currentStepIndex: number;
+  /** First batch of steps (typically 2) */
+  steps: StepPF[];
+}
+
+/** Request to validate a player's answer */
+export interface ValidateAnswerRequest {
+  stepIndex: number;
+  answer:
+    | {
+        type: "clue";
+      }
+    | {
+        type: "quiz";
+        optionId: string;
+      }
+    | {
+        type: "quiz-input";
+        answer: string;
+      }
+    | {
+        type: "mission-location";
+        lat: number;
+        lng: number;
+      }
+    | {
+        type: "mission-media";
+        assetId: number;
+      }
+    | {
+        type: "task";
+        response: string;
+      };
+}
+
+/** Response from validating an answer */
+export interface ValidateAnswerResponse {
+  correct: boolean;
+  /** Hint or explanation message */
+  feedback?: string;
+  /** Next step data (if correct and not last step) */
+  nextStep?: StepPF;
+  /** Whether the hunt is complete */
+  isComplete?: boolean;
+  /** Number of attempts on this step */
+  attempts?: number;
+}
+
+/** Request for a hint */
+export interface HintRequest {
+  stepIndex: number;
+}
+
+/** Response with hint data */
+export interface HintResponse {
+  hint: string;
+  hintsUsed: number;
+  maxHints: number;
+}
+
 /** Standard pagination query parameters */
 export interface PaginationQueryParams {
   /**
