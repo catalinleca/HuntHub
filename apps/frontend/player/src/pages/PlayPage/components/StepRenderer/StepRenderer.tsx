@@ -13,27 +13,35 @@ export const StepRenderer = ({ step, isLastStep }: StepRendererProps) => {
   const { validate, isValidating, feedback } = useStepValidation(step.stepId);
 
   switch (step.type) {
-    case 'clue':
+    case 'clue': {
+      if (!step.challenge.clue) {
+        return <Typography color="error">Invalid clue data</Typography>;
+      }
       return (
         <ClueChallenge
-          clue={step.challenge.clue!}
+          clue={step.challenge.clue}
           onValidate={validate}
           isValidating={isValidating}
           isLastStep={isLastStep}
           feedback={feedback}
         />
       );
+    }
 
-    case 'quiz':
+    case 'quiz': {
+      if (!step.challenge.quiz) {
+        return <Typography color="error">Invalid quiz data</Typography>;
+      }
       return (
         <QuizChallenge
-          quiz={step.challenge.quiz!}
+          quiz={step.challenge.quiz}
           onValidate={validate}
           isValidating={isValidating}
           isLastStep={isLastStep}
           feedback={feedback}
         />
       );
+    }
 
     case 'mission':
       return <Typography color="text.secondary">Mission challenge coming soon...</Typography>;
