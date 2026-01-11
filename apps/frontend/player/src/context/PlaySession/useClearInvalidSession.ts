@@ -17,10 +17,10 @@ export const useClearInvalidSession = ({
   error,
 }: UseClearInvalidSessionParams) => {
   useEffect(() => {
-    const queryCompleted = !isLoading && !error;
+    const querySucceeded = !isLoading && !error;
     const sessionNotFound = !hasData;
 
-    if (savedSessionId && queryCompleted && sessionNotFound) {
+    if (savedSessionId && querySucceeded && sessionNotFound) {
       sessionStorage.clear(huntId);
     }
   }, [savedSessionId, isLoading, hasData, error, huntId]);
