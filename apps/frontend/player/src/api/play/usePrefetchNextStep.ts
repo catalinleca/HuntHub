@@ -7,7 +7,7 @@ export const usePrefetchNextStep = (sessionId: string | null, hasNextLink: boole
 
   return useQuery({
     queryKey: playKeys.nextStep(sessionId ?? SKIP_KEY),
-    queryFn: shouldFetch ? () => mockGetNextStep(sessionId) : skipToken,
+    queryFn: shouldFetch ? () => mockGetNextStep(sessionId!) : skipToken,
     staleTime: Infinity,
   });
 };

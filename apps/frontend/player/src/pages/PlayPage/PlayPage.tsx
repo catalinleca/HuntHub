@@ -68,7 +68,7 @@ const PlayPageContent = () => {
 };
 
 export const PlayPage = () => {
-  const { huntId } = useParams<{ huntId: string }>();
+  const { huntId } = useParams<{ huntId?: string }>();
   const huntIdNum = Number(huntId);
   const isValidHuntId = Number.isInteger(huntIdNum) && huntIdNum > 0;
 

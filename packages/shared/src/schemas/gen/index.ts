@@ -320,27 +320,25 @@ export const ReleaseHuntRequest = z
 export const TakeOfflineRequest = z.object({ currentLiveVersion: z.number().int().nullable() }).strict();
 export const ShareHuntRequest = z.object({ email: z.string().email(), permission: z.enum(['admin', 'view']) }).strict();
 export const UpdatePermissionRequest = z.object({ permission: z.enum(['admin', 'view']) }).strict();
-export const CluePF = z.object({ title: z.string(), description: z.string() }).partial().strict();
+export const CluePF = z.object({ title: z.string(), description: z.string() }).strict();
 export const QuizPF = z
   .object({
     title: z.string(),
     description: z.string(),
     type: OptionType,
-    options: z.array(Option),
-    randomizeOrder: z.boolean(),
+    options: z.array(Option).optional(),
+    randomizeOrder: z.boolean().optional(),
   })
-  .partial()
   .strict();
 export const MissionPF = z
   .object({
     title: z.string(),
     description: z.string(),
     type: MissionType,
-    referenceAssetIds: z.array(z.number().int()),
+    referenceAssetIds: z.array(z.number().int()).optional(),
   })
-  .partial()
   .strict();
-export const TaskPF = z.object({ title: z.string(), instructions: z.string() }).partial().strict();
+export const TaskPF = z.object({ title: z.string(), instructions: z.string() }).strict();
 export const ChallengePF = z
   .object({ clue: CluePF, quiz: QuizPF, mission: MissionPF, task: TaskPF })
   .partial()

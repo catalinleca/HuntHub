@@ -746,15 +746,15 @@ export interface UpdatePermissionRequest {
 
 /** Player Format - Clue (same as Clue, no answers to strip) */
 export interface CluePF {
-  title?: string;
-  description?: string;
+  title: string;
+  description: string;
 }
 
 /** Player Format - Quiz without correct answer */
 export interface QuizPF {
-  title?: string;
-  description?: string;
-  type?: OptionType;
+  title: string;
+  description: string;
+  type: OptionType;
   /** Options to display (may be randomized by backend) */
   options?: Option[];
   randomizeOrder?: boolean;
@@ -762,18 +762,18 @@ export interface QuizPF {
 
 /** Player Format - Mission without target location */
 export interface MissionPF {
-  title?: string;
-  description?: string;
-  type?: MissionType;
+  title: string;
+  description: string;
+  type: MissionType;
   /** Reference images shown to player */
   referenceAssetIds?: number[];
 }
 
 /** Player Format - Task without AI instructions */
 export interface TaskPF {
-  title?: string;
+  title: string;
   /** What the player should do */
-  instructions?: string;
+  instructions: string;
 }
 
 /** Player Format - Challenge container (only one populated based on step.type) */

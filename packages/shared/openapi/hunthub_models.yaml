@@ -1074,6 +1074,9 @@ components:
           type: string
         description:
           type: string
+      required:
+        - title
+        - description
       additionalProperties: false
 
     QuizPF:
@@ -1093,6 +1096,10 @@ components:
           description: Options to display (may be randomized by backend)
         randomizeOrder:
           type: boolean
+      required:
+        - title
+        - description
+        - type
       additionalProperties: false
 
     MissionPF:
@@ -1110,6 +1117,10 @@ components:
           items:
             type: integer
           description: Reference images shown to player
+      required:
+        - title
+        - description
+        - type
       additionalProperties: false
 
     TaskPF:
@@ -1121,6 +1132,9 @@ components:
         instructions:
           type: string
           description: What the player should do
+      required:
+        - title
+        - instructions
       additionalProperties: false
 
     ChallengePF:
