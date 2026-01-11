@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import type { StartSessionResponse } from '@hunthub/shared';
 import { playKeys } from './keys';
 import { mockGetSession } from './mockData';
@@ -9,24 +9,9 @@ const getSession = async (sessionId: string): Promise<StartSessionResponse | nul
 };
 
 export const useGetSession = (huntId: number, sessionId: string | null) => {
-  const queryClient = useQueryClient();
-
   return useQuery({
     queryKey: playKeys.session(huntId),
-    queryFn: async () => {
-      if (!sessionId) return null;
-
-      const session = await getSession(sessionId);
-
-      if (session) {
-        session.steps.forEach((step, index) => {
-          const stepIndex = session.currentStepIndex + index;
-          queryClient.setQueryData(playKeys.step(huntId, stepIndex), step);
-        });
-      }
-
-      return session;
-    },
+    queryFn: () => (sessionId ? getSession(sessionId) : Promise.resolve(null)),
     enabled: !!sessionId,
     retry: false,
     staleTime: 5 * 60 * 1000,

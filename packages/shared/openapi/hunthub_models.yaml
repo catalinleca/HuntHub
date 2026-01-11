@@ -1336,41 +1336,37 @@ components:
 
     ValidateAnswerRequest:
       type: object
-      description: Request to validate a player's answer
+      description: Request to validate a player's answer (session tracks current step)
       properties:
-        stepIndex:
-          type: integer
         answerType:
           $ref: '#/components/schemas/AnswerType'
         payload:
           $ref: '#/components/schemas/AnswerPayload'
       required:
-        - stepIndex
         - answerType
         - payload
       additionalProperties: false
 
     ValidateAnswerResponse:
       type: object
-      description: Response from validating an answer
+      description: Response from validating an answer (HATEOAS format)
       properties:
         correct:
           type: boolean
         feedback:
           type: string
           description: Hint or explanation message
-        currentStepIndex:
-          type: integer
-          description: Current step index after validation (from BE)
         isComplete:
           type: boolean
           description: Whether the hunt is complete
         attempts:
           type: integer
           description: Number of attempts on this step
+        _links:
+          $ref: '#/components/schemas/ValidateAnswerLinks'
       required:
         - correct
-        - currentStepIndex
+        - _links
       additionalProperties: false
 
     HintRequest:
@@ -1397,6 +1393,61 @@ components:
         - hint
         - hintsUsed
         - maxHints
+      additionalProperties: false
+
+    # ============================================================
+    # HATEOAS Link Schemas (REST Best Practice for Navigation)
+    # ============================================================
+
+    HateoasLink:
+      type: object
+      description: Hypermedia link for REST navigation
+      properties:
+        href:
+          type: string
+          description: URL to the linked resource
+      required:
+        - href
+      additionalProperties: false
+
+    StepLinks:
+      type: object
+      description: HATEOAS links for step navigation
+      properties:
+        self:
+          $ref: '#/components/schemas/HateoasLink'
+        next:
+          $ref: '#/components/schemas/HateoasLink'
+        validate:
+          $ref: '#/components/schemas/HateoasLink'
+      required:
+        - self
+        - validate
+      additionalProperties: false
+
+    ValidateAnswerLinks:
+      type: object
+      description: HATEOAS links returned after validation
+      properties:
+        currentStep:
+          $ref: '#/components/schemas/HateoasLink'
+        nextStep:
+          $ref: '#/components/schemas/HateoasLink'
+      required:
+        - currentStep
+      additionalProperties: false
+
+    StepResponse:
+      type: object
+      description: Step data with HATEOAS navigation links
+      properties:
+        step:
+          $ref: '#/components/schemas/StepPF'
+        _links:
+          $ref: '#/components/schemas/StepLinks'
+      required:
+        - step
+        - _links
       additionalProperties: false
 
     # ============================================================

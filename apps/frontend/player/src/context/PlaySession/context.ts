@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import type { StepPF, HuntMetaPF } from '@hunthub/shared';
+import type { StepPF, HuntMetaPF, StepLinks } from '@hunthub/shared';
 
 export interface SessionState {
   isLoading: boolean;
@@ -9,8 +9,9 @@ export interface SessionState {
 export interface SessionData {
   sessionId: string | null;
   huntMeta: HuntMetaPF | null;
-  currentStepIndex: number;
   currentStep: StepPF | null;
+  stepLinks: StepLinks | null;
+  currentStepIndex: number;
   totalSteps: number;
 }
 

@@ -13,21 +13,24 @@ const initialState: ValidationState = {
   feedback: null,
 };
 
-export const useStepValidation = (huntId: number, stepIndex: number) => {
-  const { sessionId } = usePlaySession();
+export const useStepValidation = (stepId: number) => {
+  const { sessionId, huntMeta } = usePlaySession();
+  const huntId = huntMeta?.huntId ?? 0;
   const validateMutation = useValidateAnswer(huntId);
   const [state, setState] = useState<ValidationState>(initialState);
 
   useEffect(() => {
     setState(initialState);
-  }, [stepIndex]);
+  }, [stepId]);
 
   const validate = useCallback(
     (answerType: AnswerType, payload: AnswerPayload) => {
-      if (!sessionId) return;
+      if (!sessionId) {
+        return;
+      }
 
       validateMutation.mutate(
-        { sessionId, stepIndex, answerType, payload },
+        { sessionId, answerType, payload },
         {
           onSuccess: (data) => {
             setState({
@@ -44,7 +47,7 @@ export const useStepValidation = (huntId: number, stepIndex: number) => {
         },
       );
     },
-    [sessionId, stepIndex, validateMutation],
+    [sessionId, validateMutation],
   );
 
   return {

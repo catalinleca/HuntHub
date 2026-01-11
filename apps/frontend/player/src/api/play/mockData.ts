@@ -3,6 +3,7 @@ import type {
   HuntMetaPF,
   StartSessionResponse,
   ValidateAnswerResponse,
+  StepResponse,
   ChallengeType,
   OptionType,
   AnswerType,
@@ -167,9 +168,80 @@ export const mockGetSession = async (
   };
 };
 
+// =============================================================================
+// HATEOAS STEP ENDPOINTS
+// =============================================================================
+
+/**
+ * GET /play/sessions/:sessionId/step/current
+ * Returns current step with HATEOAS navigation links
+ */
+export const mockGetCurrentStep = async (sessionId: string): Promise<StepResponse | null> => {
+  await delay(200);
+
+  const session = mockSessions.get(sessionId);
+  if (!session) {
+    return null;
+  }
+
+  const step = mockSteps[session.currentStepIndex];
+  if (!step) {
+    return null;
+  }
+
+  const isLastStep = session.currentStepIndex >= mockSteps.length - 1;
+
+  return {
+    step,
+    _links: {
+      self: { href: `/play/sessions/${sessionId}/step/current` },
+      ...(isLastStep ? {} : { next: { href: `/play/sessions/${sessionId}/step/next` } }),
+      validate: { href: `/play/sessions/${sessionId}/validate` },
+    },
+  };
+};
+
+/**
+ * GET /play/sessions/:sessionId/step/next
+ * Returns next step for prefetching (HATEOAS)
+ */
+export const mockGetNextStep = async (sessionId: string): Promise<StepResponse | null> => {
+  await delay(200);
+
+  const session = mockSessions.get(sessionId);
+  if (!session) {
+    return null;
+  }
+
+  const nextIndex = session.currentStepIndex + 1;
+  const step = mockSteps[nextIndex];
+  if (!step) {
+    return null;
+  }
+
+  const isLastStep = nextIndex >= mockSteps.length - 1;
+
+  return {
+    step,
+    _links: {
+      self: { href: `/play/sessions/${sessionId}/step/current` },
+      ...(isLastStep ? {} : { next: { href: `/play/sessions/${sessionId}/step/next` } }),
+      validate: { href: `/play/sessions/${sessionId}/validate` },
+    },
+  };
+};
+
+// =============================================================================
+// VALIDATION
+// =============================================================================
+
+/**
+ * POST /play/sessions/:sessionId/validate
+ * Validates answer using HATEOAS response format
+ * Session tracks current step - no stepIndex needed in request
+ */
 export const mockValidateAnswer = async (
   sessionId: string,
-  stepIndex: number,
   answerType: AnswerType,
   payload: AnswerPayload,
 ): Promise<ValidateAnswerResponse> => {
@@ -180,11 +252,7 @@ export const mockValidateAnswer = async (
     throw new Error('Session not found');
   }
 
-  if (stepIndex !== session.currentStepIndex) {
-    throw new Error('Invalid step index');
-  }
-
-  const step = mockSteps[stepIndex];
+  const step = mockSteps[session.currentStepIndex];
   const stepId = step.stepId;
 
   session.attempts[stepId] = (session.attempts[stepId] || 0) + 1;
@@ -200,22 +268,25 @@ export const mockValidateAnswer = async (
       session.status = 'completed';
     }
 
-    const nextStep = mockSteps[session.currentStepIndex];
-
     return {
       correct: true,
       feedback: 'Correct! Well done.',
-      currentStepIndex: session.currentStepIndex,
-      nextStep,
       isComplete,
+      attempts: session.attempts[stepId],
+      _links: {
+        currentStep: { href: `/play/sessions/${sessionId}/step/current` },
+        ...(isComplete ? {} : { nextStep: { href: `/play/sessions/${sessionId}/step/next` } }),
+      },
     };
   }
 
   return {
     correct: false,
     feedback: 'Not quite right. Try again!',
-    currentStepIndex: session.currentStepIndex,
     attempts: session.attempts[stepId],
+    _links: {
+      currentStep: { href: `/play/sessions/${sessionId}/step/current` },
+    },
   };
 };
 

@@ -1,12 +1,9 @@
-import { useQueryClient } from '@tanstack/react-query';
-import type { StepPF } from '@hunthub/shared';
-import { useStartSession, useGetSession, playKeys } from '@/api';
+import { useStartSession, useGetSession, useCurrentStep, usePrefetchNextStep } from '@/api';
 import { sessionStorage } from '@/context';
 import { useClearInvalidSession } from './useClearInvalidSession';
 import type { PlaySessionContextValue } from './context';
 
 export const useSessionLogic = (huntId: number): PlaySessionContextValue => {
-  const queryClient = useQueryClient();
   const savedSessionId = sessionStorage.get(huntId);
 
   const sessionQuery = useGetSession(huntId, savedSessionId);
@@ -19,6 +16,17 @@ export const useSessionLogic = (huntId: number): PlaySessionContextValue => {
     hasData: !!sessionQuery.data,
   });
 
+  const session = sessionQuery.data;
+  const sessionId = session?.sessionId ?? null;
+
+  // Fetch current step via HATEOAS endpoint
+  const currentStepQuery = useCurrentStep(sessionId);
+  const currentStepData = currentStepQuery.data;
+
+  // Prefetch next step if link exists (HATEOAS-driven)
+  const hasNextLink = !!currentStepData?._links.next;
+  usePrefetchNextStep(sessionId, hasNextLink);
+
   const startSession = (playerName: string, email?: string) => {
     startMutation.mutate(
       { playerName, email },
@@ -30,25 +38,31 @@ export const useSessionLogic = (huntId: number): PlaySessionContextValue => {
     );
   };
 
-  const session = sessionQuery.data;
+  const currentStep = currentStepData?.step ?? null;
+  const stepLinks = currentStepData?._links ?? null;
   const currentStepIndex = session?.currentStepIndex ?? 0;
   const totalSteps = session?.hunt?.totalSteps ?? 0;
-  const currentStep = queryClient.getQueryData<StepPF>(playKeys.step(huntId, currentStepIndex)) ?? null;
+
+  // HATEOAS-driven navigation: isLastStep when no "next" link
+  const isLastStep = !!session && !hasNextLink && currentStep !== null;
+  // isComplete when session exists but no current step (all steps done)
+  const isComplete = !!session && currentStep === null;
 
   return {
-    isLoading: sessionQuery.isLoading || startMutation.isPending,
-    error: sessionQuery.error ?? startMutation.error ?? null,
+    isLoading: sessionQuery.isLoading || currentStepQuery.isLoading || startMutation.isPending,
+    error: sessionQuery.error ?? currentStepQuery.error ?? startMutation.error ?? null,
 
-    sessionId: session?.sessionId ?? null,
+    sessionId,
     huntMeta: session?.hunt ?? null,
-    currentStepIndex,
     currentStep,
+    stepLinks,
+    currentStepIndex,
     totalSteps,
 
     startSession,
 
     hasSession: !!session,
-    isLastStep: currentStepIndex >= totalSteps - 1,
-    isComplete: currentStepIndex >= totalSteps,
+    isLastStep,
+    isComplete,
   };
 };

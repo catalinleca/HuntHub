@@ -15,11 +15,6 @@ export const useStartSession = (huntId: number) => {
     mutationFn: (request: StartSessionRequest) => startSession(huntId, request),
     onSuccess: (data) => {
       queryClient.setQueryData(playKeys.session(huntId), data);
-
-      data.steps.forEach((step, index) => {
-        const stepIndex = data.currentStepIndex + index;
-        queryClient.setQueryData(playKeys.step(huntId, stepIndex), step);
-      });
     },
   });
 };

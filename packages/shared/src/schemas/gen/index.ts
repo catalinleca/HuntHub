@@ -388,23 +388,24 @@ export const StartSessionResponse = z
     steps: z.array(StepPF),
   })
   .strict();
-export const ValidateAnswerRequest = z
-  .object({ stepIndex: z.number().int(), answerType: AnswerType, payload: AnswerPayload })
-  .strict();
+export const ValidateAnswerRequest = z.object({ answerType: AnswerType, payload: AnswerPayload }).strict();
+export const HateoasLink = z.object({ href: z.string() }).strict();
+export const ValidateAnswerLinks = z.object({ currentStep: HateoasLink, nextStep: HateoasLink.optional() }).strict();
 export const ValidateAnswerResponse = z
   .object({
     correct: z.boolean(),
     feedback: z.string().optional(),
-    currentStepIndex: z.number().int(),
-    nextStep: StepPF.optional(),
     isComplete: z.boolean().optional(),
     attempts: z.number().int().optional(),
+    _links: ValidateAnswerLinks,
   })
   .strict();
 export const HintRequest = z.object({ stepIndex: z.number().int() }).strict();
 export const HintResponse = z
   .object({ hint: z.string(), hintsUsed: z.number().int(), maxHints: z.number().int() })
   .strict();
+export const StepLinks = z.object({ self: HateoasLink, next: HateoasLink.optional(), validate: HateoasLink }).strict();
+export const StepResponse = z.object({ step: StepPF, _links: StepLinks }).strict();
 export const SortOrder = z.enum(['asc', 'desc']);
 export const HuntSortField = z.enum(['createdAt', 'updatedAt']);
 export const AssetSortField = z.enum(['createdAt', 'originalFilename', 'size']);
@@ -500,9 +501,13 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   StartSessionRequest,
   StartSessionResponse,
   ValidateAnswerRequest,
+  HateoasLink,
+  ValidateAnswerLinks,
   ValidateAnswerResponse,
   HintRequest,
   HintResponse,
+  StepLinks,
+  StepResponse,
   SortOrder,
   HuntSortField,
   AssetSortField,

@@ -1,6 +1,5 @@
 import { Typography } from '@mui/material';
 import type { StepPF } from '@hunthub/shared';
-import { usePlaySession } from '@/context';
 import { useStepValidation } from '@/hooks';
 import { ClueChallenge } from '@/components/challenges/ClueChallenge';
 import { QuizChallenge } from '@/components/challenges/QuizChallenge';
@@ -11,10 +10,7 @@ interface StepRendererProps {
 }
 
 export const StepRenderer = ({ step, isLastStep }: StepRendererProps) => {
-  const { huntMeta, currentStepIndex } = usePlaySession();
-  const huntId = huntMeta?.huntId ?? 0;
-
-  const { validate, isValidating, feedback } = useStepValidation(huntId, currentStepIndex);
+  const { validate, isValidating, feedback } = useStepValidation(step.stepId);
 
   switch (step.type) {
     case 'clue':

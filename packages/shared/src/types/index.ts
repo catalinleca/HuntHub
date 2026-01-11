@@ -890,28 +890,25 @@ export interface StartSessionResponse {
   steps: StepPF[];
 }
 
-/** Request to validate a player's answer */
+/** Request to validate a player's answer (session tracks current step) */
 export interface ValidateAnswerRequest {
-  stepIndex: number;
   /** Type of answer being submitted */
   answerType: AnswerType;
   /** Container for answer data (only one field populated based on answerType) */
   payload: AnswerPayload;
 }
 
-/** Response from validating an answer */
+/** Response from validating an answer (HATEOAS format) */
 export interface ValidateAnswerResponse {
   correct: boolean;
   /** Hint or explanation message */
   feedback?: string;
-  /** Current step index after validation (from BE) */
-  currentStepIndex: number;
-  /** Next step data (if correct and not last step) */
-  nextStep?: StepPF;
   /** Whether the hunt is complete */
   isComplete?: boolean;
   /** Number of attempts on this step */
   attempts?: number;
+  /** HATEOAS links returned after validation */
+  _links: ValidateAnswerLinks;
 }
 
 /** Request for a hint */
@@ -924,6 +921,38 @@ export interface HintResponse {
   hint: string;
   hintsUsed: number;
   maxHints: number;
+}
+
+/** Hypermedia link for REST navigation */
+export interface HateoasLink {
+  /** URL to the linked resource */
+  href: string;
+}
+
+/** HATEOAS links for step navigation */
+export interface StepLinks {
+  /** Hypermedia link for REST navigation */
+  self: HateoasLink;
+  /** Hypermedia link for REST navigation */
+  next?: HateoasLink;
+  /** Hypermedia link for REST navigation */
+  validate: HateoasLink;
+}
+
+/** HATEOAS links returned after validation */
+export interface ValidateAnswerLinks {
+  /** Hypermedia link for REST navigation */
+  currentStep: HateoasLink;
+  /** Hypermedia link for REST navigation */
+  nextStep?: HateoasLink;
+}
+
+/** Step data with HATEOAS navigation links */
+export interface StepResponse {
+  /** Player Format - Step without answers or internal metadata */
+  step: StepPF;
+  /** HATEOAS links for step navigation */
+  _links: StepLinks;
 }
 
 /** Standard pagination query parameters */

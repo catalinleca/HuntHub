@@ -9,7 +9,7 @@ export const usePlaySession = () => {
   return context;
 };
 
-export const useCurrentStep = () => {
-  const { currentStep, currentStepIndex, isLastStep } = usePlaySession();
-  return { currentStep, currentStepIndex, isLastStep };
+export const useStepProgress = () => {
+  const { currentStep, currentStepIndex, isLastStep, totalSteps } = usePlaySession();
+  return { currentStep, currentStepIndex, isLastStep, totalSteps };
 };
