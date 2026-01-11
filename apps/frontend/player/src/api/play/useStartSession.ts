@@ -14,7 +14,7 @@ export const useStartSession = (huntId: number) => {
   return useMutation({
     mutationFn: (request: StartSessionRequest) => startSession(huntId, request),
     onSuccess: (data) => {
-      queryClient.setQueryData(playKeys.session(huntId), data);
+      queryClient.setQueryData(playKeys.session(data.sessionId), data);
     },
   });
 };

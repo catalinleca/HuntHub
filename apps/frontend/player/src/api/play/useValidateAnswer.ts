@@ -13,7 +13,7 @@ const validateAnswer = async (params: ValidateParams): Promise<ValidateAnswerRes
   return mockValidateAnswer(params.sessionId, params.answerType, params.payload);
 };
 
-export const useValidateAnswer = (huntId: number) => {
+export const useValidateAnswer = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -22,14 +22,8 @@ export const useValidateAnswer = (huntId: number) => {
       const { sessionId } = variables;
 
       if (data.correct) {
-        // TODO - check this
-        // Invalidate session to refetch updated currentStepIndex
-        queryClient.invalidateQueries({ queryKey: playKeys.session(huntId) });
-
-        // Invalidate current step - will refetch with new step
+        queryClient.invalidateQueries({ queryKey: playKeys.session(sessionId) });
         queryClient.invalidateQueries({ queryKey: playKeys.currentStep(sessionId) });
-
-        // Invalidate next step - the "next" becomes "current", need new next
         queryClient.invalidateQueries({ queryKey: playKeys.nextStep(sessionId) });
       }
     },

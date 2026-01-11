@@ -1,17 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
-import type { StartSessionResponse } from '@hunthub/shared';
 import { playKeys } from './keys';
 import { mockGetSession } from './mockData';
 import { queryFnOrSkip } from '@/utils';
 
-const getSession = async (sessionId: string): Promise<StartSessionResponse | null> => {
-  return mockGetSession(sessionId);
-};
+const SKIP_KEY = '__skip__';
 
-export const useGetSession = (huntId: number, sessionId: string | null) => {
+export const useGetSession = (sessionId: string | null) => {
   return useQuery({
-    queryKey: playKeys.session(huntId),
-    queryFn: queryFnOrSkip(getSession, sessionId),
+    queryKey: playKeys.session(sessionId ?? SKIP_KEY),
+    queryFn: queryFnOrSkip(mockGetSession, sessionId),
     retry: false,
     staleTime: 5 * 60 * 1000,
   });

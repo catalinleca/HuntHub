@@ -4,7 +4,7 @@ import { useClearInvalidSession } from './useClearInvalidSession';
 
 export const useSessionLayer = (huntId: number) => {
   const savedSessionId = sessionStorage.get(huntId);
-  const sessionQuery = useGetSession(huntId, savedSessionId);
+  const sessionQuery = useGetSession(savedSessionId);
   const startMutation = useStartSession(huntId);
 
   useClearInvalidSession({

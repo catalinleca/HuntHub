@@ -14,9 +14,8 @@ const initialState: ValidationState = {
 };
 
 export const useStepValidation = (stepId: number) => {
-  const { sessionId, huntMeta } = usePlaySession();
-  const huntId = huntMeta?.huntId ?? 0;
-  const validateMutation = useValidateAnswer(huntId);
+  const { sessionId } = usePlaySession();
+  const validateMutation = useValidateAnswer();
   const [state, setState] = useState<ValidationState>(initialState);
 
   useEffect(() => {
