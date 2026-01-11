@@ -223,7 +223,6 @@ export const mockGetNextStep = async (sessionId: string): Promise<StepResponse |
     step,
     _links: {
       self: { href: `/play/sessions/${sessionId}/step/next` },
-      ...(isLastStep ? {} : { next: { href: `/play/sessions/${sessionId}/step/next` } }),
       validate: { href: `/play/sessions/${sessionId}/validate` },
     },
   };
