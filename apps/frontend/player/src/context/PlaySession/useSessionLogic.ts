@@ -1,67 +1,28 @@
-import { useStartSession, useGetSession, useCurrentStep, usePrefetchNextStep } from '@/api';
-import { sessionStorage } from '@/context';
-import { useClearInvalidSession } from './useClearInvalidSession';
+import { useSessionLayer } from './useSessionLayer';
+import { useStepLayer } from './useStepLayer';
 import type { PlaySessionContextValue } from './context';
 
 export const useSessionLogic = (huntId: number): PlaySessionContextValue => {
-  const savedSessionId = sessionStorage.get(huntId);
+  const sessionLayer = useSessionLayer(huntId);
+  const stepLayer = useStepLayer(sessionLayer.sessionId);
 
-  const sessionQuery = useGetSession(huntId, savedSessionId);
-  const startMutation = useStartSession(huntId);
-
-  useClearInvalidSession({
-    huntId,
-    savedSessionId,
-    isLoading: sessionQuery.isLoading,
-    hasData: !!sessionQuery.data,
-  });
-
-  const session = sessionQuery.data;
-  const sessionId = session?.sessionId ?? null;
-
-  // Fetch current step via HATEOAS endpoint
-  const currentStepQuery = useCurrentStep(sessionId);
-  const currentStepData = currentStepQuery.data;
-
-  // Prefetch next step if link exists (HATEOAS-driven)
-  const hasNextLink = !!currentStepData?._links.next;
-  usePrefetchNextStep(sessionId, hasNextLink);
-
-  const startSession = (playerName: string, email?: string) => {
-    startMutation.mutate(
-      { playerName, email },
-      {
-        onSuccess: (data) => {
-          sessionStorage.set(huntId, data.sessionId);
-        },
-      },
-    );
-  };
-
-  const currentStep = currentStepData?.step ?? null;
-  const stepLinks = currentStepData?._links ?? null;
-  const currentStepIndex = session?.currentStepIndex ?? 0;
-  const totalSteps = session?.hunt?.totalSteps ?? 0;
-
-  // HATEOAS-driven navigation: isLastStep when no "next" link
-  const isLastStep = !!session && !hasNextLink && currentStep !== null;
-  // isComplete when session exists but no current step (all steps done)
-  const isComplete = !!session && currentStep === null;
+  const hasSession = !!sessionLayer.session;
+  const isLastStep = hasSession && !stepLayer.hasNextLink && stepLayer.currentStep !== null;
+  const isComplete = hasSession && stepLayer.currentStep === null;
 
   return {
-    isLoading: sessionQuery.isLoading || currentStepQuery.isLoading || startMutation.isPending,
-    error: sessionQuery.error ?? currentStepQuery.error ?? startMutation.error ?? null,
+    isLoading: sessionLayer.isLoading || stepLayer.isLoading,
+    error: sessionLayer.error ?? stepLayer.error,
 
-    sessionId,
-    huntMeta: session?.hunt ?? null,
-    currentStep,
-    stepLinks,
-    currentStepIndex,
-    totalSteps,
+    sessionId: sessionLayer.sessionId,
+    huntMeta: sessionLayer.huntMeta,
+    currentStep: stepLayer.currentStep,
+    currentStepIndex: sessionLayer.currentStepIndex,
+    totalSteps: sessionLayer.huntMeta?.totalSteps ?? 0,
 
-    startSession,
+    startSession: sessionLayer.startSession,
 
-    hasSession: !!session,
+    hasSession,
     isLastStep,
     isComplete,
   };
