@@ -320,6 +320,90 @@ export const ReleaseHuntRequest = z
 export const TakeOfflineRequest = z.object({ currentLiveVersion: z.number().int().nullable() }).strict();
 export const ShareHuntRequest = z.object({ email: z.string().email(), permission: z.enum(['admin', 'view']) }).strict();
 export const UpdatePermissionRequest = z.object({ permission: z.enum(['admin', 'view']) }).strict();
+export const CluePF = z.object({ title: z.string(), description: z.string() }).strict();
+export const QuizPF = z
+  .object({
+    title: z.string(),
+    description: z.string(),
+    type: OptionType,
+    options: z.array(Option).optional(),
+    randomizeOrder: z.boolean().optional(),
+  })
+  .strict();
+export const MissionPF = z
+  .object({
+    title: z.string(),
+    description: z.string(),
+    type: MissionType,
+    referenceAssetIds: z.array(z.number().int()).optional(),
+  })
+  .strict();
+export const TaskPF = z.object({ title: z.string(), instructions: z.string() }).strict();
+export const ChallengePF = z
+  .object({ clue: CluePF, quiz: QuizPF, mission: MissionPF, task: TaskPF })
+  .partial()
+  .strict();
+export const StepPF = z
+  .object({ stepId: z.number().int(), type: ChallengeType, challenge: ChallengePF, media: Media.optional() })
+  .strict();
+export const HuntMetaPF = z
+  .object({
+    huntId: z.number().int(),
+    name: z.string(),
+    description: z.string().optional(),
+    totalSteps: z.number().int(),
+    coverImage: Media.nullish(),
+  })
+  .strict();
+export const AnswerType = z.enum(['clue', 'quiz-choice', 'quiz-input', 'mission-location', 'mission-media', 'task']);
+export const ClueAnswerPayload = z.object({}).partial().strict();
+export const QuizChoicePayload = z.object({ optionId: z.string().min(1) }).strict();
+export const QuizInputPayload = z.object({ answer: z.string().min(1) }).strict();
+export const MissionLocationPayload = z
+  .object({ lat: z.number().gte(-90).lte(90), lng: z.number().gte(-180).lte(180) })
+  .strict();
+export const MissionMediaPayload = z.object({ assetId: z.number().int().gte(1) }).strict();
+export const TaskAnswerPayload = z.object({ response: z.string().min(1) }).strict();
+export const AnswerPayload = z
+  .object({
+    clue: ClueAnswerPayload,
+    quizChoice: QuizChoicePayload,
+    quizInput: QuizInputPayload,
+    missionLocation: MissionLocationPayload,
+    missionMedia: MissionMediaPayload,
+    task: TaskAnswerPayload,
+  })
+  .partial()
+  .strict();
+export const StartSessionRequest = z
+  .object({ playerName: z.string().min(1).max(50), email: z.string().email().optional() })
+  .strict();
+export const StartSessionResponse = z
+  .object({
+    sessionId: z.string().uuid(),
+    hunt: HuntMetaPF,
+    currentStepIndex: z.number().int().default(0),
+    steps: z.array(StepPF),
+  })
+  .strict();
+export const ValidateAnswerRequest = z.object({ answerType: AnswerType, payload: AnswerPayload }).strict();
+export const HateoasLink = z.object({ href: z.string() }).strict();
+export const ValidateAnswerLinks = z.object({ currentStep: HateoasLink, nextStep: HateoasLink.optional() }).strict();
+export const ValidateAnswerResponse = z
+  .object({
+    correct: z.boolean(),
+    feedback: z.string().optional(),
+    isComplete: z.boolean().optional(),
+    attempts: z.number().int().optional(),
+    _links: ValidateAnswerLinks,
+  })
+  .strict();
+export const HintRequest = z.object({ stepIndex: z.number().int() }).strict();
+export const HintResponse = z
+  .object({ hint: z.string(), hintsUsed: z.number().int(), maxHints: z.number().int() })
+  .strict();
+export const StepLinks = z.object({ self: HateoasLink, next: HateoasLink.optional(), validate: HateoasLink }).strict();
+export const StepResponse = z.object({ step: StepPF, _links: StepLinks }).strict();
 export const SortOrder = z.enum(['asc', 'desc']);
 export const HuntSortField = z.enum(['createdAt', 'updatedAt']);
 export const AssetSortField = z.enum(['createdAt', 'originalFilename', 'size']);
@@ -397,6 +481,31 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   TakeOfflineRequest,
   ShareHuntRequest,
   UpdatePermissionRequest,
+  CluePF,
+  QuizPF,
+  MissionPF,
+  TaskPF,
+  ChallengePF,
+  StepPF,
+  HuntMetaPF,
+  AnswerType,
+  ClueAnswerPayload,
+  QuizChoicePayload,
+  QuizInputPayload,
+  MissionLocationPayload,
+  MissionMediaPayload,
+  TaskAnswerPayload,
+  AnswerPayload,
+  StartSessionRequest,
+  StartSessionResponse,
+  ValidateAnswerRequest,
+  HateoasLink,
+  ValidateAnswerLinks,
+  ValidateAnswerResponse,
+  HintRequest,
+  HintResponse,
+  StepLinks,
+  StepResponse,
   SortOrder,
   HuntSortField,
   AssetSortField,

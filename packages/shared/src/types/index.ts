@@ -38,6 +38,16 @@ export enum SortOrder {
   Desc = "desc",
 }
 
+/** Type of answer being submitted */
+export enum AnswerType {
+  Clue = "clue",
+  QuizChoice = "quiz-choice",
+  QuizInput = "quiz-input",
+  MissionLocation = "mission-location",
+  MissionMedia = "mission-media",
+  Task = "task",
+}
+
 /** Player's progress status through a hunt */
 export enum HuntProgressStatus {
   InProgress = "in_progress",
@@ -732,6 +742,217 @@ export interface ShareHuntRequest {
 export interface UpdatePermissionRequest {
   /** New permission level */
   permission: "admin" | "view";
+}
+
+/** Player Format - Clue (same as Clue, no answers to strip) */
+export interface CluePF {
+  title: string;
+  description: string;
+}
+
+/** Player Format - Quiz without correct answer */
+export interface QuizPF {
+  title: string;
+  description: string;
+  type: OptionType;
+  /** Options to display (may be randomized by backend) */
+  options?: Option[];
+  randomizeOrder?: boolean;
+}
+
+/** Player Format - Mission without target location */
+export interface MissionPF {
+  title: string;
+  description: string;
+  type: MissionType;
+  /** Reference images shown to player */
+  referenceAssetIds?: number[];
+}
+
+/** Player Format - Task without AI instructions */
+export interface TaskPF {
+  title: string;
+  /** What the player should do */
+  instructions: string;
+}
+
+/** Player Format - Challenge container (only one populated based on step.type) */
+export interface ChallengePF {
+  /** Player Format - Clue (same as Clue, no answers to strip) */
+  clue?: CluePF;
+  /** Player Format - Quiz without correct answer */
+  quiz?: QuizPF;
+  /** Player Format - Mission without target location */
+  mission?: MissionPF;
+  /** Player Format - Task without AI instructions */
+  task?: TaskPF;
+}
+
+/** Player Format - Step without answers or internal metadata */
+export interface StepPF {
+  /** @example 10000 */
+  stepId: number;
+  type: ChallengeType;
+  /** Player Format - Challenge container (only one populated based on step.type) */
+  challenge: ChallengePF;
+  /** Optional media attachment */
+  media?: Media;
+}
+
+/** Player Format - Hunt metadata (no steps) */
+export interface HuntMetaPF {
+  /** @example 1332 */
+  huntId: number;
+  name: string;
+  description?: string;
+  /** Total number of steps in the hunt */
+  totalSteps: number;
+  coverImage?: Media | null;
+}
+
+/** Clue acknowledgment (no actual answer needed) */
+export type ClueAnswerPayload = object;
+
+/** Multiple choice quiz answer */
+export interface QuizChoicePayload {
+  /** @minLength 1 */
+  optionId: string;
+}
+
+/** Free text quiz answer */
+export interface QuizInputPayload {
+  /** @minLength 1 */
+  answer: string;
+}
+
+/** GPS location for location-based missions */
+export interface MissionLocationPayload {
+  /**
+   * @min -90
+   * @max 90
+   */
+  lat: number;
+  /**
+   * @min -180
+   * @max 180
+   */
+  lng: number;
+}
+
+/** Uploaded media for media missions */
+export interface MissionMediaPayload {
+  /** @min 1 */
+  assetId: number;
+}
+
+/** Free text response for tasks */
+export interface TaskAnswerPayload {
+  /** @minLength 1 */
+  response: string;
+}
+
+/** Container for answer data (only one field populated based on answerType) */
+export interface AnswerPayload {
+  /** Clue acknowledgment (no actual answer needed) */
+  clue?: ClueAnswerPayload;
+  /** Multiple choice quiz answer */
+  quizChoice?: QuizChoicePayload;
+  /** Free text quiz answer */
+  quizInput?: QuizInputPayload;
+  /** GPS location for location-based missions */
+  missionLocation?: MissionLocationPayload;
+  /** Uploaded media for media missions */
+  missionMedia?: MissionMediaPayload;
+  /** Free text response for tasks */
+  task?: TaskAnswerPayload;
+}
+
+/** Request to start a play session */
+export interface StartSessionRequest {
+  /**
+   * @minLength 1
+   * @maxLength 50
+   */
+  playerName: string;
+  /** @format email */
+  email?: string;
+}
+
+/** Response from starting a play session */
+export interface StartSessionResponse {
+  /** @format uuid */
+  sessionId: string;
+  /** Player Format - Hunt metadata (no steps) */
+  hunt: HuntMetaPF;
+  /** @default 0 */
+  currentStepIndex: number;
+  /** First batch of steps (typically 2) */
+  steps: StepPF[];
+}
+
+/** Request to validate a player's answer (session tracks current step) */
+export interface ValidateAnswerRequest {
+  /** Type of answer being submitted */
+  answerType: AnswerType;
+  /** Container for answer data (only one field populated based on answerType) */
+  payload: AnswerPayload;
+}
+
+/** Response from validating an answer (HATEOAS format) */
+export interface ValidateAnswerResponse {
+  correct: boolean;
+  /** Hint or explanation message */
+  feedback?: string;
+  /** Whether the hunt is complete */
+  isComplete?: boolean;
+  /** Number of attempts on this step */
+  attempts?: number;
+  /** HATEOAS links returned after validation */
+  _links: ValidateAnswerLinks;
+}
+
+/** Request for a hint */
+export interface HintRequest {
+  stepIndex: number;
+}
+
+/** Response with hint data */
+export interface HintResponse {
+  hint: string;
+  hintsUsed: number;
+  maxHints: number;
+}
+
+/** Hypermedia link for REST navigation */
+export interface HateoasLink {
+  /** URL to the linked resource */
+  href: string;
+}
+
+/** HATEOAS links for step navigation */
+export interface StepLinks {
+  /** Hypermedia link for REST navigation */
+  self: HateoasLink;
+  /** Hypermedia link for REST navigation */
+  next?: HateoasLink;
+  /** Hypermedia link for REST navigation */
+  validate: HateoasLink;
+}
+
+/** HATEOAS links returned after validation */
+export interface ValidateAnswerLinks {
+  /** Hypermedia link for REST navigation */
+  currentStep: HateoasLink;
+  /** Hypermedia link for REST navigation */
+  nextStep?: HateoasLink;
+}
+
+/** Step data with HATEOAS navigation links */
+export interface StepResponse {
+  /** Player Format - Step without answers or internal metadata */
+  step: StepPF;
+  /** HATEOAS links for step navigation */
+  _links: StepLinks;
 }
 
 /** Standard pagination query parameters */

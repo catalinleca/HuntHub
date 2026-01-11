@@ -73,6 +73,18 @@ export {
   ShareHuntRequest,
   UpdatePermissionRequest,
 
+  // Answer Validation (for edge + server)
+  AnswerType,
+  ClueAnswerPayload,
+  QuizChoicePayload,
+  QuizInputPayload,
+  MissionLocationPayload,
+  MissionMediaPayload,
+  TaskAnswerPayload,
+  AnswerPayload,
+  ValidateAnswerRequest,
+  ValidateAnswerResponse,
+
   // Pagination
   SortOrder,
   HuntSortField,
