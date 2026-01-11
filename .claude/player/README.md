@@ -1,44 +1,100 @@
 # HuntHub Player Documentation
 
-**Architecture:** Catalyst Pattern (Iframe + Thin SDK + Self-Contained Player)
+## Start Here
 
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for complete design and implementation plan.
+**Branch:** `player-start-implementation-RENAME-BRANCH`
+**Status:** Core play flow implemented (session, steps, validation, challenges)
 
----
+**What's working:**
+- Player can start a hunt, see steps, submit answers
+- HATEOAS navigation with prefetch
+- Session persistence (localStorage)
+- Clue and Quiz challenges
 
-## Quick Summary
-
-| Concept | Description |
-|---------|-------------|
-| **Player App** | Self-contained in `apps/frontend/player/` |
-| **Routes** | `/play/:huntId` (production) and `/preview` (embedded in editor) |
-| **SDK** | Thin (~50 lines) - just postMessage wrapper, no UI/logic |
-| **Pattern** | Behavior injection - same `<PlayerUI />`, different validators/handlers |
-
----
-
-## Key Architecture Decisions
-
-1. **Iframe embedding** - Editor embeds Player via iframe, communicates via postMessage
-2. **Route-based mode separation** - Not a mode prop; different routes with different behavior
-3. **Self-contained Player** - All player code in one place, not split across packages
-4. **Thin SDK** - Only types and postMessage wrapper (~200 lines max)
-5. **Admin controls in preview route** - Toggle panels live in Player App, not Editor
+**What's next:**
+- Mission/Task challenges
+- Preview route for Editor integration
+- Real backend integration (currently mocked)
 
 ---
 
-## Documentation Index
+## Quick Commands
 
-| Document | Description |
-|----------|-------------|
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | Full architecture, implementation phases, code examples |
-| [COMPASS-LIBRARY.md](./COMPASS-LIBRARY.md) | Shared theming infrastructure (@hunthub/compass) |
-| [decisions/](./decisions/) | Architecture Decision Records (ADRs) |
+```bash
+npm run dev:player     # Start on port 5175
+npm run type-check     # From apps/frontend/player
+```
 
 ---
 
-## Reference
+## Documentation
 
-- **Efecta/Catalyst comparison:** See ARCHITECTURE.md for how this mirrors proven production patterns
-- **Backend Player API:** See `.claude/guides/player-api-design.md`
-- **Full implementation plan:** See `.claude/plans/greedy-tinkering-hamster.md`
+| Document | When to Read |
+|----------|--------------|
+| **PLAYER-ARCHITECTURE.md** | Understanding the implementation - data flow, HATEOAS, examples |
+| **PLAYER-FORMAT.md** | When working with types (StepPF vs Step) |
+| **PREVIEW-INTEGRATION.md** | When implementing Editor preview (future) |
+| **COMPASS-LIBRARY.md** | When working on theming |
+
+---
+
+## Architecture Summary
+
+```
+User visits /play/:huntId
+        ↓
+PlaySessionProvider (context)
+    ├── useSessionLayer → session, startSession, huntMeta
+    └── useStepLayer → currentStep, prefetchNext (HATEOAS)
+        ↓
+PlayPage → StepRenderer → Challenge Components
+        ↓
+useStepValidation → validate answer → cache invalidation → next step
+```
+
+**Key patterns:**
+- HATEOAS: Server provides `_links.next` - client follows links, doesn't hardcode step indices
+- Prefetch: Next step fetched while playing current → instant transitions
+- Layer separation: Session concerns vs Step concerns
+- Version lock: Session locks to hunt version at start
+
+---
+
+## File Structure
+
+```
+apps/frontend/player/src/
+├── api/play/
+│   ├── keys.ts              # Cache keys
+│   ├── mockData.ts          # Mock backend
+│   ├── useCurrentStep.ts    # GET /step/current
+│   ├── usePrefetchNextStep.ts
+│   ├── useGetSession.ts
+│   ├── useStartSession.ts
+│   └── useValidateAnswer.ts
+├── context/PlaySession/
+│   ├── useSessionLayer.ts   # Session concerns
+│   ├── useStepLayer.ts      # Step concerns
+│   ├── useSessionLogic.ts   # Composition
+│   └── sessionStorage.ts    # localStorage
+├── hooks/
+│   └── useStepValidation.ts
+├── components/challenges/
+│   ├── ClueChallenge/
+│   └── QuizChallenge/
+└── pages/PlayPage/
+    ├── PlayPage.tsx
+    └── components/
+        ├── PlayerIdentification/
+        └── StepRenderer/
+```
+
+---
+
+## Historical Branches (Do Not Merge)
+
+- `player-setup-and-poc`
+- `player-sdk-and-iframe`
+- `player-editor-integration`
+
+These contain outdated patterns. Current work is on the main branch listed above.
