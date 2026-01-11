@@ -1198,6 +1198,103 @@ components:
     # PLAY SESSION SCHEMAS (For Play API)
     # ============================================================
 
+    # ============================================================
+    # Answer Validation Schemas
+    # ============================================================
+
+    AnswerType:
+      type: string
+      enum: [clue, quiz-choice, quiz-input, mission-location, mission-media, task]
+      description: Type of answer being submitted
+
+    ClueAnswerPayload:
+      type: object
+      description: Clue acknowledgment (no actual answer needed)
+      additionalProperties: false
+
+    QuizChoicePayload:
+      type: object
+      description: Multiple choice quiz answer
+      properties:
+        optionId:
+          type: string
+          minLength: 1
+      required:
+        - optionId
+      additionalProperties: false
+
+    QuizInputPayload:
+      type: object
+      description: Free text quiz answer
+      properties:
+        answer:
+          type: string
+          minLength: 1
+      required:
+        - answer
+      additionalProperties: false
+
+    MissionLocationPayload:
+      type: object
+      description: GPS location for location-based missions
+      properties:
+        lat:
+          type: number
+          minimum: -90
+          maximum: 90
+        lng:
+          type: number
+          minimum: -180
+          maximum: 180
+      required:
+        - lat
+        - lng
+      additionalProperties: false
+
+    MissionMediaPayload:
+      type: object
+      description: Uploaded media for media missions
+      properties:
+        assetId:
+          type: integer
+          minimum: 1
+      required:
+        - assetId
+      additionalProperties: false
+
+    TaskAnswerPayload:
+      type: object
+      description: Free text response for tasks
+      properties:
+        response:
+          type: string
+          minLength: 1
+      required:
+        - response
+      additionalProperties: false
+
+    AnswerPayload:
+      type: object
+      description: Container for answer data (only one field populated based on answerType)
+      properties:
+        clue:
+          $ref: '#/components/schemas/ClueAnswerPayload'
+        quizChoice:
+          $ref: '#/components/schemas/QuizChoicePayload'
+        quizInput:
+          $ref: '#/components/schemas/QuizInputPayload'
+        missionLocation:
+          $ref: '#/components/schemas/MissionLocationPayload'
+        missionMedia:
+          $ref: '#/components/schemas/MissionMediaPayload'
+        task:
+          $ref: '#/components/schemas/TaskAnswerPayload'
+      additionalProperties: false
+
+    # ============================================================
+    # Session Schemas
+    # ============================================================
+
     StartSessionRequest:
       type: object
       description: Request to start a play session
@@ -1243,59 +1340,14 @@ components:
       properties:
         stepIndex:
           type: integer
-        answer:
-          oneOf:
-            - type: object
-              properties:
-                type:
-                  type: string
-                  enum: [clue]
-              required: [type]
-            - type: object
-              properties:
-                type:
-                  type: string
-                  enum: [quiz]
-                optionId:
-                  type: string
-              required: [type, optionId]
-            - type: object
-              properties:
-                type:
-                  type: string
-                  enum: [quiz-input]
-                answer:
-                  type: string
-              required: [type, answer]
-            - type: object
-              properties:
-                type:
-                  type: string
-                  enum: [mission-location]
-                lat:
-                  type: number
-                lng:
-                  type: number
-              required: [type, lat, lng]
-            - type: object
-              properties:
-                type:
-                  type: string
-                  enum: [mission-media]
-                assetId:
-                  type: integer
-              required: [type, assetId]
-            - type: object
-              properties:
-                type:
-                  type: string
-                  enum: [task]
-                response:
-                  type: string
-              required: [type, response]
+        answerType:
+          $ref: '#/components/schemas/AnswerType'
+        payload:
+          $ref: '#/components/schemas/AnswerPayload'
       required:
         - stepIndex
-        - answer
+        - answerType
+        - payload
       additionalProperties: false
 
     ValidateAnswerResponse:
@@ -1307,9 +1359,9 @@ components:
         feedback:
           type: string
           description: Hint or explanation message
-        nextStep:
-          $ref: '#/components/schemas/StepPF'
-          description: Next step data (if correct and not last step)
+        currentStepIndex:
+          type: integer
+          description: Current step index after validation (from BE)
         isComplete:
           type: boolean
           description: Whether the hunt is complete
@@ -1318,6 +1370,7 @@ components:
           description: Number of attempts on this step
       required:
         - correct
+        - currentStepIndex
       additionalProperties: false
 
     HintRequest:

@@ -38,6 +38,16 @@ export enum SortOrder {
   Desc = "desc",
 }
 
+/** Type of answer being submitted */
+export enum AnswerType {
+  Clue = "clue",
+  QuizChoice = "quiz-choice",
+  QuizInput = "quiz-input",
+  MissionLocation = "mission-location",
+  MissionMedia = "mission-media",
+  Task = "task",
+}
+
 /** Player's progress status through a hunt */
 export enum HuntProgressStatus {
   InProgress = "in_progress",
@@ -800,6 +810,63 @@ export interface HuntMetaPF {
   coverImage?: Media | null;
 }
 
+/** Clue acknowledgment (no actual answer needed) */
+export type ClueAnswerPayload = object;
+
+/** Multiple choice quiz answer */
+export interface QuizChoicePayload {
+  /** @minLength 1 */
+  optionId: string;
+}
+
+/** Free text quiz answer */
+export interface QuizInputPayload {
+  /** @minLength 1 */
+  answer: string;
+}
+
+/** GPS location for location-based missions */
+export interface MissionLocationPayload {
+  /**
+   * @min -90
+   * @max 90
+   */
+  lat: number;
+  /**
+   * @min -180
+   * @max 180
+   */
+  lng: number;
+}
+
+/** Uploaded media for media missions */
+export interface MissionMediaPayload {
+  /** @min 1 */
+  assetId: number;
+}
+
+/** Free text response for tasks */
+export interface TaskAnswerPayload {
+  /** @minLength 1 */
+  response: string;
+}
+
+/** Container for answer data (only one field populated based on answerType) */
+export interface AnswerPayload {
+  /** Clue acknowledgment (no actual answer needed) */
+  clue?: ClueAnswerPayload;
+  /** Multiple choice quiz answer */
+  quizChoice?: QuizChoicePayload;
+  /** Free text quiz answer */
+  quizInput?: QuizInputPayload;
+  /** GPS location for location-based missions */
+  missionLocation?: MissionLocationPayload;
+  /** Uploaded media for media missions */
+  missionMedia?: MissionMediaPayload;
+  /** Free text response for tasks */
+  task?: TaskAnswerPayload;
+}
+
 /** Request to start a play session */
 export interface StartSessionRequest {
   /**
@@ -826,31 +893,10 @@ export interface StartSessionResponse {
 /** Request to validate a player's answer */
 export interface ValidateAnswerRequest {
   stepIndex: number;
-  answer:
-    | {
-        type: "clue";
-      }
-    | {
-        type: "quiz";
-        optionId: string;
-      }
-    | {
-        type: "quiz-input";
-        answer: string;
-      }
-    | {
-        type: "mission-location";
-        lat: number;
-        lng: number;
-      }
-    | {
-        type: "mission-media";
-        assetId: number;
-      }
-    | {
-        type: "task";
-        response: string;
-      };
+  /** Type of answer being submitted */
+  answerType: AnswerType;
+  /** Container for answer data (only one field populated based on answerType) */
+  payload: AnswerPayload;
 }
 
 /** Response from validating an answer */
@@ -858,6 +904,8 @@ export interface ValidateAnswerResponse {
   correct: boolean;
   /** Hint or explanation message */
   feedback?: string;
+  /** Current step index after validation (from BE) */
+  currentStepIndex: number;
   /** Next step data (if correct and not last step) */
   nextStep?: StepPF;
   /** Whether the hunt is complete */

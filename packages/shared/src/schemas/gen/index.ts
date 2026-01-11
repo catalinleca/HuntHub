@@ -357,6 +357,26 @@ export const HuntMetaPF = z
     coverImage: Media.nullish(),
   })
   .strict();
+export const AnswerType = z.enum(['clue', 'quiz-choice', 'quiz-input', 'mission-location', 'mission-media', 'task']);
+export const ClueAnswerPayload = z.object({}).partial().strict();
+export const QuizChoicePayload = z.object({ optionId: z.string().min(1) }).strict();
+export const QuizInputPayload = z.object({ answer: z.string().min(1) }).strict();
+export const MissionLocationPayload = z
+  .object({ lat: z.number().gte(-90).lte(90), lng: z.number().gte(-180).lte(180) })
+  .strict();
+export const MissionMediaPayload = z.object({ assetId: z.number().int().gte(1) }).strict();
+export const TaskAnswerPayload = z.object({ response: z.string().min(1) }).strict();
+export const AnswerPayload = z
+  .object({
+    clue: ClueAnswerPayload,
+    quizChoice: QuizChoicePayload,
+    quizInput: QuizInputPayload,
+    missionLocation: MissionLocationPayload,
+    missionMedia: MissionMediaPayload,
+    task: TaskAnswerPayload,
+  })
+  .partial()
+  .strict();
 export const StartSessionRequest = z
   .object({ playerName: z.string().min(1).max(50), email: z.string().email().optional() })
   .strict();
@@ -369,40 +389,13 @@ export const StartSessionResponse = z
   })
   .strict();
 export const ValidateAnswerRequest = z
-  .object({
-    stepIndex: z.number().int(),
-    answer: z.union([
-      z
-        .object({ type: z.literal('clue') })
-        .strict()
-        .passthrough(),
-      z
-        .object({ type: z.literal('quiz'), optionId: z.string() })
-        .strict()
-        .passthrough(),
-      z
-        .object({ type: z.literal('quiz-input'), answer: z.string() })
-        .strict()
-        .passthrough(),
-      z
-        .object({ type: z.literal('mission-location'), lat: z.number(), lng: z.number() })
-        .strict()
-        .passthrough(),
-      z
-        .object({ type: z.literal('mission-media'), assetId: z.number().int() })
-        .strict()
-        .passthrough(),
-      z
-        .object({ type: z.literal('task'), response: z.string() })
-        .strict()
-        .passthrough(),
-    ]),
-  })
+  .object({ stepIndex: z.number().int(), answerType: AnswerType, payload: AnswerPayload })
   .strict();
 export const ValidateAnswerResponse = z
   .object({
     correct: z.boolean(),
     feedback: z.string().optional(),
+    currentStepIndex: z.number().int(),
     nextStep: StepPF.optional(),
     isComplete: z.boolean().optional(),
     attempts: z.number().int().optional(),
@@ -496,6 +489,14 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   ChallengePF,
   StepPF,
   HuntMetaPF,
+  AnswerType,
+  ClueAnswerPayload,
+  QuizChoicePayload,
+  QuizInputPayload,
+  MissionLocationPayload,
+  MissionMediaPayload,
+  TaskAnswerPayload,
+  AnswerPayload,
   StartSessionRequest,
   StartSessionResponse,
   ValidateAnswerRequest,

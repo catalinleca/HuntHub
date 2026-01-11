@@ -1,14 +1,87 @@
 import { useParams } from 'react-router-dom';
-import { Typography } from '@mui/material';
+import { Typography, CircularProgress } from '@mui/material';
+import { PlaySessionProvider, usePlaySession } from '../../context/PlaySession';
+import { PlayerIdentification } from './components/PlayerIdentification';
+import { StepRenderer } from './components/StepRenderer';
 import * as S from './PlayPage.styles';
 
-export const PlayPage = () => {
-  const { huntId } = useParams<{ huntId: string }>();
+const PlayPageContent = () => {
+  const {
+    isLoading,
+    isComplete,
+    hasSession,
+    huntMeta,
+    currentStep,
+    currentStepIndex,
+    totalSteps,
+    isLastStep,
+    startSession,
+  } = usePlaySession();
+
+  if (isLoading) {
+    return (
+      <S.Container>
+        <CircularProgress />
+      </S.Container>
+    );
+  }
+
+  if (!hasSession) {
+    return (
+      <S.Container>
+        <PlayerIdentification onSubmit={startSession} />
+      </S.Container>
+    );
+  }
+
+  if (isComplete) {
+    return (
+      <S.Container>
+        <Typography variant="h4">Hunt Complete!</Typography>
+        <Typography color="text.secondary">Congratulations on finishing {huntMeta?.name}</Typography>
+      </S.Container>
+    );
+  }
+
+  if (!currentStep) {
+    return (
+      <S.Container>
+        <Typography>Loading step...</Typography>
+      </S.Container>
+    );
+  }
 
   return (
     <S.Container>
-      <Typography variant="h4">Play Hunt</Typography>
-      <Typography color="text.secondary">Hunt ID: {huntId}</Typography>
+      <S.Header>
+        <Typography variant="h6">{huntMeta?.name}</Typography>
+        <Typography variant="body2" color="text.secondary">
+          Step {currentStepIndex + 1} of {totalSteps}
+        </Typography>
+      </S.Header>
+
+      <S.Content>
+        <StepRenderer step={currentStep} isLastStep={isLastStep} />
+      </S.Content>
     </S.Container>
+  );
+};
+
+export const PlayPage = () => {
+  const { huntId } = useParams<{ huntId: string }>();
+  const huntIdNum = Number(huntId);
+
+  if (!huntIdNum || isNaN(huntIdNum)) {
+    return (
+      <S.Container>
+        <Typography color="error">Invalid hunt ID</Typography>
+      </S.Container>
+    );
+  }
+
+  return (
+    <PlaySessionProvider huntId={huntIdNum}>
+      <PlayPageContent />
+    </PlaySessionProvider>
   );
 };
