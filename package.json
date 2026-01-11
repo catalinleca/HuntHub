@@ -19,6 +19,7 @@
     "dev:api": "npm run dev --workspace=@hunthub/api",
     "dev:backend": "npm run dev:api",
     "dev:editor": "npm run dev --workspace=@hunthub/editor",
+    "dev:player": "npm run dev --workspace=@hunthub/player",
     "dev:frontend": "npm run dev:editor",
     "generate": "npm run generate --workspace=@hunthub/shared",
     "test:api": "npm run test --workspace=@hunthub/api",
