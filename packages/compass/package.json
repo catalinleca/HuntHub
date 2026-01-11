@@ -52,6 +52,9 @@
       "import": "./src/utils/index.ts",
       "require": "./dist/utils/index.js",
       "default": "./src/utils/index.ts"
+    },
+    "./theme-types": {
+      "types": "./src/mui-theme.d.ts"
     }
   },
   "scripts": {
