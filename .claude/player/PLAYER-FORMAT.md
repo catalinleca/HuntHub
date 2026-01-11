@@ -217,7 +217,7 @@ Server-side validation         Can show answers
 
 ---
 
-## Play API Endpoints
+## Play API Endpoints (HATEOAS)
 
 ```typescript
 // 1. START SESSION
@@ -225,25 +225,40 @@ POST /api/play/:huntId/start
 Request: { playerName: string; email?: string }
 Response: {
   sessionId: string;
-  hunt: HuntMetaPF;           // Basic hunt info
-  currentStepIndex: 0;
-  steps: [StepPF, StepPF];    // First 2 steps, NO ANSWERS
+  hunt: HuntMetaPF;           // Basic hunt info (version-locked)
+  currentStepIndex: number;
 }
 
-// 2. GET NEXT STEP (prefetch)
-GET /api/play/sessions/:sessionId/step/:index
-Response: StepPF              // Only if index <= currentStepIndex + 1
+// 2. GET CURRENT STEP (with navigation links)
+GET /play/sessions/:sessionId/step/current
+Response: {
+  step: StepPF;
+  _links: {
+    self: { href: string };
+    next?: { href: string };  // Omitted on last step
+    validate: { href: string };
+  }
+}
 
-// 3. VALIDATE ANSWER
-POST /api/play/sessions/:sessionId/validate
-Request: { stepIndex: number; answer: ValidateAnswerRequest }
+// 3. GET NEXT STEP (prefetch)
+GET /play/sessions/:sessionId/step/next
+Response: StepResponse        // Same structure as current
+
+// 4. VALIDATE ANSWER
+POST /play/sessions/:sessionId/validate
+Request: { answerType: AnswerType; payload: AnswerPayload }
 Response: {
   correct: boolean;
   feedback?: string;
-  nextStep?: StepPF;          // If correct, include next
-  isComplete?: boolean;       // Hunt finished?
+  isComplete?: boolean;
+  _links: {
+    currentStep: { href: string };
+    nextStep?: { href: string };  // Only if correct and not complete
+  }
 }
 ```
+
+**Key:** No step index in URLs or requests - server tracks current step via session.
 
 ---
 
