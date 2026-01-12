@@ -34,14 +34,21 @@ export const MockValidationProvider = ({ step, onValidated, children }: MockVali
 
   const validate = useCallback(
     (answerType: AnswerType, payload: AnswerPayload) => {
-      const result = checkAnswer(step, answerType, payload);
+      try {
+        const result = checkAnswer(step, answerType, payload);
 
-      setState({
-        isCorrect: result.isCorrect,
-        feedback: result.feedback,
-      });
+        setState({
+          isCorrect: result.isCorrect,
+          feedback: result.feedback,
+        });
 
-      onValidated?.(result);
+        onValidated?.(result);
+      } catch {
+        setState({
+          isCorrect: false,
+          feedback: 'Something went wrong. Please try again.',
+        });
+      }
     },
     [step, onValidated],
   );
