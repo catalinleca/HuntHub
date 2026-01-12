@@ -1,8 +1,7 @@
 import { Typography } from '@mui/material';
 import type { StepPF } from '@hunthub/shared';
 import { useValidation } from '@/context';
-import { ClueChallenge } from '@/components/challenges/ClueChallenge';
-import { QuizChallenge } from '@/components/challenges/QuizChallenge';
+import { ClueChallenge, QuizChallenge, MissionChallenge, TaskChallenge } from '@/components/challenges';
 
 interface StepRendererProps {
   step: StepPF;
@@ -43,11 +42,19 @@ export const StepRenderer = ({ step, isLastStep }: StepRendererProps) => {
       );
     }
 
-    case 'mission':
-      return <Typography color="text.secondary">Mission challenge coming soon...</Typography>;
+    case 'mission': {
+      if (!step.challenge.mission) {
+        return <Typography color="error">Invalid mission data</Typography>;
+      }
+      return <MissionChallenge mission={step.challenge.mission} />;
+    }
 
-    case 'task':
-      return <Typography color="text.secondary">Task challenge coming soon...</Typography>;
+    case 'task': {
+      if (!step.challenge.task) {
+        return <Typography color="error">Invalid task data</Typography>;
+      }
+      return <TaskChallenge task={step.challenge.task} />;
+    }
 
     default:
       return <Typography color="error">Unknown challenge type: {step.type}</Typography>;

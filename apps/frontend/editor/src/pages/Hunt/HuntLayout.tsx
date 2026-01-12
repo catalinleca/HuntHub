@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import { useForm, useFormContext, FormProvider, FieldErrors } from 'react-hook-form';
+import { Button } from '@mui/material';
+import { DeviceMobileIcon } from '@phosphor-icons/react';
 import { Hunt } from '@hunthub/shared';
 import { NavBar } from '@/components';
 import { useSaveHunt } from '@/api/Hunt';
@@ -11,6 +14,7 @@ import { useSnackbarStore } from '@/stores';
 import { HuntHeader } from './HuntHeader';
 import { HuntStepTimeline } from './HuntStepTimeline';
 import { HuntForm } from './HuntForm';
+import { HuntPreview } from './HuntPreview';
 import * as S from './HuntLayout.styles';
 
 interface HuntLayoutProps {
@@ -51,19 +55,30 @@ export const HuntLayout = ({ huntFormData, hunt }: HuntLayoutProps) => {
     <FormProvider {...formMethods}>
       <PublishingProvider hunt={hunt}>
         <HuntStepsProvider>
-          <HuntLayoutContent huntFormData={huntFormData} />
+          <HuntLayoutContent huntFormData={huntFormData} hunt={hunt} />
         </HuntStepsProvider>
       </PublishingProvider>
     </FormProvider>
   );
 };
 
-const HuntLayoutContent = ({ huntFormData }: { huntFormData: HuntFormData }) => {
+interface HuntLayoutContentProps {
+  huntFormData: HuntFormData;
+  hunt: Hunt;
+}
+
+const HuntLayoutContent = ({ huntFormData, hunt }: HuntLayoutContentProps) => {
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
   const snackbar = useSnackbarStore();
   const { handleSubmit, reset, getValues } = useFormContext<{ hunt: HuntFormData }>();
   const { steps, selectedFormKey, setSelectedFormKey } = useHuntStepsContext();
 
   const saveHuntMutation = useSaveHunt();
+
+  const togglePreview = () => {
+    setIsPreviewOpen((prev) => !prev);
+  };
 
   const onInvalid = (errors: FieldErrors<{ hunt: HuntFormData }>) => {
     logFormErrors(errors, getValues());
@@ -102,12 +117,29 @@ const HuntLayoutContent = ({ huntFormData }: { huntFormData: HuntFormData }) => 
   const selectedStepIndex = selectedFormKey ? steps.findIndex((s) => s.formKey === selectedFormKey) : -1;
   const selectedStepType = selectedStepIndex >= 0 ? steps[selectedStepIndex]?.type : undefined;
 
+  const previewToggleButton = (
+    <Button
+      onClick={togglePreview}
+      variant={isPreviewOpen ? 'contained' : 'outlined'}
+      size="small"
+      startIcon={<DeviceMobileIcon size={18} weight={isPreviewOpen ? 'fill' : 'regular'} />}
+    >
+      {isPreviewOpen ? 'Hide Preview' : 'Show Preview'}
+    </Button>
+  );
+
   return (
     <S.Container>
       <NavBar />
       <HuntHeader huntName={huntFormData.name} lastUpdatedBy="You" onSave={handleSubmit(onSubmit, onInvalid)} />
-      <HuntStepTimeline />
-      {selectedStepIndex !== -1 && <HuntForm stepIndex={selectedStepIndex} stepType={selectedStepType} />}
+      <HuntStepTimeline actions={previewToggleButton} />
+      <S.ContentArea>
+        {selectedStepIndex !== -1 && (
+          <HuntForm stepIndex={selectedStepIndex} stepType={selectedStepType} isPreviewOpen={isPreviewOpen} />
+        )}
+
+        <HuntPreview hunt={hunt} isOpen={isPreviewOpen} selectedStepIndex={selectedStepIndex} />
+      </S.ContentArea>
     </S.Container>
   );
 };

@@ -6,3 +6,12 @@ export const Container = styled(Stack)`
   min-height: 100vh;
   background-color: ${({ theme }) => theme.palette.background.defaultLight};
 `;
+
+export const ContentArea = styled(Stack)`
+  flex-direction: row;
+  flex: 1;
+  gap: ${({ theme }) => theme.spacing(3)};
+  padding: ${({ theme }) => theme.spacing(0, 3)};
+  justify-content: center;
+  overflow-x: clip;
+`;
