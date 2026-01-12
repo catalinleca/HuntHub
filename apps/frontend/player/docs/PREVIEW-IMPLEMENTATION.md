@@ -227,29 +227,61 @@ User clicks "Check Answer"
 
 ## Preview Mode: Standalone vs Embedded
 
+### Hook Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         usePreviewMode() - Composer                      │
+│                                                                          │
+│   ┌───────────────────────────────────────────────────────────────────┐ │
+│   │                        usePreviewCore()                            │ │
+│   │                                                                    │ │
+│   │   Shared state: hunt, stepIndex, isLoading, error                 │ │
+│   │   Navigation: goToStep(), goToNextStep(), goToPrevStep()          │ │
+│   │   Derived: currentStep, totalSteps, isFirstStep, isLastStep       │ │
+│   └───────────────────────────────────────────────────────────────────┘ │
+│                              │                                           │
+│              ┌───────────────┴───────────────┐                          │
+│              ▼                               ▼                          │
+│   ┌─────────────────────────┐   ┌─────────────────────────┐            │
+│   │  useEmbeddedPreview()   │   │ useStandalonePreview()  │            │
+│   │                         │   │                         │            │
+│   │  - isEmbedded detection │   │  - Loads mock data      │            │
+│   │  - Sends PREVIEW_READY  │   │  - After 500ms timeout  │            │
+│   │  - Listens for messages │   │  - Only if not embedded │            │
+│   │  - RENDER_HUNT handler  │   │                         │            │
+│   │  - JUMP_TO_STEP handler │   │                         │            │
+│   └─────────────────────────┘   └─────────────────────────┘            │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
 ### How Detection Works
 
 ```
 ┌───────────────────────────────────────────────────────────────────────┐
-│                         usePreviewMode()                               │
+│                       useEmbeddedPreview()                             │
 │                                                                        │
-│   on mount:                                                            │
-│   ┌─────────────────────────────────────────────────────────────────┐ │
-│   │                                                                  │ │
-│   │   if (window.parent !== window) {                               │ │
-│   │     // We're in an iframe!                                      │ │
-│   │     window.parent.postMessage({ type: 'PREVIEW_READY' }, '*')   │ │
-│   │   }                                                             │ │
-│   │                                                                  │ │
-│   │   // Listen for messages from parent                            │ │
-│   │   window.addEventListener('message', handleMessage)             │ │
-│   │                                                                  │ │
-│   │   // Fallback: if no message in 500ms, load mock data           │ │
-│   │   setTimeout(() => {                                            │ │
-│   │     if (!hunt) loadMockHunt()                                   │ │
-│   │   }, 500)                                                       │ │
-│   │                                                                  │ │
-│   └─────────────────────────────────────────────────────────────────┘ │
+│   // Static detection on mount                                         │
+│   const [isEmbedded] = useState(() => window.parent !== window);       │
+│                                                                        │
+│   // If in iframe, signal ready and listen for messages                │
+│   useEffect(() => {                                                    │
+│     if (isEmbedded) {                                                  │
+│       sendToEditor(playerMessages.previewReady());                     │
+│     }                                                                  │
+│     window.addEventListener('message', handleMessage);                 │
+│   }, []);                                                              │
+└───────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────┐
+│                      useStandalonePreview()                            │
+│                                                                        │
+│   // Only runs if NOT embedded and no hunt data                        │
+│   useEffect(() => {                                                    │
+│     if (isEmbedded || hunt) return;                                    │
+│                                                                        │
+│     setTimeout(() => loadMockPreviewHunt(), 500);                      │
+│   }, [isEmbedded, hunt]);                                              │
 └───────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -313,36 +345,41 @@ User clicks "Check Answer"
 
 ## PostMessage Protocol
 
-### Editor → Player Messages
+### Message Types (Redux-style constants)
 
 ```typescript
-// Send hunt data to preview
-{
-  type: 'RENDER_HUNT',
-  hunt: Hunt  // Full hunt with steps including answers
-}
+// hooks/preview/types.ts
 
-// Navigate to specific step
-{
-  type: 'JUMP_TO_STEP',
-  stepIndex: number  // 0-based index
-}
+export const EDITOR_MESSAGES = {
+  RENDER_HUNT: 'RENDER_HUNT',
+  JUMP_TO_STEP: 'JUMP_TO_STEP',
+} as const;
+
+export const PLAYER_MESSAGES = {
+  PREVIEW_READY: 'PREVIEW_READY',
+  STEP_VALIDATED: 'STEP_VALIDATED',
+} as const;
 ```
 
-### Player → Editor Messages
+### Message Factories (Type-safe creation)
 
 ```typescript
-// Player is ready to receive data
-{
-  type: 'PREVIEW_READY'
-}
+// Editor → Player
+editorMessages.renderHunt(hunt)      // { type: 'RENDER_HUNT', hunt }
+editorMessages.jumpToStep(2)         // { type: 'JUMP_TO_STEP', stepIndex: 2 }
 
-// Validation result (so Editor can show feedback)
-{
-  type: 'STEP_VALIDATED',
-  isCorrect: boolean,
-  feedback: string
-}
+// Player → Editor
+playerMessages.previewReady()        // { type: 'PREVIEW_READY' }
+playerMessages.stepValidated(true, 'Correct!')  // { type: 'STEP_VALIDATED', isCorrect, feedback }
+```
+
+### Usage in Player
+
+```typescript
+import { playerMessages, sendToEditor } from '@/hooks';
+
+// Send validation result to Editor
+sendToEditor(playerMessages.stepValidated(result.isCorrect, result.feedback));
 ```
 
 ---
@@ -437,7 +474,14 @@ apps/frontend/player/src/
 │       └── MockValidationProvider.tsx  # For /preview (client-side)
 │
 ├── hooks/
-│   └── usePreviewMode.ts               # PostMessage + state management
+│   ├── index.ts                        # Barrel exports
+│   └── preview/
+│       ├── index.ts                    # Barrel exports
+│       ├── types.ts                    # Message constants + factories
+│       ├── usePreviewCore.ts           # Shared state + navigation
+│       ├── useStandalonePreview.ts     # Loads mock data when not embedded
+│       ├── useEmbeddedPreview.ts       # PostMessage communication
+│       └── usePreviewMode.ts           # Composer hook
 │
 ├── utils/
 │   ├── checkAnswer.ts                  # Client-side validation logic
@@ -534,7 +578,9 @@ When Backend Player API is built:
 | Preview has no session | MockValidationProvider with full Step data |
 | Need same UI for both routes | useValidation() hook works with any provider |
 | Answers visible in DevTools | stripAnswers() creates safe StepPF |
-| Standalone vs Embedded modes | usePreviewMode() detects via postMessage |
+| Standalone vs Embedded modes | Separated hooks (useEmbeddedPreview, useStandalonePreview) |
+| PostMessage magic strings | Redux-style constants + factory functions |
+| Mixed concerns in one hook | Physical separation (core, embedded, standalone, composer) |
 
 ---
 
