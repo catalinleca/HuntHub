@@ -7,7 +7,7 @@ interface ContainerProps {
 
 export const Container = styled(Box)<ContainerProps>`
   position: sticky;
-  top: 80px;
+  top: 150px;
   align-self: flex-start;
   margin-top: ${({ theme }) => theme.spacing(4)};
   margin-left: ${({ $isOpen }) => ($isOpen ? '0' : '-320px')};

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useForm, useFormContext, FormProvider, FieldErrors } from 'react-hook-form';
-import { IconButton } from '@mui/material';
+import { Button } from '@mui/material';
 import { DeviceMobileIcon } from '@phosphor-icons/react';
 import { Hunt } from '@hunthub/shared';
 import { NavBar } from '@/components';
@@ -118,16 +118,21 @@ const HuntLayoutContent = ({ huntFormData, hunt }: HuntLayoutContentProps) => {
   const selectedStepType = selectedStepIndex >= 0 ? steps[selectedStepIndex]?.type : undefined;
 
   const previewToggleButton = (
-    <IconButton onClick={togglePreview} size="small">
-      <DeviceMobileIcon size={20} weight={isPreviewOpen ? 'fill' : 'regular'} />
-    </IconButton>
+    <Button
+      onClick={togglePreview}
+      variant={isPreviewOpen ? 'contained' : 'outlined'}
+      size="small"
+      startIcon={<DeviceMobileIcon size={18} weight={isPreviewOpen ? 'fill' : 'regular'} />}
+    >
+      {isPreviewOpen ? 'Hide Preview' : 'Show Preview'}
+    </Button>
   );
 
   return (
     <S.Container>
-      <NavBar actions={previewToggleButton} />
+      <NavBar />
       <HuntHeader huntName={huntFormData.name} lastUpdatedBy="You" onSave={handleSubmit(onSubmit, onInvalid)} />
-      <HuntStepTimeline />
+      <HuntStepTimeline actions={previewToggleButton} />
       <S.ContentArea>
         {selectedStepIndex !== -1 && (
           <HuntForm stepIndex={selectedStepIndex} stepType={selectedStepType} isPreviewOpen={isPreviewOpen} />

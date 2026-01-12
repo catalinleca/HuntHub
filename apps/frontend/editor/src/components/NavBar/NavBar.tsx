@@ -9,7 +9,7 @@ interface NavBarProps {
 
 export const NavBar = ({ actions }: NavBarProps) => {
   return (
-    <S.AppBar position="sticky" elevation={0}>
+    <S.AppBar position="static" elevation={0}>
       <S.Toolbar>
         <S.LogoContainer>
           <CompassIcon size={32} weight="duotone" />
