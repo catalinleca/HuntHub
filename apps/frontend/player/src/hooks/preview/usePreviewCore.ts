@@ -69,7 +69,7 @@ export const usePreviewCore = () => {
     });
   }, []);
 
-  const setError = useCallback((error: string) => {
+  const setError = useCallback((error: string | null) => {
     setState((prev) => {
       return { ...prev, error, isLoading: false };
     });
