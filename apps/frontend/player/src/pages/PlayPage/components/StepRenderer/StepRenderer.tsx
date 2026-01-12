@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material';
 import type { StepPF } from '@hunthub/shared';
-import { useStepValidation } from '@/hooks';
+import { useValidation } from '@/context';
 import { ClueChallenge } from '@/components/challenges/ClueChallenge';
 import { QuizChallenge } from '@/components/challenges/QuizChallenge';
 
@@ -10,7 +10,7 @@ interface StepRendererProps {
 }
 
 export const StepRenderer = ({ step, isLastStep }: StepRendererProps) => {
-  const { validate, isValidating, feedback } = useStepValidation(step.stepId);
+  const { validate, isValidating, feedback } = useValidation();
 
   switch (step.type) {
     case 'clue': {
