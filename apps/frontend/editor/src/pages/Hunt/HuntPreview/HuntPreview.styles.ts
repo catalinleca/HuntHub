@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { Box } from '@mui/material';
-import { PREVIEW_WIDTH, PREVIEW_GAP } from '../layout.constants';
+import { PREVIEW_WIDTH, PREVIEW_HEIGHT, PREVIEW_GAP } from '../layout.constants';
 
 interface ContainerProps {
   $isOpen: boolean;
@@ -12,7 +12,7 @@ export const Container = styled(Box)<ContainerProps>`
   align-self: flex-start;
   margin-top: ${({ theme }) => theme.spacing(4)};
   width: ${PREVIEW_WIDTH}px;
-  height: 580px;
+  height: ${PREVIEW_HEIGHT}px;
   background-color: ${({ theme }) => theme.palette.background.surface};
   border: 2px solid ${({ theme }) => theme.palette.divider};
   border-radius: 24px;
