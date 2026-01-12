@@ -133,7 +133,7 @@ const HuntLayoutContent = ({ huntFormData, hunt }: HuntLayoutContentProps) => {
           <HuntForm stepIndex={selectedStepIndex} stepType={selectedStepType} isPreviewOpen={isPreviewOpen} />
         )}
 
-        <HuntPreview hunt={hunt} isOpen={isPreviewOpen} />
+        <HuntPreview hunt={hunt} isOpen={isPreviewOpen} selectedStepIndex={selectedStepIndex} />
       </S.ContentArea>
     </S.Container>
   );
