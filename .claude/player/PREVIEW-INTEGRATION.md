@@ -1,39 +1,34 @@
-# Player Architecture (Catalyst Pattern)
+# Player Preview Architecture
 
-**Status:** Approved
-**Date:** 2026-01-10
-**Based on:** Efecta/Catalyst production patterns
+**Status:** Implemented
+**Date:** 2026-01-12
+**Based on:** Wrapper pattern for race-condition-free mode separation
 
 ---
 
 ## TL;DR
 
 - **Player App is self-contained** - All player code lives in `apps/frontend/player/`
-- **Two routes, same UI** - `/play/:huntId` (production) and `/preview` (embedded in editor)
-- **Behavior injection** - Same `<PlayerUI />` component, different validators/handlers passed as props
-- **SDK is thin** - Just postMessage wrapper (~50 lines) for iframe communication
-- **Admin controls in preview route** - Not in Editor, not in SDK
+- **Two routes** - `/play/:huntId` (production) and `/preview` (embedded or standalone)
+- **Wrapper pattern** - `PreviewPage` decides mode once, renders appropriate component
+- **No race conditions** - Each sub-component has exactly one data source
+- **Shared rendering** - `PreviewContent` handles UI, sub-components handle data
 
 ---
 
 ## Mental Model
 
-The Player is one component (`<PlayerUI />`) that renders the same UI everywhere. What changes is the **behavior** passed to it:
+The `/preview` route uses the **wrapper pattern** to eliminate race conditions:
 
-| Route | GPS | Validation | Progress | Navigation |
-|-------|-----|------------|----------|------------|
-| `/play/:huntId` | Real Geolocation API | Real validation | Saves to backend | Sequential only |
-| `/preview` | Mock (always returns target) | Mock (always passes) | No persistence | Jump to any step |
-
-**The component doesn't know which mode it's in.** It just calls whatever functions it receives. This is dependency injection - same UI, different implementations.
-
-```tsx
-// Production: real everything
-<PlayerUI validateLocation={realGPS} saveProgress={api.save} />
-
-// Preview: mocked everything
-<PlayerUI validateLocation={mockAlwaysPass} saveProgress={noop} />
 ```
+PreviewPage (mode decider)
+    │
+    ├── EmbeddedPreview   → ONLY postMessage (waits for Editor)
+    │
+    └── StandalonePreview → ONLY mock data (loads immediately)
+```
+
+**Key insight:** `window.parent !== window` tells us the mode **synchronously** at mount. No need to "wait and see".
 
 ---
 
@@ -52,6 +47,7 @@ The Player is one component (`<PlayerUI />`) that renders the same UI everywhere
 │  │                    │    │                  ▼         │    │
 │  │                    │    │  ┌──────────────────────┐  │    │
 │  │                    │    │  │ iframe /preview      │  │    │
+│  │                    │    │  │ (EmbeddedPreview)    │  │    │
 │  │                    │    │  └──────────────────────┘  │    │
 │  └────────────────────┘    └────────────────────────────┘    │
 │                                                              │
@@ -59,184 +55,232 @@ The Player is one component (`<PlayerUI />`) that renders the same UI everywhere
 └──────────────────────────────────────────────────────────────┘
 
 ┌──────────────────────────────────────────────────────────────┐
-│ Player App (Self-Contained)                                  │
+│ Player App /preview Route                                    │
 │                                                              │
-│  /play/:huntId                      /preview                 │
-│  ┌─────────────────────┐           ┌─────────────────────┐   │
-│  │                     │           │ ┌─────────────────┐ │   │
-│  │    <PlayerUI />     │           │ │  <PlayerUI />   │ │   │
-│  │                     │           │ │                 │ │   │
-│  │  Real validators    │           │ │ Mock validators │ │   │
-│  │  Real GPS           │           │ │ Mock GPS        │ │   │
-│  │  Saves progress     │           │ └─────────────────┘ │   │
-│  │  Sequential nav     │           │                     │   │
-│  │                     │           │  Admin Controls:    │   │
-│  │                     │           │  - Step picker      │   │
-│  │                     │           │  - Toggle validation│   │
-│  │                     │           │  - Debug panel      │   │
-│  └─────────────────────┘           └─────────────────────┘   │
+│  PreviewPage.tsx (12 lines - mode decider)                   │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │  isEmbedded = window.parent !== window                  │ │
+│  │                                                         │ │
+│  │  return isEmbedded                                      │ │
+│  │    ? <EmbeddedPreview />                                │ │
+│  │    : <StandalonePreview />                              │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│                    │                    │                    │
+│                    ▼                    ▼                    │
+│  ┌─────────────────────┐  ┌─────────────────────┐           │
+│  │ EmbeddedPreview     │  │ StandalonePreview   │           │
+│  │                     │  │                     │           │
+│  │ Data: postMessage   │  │ Data: mock loader   │           │
+│  │ Toolbar: hidden     │  │ Toolbar: visible    │           │
+│  │ Validation → Editor │  │ Validation → next   │           │
+│  │                     │  │                     │           │
+│  │   ┌─────────────┐   │  │   ┌─────────────┐   │           │
+│  │   │ Preview     │   │  │   │ Preview     │   │           │
+│  │   │ Content     │   │  │   │ Content     │   │           │
+│  │   │ (shared)    │   │  │   │ (shared)    │   │           │
+│  │   └─────────────┘   │  │   └─────────────┘   │           │
+│  └─────────────────────┘  └─────────────────────┘           │
 │                                                              │
-│  Shared: <PlayerUI /> with injected behaviors                │
-└──────────────────────────────────────────────────────────────┘
-
-┌──────────────────────────────────────────────────────────────┐
-│ packages/player-sdk (~50 lines)                              │
-│                                                              │
-│  - Message types (TypeScript)                                │
-│  - PlayerSDK class (postMessage wrapper)                     │
-│  - NO UI, NO logic                                           │
+│  Shared: usePreviewCore (state), PreviewContent (rendering)  │
 └──────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Key Concepts
-
-### 1. Self-Contained Player App
-
-All player code lives in one place: `apps/frontend/player/`
+## File Structure
 
 ```
-apps/frontend/player/
+apps/frontend/player/src/
 ├── pages/
-│   ├── PlayPage.tsx        # Production: /play/:huntId
-│   └── preview/
-│       └── PreviewPage.tsx # Preview: /preview
-├── components/
-│   ├── PlayerUI.tsx        # Core (shared by both routes)
-│   ├── challenges/         # Challenge type renderers
-│   └── preview/            # Preview-only admin controls
+│   ├── PlayPage/              # Production: /play/:huntId
+│   └── PreviewPage/
+│       ├── PreviewPage.tsx    # Mode decider (12 lines)
+│       ├── PreviewPage.styles.ts
+│       └── components/
+│           ├── EmbeddedPreview.tsx    # postMessage only
+│           ├── StandalonePreview.tsx  # Mock data only
+│           ├── PreviewContent.tsx     # Shared rendering
+│           └── PreviewToolbar.tsx     # Step navigation
 ├── hooks/
-├── lib/
-│   ├── validators.ts       # Real implementations
-│   └── mocks.ts            # Mock implementations
-└── types/
+│   └── preview/
+│       ├── usePreviewCore.ts  # Shared state management
+│       └── types.ts           # Message types & factories
+├── context/
+│   └── Validation/
+│       ├── MockValidationProvider.tsx  # Client-side validation
+│       └── ApiValidationProvider.tsx   # Server-side validation
+└── api/
+    └── preview/
+        └── mockPreviewData.ts  # Standalone mock hunt
 ```
 
-### 2. Route-Based Mode Separation
+---
 
-NOT a mode prop. Different routes with different behavior:
+## Key Components
 
-| Route | Data Source | Validators | Persistence | Navigation |
-|-------|-------------|------------|-------------|------------|
-| `/play/:huntId` | API | Real | Yes | Sequential |
-| `/preview` | postMessage | Mock | No | Free |
-
-### 3. Behavior Injection (Dependency Injection)
-
-Same `<PlayerUI />` component, different props:
+### PreviewPage (Mode Decider)
 
 ```tsx
-// Production route
-<PlayerUI
-  hunt={huntFromAPI}
-  validateLocation={realGPSValidator}
-  saveProgress={api.saveProgress}
-  canJumpToStep={false}
-/>
+// 12 lines - just decides which component to render
+const isRunningInIframe = (): boolean => window.parent !== window;
 
-// Preview route
-<PlayerUI
-  hunt={huntFromPostMessage}
-  validateLocation={mockValidator}
-  saveProgress={noop}
-  canJumpToStep={true}
-/>
+export const PreviewPage = () => {
+  const isEmbedded = isRunningInIframe();
+  return isEmbedded ? <EmbeddedPreview /> : <StandalonePreview />;
+};
 ```
 
-**PlayerUI doesn't know if it's preview or production.** It just uses what it receives.
+### EmbeddedPreview
 
-### 4. Thin SDK (postMessage Only)
+- **Data source:** postMessage from Editor
+- **On mount:** Sends `PREVIEW_READY` to Editor
+- **On validation:** Sends result back to Editor (no auto-advance)
+- **Toolbar:** Hidden (Editor controls navigation)
 
-The SDK does NOT contain:
-- UI components
-- Player logic
-- State management
-- Validation
+### StandalonePreview
 
-The SDK ONLY contains:
-- TypeScript types for messages
-- A class that wraps postMessage
+- **Data source:** Mock hunt data (loads immediately)
+- **On mount:** Loads mock hunt
+- **On validation:** Auto-advances to next step
+- **Toolbar:** Visible (user can navigate freely)
+
+### PreviewContent (Shared)
+
+Handles all rendering:
+- Loading state
+- Error state
+- Empty state ("waiting for Editor" vs "loading mock")
+- Hunt display with `StepRenderer`
+- `MockValidationProvider` for client-side validation
+
+---
+
+## Why Wrapper Pattern?
+
+### Problem: Race Condition
+
+Old approach had both data sources active simultaneously:
+
+```
+Old: usePreviewMode()
+├── useEmbeddedPreview() → listens for postMessage
+└── useStandalonePreview() → waits 500ms, then loads mock
+
+Race: Mock loading starts → Editor sends real data → Mock finishes → overwrites real data
+```
+
+### Solution: Mode Separation
+
+New approach decides mode once, renders single-source component:
+
+```
+New: PreviewPage
+├── isEmbedded = true  → EmbeddedPreview (ONLY postMessage)
+└── isEmbedded = false → StandalonePreview (ONLY mock)
+
+No race: Each component has exactly one data source
+```
+
+**The iframe check is synchronous.** We know the mode instantly at mount.
+
+---
+
+## Message Protocol
+
+### Editor → Player
 
 ```typescript
-// This is essentially the entire SDK
-class PlayerSDK {
-  renderHunt(hunt: Hunt) {
-    this.iframe.contentWindow?.postMessage({ type: 'RENDER_HUNT', hunt }, '*');
-  }
+const EDITOR_MESSAGES = {
+  RENDER_HUNT: 'RENDER_HUNT',      // Send hunt data
+  JUMP_TO_STEP: 'JUMP_TO_STEP',    // Navigate to step
+} as const;
+```
 
-  navigateToStep(index: number) {
-    this.iframe.contentWindow?.postMessage({ type: 'NAVIGATE_TO_STEP', stepIndex: index }, '*');
-  }
+### Player → Editor
+
+```typescript
+const PLAYER_MESSAGES = {
+  PREVIEW_READY: 'PREVIEW_READY',      // Player ready for data
+  STEP_VALIDATED: 'STEP_VALIDATED',    // Validation result
+} as const;
+```
+
+---
+
+## Validation Flow
+
+### Embedded (Editor controls)
+
+```
+User submits answer
+    → MockValidationProvider checks answer
+    → onValidated callback fires
+    → EmbeddedPreview sends STEP_VALIDATED to Editor
+    → Editor decides what to do (show feedback, advance, etc.)
+```
+
+### Standalone (Auto-advance)
+
+```
+User submits answer
+    → MockValidationProvider checks answer
+    → onValidated callback fires
+    → StandalonePreview auto-advances if correct
+```
+
+---
+
+## State Management
+
+### usePreviewCore
+
+Shared state hook used by both sub-components:
+
+```typescript
+interface PreviewCoreState {
+  hunt: Hunt | null;
+  stepIndex: number;
+  isLoading: boolean;
+  error: string | null;
 }
+
+// Returns:
+// - State: hunt, currentStep, stepIndex, totalSteps, isFirstStep, isLastStep
+// - Actions: goToStep, goToNextStep, goToPrevStep, setHunt, setLoading, setError
 ```
 
-### 5. Admin Controls in Preview Route
+### clampStepIndex
 
-Admin controls (toggles, step picker, debug panel) are:
-- Part of the Player App codebase
-- Only rendered in the `/preview` route
-- NOT in the Editor
-- NOT in the SDK
+Pure function for navigation bounds:
 
-```tsx
-// pages/preview/PreviewPage.tsx
-<div className="preview-container">
-  {/* The actual player */}
-  <div className="player-frame">
-    <PlayerUI {...props} />
-  </div>
+```typescript
+const clampStepIndex = (state: PreviewCoreState, requestedIndex: number): number => {
+  const steps = state.hunt?.steps ?? [];
+  const maxIndex = Math.max(0, steps.length - 1);
+  return Math.max(0, Math.min(maxIndex, requestedIndex));
+};
+```
 
-  {/* Admin controls (preview-only) */}
-  <aside className="admin-controls">
-    <StepPicker />
-    <Toggle label="Skip validation" />
-  </aside>
-</div>
+No stale closures - reads bounds from state directly.
+
+---
+
+## Security TODOs
+
+```typescript
+// types.ts - sendToEditor
+// TODO: Replace '*' with specific editor origin for production
+
+// EmbeddedPreview.tsx - handleMessage
+// TODO: Add origin validation (event.origin === VITE_EDITOR_ORIGIN)
 ```
 
 ---
 
-## Why This Architecture?
+## Testing Modes
 
-### Why not a shared component package?
-
-| Shared Component (rejected) | Iframe + Routes (chosen) |
-|----------------------------|--------------------------|
-| Player logic split across packages | All code in one place |
-| Complex package dependencies | Simple iframe embed |
-| Tighter coupling | True isolation |
-| Hard to deploy independently | Deploy separately |
-
-### Why iframe instead of direct import?
-
-1. **Isolation** - Player and Editor are separate apps
-2. **Independent deployment** - Update player without redeploying editor
-3. **Proven pattern** - Catalyst uses this at scale
-4. **Simpler mental model** - "Editor embeds player"
-
-### Why admin controls in Player App?
-
-1. **Works standalone** - Can test preview at `localhost:5174/preview`
-2. **Works embedded** - Same experience when embedded in Editor
-3. **No extra messages** - Controls affect local state directly
-4. **Self-contained** - Player app owns all player-related UI
-
----
-
-## Implementation Order
-
-1. **Phase 1:** Player App with `/play/:huntId` route (production)
-2. **Phase 2:** Add `/preview` route with admin controls
-3. **Phase 3:** Create thin SDK package
-4. **Phase 4:** Integrate PreviewPanel in Editor
-5. **Phase 5:** Backend Player API
-6. **Phase 6:** Full integration
-
----
-
-## Reference
-
-- **Full plan:** `/Users/catalinleca/.claude/plans/greedy-tinkering-hamster.md`
-- **Efecta comparison:** `/Users/catalinleca/.claude/plans/inherited-roaming-glade.md`
-- **Backend API design:** `.claude/guides/player-api-design.md`
+| Mode | URL | Data Source | Use Case |
+|------|-----|-------------|----------|
+| Standalone | `localhost:5173/preview` | Mock data | Test preview UI independently |
+| Embedded | Editor iframe | postMessage | Test Editor ↔ Player integration |
+| Production | `localhost:5173/play/:id` | API | Test real play flow |
