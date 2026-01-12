@@ -13,6 +13,9 @@ export const FormArea = styled(Container).attrs({
   justify-content: center;
   padding-top: ${({ theme }) => theme.spacing(4)};
   padding-bottom: ${({ theme }) => theme.spacing(4)};
+  transform: translateX(${({ $isPreviewOpen }) => ($isPreviewOpen ? '0' : '172px')});
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
 `;
 
 export const FormCard = styled(Card)`

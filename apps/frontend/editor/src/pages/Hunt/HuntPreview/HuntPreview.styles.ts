@@ -10,7 +10,6 @@ export const Container = styled(Box)<ContainerProps>`
   top: 150px;
   align-self: flex-start;
   margin-top: ${({ theme }) => theme.spacing(4)};
-  margin-left: ${({ $isOpen }) => ($isOpen ? '0' : '-320px')};
   width: 320px;
   height: 580px;
   background-color: ${({ theme }) => theme.palette.background.surface};
@@ -19,12 +18,12 @@ export const Container = styled(Box)<ContainerProps>`
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   flex-shrink: 0;
-  transform: translateX(${({ $isOpen }) => ($isOpen ? '0' : '100%')});
+  transform: translateX(${({ $isOpen }) => ($isOpen ? '0' : 'calc(100% + 24px)')});
   opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
   transition:
-    transform 0.3s ease-in-out,
-    opacity 0.3s ease-in-out,
-    margin-left 0.3s ease-in-out;
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
   pointer-events: ${({ $isOpen }) => ($isOpen ? 'auto' : 'none')};
 `;
 
