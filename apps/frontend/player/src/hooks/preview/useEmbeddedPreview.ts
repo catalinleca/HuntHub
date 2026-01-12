@@ -23,6 +23,7 @@ export const useEmbeddedPreview = ({ core }: UseEmbeddedPreviewParams): UseEmbed
   coreRef.current = core;
 
   useEffect(() => {
+    // TODO: Add origin validation (e.g., event.origin === VITE_EDITOR_ORIGIN) for production security
     const handleMessage = (event: MessageEvent) => {
       const message = event.data as EditorToPlayerMessage;
 
