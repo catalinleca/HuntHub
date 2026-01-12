@@ -1,12 +1,16 @@
 import styled from 'styled-components';
 import { Container, Card } from '@mui/material';
 
+interface FormAreaProps {
+  $isPreviewOpen?: boolean;
+}
+
 export const FormArea = styled(Container).attrs({
   maxWidth: 'md',
-})`
+})<FormAreaProps>`
   flex: 1;
   display: flex;
-  justify-content: center;
+  justify-content: ${({ $isPreviewOpen }) => ($isPreviewOpen ? 'flex-start' : 'center')};
   padding-top: ${({ theme }) => theme.spacing(4)};
   padding-bottom: ${({ theme }) => theme.spacing(4)};
 `;
