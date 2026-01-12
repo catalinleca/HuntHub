@@ -36,6 +36,7 @@ export type EditorToPlayerMessage = ReturnType<(typeof editorMessages)[keyof typ
 
 export type PlayerToEditorMessage = ReturnType<(typeof playerMessages)[keyof typeof playerMessages]>;
 
+// TODO: Replace '*' with specific editor origin (e.g., VITE_EDITOR_ORIGIN) for production security
 export const sendToEditor = (message: PlayerToEditorMessage): void => {
   window.parent.postMessage(message, '*');
 };
