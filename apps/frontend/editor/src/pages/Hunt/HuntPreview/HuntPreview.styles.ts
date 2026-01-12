@@ -17,7 +17,7 @@ export const Container = styled(Box)<ContainerProps>`
   border: 2px solid ${({ theme }) => theme.palette.divider};
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  box-shadow: ${({ theme }) => theme.shadows[8]};
   flex-shrink: 0;
   transform: translateX(${({ $isOpen }) => ($isOpen ? '0' : `calc(100% + ${PREVIEW_GAP}px)`)});
   opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
