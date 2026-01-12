@@ -75,6 +75,7 @@ export class PlayerSDK {
   private listeners: Set<PlayerEventCallback> = new Set();
   private messageHandler: (event: MessageEvent) => void;
 
+  // TODO: In production, pass specific origin instead of '*' for security
   constructor(iframe: HTMLIFrameElement, targetOrigin: string = '*') {
     this.iframe = iframe;
     this.targetOrigin = targetOrigin;
@@ -114,6 +115,7 @@ export class PlayerSDK {
     this.iframe.contentWindow?.postMessage(message, this.targetOrigin);
   }
 
+  // TODO: Add event.origin validation when targetOrigin is not '*' for production security
   private handleMessage(event: MessageEvent): void {
     if (event.source !== this.iframe.contentWindow) {
       return;
