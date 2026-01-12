@@ -214,8 +214,6 @@ export const mockGetNextStep = async (sessionId: string): Promise<StepResponse |
     return null;
   }
 
-  const _isLastStep = nextIndex >= mockSteps.length - 1;
-
   return {
     step,
     _links: {
