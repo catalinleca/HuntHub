@@ -12,8 +12,8 @@ export interface ValidationResult {
  * Validation context value - same interface for both API and Mock providers
  */
 export interface ValidationContextValue {
-  /** Validate an answer */
-  validate: (answerType: AnswerType, payload: AnswerPayload) => void;
+  /** Validate an answer (async for API, sync for mock) */
+  validate: (answerType: AnswerType, payload: AnswerPayload) => Promise<void> | void;
   /** Whether validation is in progress */
   isValidating: boolean;
   /** Whether the last answer was correct (null if not yet validated) */
