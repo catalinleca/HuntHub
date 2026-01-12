@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { Box } from '@mui/material';
+import { PREVIEW_WIDTH, PREVIEW_GAP } from '../layout.constants';
 
 interface ContainerProps {
   $isOpen: boolean;
@@ -10,7 +11,7 @@ export const Container = styled(Box)<ContainerProps>`
   top: 150px;
   align-self: flex-start;
   margin-top: ${({ theme }) => theme.spacing(4)};
-  width: 320px;
+  width: ${PREVIEW_WIDTH}px;
   height: 580px;
   background-color: ${({ theme }) => theme.palette.background.surface};
   border: 2px solid ${({ theme }) => theme.palette.divider};
@@ -18,7 +19,7 @@ export const Container = styled(Box)<ContainerProps>`
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   flex-shrink: 0;
-  transform: translateX(${({ $isOpen }) => ($isOpen ? '0' : 'calc(100% + 24px)')});
+  transform: translateX(${({ $isOpen }) => ($isOpen ? '0' : `calc(100% + ${PREVIEW_GAP}px)`)});
   opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
   transition:
     transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
