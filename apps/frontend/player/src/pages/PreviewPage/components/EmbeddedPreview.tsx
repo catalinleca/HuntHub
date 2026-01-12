@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { usePreviewCore } from '@/hooks/preview/usePreviewCore';
-import { EDITOR_MESSAGES, playerMessages, sendToEditor } from '@/hooks/preview/types';
-import type { EditorToPlayerMessage } from '@/hooks/preview/types';
+import { EDITOR_MESSAGES, playerMessages, sendToEditor, type EditorToPlayerMessage } from '@hunthub/player-sdk';
 import type { ValidationResult } from '@/context';
 import { PreviewContent } from './PreviewContent';
 
