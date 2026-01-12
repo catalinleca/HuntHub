@@ -1,4 +1,4 @@
-import type { Hunt, Step, ChallengeType, OptionType, HuntStatus } from '@hunthub/shared';
+import type { Hunt, ChallengeType, OptionType, HuntStatus } from '@hunthub/shared';
 
 /**
  * Mock hunt with FULL Step data (including answers)

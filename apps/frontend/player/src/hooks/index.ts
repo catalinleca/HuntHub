@@ -1,2 +1,2 @@
-export { usePreviewMode, playerMessages, sendToEditor, PLAYER_MESSAGES } from './preview';
-export type { PlayerToEditorMessage } from './preview';
+export { usePreviewCore, playerMessages, sendToEditor, PLAYER_MESSAGES, EDITOR_MESSAGES } from './preview';
+export type { PlayerToEditorMessage, EditorToPlayerMessage } from './preview';
