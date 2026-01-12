@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, type ReactNode } from 'react';
+import { useState, useCallback, type ReactNode } from 'react';
 import type { AnswerType, AnswerPayload } from '@hunthub/shared';
 import { useValidateAnswer } from '@/api';
 import { ValidationContext } from './context';
@@ -14,52 +14,41 @@ const initialState: ValidationState = {
 };
 
 interface ApiValidationProviderProps {
-  /** Session ID for API validation */
   sessionId: string;
-  /** Current step ID - resets state when step changes */
-  stepId: number;
   children: ReactNode;
 }
 
 /**
- * Provides API-based validation for /play route
- * Wraps useValidateAnswer mutation with context interface
+ * Provides API-based validation for /play route.
+ *
+ * IMPORTANT: Use key={stepId} on this component to reset state when step changes. "You might not need an effect"
+ * Example: <ApiValidationProvider key={stepId} sessionId={sessionId}> instead of useEffect with stepId dep and setState(initial)
  */
-export const ApiValidationProvider = ({ sessionId, stepId, children }: ApiValidationProviderProps) => {
-  const validateMutation = useValidateAnswer();
+export const ApiValidationProvider = ({ sessionId, children }: ApiValidationProviderProps) => {
+  const { validate: validateAnswer, isValidating } = useValidateAnswer();
   const [state, setState] = useState<ValidationState>(initialState);
 
-  // Reset state when step changes
-  useEffect(() => {
-    setState(initialState);
-  }, [stepId]);
-
   const validate = useCallback(
-    (answerType: AnswerType, payload: AnswerPayload) => {
+    async (answerType: AnswerType, payload: AnswerPayload) => {
       if (!sessionId) {
         console.warn('validate called without sessionId');
         return;
       }
 
-      validateMutation.mutate(
-        { sessionId, answerType, payload },
-        {
-          onSuccess: (data) => {
-            setState({
-              isCorrect: data.correct,
-              feedback: data.feedback ?? null,
-            });
-          },
-          onError: () => {
-            setState({
-              isCorrect: false,
-              feedback: 'Something went wrong. Please try again.',
-            });
-          },
-        },
-      );
+      try {
+        const data = await validateAnswer({ sessionId, answerType, payload });
+        setState({
+          isCorrect: data.correct,
+          feedback: data.feedback ?? null,
+        });
+      } catch {
+        setState({
+          isCorrect: false,
+          feedback: 'Something went wrong. Please try again.',
+        });
+      }
     },
-    [sessionId, validateMutation],
+    [sessionId, validateAnswer],
   );
 
   const reset = useCallback(() => {
@@ -70,7 +59,7 @@ export const ApiValidationProvider = ({ sessionId, stepId, children }: ApiValida
     <ValidationContext.Provider
       value={{
         validate,
-        isValidating: validateMutation.isPending,
+        isValidating,
         isCorrect: state.isCorrect,
         feedback: state.feedback,
         reset,

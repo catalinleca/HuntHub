@@ -1,129 +1,80 @@
 import type { Step, AnswerType, AnswerPayload } from '@hunthub/shared';
 import type { ValidationResult } from '@/context/Validation/types';
 
+const CORRECT = 'Correct! Well done.';
+const INCORRECT = 'Not quite right. Try again!';
+
 /**
- * Client-side validation against full Step data (with answers)
- * Used by MockValidationProvider for preview mode
- *
- * @param step - Full Step with answers (quiz.targetId, quiz.expectedAnswer, etc.)
- * @param answerType - Type of answer being validated
- * @param payload - The answer payload from the user
- * @returns ValidationResult with isCorrect and feedback
+ * Client-side validation for preview mode.
+ * Validates user answers against full Step data (which includes correct answers).
  */
 export const checkAnswer = (step: Step, answerType: AnswerType, payload: AnswerPayload): ValidationResult => {
   switch (answerType) {
-    case 'clue': {
-      // Clues are always "correct" - just acknowledgment
-      return {
-        isCorrect: true,
-        feedback: 'Got it! Moving on...',
-      };
-    }
+    case 'clue':
+      return { isCorrect: true, feedback: 'Got it! Moving on...' };
 
     case 'quiz-choice': {
-      const expectedId = step.challenge.quiz?.targetId;
-      const actualId = payload.quizChoice?.optionId;
+      const expected = step.challenge.quiz?.targetId;
+      const actual = payload.quizChoice?.optionId;
 
-      if (!expectedId) {
-        // No correct answer defined - pass through
+      if (!expected) {
         return { isCorrect: true, feedback: 'Acknowledged' };
       }
 
-      const isCorrect = expectedId === actualId;
-      return {
-        isCorrect,
-        feedback: isCorrect ? 'Correct! Well done.' : 'Not quite right. Try again!',
-      };
+      const isCorrect = expected === actual;
+      return { isCorrect, feedback: isCorrect ? CORRECT : INCORRECT };
     }
 
     case 'quiz-input': {
-      const expectedAnswer = step.challenge.quiz?.expectedAnswer;
-      const actualAnswer = payload.quizInput?.answer;
+      const expected = step.challenge.quiz?.expectedAnswer?.toLowerCase().trim();
+      const actual = payload.quizInput?.answer?.toLowerCase().trim();
 
-      if (!expectedAnswer) {
-        // No correct answer defined - pass through
+      if (!expected) {
         return { isCorrect: true, feedback: 'Acknowledged' };
       }
 
-      // Case-insensitive, trimmed comparison
-      const isCorrect = expectedAnswer.toLowerCase().trim() === actualAnswer?.toLowerCase().trim();
-
-      return {
-        isCorrect,
-        feedback: isCorrect ? 'Correct! Well done.' : 'Not quite right. Try again!',
-      };
+      const isCorrect = expected === actual;
+      return { isCorrect, feedback: isCorrect ? CORRECT : INCORRECT };
     }
 
     case 'mission-location': {
-      const targetLocation = step.challenge.mission?.targetLocation;
-      const playerLocation = payload.missionLocation;
+      const target = step.challenge.mission?.targetLocation;
+      const player = payload.missionLocation;
 
-      if (!targetLocation || !playerLocation) {
-        // No location to validate against - pass through
+      if (!target || !player) {
         return { isCorrect: true, feedback: 'Location acknowledged' };
       }
 
-      // Calculate distance and check if within radius
-      const distance = calculateDistance(
-        playerLocation.lat,
-        playerLocation.lng,
-        targetLocation.lat,
-        targetLocation.lng,
-      );
+      const distance = haversineDistance(player.lat, player.lng, target.lat, target.lng);
+      const isCorrect = distance <= target.radius;
 
-      const isCorrect = distance <= targetLocation.radius;
       return {
         isCorrect,
         feedback: isCorrect ? 'You found the location!' : `You're about ${Math.round(distance)}m away. Keep looking!`,
       };
     }
 
-    case 'mission-media': {
-      // Media upload validation would be server-side (AI analysis)
-      // For preview, auto-pass
-      return {
-        isCorrect: true,
-        feedback: 'Media received (preview mode - auto-validated)',
-      };
-    }
+    case 'mission-media':
+      return { isCorrect: true, feedback: 'Media received (preview: auto-validated)' };
 
-    case 'task': {
-      // Task validation would be server-side (AI analysis)
-      // For preview, auto-pass
-      return {
-        isCorrect: true,
-        feedback: 'Task response received (preview mode - auto-validated)',
-      };
-    }
+    case 'task':
+      return { isCorrect: true, feedback: 'Task received (preview: auto-validated)' };
 
-    default: {
+    default:
       console.warn(`Unknown answer type: ${answerType}`);
-      return {
-        isCorrect: true,
-        feedback: 'Validated',
-      };
-    }
+      return { isCorrect: true, feedback: 'Validated' };
   }
 };
 
-/**
- * Calculate distance between two coordinates using Haversine formula
- * @returns Distance in meters
- */
-const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
-  const R = 6371000; // Earth's radius in meters
+/** Haversine formula - distance between two coordinates in meters */
+const haversineDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
+  const R = 6371000;
   const dLat = toRad(lat2 - lat1);
   const dLng = toRad(lng2 - lng1);
 
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
 
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  return R * c;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 };
 
-const toRad = (deg: number): number => {
-  return deg * (Math.PI / 180);
-};
+const toRad = (deg: number): number => deg * (Math.PI / 180);

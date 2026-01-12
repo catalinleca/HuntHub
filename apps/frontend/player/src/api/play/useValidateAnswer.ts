@@ -16,7 +16,7 @@ const validateAnswer = async (params: ValidateParams): Promise<ValidateAnswerRes
 export const useValidateAnswer = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: validateAnswer,
     onSuccess: (data, variables) => {
       const { sessionId } = variables;
@@ -28,4 +28,11 @@ export const useValidateAnswer = () => {
       }
     },
   });
+
+  return {
+    validate: mutation.mutateAsync,
+    isValidating: mutation.isPending,
+    error: mutation.error,
+    reset: mutation.reset,
+  };
 };

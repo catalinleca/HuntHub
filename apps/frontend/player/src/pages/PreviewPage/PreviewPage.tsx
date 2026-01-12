@@ -105,7 +105,7 @@ export const PreviewPage = () => {
 
       {/* Step content */}
       <S.Content>
-        <MockValidationProvider step={currentStep} onValidated={handleValidated}>
+        <MockValidationProvider key={currentStep.stepId} step={currentStep} onValidated={handleValidated}>
           <StepRenderer step={stepPF} isLastStep={isLastStep} />
         </MockValidationProvider>
       </S.Content>

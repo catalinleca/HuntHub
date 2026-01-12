@@ -62,7 +62,7 @@ const PlayPageContent = () => {
       </S.Header>
 
       <S.Content>
-        <ApiValidationProvider sessionId={sessionId!} stepId={currentStep.stepId}>
+        <ApiValidationProvider key={currentStep.stepId} sessionId={sessionId!}>
           <StepRenderer step={currentStep} isLastStep={isLastStep} />
         </ApiValidationProvider>
       </S.Content>

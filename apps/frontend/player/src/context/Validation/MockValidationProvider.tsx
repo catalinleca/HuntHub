@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, type ReactNode } from 'react';
+import { useState, useCallback, type ReactNode } from 'react';
 import type { Step, AnswerType, AnswerPayload } from '@hunthub/shared';
 import { checkAnswer } from '@/utils/checkAnswer';
 import { ValidationContext } from './context';
@@ -7,13 +7,11 @@ import type { ValidationResult } from './types';
 interface ValidationState {
   isCorrect: boolean | null;
   feedback: string | null;
-  isValidating: boolean;
 }
 
 const initialState: ValidationState = {
   isCorrect: null,
   feedback: null,
-  isValidating: false,
 };
 
 interface MockValidationProviderProps {
@@ -25,35 +23,25 @@ interface MockValidationProviderProps {
 }
 
 /**
- * Provides client-side mock validation for /preview route
- * Uses checkAnswer utility to validate against full Step data
+ * Provides client-side validation for /preview route.
+ * Validation is instant (no API call).
+ *
+ * IMPORTANT: Use key={stepId} on this component to reset state when step changes.
+ * Example: <MockValidationProvider key={stepId} step={step}>
  */
 export const MockValidationProvider = ({ step, onValidated, children }: MockValidationProviderProps) => {
   const [state, setState] = useState<ValidationState>(initialState);
 
-  // Reset state when step changes
-  useEffect(() => {
-    setState(initialState);
-  }, [step.stepId]);
-
   const validate = useCallback(
     (answerType: AnswerType, payload: AnswerPayload) => {
-      // Simulate async validation (brief delay for UX feedback)
-      setState((s) => ({ ...s, isValidating: true }));
+      const result = checkAnswer(step, answerType, payload);
 
-      // Small delay to show loading state
-      setTimeout(() => {
-        const result = checkAnswer(step, answerType, payload);
+      setState({
+        isCorrect: result.isCorrect,
+        feedback: result.feedback,
+      });
 
-        setState({
-          isValidating: false,
-          isCorrect: result.isCorrect,
-          feedback: result.feedback,
-        });
-
-        // Notify parent (for postMessage or auto-advance)
-        onValidated?.(result);
-      }, 300);
+      onValidated?.(result);
     },
     [step, onValidated],
   );
@@ -66,7 +54,7 @@ export const MockValidationProvider = ({ step, onValidated, children }: MockVali
     <ValidationContext.Provider
       value={{
         validate,
-        isValidating: state.isValidating,
+        isValidating: false, // Always false - validation is instant
         isCorrect: state.isCorrect,
         feedback: state.feedback,
         reset,
