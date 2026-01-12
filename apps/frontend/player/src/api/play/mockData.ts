@@ -69,8 +69,7 @@ export const mockSteps: StepPF[] = [
     challenge: {
       clue: {
         title: 'Congratulations!',
-        description:
-          'You have completed the City Explorer Adventure! Thank you for playing.',
+        description: 'You have completed the City Explorer Adventure! Thank you for playing.',
       },
     },
   },
@@ -144,9 +143,7 @@ export const mockStartSession = async (
  * GET /api/play/sessions/:sessionId
  * Resume an existing session
  */
-export const mockGetSession = async (
-  sessionId: string,
-): Promise<StartSessionResponse | null> => {
+export const mockGetSession = async (sessionId: string): Promise<StartSessionResponse | null> => {
   await delay(300);
 
   const session = mockSessions.get(sessionId);
@@ -216,8 +213,6 @@ export const mockGetNextStep = async (sessionId: string): Promise<StepResponse |
   if (!step) {
     return null;
   }
-
-  const isLastStep = nextIndex >= mockSteps.length - 1;
 
   return {
     step,
@@ -301,11 +296,7 @@ const generateUUID = (): string => {
   return crypto.randomUUID();
 };
 
-const checkAnswer = (
-  step: StepPF,
-  answerType: AnswerType,
-  payload: AnswerPayload,
-): boolean => {
+const checkAnswer = (step: StepPF, answerType: AnswerType, payload: AnswerPayload): boolean => {
   if (answerType === 'clue') {
     return true;
   }

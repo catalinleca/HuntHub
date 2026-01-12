@@ -1,7 +1,6 @@
 import { RouteObject } from 'react-router-dom';
 import { RootLayout } from './RootLayout';
 import { PlayPage } from '@/pages/PlayPage';
-import { PreviewPage } from '@/pages/PreviewPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 export const routes: RouteObject[] = [
@@ -14,7 +13,10 @@ export const routes: RouteObject[] = [
       },
       {
         path: '/preview',
-        element: <PreviewPage />,
+        lazy: async () => {
+          const { PreviewPage } = await import('@/pages/PreviewPage');
+          return { Component: PreviewPage };
+        },
       },
       {
         path: '*',

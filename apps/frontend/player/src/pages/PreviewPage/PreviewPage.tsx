@@ -1,11 +1,12 @@
-import { Typography } from '@mui/material';
-import * as S from './PreviewPage.styles';
+import { EmbeddedPreview } from './components/EmbeddedPreview';
+import { StandalonePreview } from './components/StandalonePreview';
+
+const isRunningInIframe = (): boolean => {
+  return window.parent !== window;
+};
 
 export const PreviewPage = () => {
-  return (
-    <S.Container>
-      <Typography variant="h4">Preview Mode</Typography>
-      <Typography color="text.secondary">Waiting for hunt data from Editor...</Typography>
-    </S.Container>
-  );
+  const isEmbedded = isRunningInIframe();
+
+  return isEmbedded ? <EmbeddedPreview /> : <StandalonePreview />;
 };

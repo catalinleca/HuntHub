@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { Typography, CircularProgress } from '@mui/material';
-import { PlaySessionProvider, usePlaySession } from '../../context/PlaySession';
+import { PlaySessionProvider, usePlaySession, ApiValidationProvider } from '@/context';
 import { PlayerIdentification } from './components/PlayerIdentification';
 import { StepRenderer } from './components/StepRenderer';
 import * as S from './PlayPage.styles';
@@ -10,6 +10,7 @@ const PlayPageContent = () => {
     isLoading,
     isComplete,
     hasSession,
+    sessionId,
     huntMeta,
     currentStep,
     currentStepIndex,
@@ -61,7 +62,9 @@ const PlayPageContent = () => {
       </S.Header>
 
       <S.Content>
-        <StepRenderer step={currentStep} isLastStep={isLastStep} />
+        <ApiValidationProvider key={currentStep.stepId} sessionId={sessionId!}>
+          <StepRenderer step={currentStep} isLastStep={isLastStep} />
+        </ApiValidationProvider>
       </S.Content>
     </S.Container>
   );
