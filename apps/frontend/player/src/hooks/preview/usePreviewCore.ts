@@ -15,6 +15,12 @@ const initialState: PreviewCoreState = {
   error: null,
 };
 
+const clampStepIndex = (state: PreviewCoreState, requestedIndex: number): number => {
+  const steps = state.hunt?.steps ?? [];
+  const maxIndex = Math.max(0, steps.length - 1);
+  return Math.max(0, Math.min(maxIndex, requestedIndex));
+};
+
 export const usePreviewCore = () => {
   const [state, setState] = useState<PreviewCoreState>(initialState);
 
@@ -26,36 +32,17 @@ export const usePreviewCore = () => {
   const isFirstStep = state.stepIndex === 0;
   const isLastStep = state.stepIndex === lastStepIndex;
 
-  const ensureValidStepIndex = useCallback(
-    (requestedIndex: number): number => {
-      const minimumIndex = 0;
-      const maximumIndex = lastStepIndex;
-
-      const notBelowMinimum = Math.max(minimumIndex, requestedIndex);
-      const notAboveMaximum = Math.min(maximumIndex, notBelowMinimum);
-
-      return notAboveMaximum;
-    },
-    [lastStepIndex],
-  );
-
-  const goToStep = useCallback(
-    (index: number) => {
-      const validIndex = ensureValidStepIndex(index);
-      setState((prev) => {
-        return { ...prev, stepIndex: validIndex };
-      });
-    },
-    [ensureValidStepIndex],
-  );
+  const goToStep = useCallback((index: number) => {
+    setState((prev) => ({ ...prev, stepIndex: clampStepIndex(prev, index) }));
+  }, []);
 
   const goToNextStep = useCallback(() => {
-    setState((prev) => ({ ...prev, stepIndex: ensureValidStepIndex(prev.stepIndex + 1) }));
-  }, [ensureValidStepIndex]);
+    setState((prev) => ({ ...prev, stepIndex: clampStepIndex(prev, prev.stepIndex + 1) }));
+  }, []);
 
   const goToPrevStep = useCallback(() => {
-    setState((prev) => ({ ...prev, stepIndex: ensureValidStepIndex(prev.stepIndex - 1) }));
-  }, [ensureValidStepIndex]);
+    setState((prev) => ({ ...prev, stepIndex: clampStepIndex(prev, prev.stepIndex - 1) }));
+  }, []);
 
   const setHunt = useCallback((hunt: Hunt) => {
     setState((prev) => {
