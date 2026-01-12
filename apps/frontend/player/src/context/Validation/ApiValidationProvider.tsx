@@ -25,13 +25,16 @@ interface ApiValidationProviderProps {
  * Example: <ApiValidationProvider key={stepId} sessionId={sessionId}> instead of useEffect with stepId dep and setState(initial)
  */
 export const ApiValidationProvider = ({ sessionId, children }: ApiValidationProviderProps) => {
-  const { validate: validateAnswer, isValidating } = useValidateAnswer();
+  const { validate: validateAnswer, isValidating, reset: resetMutation } = useValidateAnswer();
   const [state, setState] = useState<ValidationState>(initialState);
 
   const validate = useCallback(
     async (answerType: AnswerType, payload: AnswerPayload) => {
       if (!sessionId) {
-        console.warn('validate called without sessionId');
+        setState({
+          isCorrect: false,
+          feedback: 'Session not found. Please restart the hunt.',
+        });
         return;
       }
 
@@ -51,9 +54,19 @@ export const ApiValidationProvider = ({ sessionId, children }: ApiValidationProv
     [sessionId, validateAnswer],
   );
 
+  /**
+   * Reset both local state and mutation state to keep them in sync.
+   *
+   * Example without resetMutation():
+   * 1. User submits wrong answer → mutation catches error internally
+   * 2. User moves to next step → reset() clears our state
+   * 3. But mutation's internal error/isError still holds the old error
+   * 4. If we ever expose error from context, it would be stale
+   */
   const reset = useCallback(() => {
     setState(initialState);
-  }, []);
+    resetMutation();
+  }, [resetMutation]);
 
   return (
     <ValidationContext.Provider

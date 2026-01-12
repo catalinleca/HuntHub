@@ -80,7 +80,6 @@ export const mockPreviewHunt: Hunt = {
  * Returns a Promise to simulate async loading
  */
 export const loadMockPreviewHunt = async (): Promise<Hunt> => {
-  // Simulate network delay
   await new Promise((resolve) => setTimeout(resolve, 300));
-  return mockPreviewHunt;
+  return structuredClone(mockPreviewHunt);
 };
