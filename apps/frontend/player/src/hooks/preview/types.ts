@@ -32,13 +32,9 @@ export const playerMessages = {
   }),
 };
 
-export type EditorToPlayerMessage = ReturnType<
-  (typeof editorMessages)[keyof typeof editorMessages]
->;
+export type EditorToPlayerMessage = ReturnType<(typeof editorMessages)[keyof typeof editorMessages]>;
 
-export type PlayerToEditorMessage = ReturnType<
-  (typeof playerMessages)[keyof typeof playerMessages]
->;
+export type PlayerToEditorMessage = ReturnType<(typeof playerMessages)[keyof typeof playerMessages]>;
 
 export const sendToEditor = (message: PlayerToEditorMessage): void => {
   window.parent.postMessage(message, '*');

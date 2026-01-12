@@ -17,36 +17,17 @@ interface PreviewToolbarProps {
  * Toolbar for standalone preview mode
  * Shows step navigation (prev/next) and current position
  */
-export const PreviewToolbar = ({
-  currentStep,
-  totalSteps,
-  onPrev,
-  onNext,
-}: PreviewToolbarProps) => {
+export const PreviewToolbar = ({ currentStep, totalSteps, onPrev, onNext }: PreviewToolbarProps) => {
   const isFirst = currentStep === 0;
   const isLast = currentStep === totalSteps - 1;
 
   return (
     <S.Toolbar elevation={2}>
-      <S.ToolbarContent
-        direction="row"
-        alignItems="center"
-        justifyContent="space-between"
-      >
-        <Chip
-          label="Preview Mode"
-          size="small"
-          color="warning"
-          variant="outlined"
-        />
+      <S.ToolbarContent direction="row" alignItems="center" justifyContent="space-between">
+        <Chip label="Preview Mode" size="small" color="warning" variant="outlined" />
 
         <S.ToolbarContent direction="row" alignItems="center" gap={1}>
-          <IconButton
-            onClick={onPrev}
-            disabled={isFirst}
-            size="small"
-            aria-label="Previous step"
-          >
+          <IconButton onClick={onPrev} disabled={isFirst} size="small" aria-label="Previous step">
             <CaretLeftIcon size={20} />
           </IconButton>
 
@@ -54,12 +35,7 @@ export const PreviewToolbar = ({
             Step {currentStep + 1} of {totalSteps}
           </Typography>
 
-          <IconButton
-            onClick={onNext}
-            disabled={isLast}
-            size="small"
-            aria-label="Next step"
-          >
+          <IconButton onClick={onNext} disabled={isLast} size="small" aria-label="Next step">
             <CaretRightIcon size={20} />
           </IconButton>
         </S.ToolbarContent>

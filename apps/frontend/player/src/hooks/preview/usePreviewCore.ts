@@ -75,43 +75,40 @@ export const usePreviewCore = () => {
     });
   }, []);
 
-  return useMemo(
-    () => {
-      return {
-        hunt: state.hunt,
-        currentStep,
-        stepIndex: state.stepIndex,
-        totalSteps,
-        isFirstStep,
-        isLastStep,
-        isLoading: state.isLoading,
-        error: state.error,
-
-        goToStep,
-        goToNextStep,
-        goToPrevStep,
-        setHunt,
-        setLoading,
-        setError,
-      };
-    },
-    [
-      state.hunt,
-      state.stepIndex,
-      state.isLoading,
-      state.error,
+  return useMemo(() => {
+    return {
+      hunt: state.hunt,
       currentStep,
+      stepIndex: state.stepIndex,
       totalSteps,
       isFirstStep,
       isLastStep,
+      isLoading: state.isLoading,
+      error: state.error,
+
       goToStep,
       goToNextStep,
       goToPrevStep,
       setHunt,
       setLoading,
       setError,
-    ],
-  );
+    };
+  }, [
+    state.hunt,
+    state.stepIndex,
+    state.isLoading,
+    state.error,
+    currentStep,
+    totalSteps,
+    isFirstStep,
+    isLastStep,
+    goToStep,
+    goToNextStep,
+    goToPrevStep,
+    setHunt,
+    setLoading,
+    setError,
+  ]);
 };
 
 export type PreviewCore = ReturnType<typeof usePreviewCore>;
