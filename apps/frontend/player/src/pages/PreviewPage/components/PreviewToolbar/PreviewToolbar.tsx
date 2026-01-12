@@ -18,8 +18,10 @@ interface PreviewToolbarProps {
  * Shows step navigation (prev/next) and current position
  */
 export const PreviewToolbar = ({ currentStep, totalSteps, onPrev, onNext }: PreviewToolbarProps) => {
-  const isFirst = currentStep === 0;
-  const isLast = currentStep === totalSteps - 1;
+  const hasSteps = totalSteps > 0;
+  const safeStep = hasSteps ? Math.min(Math.max(currentStep, 0), totalSteps - 1) : 0;
+  const isFirst = !hasSteps || safeStep === 0;
+  const isLast = !hasSteps || safeStep === totalSteps - 1;
 
   return (
     <S.Toolbar elevation={2}>
@@ -32,7 +34,7 @@ export const PreviewToolbar = ({ currentStep, totalSteps, onPrev, onNext }: Prev
           </IconButton>
 
           <Typography variant="body2" color="text.secondary">
-            Step {currentStep + 1} of {totalSteps}
+            Step {hasSteps ? safeStep + 1 : 0} of {totalSteps}
           </Typography>
 
           <IconButton onClick={onNext} disabled={isLast} size="small" aria-label="Next step">
