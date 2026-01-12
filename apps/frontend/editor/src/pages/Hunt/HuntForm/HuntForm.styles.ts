@@ -10,7 +10,7 @@ export const FormArea = styled(Container).attrs({
 })<FormAreaProps>`
   flex: 1;
   display: flex;
-  justify-content: ${({ $isPreviewOpen }) => ($isPreviewOpen ? 'flex-start' : 'center')};
+  justify-content: center;
   padding-top: ${({ theme }) => theme.spacing(4)};
   padding-bottom: ${({ theme }) => theme.spacing(4)};
 `;

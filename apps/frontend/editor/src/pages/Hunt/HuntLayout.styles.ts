@@ -13,4 +13,5 @@ export const ContentArea = styled(Stack)`
   gap: ${({ theme }) => theme.spacing(3)};
   padding: ${({ theme }) => theme.spacing(0, 3)};
   justify-content: center;
+  overflow-x: clip;
 `;

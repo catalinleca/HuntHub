@@ -12,11 +12,11 @@ interface HuntPreviewProps {
 }
 
 export const HuntPreview = ({ hunt, isOpen, selectedStepIndex }: HuntPreviewProps) => {
-  if (!isOpen) {
-    return null;
-  }
-
-  return <PreviewIframe hunt={hunt} selectedStepIndex={selectedStepIndex} />;
+  return (
+    <S.Container $isOpen={isOpen}>
+      {isOpen && <PreviewIframe hunt={hunt} selectedStepIndex={selectedStepIndex} />}
+    </S.Container>
+  );
 };
 
 interface PreviewIframeProps {
@@ -66,9 +66,5 @@ const PreviewIframe = ({ hunt, selectedStepIndex }: PreviewIframeProps) => {
     });
   }, [hunt, selectedStepIndex]);
 
-  return (
-    <S.Container>
-      <S.Iframe ref={iframeRef} src={`${PLAYER_URL}/preview`} onLoad={handleIframeLoad} title="Hunt Preview" />
-    </S.Container>
-  );
+  return <S.Iframe ref={iframeRef} src={`${PLAYER_URL}/preview`} onLoad={handleIframeLoad} title="Hunt Preview" />;
 };
