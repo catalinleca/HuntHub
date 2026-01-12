@@ -50,12 +50,12 @@ export const usePreviewCore = () => {
   );
 
   const goToNextStep = useCallback(() => {
-    goToStep(state.stepIndex + 1);
-  }, [goToStep, state.stepIndex]);
+    setState((prev) => ({ ...prev, stepIndex: ensureValidStepIndex(prev.stepIndex + 1) }));
+  }, [ensureValidStepIndex]);
 
   const goToPrevStep = useCallback(() => {
-    goToStep(state.stepIndex - 1);
-  }, [goToStep, state.stepIndex]);
+    setState((prev) => ({ ...prev, stepIndex: ensureValidStepIndex(prev.stepIndex - 1) }));
+  }, [ensureValidStepIndex]);
 
   const setHunt = useCallback((hunt: Hunt) => {
     setState((prev) => {
