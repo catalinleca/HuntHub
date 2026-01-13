@@ -20,7 +20,7 @@ export const CHALLENGE_BADGES: Record<ChallengeType, BadgeConfig> = {
   [ChallengeType.Clue]: { label: 'Clue', icon: ScrollIcon, color: '#6BCF7F' },
   [ChallengeType.Quiz]: { label: 'Quiz', icon: QuestionIcon, color: '#5DADE2' },
   [ChallengeType.Mission]: { label: 'Mission', icon: CameraIcon, color: '#FF6B6B' },
-  [ChallengeType.Task]: { label: 'Challenge', icon: LightningIcon, color: '#9B59B6' },
+  [ChallengeType.Task]: { label: 'Task', icon: LightningIcon, color: '#9B59B6' },
 };
 
 export const QUIZ_BADGES: Record<OptionType, BadgeConfig> = {
