@@ -1,131 +1,50 @@
-import { Button, Typography, Paper, Stack, Alert, Box } from '@mui/material';
-import { MapPinIcon, CameraIcon, MicrophoneIcon } from '@phosphor-icons/react';
-import type { MissionPF, AnswerType, AnswerPayload } from '@hunthub/shared';
+import React from 'react';
 import { MissionType } from '@hunthub/shared';
+import type { MissionPF } from '@hunthub/shared';
+import { MISSION_BADGES, MISSION_ACTION_LABELS } from '@/constants';
+import { ChallengeLayout, ActionButton, FeedbackDisplay } from '@/components/shared';
+import type { ChallengeProps } from '@/types';
+import { LocationContent } from './LocationContent';
+import { PhotoContent } from './PhotoContent';
+import { AudioContent } from './AudioContent';
 
-interface MissionChallengeProps {
-  mission: MissionPF;
-  onValidate: (answerType: AnswerType, payload: AnswerPayload) => void;
-  isValidating: boolean;
-  isLastStep: boolean;
-  feedback: string | null;
-}
+const MISSION_CONTENT = {
+  [MissionType.MatchLocation]: LocationContent,
+  [MissionType.UploadMedia]: PhotoContent,
+  [MissionType.UploadAudio]: AudioContent,
+};
 
 export const MissionChallenge = ({
-  mission,
+  challenge,
   onValidate,
   isValidating,
   isLastStep,
   feedback,
-}: MissionChallengeProps) => {
-  const getMissionIcon = () => {
-    switch (mission.type) {
-      case MissionType.MatchLocation:
-        return <MapPinIcon size={32} weight="duotone" />;
-      case MissionType.UploadMedia:
-        return <CameraIcon size={32} weight="duotone" />;
-      case MissionType.UploadAudio:
-        return <MicrophoneIcon size={32} weight="duotone" />;
-      default:
-        return null;
-    }
-  };
+}: ChallengeProps<MissionPF>) => {
+  const badge = MISSION_BADGES[challenge.type];
+  const actionLabel = MISSION_ACTION_LABELS[challenge.type];
+  const ContentComponent = MISSION_CONTENT[challenge.type];
 
-  const getMissionLabel = () => {
-    switch (mission.type) {
-      case MissionType.MatchLocation:
-        return 'Location Mission';
-      case MissionType.UploadMedia:
-        return 'Photo/Video Mission';
-      case MissionType.UploadAudio:
-        return 'Audio Mission';
-      default:
-        return 'Mission';
-    }
-  };
-
-  const renderMissionContent = () => {
-    switch (mission.type) {
-      case MissionType.MatchLocation:
-        return (
-          <Box sx={{ p: 3, bgcolor: 'grey.100', borderRadius: 2, textAlign: 'center' }}>
-            <MapPinIcon size={48} weight="duotone" />
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Location check coming soon
-            </Typography>
-          </Box>
-        );
-
-      case MissionType.UploadMedia:
-        return (
-          <Box sx={{ p: 3, bgcolor: 'grey.100', borderRadius: 2, textAlign: 'center' }}>
-            <CameraIcon size={48} weight="duotone" />
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Photo/video upload coming soon
-            </Typography>
-          </Box>
-        );
-
-      case MissionType.UploadAudio:
-        return (
-          <Box sx={{ p: 3, bgcolor: 'grey.100', borderRadius: 2, textAlign: 'center' }}>
-            <MicrophoneIcon size={48} weight="duotone" />
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Audio recording coming soon
-            </Typography>
-          </Box>
-        );
-
-      default:
-        return null;
-    }
-  };
-
-  const getButtonLabel = () => {
-    if (isValidating) {
-      return 'Checking...';
-    }
-    if (isLastStep) {
-      return 'Finish Hunt';
-    }
-    switch (mission.type) {
-      case MissionType.MatchLocation:
-        return 'Check Location';
-      case MissionType.UploadMedia:
-        return 'Upload Media';
-      case MissionType.UploadAudio:
-        return 'Record Audio';
-      default:
-        return 'Submit';
-    }
+  const handleSubmit = () => {
+    // TODO: Implement mission submission logic per type
   };
 
   return (
-    <Paper sx={{ p: 3 }}>
-      <Stack gap={2}>
-        <Stack direction="row" alignItems="center" gap={1}>
-          {getMissionIcon()}
-          <Typography variant="overline" color="text.secondary">
-            {getMissionLabel()}
-          </Typography>
-        </Stack>
-
-        {mission.title && <Typography variant="h5">{mission.title}</Typography>}
-
-        {mission.description && (
-          <Typography variant="body1" color="text.secondary">
-            {mission.description}
-          </Typography>
-        )}
-
-        {renderMissionContent()}
-
-        {feedback && <Alert severity="info">{feedback}</Alert>}
-
-        <Button variant="contained" disabled={isValidating} size="large">
-          {getButtonLabel()}
-        </Button>
-      </Stack>
-    </Paper>
+    <ChallengeLayout
+      badge={badge}
+      title={challenge.title}
+      description={challenge.description}
+      footer={
+        <ActionButton
+          onClick={handleSubmit}
+          isValidating={isValidating}
+          isLastStep={isLastStep}
+          label={actionLabel}
+        />
+      }
+    >
+      <ContentComponent mission={challenge} />
+      <FeedbackDisplay feedback={feedback} />
+    </ChallengeLayout>
   );
 };

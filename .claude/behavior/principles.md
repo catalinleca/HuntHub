@@ -70,6 +70,54 @@ Never compromise on reliability - but always aim for the simplest version of cod
 - Inline returns in functions (always use explicit return with braces)
 - Over-engineered solutions for simple problems
 
+## MUI + Styled-Components Pattern
+
+**Don't mix styling approaches on the same element.**
+
+**Decision order (ALWAYS follow this):**
+1. Can I use component props? → Use props
+2. Only need spacing? → Use sx with abbreviations (pt, mt, etc.)
+3. Need custom styles that props/sx can't handle? → ONLY THEN use styled()
+
+**When to use what:**
+
+| Situation | Approach |
+|-----------|----------|
+| Only need layout props | `<Stack direction="row" gap={2}>` |
+| Props + simple spacing | `<Stack direction="row" sx={{ mt: 2 }}>` |
+| Need custom styles (margin-top: auto, flex: 1, etc.) | `styled()` with ALL styles inside |
+
+**Rules:**
+- **Props** → layout behavior (direction, alignItems, justifyContent, gap)
+- **sx** → spacing abbreviations only with numeric values (m, mt, mb, p, pt, pb, px, py, mx, my, gap)
+- **styled()** → ONLY for custom styles that can't be expressed with props or sx (e.g., margin-top: auto, flex: 1, custom colors, transforms)
+
+**IMPORTANT:** If a component only needs spacing (padding, margin), do NOT create a styles file. Just use sx.
+
+**Never mix styled wrapper + sx props:**
+```tsx
+// ❌ Mixing - confusing, styles in two places
+const Footer = styled(Stack)`
+  margin-top: auto;
+`;
+<Footer sx={{ pt: 2 }}>{footer}</Footer>
+
+// ✅ All styles in styled component
+const Footer = styled(Stack)`
+  margin-top: auto;
+  padding-top: ${({ theme }) => theme.spacing(2)};
+`;
+<Footer>{footer}</Footer>
+```
+
+**When using styled():**
+- Use `styled(Box)` for neutral containers
+- Use `styled(Stack)` only if you need Stack's flex defaults
+- Use `styled(Paper)` when you need Paper's elevation/styling
+- Put ALL styles in the styled component, not split between styled and sx
+
+---
+
 ## Form Data & Transformers Pattern
 
 **Form holds "wider" data than UI needs.** Transformers prepare complete data structures once on load - UI just shows/hides based on state. Don't scatter edge-case handlers across components.
