@@ -15,7 +15,7 @@ const initialState: PreviewCoreState = {
   error: null,
 };
 
-const clampStepIndex = (steps: unknown[], requestedIndex: number): number => {
+const clampStepIndex = (steps: Step[], requestedIndex: number): number => {
   const maxIndex = Math.max(0, steps.length - 1);
   return Math.max(0, Math.min(maxIndex, requestedIndex));
 };
@@ -33,22 +33,22 @@ export const usePreviewCore = () => {
 
   const goToStep = useCallback((index: number) => {
     setState((prev) => {
-      const steps = prev.hunt?.steps ?? [];
-      return { ...prev, stepIndex: clampStepIndex(steps, index) };
+      const prevSteps = prev.hunt?.steps ?? [];
+      return { ...prev, stepIndex: clampStepIndex(prevSteps, index) };
     });
   }, []);
 
   const goToNextStep = useCallback(() => {
     setState((prev) => {
-      const steps = prev.hunt?.steps ?? [];
-      return { ...prev, stepIndex: clampStepIndex(steps, prev.stepIndex + 1) };
+      const prevSteps = prev.hunt?.steps ?? [];
+      return { ...prev, stepIndex: clampStepIndex(prevSteps, prev.stepIndex + 1) };
     });
   }, []);
 
   const goToPrevStep = useCallback(() => {
     setState((prev) => {
-      const steps = prev.hunt?.steps ?? [];
-      return { ...prev, stepIndex: clampStepIndex(steps, prev.stepIndex - 1) };
+      const prevSteps = prev.hunt?.steps ?? [];
+      return { ...prev, stepIndex: clampStepIndex(prevSteps, prev.stepIndex - 1) };
     });
   }, []);
 
