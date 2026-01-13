@@ -23,6 +23,8 @@ export const useHint = () => {
   return {
     requestHint: mutation.mutate,
     hint: mutation.data?.hint ?? null,
+    hintsUsed: mutation.data?.hintsUsed ?? 0,
+    maxHints: mutation.data?.maxHints ?? 0,
     isLoading: mutation.isPending,
     isError: mutation.isError,
   };
