@@ -33,6 +33,9 @@ export const mockSteps: StepPF[] = [
           'Welcome to the adventure! Look for the old fountain in the main square. Your journey begins here.',
       },
     },
+    // Clue with all constraints for testing (will remove later)
+    timeLimit: 120,
+    maxAttempts: 3,
   },
   {
     stepId: 2,
@@ -51,6 +54,8 @@ export const mockSteps: StepPF[] = [
         randomizeOrder: false,
       },
     },
+    timeLimit: 60,
+    maxAttempts: 3,
   },
   {
     stepId: 3,
@@ -62,6 +67,7 @@ export const mockSteps: StepPF[] = [
         type: 'input' as OptionType,
       },
     },
+    maxAttempts: 5,
   },
   {
     stepId: 4,
@@ -74,6 +80,13 @@ export const mockSteps: StepPF[] = [
     },
   },
 ];
+
+// Mock hints (server-side only - fetched via API)
+const mockHints: Record<number, string> = {
+  1: 'The fountain is near the central plaza, look for the statue of the founder.',
+  2: 'Think about when the city was founded and add 70 years.',
+  3: 'The code starts with "EXPLORE" followed by the current year.',
+};
 
 // Mock answers (server-side only - never sent to client)
 const mockAnswers: Record<number, string> = {
@@ -93,6 +106,7 @@ interface MockSession {
   currentStepIndex: number;
   completedSteps: number[];
   attempts: Record<number, number>;
+  stepStartedAt: Record<number, number>; // stepId -> timestamp
   startedAt: string;
   status: 'in_progress' | 'completed' | 'abandoned';
 }
@@ -125,6 +139,7 @@ export const mockStartSession = async (
     currentStepIndex: 0,
     completedSteps: [],
     attempts: {},
+    stepStartedAt: { [mockSteps[0].stepId]: Date.now() }, // Start timer for first step
     startedAt: new Date().toISOString(),
     status: 'in_progress',
   };
@@ -250,14 +265,52 @@ export const mockValidateAnswer = async (
   }
 
   const stepId = step.stepId;
+  const currentAttempts = session.attempts[stepId] || 0;
 
-  session.attempts[stepId] = (session.attempts[stepId] || 0) + 1;
+  // Check time limit (server-side enforcement)
+  if (step.timeLimit) {
+    const startedAt = session.stepStartedAt[stepId];
+    if (startedAt) {
+      const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+      if (elapsed > step.timeLimit) {
+        // Time expired - auto-advance to next step
+        advanceToNextStep(session);
+        return {
+          correct: false,
+          feedback: "Time's up!",
+          expired: true,
+          attempts: currentAttempts,
+          maxAttempts: step.maxAttempts ?? undefined,
+          _links: {
+            currentStep: { href: `/play/sessions/${sessionId}/step/current` },
+            nextStep: { href: `/play/sessions/${sessionId}/step/next` },
+          },
+        };
+      }
+    }
+  }
+
+  // Check max attempts (server-side enforcement)
+  if (step.maxAttempts && currentAttempts >= step.maxAttempts) {
+    return {
+      correct: false,
+      feedback: 'No more attempts remaining.',
+      exhausted: true,
+      attempts: currentAttempts,
+      maxAttempts: step.maxAttempts,
+      _links: {
+        currentStep: { href: `/play/sessions/${sessionId}/step/current` },
+      },
+    };
+  }
+
+  // Increment attempts
+  session.attempts[stepId] = currentAttempts + 1;
 
   const isCorrect = checkAnswer(step, answerType, payload);
 
   if (isCorrect) {
-    session.completedSteps.push(stepId);
-    session.currentStepIndex++;
+    advanceToNextStep(session);
 
     const isComplete = session.currentStepIndex >= mockSteps.length;
     if (isComplete) {
@@ -269,6 +322,7 @@ export const mockValidateAnswer = async (
       feedback: 'Correct! Well done.',
       isComplete,
       attempts: session.attempts[stepId],
+      maxAttempts: step.maxAttempts ?? undefined,
       _links: {
         currentStep: { href: `/play/sessions/${sessionId}/step/current` },
         ...(isComplete ? {} : { nextStep: { href: `/play/sessions/${sessionId}/step/next` } }),
@@ -276,13 +330,76 @@ export const mockValidateAnswer = async (
     };
   }
 
+  // Check if this attempt exhausted all attempts
+  const isExhausted = step.maxAttempts ? session.attempts[stepId] >= step.maxAttempts : false;
+
   return {
     correct: false,
-    feedback: 'Not quite right. Try again!',
+    feedback: isExhausted ? 'No more attempts remaining.' : 'Not quite right. Try again!',
     attempts: session.attempts[stepId],
+    maxAttempts: step.maxAttempts ?? undefined,
+    exhausted: isExhausted,
     _links: {
       currentStep: { href: `/play/sessions/${sessionId}/step/current` },
     },
+  };
+};
+
+const advanceToNextStep = (session: MockSession) => {
+  const currentStep = mockSteps[session.currentStepIndex];
+  if (currentStep) {
+    session.completedSteps.push(currentStep.stepId);
+  }
+  session.currentStepIndex++;
+
+  // Start timer for next step
+  const nextStep = mockSteps[session.currentStepIndex];
+  if (nextStep) {
+    session.stepStartedAt[nextStep.stepId] = Date.now();
+  }
+};
+
+// =============================================================================
+// HINT API
+// =============================================================================
+
+/**
+ * POST /play/sessions/:sessionId/hint
+ * Request a hint for the current step
+ */
+export const mockRequestHint = async (
+  sessionId: string,
+): Promise<{ hint: string; hintsUsed: number; maxHints: number }> => {
+  await delay(300);
+
+  // Handle preview/mock sessions
+  if (sessionId === 'mock-session') {
+    return {
+      hint: 'This is a preview hint. In production, hints will come from the backend.',
+      hintsUsed: 1,
+      maxHints: 1,
+    };
+  }
+
+  const session = mockSessions.get(sessionId);
+  if (!session) {
+    throw new Error('Session not found');
+  }
+
+  const step = mockSteps[session.currentStepIndex];
+  if (!step) {
+    throw new Error('No current step');
+  }
+
+  const hint = mockHints[step.stepId];
+  if (!hint) {
+    throw new Error('No hint available for this step');
+  }
+
+  return {
+    hint,
+    hintsUsed: 1,
+    maxHints: 1,
   };
 };
 

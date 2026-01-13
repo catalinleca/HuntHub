@@ -11,10 +11,10 @@ interface ChallengeCardProps {
   title?: string;
   description?: string;
   footer: React.ReactNode;
-  hint?: string | null;
+  showHint?: boolean;
 }
 
-export const ChallengeCard = ({ badge, title, description, children, footer, hint }: ChallengeCardProps) => {
+export const ChallengeCard = ({ badge, title, description, children, footer, showHint }: ChallengeCardProps) => {
   return (
     <S.Container>
       <TypeBadge {...badge} />
@@ -24,7 +24,7 @@ export const ChallengeCard = ({ badge, title, description, children, footer, hin
 
       <S.Content>{children}</S.Content>
 
-      {hint && <HintSection hint={hint} />}
+      {showHint && <HintSection />}
 
       <S.Footer>{footer}</S.Footer>
     </S.Container>

@@ -1,0 +1,63 @@
+import { ArrowRightIcon, TrophyIcon } from '@phosphor-icons/react';
+import * as S from './ActionButton.styles';
+
+interface ActionButtonProps {
+  onClick: () => void;
+  isValidating: boolean;
+  isLastStep: boolean;
+  disabled?: boolean;
+  label: string;
+  loadingLabel?: string;
+  color?: string;
+}
+
+export const ActionButton = ({
+  onClick,
+  isValidating,
+  isLastStep,
+  disabled = false,
+  label,
+  loadingLabel = 'Checking...',
+  color,
+}: ActionButtonProps) => {
+  const getButtonContent = () => {
+    if (isValidating) {
+      return (
+        <S.ButtonContent>
+          <S.LoadingSpinner />
+          {loadingLabel}
+        </S.ButtonContent>
+      );
+    }
+
+    if (isLastStep) {
+      return (
+        <S.ButtonContent>
+          <TrophyIcon size={20} weight="bold" />
+          Finish Hunt
+        </S.ButtonContent>
+      );
+    }
+
+    return (
+      <S.ButtonContent>
+        {label}
+        <ArrowRightIcon size={20} weight="bold" />
+      </S.ButtonContent>
+    );
+  };
+
+  return (
+    <S.StyledButton
+      variant="contained"
+      size="large"
+      onClick={onClick}
+      disabled={isValidating || disabled}
+      fullWidth
+      $color={color}
+      $isLoading={isValidating}
+    >
+      {getButtonContent()}
+    </S.StyledButton>
+  );
+};

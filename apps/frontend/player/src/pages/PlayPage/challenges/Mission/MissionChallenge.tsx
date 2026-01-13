@@ -2,8 +2,8 @@ import React from 'react';
 import { MissionType } from '@hunthub/shared';
 import type { MissionPF } from '@hunthub/shared';
 import { MISSION_BADGES, MISSION_ACTION_LABELS } from '@/constants';
-import { ChallengeCard, ActionButton, FeedbackDisplay } from './components';
-import { LocationContent, PhotoContent, AudioContent } from './components/Mission';
+import { ChallengeCard, ActionButton, FeedbackDisplay } from '../components';
+import { LocationContent, PhotoContent, AudioContent } from '../components/Mission';
 import type { ChallengeProps } from '@/types';
 
 const MISSION_CONTENT = {

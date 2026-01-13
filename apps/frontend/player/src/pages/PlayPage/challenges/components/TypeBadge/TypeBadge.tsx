@@ -11,7 +11,7 @@ interface TypeBadgeProps {
 export const TypeBadge = ({ label, icon: IconComponent, color }: TypeBadgeProps) => {
   return (
     <S.Badge $color={color}>
-      <IconComponent size={16} weight="bold" />
+      <IconComponent size={18} weight="bold" />
       <Typography variant="overline">{label}</Typography>
     </S.Badge>
   );

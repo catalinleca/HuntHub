@@ -3,7 +3,7 @@ import { Typography } from '@mui/material';
 import { ChallengeType } from '@hunthub/shared';
 import type { TaskPF } from '@hunthub/shared';
 import { CHALLENGE_BADGES } from '@/constants';
-import { ChallengeCard, ActionButton, FeedbackDisplay } from './components';
+import { ChallengeCard, ActionButton, FeedbackDisplay } from '../components';
 import type { ChallengeProps } from '@/types';
 
 export const TaskChallenge = ({

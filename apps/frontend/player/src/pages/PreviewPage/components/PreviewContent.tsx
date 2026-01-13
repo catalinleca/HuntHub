@@ -1,6 +1,6 @@
 import { Typography, CircularProgress } from '@mui/material';
 import type { Hunt, Step } from '@hunthub/shared';
-import { MockValidationProvider, type ValidationResult } from '@/context';
+import { MockValidationProvider, MockPlaySessionProvider, type ValidationResult } from '@/context';
 import { stripAnswers } from '@/utils';
 import { StepRenderer } from '../../PlayPage/components/StepRenderer';
 import { PreviewToolbar } from './PreviewToolbar';
@@ -83,9 +83,11 @@ export const PreviewContent = ({
       )}
 
       <S.Content>
-        <MockValidationProvider key={currentStep.stepId} step={currentStep} onValidated={onValidated}>
-          <StepRenderer step={stepForPlayer} isLastStep={isLastStep} />
-        </MockValidationProvider>
+        <MockPlaySessionProvider>
+          <MockValidationProvider key={currentStep.stepId} step={currentStep} onValidated={onValidated}>
+            <StepRenderer step={stepForPlayer} isLastStep={isLastStep} />
+          </MockValidationProvider>
+        </MockPlaySessionProvider>
       </S.Content>
     </S.Container>
   );

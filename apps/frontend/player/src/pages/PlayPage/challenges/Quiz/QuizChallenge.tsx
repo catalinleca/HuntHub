@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { AnswerType, OptionType } from '@hunthub/shared';
 import type { QuizPF } from '@hunthub/shared';
 import { QUIZ_BADGES } from '@/constants';
-import { ChallengeCard, ActionButton, FeedbackDisplay } from './components';
-import { ChoiceContent, InputContent } from './components/Quiz';
+import { ChallengeCard, ActionButton, FeedbackDisplay } from '../components';
+import { ChoiceContent, InputContent } from '../components/Quiz';
 import type { ChallengeProps } from '@/types';
 
 export const QuizChallenge = ({
