@@ -19,7 +19,7 @@ const CHALLENGES: Record<ChallengeType, (c: ChallengePF, props: BaseChallengePro
 
 export const StepRenderer = ({ step, isLastStep }: StepRendererProps) => {
   const { validate, isValidating, feedback } = useValidation();
-  const baseProps = {
+  const baseProps: BaseChallengeProps = {
     onValidate: validate,
     isValidating,
     isLastStep,

@@ -8,7 +8,6 @@ export interface BaseChallengeProps {
   media?: Media;
   timeLimit?: number | null;
   maxAttempts?: number | null;
-  // hint is NOT here - fetched via API by HintSection component
 }
 
 export type ChallengeProps<T> = BaseChallengeProps & { challenge: T };

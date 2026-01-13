@@ -372,6 +372,15 @@ export const mockRequestHint = async (
 ): Promise<{ hint: string; hintsUsed: number; maxHints: number }> => {
   await delay(300);
 
+  // Handle preview/mock sessions
+  if (sessionId === 'mock-session') {
+    return {
+      hint: 'This is a preview hint. In production, hints will come from the backend.',
+      hintsUsed: 1,
+      maxHints: 1,
+    };
+  }
+
   const session = mockSessions.get(sessionId);
   if (!session) {
     throw new Error('Session not found');
@@ -387,7 +396,6 @@ export const mockRequestHint = async (
     throw new Error('No hint available for this step');
   }
 
-  // Track hint usage (in real backend, this would be in session.stepProgress)
   return {
     hint,
     hintsUsed: 1,
