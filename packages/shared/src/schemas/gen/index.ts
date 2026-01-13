@@ -344,7 +344,14 @@ export const ChallengePF = z
   .partial()
   .strict();
 export const StepPF = z
-  .object({ stepId: z.number().int(), type: ChallengeType, challenge: ChallengePF, media: Media.optional() })
+  .object({
+    stepId: z.number().int(),
+    type: ChallengeType,
+    challenge: ChallengePF,
+    media: Media.optional(),
+    timeLimit: z.number().int().nullish(),
+    maxAttempts: z.number().int().nullish(),
+  })
   .strict();
 export const HuntMetaPF = z
   .object({
@@ -395,6 +402,9 @@ export const ValidateAnswerResponse = z
     feedback: z.string().optional(),
     isComplete: z.boolean().optional(),
     attempts: z.number().int().optional(),
+    maxAttempts: z.number().int().optional(),
+    expired: z.boolean().optional(),
+    exhausted: z.boolean().optional(),
     _links: ValidateAnswerLinks,
   })
   .strict();

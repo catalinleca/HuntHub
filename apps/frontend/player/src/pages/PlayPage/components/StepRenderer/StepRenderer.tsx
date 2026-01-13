@@ -19,7 +19,15 @@ const CHALLENGES: Record<ChallengeType, (c: ChallengePF, props: BaseChallengePro
 
 export const StepRenderer = ({ step, isLastStep }: StepRendererProps) => {
   const { validate, isValidating, feedback } = useValidation();
-  const baseProps = { onValidate: validate, isValidating, isLastStep, feedback };
+  const baseProps = {
+    onValidate: validate,
+    isValidating,
+    isLastStep,
+    feedback,
+    media: step.media,
+    timeLimit: step.timeLimit,
+    maxAttempts: step.maxAttempts,
+  };
 
   const renderChallenge = CHALLENGES[step.type];
 

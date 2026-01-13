@@ -798,6 +798,10 @@ export interface StepPF {
   challenge: ChallengePF;
   /** Optional media attachment */
   media?: Media;
+  /** Time limit in seconds (for display - server enforces) */
+  timeLimit?: number | null;
+  /** Maximum attempts allowed (for display - server enforces) */
+  maxAttempts?: number | null;
 }
 
 /** Player Format - Hunt metadata (no steps) */
@@ -908,6 +912,12 @@ export interface ValidateAnswerResponse {
   isComplete?: boolean;
   /** Number of attempts on this step */
   attempts?: number;
+  /** Maximum attempts allowed for this step */
+  maxAttempts?: number;
+  /** Whether the time limit expired */
+  expired?: boolean;
+  /** Whether all attempts have been used */
+  exhausted?: boolean;
   /** HATEOAS links returned after validation */
   _links: ValidateAnswerLinks;
 }

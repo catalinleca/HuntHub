@@ -1165,6 +1165,14 @@ components:
         media:
           $ref: '#/components/schemas/Media'
           description: Optional media attachment
+        timeLimit:
+          type: integer
+          nullable: true
+          description: Time limit in seconds (for display - server enforces)
+        maxAttempts:
+          type: integer
+          nullable: true
+          description: Maximum attempts allowed (for display - server enforces)
       required:
         - stepId
         - type
@@ -1363,6 +1371,15 @@ components:
         attempts:
           type: integer
           description: Number of attempts on this step
+        maxAttempts:
+          type: integer
+          description: Maximum attempts allowed for this step
+        expired:
+          type: boolean
+          description: Whether the time limit expired
+        exhausted:
+          type: boolean
+          description: Whether all attempts have been used
         _links:
           $ref: '#/components/schemas/ValidateAnswerLinks'
       required:

@@ -1,12 +1,20 @@
-import React from 'react';
-import { AnswerType, ChallengeType } from '@hunthub/shared';
+import { AnswerType, MediaType } from '@hunthub/shared';
 import type { CluePF } from '@hunthub/shared';
-import { CHALLENGE_BADGES } from '@/constants';
-import { ChallengeCard, ActionButton, FeedbackDisplay } from './components';
+import { StepContainer, StepContent, StepActions } from '@/components/step';
+import { MediaDisplay } from '@/components/media';
+import { ActionButton, FeedbackDisplay } from './components';
 import type { ChallengeProps } from '@/types';
+import * as S from './ClueChallenge.styles';
+
+const VISUAL_MEDIA_TYPES: MediaType[] = [
+  MediaType.Image,
+  MediaType.Video,
+  MediaType.ImageAudio,
+];
 
 export const ClueChallenge = ({
   challenge,
+  media,
   onValidate,
   isValidating,
   isLastStep,
@@ -16,16 +24,36 @@ export const ClueChallenge = ({
     onValidate(AnswerType.Clue, { clue: {} });
   };
 
+  const hasVisualMedia = media && VISUAL_MEDIA_TYPES.includes(media.type);
+  const hasAudioOnly = media?.type === MediaType.Audio;
+
   return (
-    <ChallengeCard
-      badge={CHALLENGE_BADGES[ChallengeType.Clue]}
-      title={challenge.title}
-      description={challenge.description}
-      footer={
-        <ActionButton onClick={handleContinue} isValidating={isValidating} isLastStep={isLastStep} label="Continue" />
-      }
-    >
-      <FeedbackDisplay feedback={feedback} />
-    </ChallengeCard>
+    <StepContainer>
+      <StepContent>
+        {hasVisualMedia && <MediaDisplay media={media} />}
+
+        <S.ClueContent>
+          {challenge.title && (
+            <S.ClueTitle variant="h5">{challenge.title}</S.ClueTitle>
+          )}
+          {challenge.description && (
+            <S.ClueDescription>{challenge.description}</S.ClueDescription>
+          )}
+        </S.ClueContent>
+
+        {hasAudioOnly && <MediaDisplay media={media} />}
+
+        <FeedbackDisplay feedback={feedback} />
+      </StepContent>
+
+      <StepActions>
+        <ActionButton
+          onClick={handleContinue}
+          isValidating={isValidating}
+          isLastStep={isLastStep}
+          label="Continue"
+        />
+      </StepActions>
+    </StepContainer>
   );
 };
