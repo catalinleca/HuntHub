@@ -35,14 +35,8 @@ export const HintSection = () => {
 
   return (
     <S.HintButton onClick={() => requestHint()} disabled={isLoading}>
-      {isLoading ? (
-        <CircularProgress size={16} />
-      ) : (
-        <LightbulbIcon size={20} weight="duotone" />
-      )}
-      <Typography variant="body2">
-        {isLoading ? 'Loading...' : 'Need a hint?'}
-      </Typography>
+      {isLoading ? <CircularProgress size={16} /> : <LightbulbIcon size={20} weight="duotone" />}
+      <Typography variant="body2">{isLoading ? 'Loading...' : 'Need a hint?'}</Typography>
     </S.HintButton>
   );
 };
