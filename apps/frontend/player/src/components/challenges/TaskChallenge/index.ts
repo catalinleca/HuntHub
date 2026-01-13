@@ -1,1 +1,0 @@
-export { TaskChallenge } from './TaskChallenge';

@@ -1,70 +1,39 @@
-import { Typography } from '@mui/material';
-import type { StepPF } from '@hunthub/shared';
+import React from 'react';
+import { ChallengeType } from '@hunthub/shared';
+import type { StepPF, ChallengePF } from '@hunthub/shared';
 import { useValidation } from '@/context';
-import { ClueChallenge, QuizChallenge, MissionChallenge, TaskChallenge } from '@/components/challenges';
+import { ClueChallenge, QuizChallenge, MissionChallenge, TaskChallenge } from '../../challenges';
+import type { BaseChallengeProps } from '@/types';
 
 interface StepRendererProps {
   step: StepPF;
   isLastStep: boolean;
 }
 
+const CHALLENGES: Record<ChallengeType, (c: ChallengePF, props: BaseChallengeProps) => React.ReactNode> = {
+  [ChallengeType.Clue]: (c, props) => c.clue && <ClueChallenge challenge={c.clue} {...props} />,
+  [ChallengeType.Quiz]: (c, props) => c.quiz && <QuizChallenge challenge={c.quiz} {...props} />,
+  [ChallengeType.Mission]: (c, props) => c.mission && <MissionChallenge challenge={c.mission} {...props} />,
+  [ChallengeType.Task]: (c, props) => c.task && <TaskChallenge challenge={c.task} {...props} />,
+};
+
 export const StepRenderer = ({ step, isLastStep }: StepRendererProps) => {
   const { validate, isValidating, feedback } = useValidation();
+  const baseProps = { onValidate: validate, isValidating, isLastStep, feedback };
 
-  switch (step.type) {
-    case 'clue': {
-      if (!step.challenge.clue) {
-        return <Typography color="error">Invalid clue data</Typography>;
-      }
-      return (
-        <ClueChallenge
-          clue={step.challenge.clue}
-          onValidate={validate}
-          isValidating={isValidating}
-          isLastStep={isLastStep}
-          feedback={feedback}
-        />
-      );
-    }
+  const renderChallenge = CHALLENGES[step.type];
 
-    case 'quiz': {
-      if (!step.challenge.quiz) {
-        return <Typography color="error">Invalid quiz data</Typography>;
-      }
-      return (
-        <QuizChallenge
-          quiz={step.challenge.quiz}
-          onValidate={validate}
-          isValidating={isValidating}
-          isLastStep={isLastStep}
-          feedback={feedback}
-        />
-      );
-    }
-
-    case 'mission': {
-      if (!step.challenge.mission) {
-        return <Typography color="error">Invalid mission data</Typography>;
-      }
-      return (
-        <MissionChallenge
-          mission={step.challenge.mission}
-          onValidate={validate}
-          isValidating={isValidating}
-          isLastStep={isLastStep}
-          feedback={feedback}
-        />
-      );
-    }
-
-    case 'task': {
-      if (!step.challenge.task) {
-        return <Typography color="error">Invalid task data</Typography>;
-      }
-      return <TaskChallenge task={step.challenge.task} />;
-    }
-
-    default:
-      return <Typography color="error">Unknown challenge type: {step.type}</Typography>;
+  if (!renderChallenge) {
+    console.warn(`StepRenderer: Unknown challenge type "${step.type}"`);
+    return null;
   }
+
+  const rendered = renderChallenge(step.challenge, baseProps);
+
+  if (!rendered) {
+    console.warn(`StepRenderer: Missing challenge data for type "${step.type}"`);
+    return null;
+  }
+
+  return rendered;
 };
