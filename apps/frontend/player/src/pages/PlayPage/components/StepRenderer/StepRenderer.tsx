@@ -21,7 +21,14 @@ export const StepRenderer = ({ step, isLastStep }: StepRendererProps) => {
   const { validate, isValidating, feedback } = useValidation();
   const baseProps = { onValidate: validate, isValidating, isLastStep, feedback };
 
-  const rendered = CHALLENGES[step.type](step.challenge, baseProps);
+  const renderChallenge = CHALLENGES[step.type];
+
+  if (!renderChallenge) {
+    console.warn(`StepRenderer: Unknown challenge type "${step.type}"`);
+    return null;
+  }
+
+  const rendered = renderChallenge(step.challenge, baseProps);
 
   if (!rendered) {
     console.warn(`StepRenderer: Missing challenge data for type "${step.type}"`);
