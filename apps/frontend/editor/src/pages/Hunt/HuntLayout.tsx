@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useForm, useFormContext, FormProvider, FieldErrors } from 'react-hook-form';
+import { useState, useMemo } from 'react';
+import { useForm, useFormContext, useWatch, FormProvider, FieldErrors } from 'react-hook-form';
 import { Button } from '@mui/material';
 import { DeviceMobileIcon } from '@phosphor-icons/react';
 import { Hunt } from '@hunthub/shared';
@@ -67,12 +67,17 @@ interface HuntLayoutContentProps {
   hunt: Hunt;
 }
 
-const HuntLayoutContent = ({ huntFormData, hunt }: HuntLayoutContentProps) => {
+const HuntLayoutContent = ({ huntFormData }: HuntLayoutContentProps) => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const snackbar = useSnackbarStore();
-  const { handleSubmit, reset, getValues } = useFormContext<{ hunt: HuntFormData }>();
+  const { handleSubmit, reset, getValues, control } = useFormContext<{ hunt: HuntFormData }>();
   const { steps, selectedFormKey, setSelectedFormKey } = useHuntStepsContext();
+
+  const watchedFormData = useWatch({ control, name: 'hunt' });
+  const previewHunt = useMemo(() => {
+    return prepareHuntForSave(watchedFormData);
+  }, [watchedFormData]);
 
   const saveHuntMutation = useSaveHunt();
 
@@ -138,7 +143,7 @@ const HuntLayoutContent = ({ huntFormData, hunt }: HuntLayoutContentProps) => {
           <HuntForm stepIndex={selectedStepIndex} stepType={selectedStepType} isPreviewOpen={isPreviewOpen} />
         )}
 
-        <HuntPreview hunt={hunt} isOpen={isPreviewOpen} selectedStepIndex={selectedStepIndex} />
+        <HuntPreview hunt={previewHunt} isOpen={isPreviewOpen} selectedStepIndex={selectedStepIndex} />
       </S.ContentArea>
     </S.Container>
   );

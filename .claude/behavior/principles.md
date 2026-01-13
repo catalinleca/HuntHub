@@ -81,12 +81,6 @@ Never compromise on reliability - but always aim for the simplest version of cod
 
 ## Response Style
 
-**BE CONCISE. No information vomit.**
-- Short answers when short answers suffice
-- Don't dump walls of code - show only what's relevant
-- Skip obvious explanations
-- If it fits in 3 lines, don't write 30
-
 1. First, explain what patterns you found in the existing code
 2. Show how your solution follows those patterns
 3. Highlight any trade-offs or risks

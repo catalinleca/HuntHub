@@ -15,8 +15,7 @@ const initialState: PreviewCoreState = {
   error: null,
 };
 
-const clampStepIndex = (state: PreviewCoreState, requestedIndex: number): number => {
-  const steps = state.hunt?.steps ?? [];
+const clampStepIndex = (steps: unknown[], requestedIndex: number): number => {
   const maxIndex = Math.max(0, steps.length - 1);
   return Math.max(0, Math.min(maxIndex, requestedIndex));
 };
@@ -33,20 +32,31 @@ export const usePreviewCore = () => {
   const isLastStep = state.stepIndex === lastStepIndex;
 
   const goToStep = useCallback((index: number) => {
-    setState((prev) => ({ ...prev, stepIndex: clampStepIndex(prev, index) }));
+    setState((prev) => {
+      const steps = prev.hunt?.steps ?? [];
+      return { ...prev, stepIndex: clampStepIndex(steps, index) };
+    });
   }, []);
 
   const goToNextStep = useCallback(() => {
-    setState((prev) => ({ ...prev, stepIndex: clampStepIndex(prev, prev.stepIndex + 1) }));
+    setState((prev) => {
+      const steps = prev.hunt?.steps ?? [];
+      return { ...prev, stepIndex: clampStepIndex(steps, prev.stepIndex + 1) };
+    });
   }, []);
 
   const goToPrevStep = useCallback(() => {
-    setState((prev) => ({ ...prev, stepIndex: clampStepIndex(prev, prev.stepIndex - 1) }));
+    setState((prev) => {
+      const steps = prev.hunt?.steps ?? [];
+      return { ...prev, stepIndex: clampStepIndex(steps, prev.stepIndex - 1) };
+    });
   }, []);
 
   const setHunt = useCallback((hunt: Hunt) => {
     setState((prev) => {
-      return { ...prev, hunt, stepIndex: 0, isLoading: false, error: null };
+      const newSteps = hunt.steps ?? [];
+      const preservedStepIndex = clampStepIndex(newSteps, prev.stepIndex);
+      return { ...prev, hunt, stepIndex: preservedStepIndex, isLoading: false, error: null };
     });
   }, []);
 

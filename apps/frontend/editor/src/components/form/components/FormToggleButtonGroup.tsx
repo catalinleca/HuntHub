@@ -1,3 +1,4 @@
+import React from 'react';
 import { FormHelperText } from '@mui/material';
 import { useFormContext, useController } from 'react-hook-form';
 import { FormFieldProps } from '../types';
@@ -24,6 +25,12 @@ export const FormToggleButtonGroup = ({
   const error = useFieldError(name);
   const id = nameToId(name);
 
+  const handleChange = (_event: React.MouseEvent<HTMLElement>, newValue: string | null) => {
+    if (newValue !== null) {
+      field.onChange(newValue);
+    }
+  };
+
   return (
     <FieldContainer fullWidth={false}>
       {label && (
@@ -31,7 +38,17 @@ export const FormToggleButtonGroup = ({
           {label}
         </InputLabel>
       )}
-      <ToggleButtonGroup {...field} id={id} options={options} exclusive disabled={disabled} {...props} />
+      <ToggleButtonGroup
+        value={field.value}
+        onChange={handleChange}
+        onBlur={field.onBlur}
+        ref={field.ref}
+        id={id}
+        options={options}
+        exclusive
+        disabled={disabled}
+        {...props}
+      />
       {error && <FormHelperText error>{error}</FormHelperText>}
       {!error && helperText && <FormHelperText>{helperText}</FormHelperText>}
     </FieldContainer>

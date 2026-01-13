@@ -4,7 +4,7 @@ import { FormInput, FormTextArea, FormMediaInput, getFieldPath, FormToggleButton
 import { LocationSection, StepCard } from './components';
 import { StepSettings } from './StepSettings';
 import { STEP_TYPE_CONFIG } from '@/pages/Hunt/HuntSteps/stepTypeConfig';
-import { GpsIcon, UploadSimpleIcon } from '@phosphor-icons/react';
+import { GpsIcon, MicrophoneIcon, UploadSimpleIcon } from '@phosphor-icons/react';
 import { useWatch } from 'react-hook-form';
 import { WithTransition } from '@/components/common';
 
@@ -21,8 +21,9 @@ const getMissionFieldNames = (stepIndex: number) => ({
 });
 
 const MISSION_TYPE_OPTIONS = [
-  { value: MissionType.UploadMedia, label: 'Upload Photo/Video', icon: <UploadSimpleIcon size={16} weight="bold" /> },
-  { value: MissionType.MatchLocation, label: 'Match Location', icon: <GpsIcon size={16} weight="bold" /> },
+  { value: MissionType.UploadMedia, label: 'Photo', icon: <UploadSimpleIcon size={16} weight="bold" /> },
+  { value: MissionType.UploadAudio, label: 'Audio', icon: <MicrophoneIcon size={16} weight="bold" /> },
+  { value: MissionType.MatchLocation, label: 'Location', icon: <GpsIcon size={16} weight="bold" /> },
 ];
 
 export const MissionInput = ({ stepIndex }: MissionInputProps) => {
@@ -49,13 +50,20 @@ export const MissionInput = ({ stepIndex }: MissionInputProps) => {
         rows={4}
       />
 
-      <WithTransition transitionKey={missionType} variant="fade-slide-down">
-        {isMatchLocation && (
+      <WithTransition transitionKey={isMatchLocation ? 'location' : 'ai'} variant="fade-slide-down">
+        {isMatchLocation ? (
           <LocationSection
             stepIndex={stepIndex}
             title="Target Location"
             description="Where players must go to complete this mission"
             color={color}
+          />
+        ) : (
+          <FormTextArea
+            name={fields.aiInstructions}
+            label="AI Validation Instructions"
+            placeholder="Describe what the AI should look for to validate the submission..."
+            rows={3}
           />
         )}
       </WithTransition>

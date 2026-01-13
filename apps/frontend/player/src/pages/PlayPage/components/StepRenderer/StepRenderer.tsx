@@ -46,7 +46,15 @@ export const StepRenderer = ({ step, isLastStep }: StepRendererProps) => {
       if (!step.challenge.mission) {
         return <Typography color="error">Invalid mission data</Typography>;
       }
-      return <MissionChallenge mission={step.challenge.mission} />;
+      return (
+        <MissionChallenge
+          mission={step.challenge.mission}
+          onValidate={validate}
+          isValidating={isValidating}
+          isLastStep={isLastStep}
+          feedback={feedback}
+        />
+      );
     }
 
     case 'task': {
