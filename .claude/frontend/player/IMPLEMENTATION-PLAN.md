@@ -2,6 +2,77 @@
 
 **Context dump for session continuity. Not human-readable prose.**
 
+**Last updated:** 2025-01-13
+
+---
+
+## 🎯 CURRENT SESSION STATE (2025-01-13)
+
+### Folder Structure (REFACTORED)
+```
+apps/frontend/player/src/pages/PlayPage/
+├── challenges/                    # Core feature (NOT in /components/)
+│   ├── ClueChallenge.tsx          # ✅ Validation wired up
+│   ├── QuizChallenge.tsx          # ✅ Validation wired up (choice + input)
+│   ├── MissionChallenge.tsx       # ⏳ UI only, handleSubmit TODO
+│   ├── TaskChallenge.tsx          # ⏳ UI only, handleSubmit TODO
+│   ├── index.ts
+│   └── components/                # Internal components
+│       ├── ChallengeCard/         # Card wrapper (has styles)
+│       ├── TypeBadge/             # Badge display (has styles)
+│       ├── Quiz/                  # Quiz-specific (ChoiceContent, InputContent)
+│       ├── Mission/               # Mission-specific (Location, Photo, Audio)
+│       ├── ActionButton.tsx       # Submit button
+│       ├── FeedbackDisplay.tsx    # Shows validation feedback
+│       ├── HintSection.tsx        # Collapsible hint
+│       └── index.ts
+└── components/
+    └── StepRenderer/              # Routes to correct challenge by type
+```
+
+### Validation Infrastructure (COMPLETE)
+```
+Challenge → onValidate(answerType, payload)
+     ↓
+MockValidationProvider → checkAnswer() → sets feedback → calls onValidated(result)
+     ↓                         ↓
+Challenge shows feedback       Parent decides navigation based on mode
+```
+
+**Files:**
+- `context/Validation/MockValidationProvider.tsx` - Client-side validation for preview
+- `context/Validation/ApiValidationProvider.tsx` - API validation for production
+- `utils/checkAnswer.ts` - Handles all answer types (clue, quiz, mission, task)
+
+### Navigation Behavior (DECIDED)
+```
+MODE                 AFTER CORRECT VALIDATION
+─────────────────────────────────────────────
+Production           Navigate to next step ✅
+Standalone preview   Don't navigate ❌
+Editor embed         Don't navigate ❌
+```
+
+Parent provides `onValidated` callback and decides navigation based on mode.
+
+### Challenge Status
+```
+CHALLENGE        handleSubmit    UI         NOTES
+───────────────────────────────────────────────────────
+ClueChallenge    ✅ Done         ⏳ Basic   Just title + description + Continue
+QuizChallenge    ✅ Done         ✅ Done    Choice + Input modes working
+MissionChallenge ⏳ TODO         ⏳ Basic   Needs GPS/upload logic
+TaskChallenge    ⏳ TODO         ⏳ Basic   Needs textarea + submit
+```
+
+### Next Steps (Next Session)
+1. Finalize Clue UI (MVP design)
+2. Finalize Quiz UI (MVP design)
+3. Implement Mission handleSubmit + UI per type
+4. Implement Task handleSubmit + UI
+5. Wire up navigation in parent pages based on mode
+6. Test end-to-end in preview
+
 ---
 
 ## DECIDED: 7 Challenge Variations (MVP)
@@ -325,7 +396,7 @@ quiz/input  🔐 PUZZLE           KeyIcon           #5DADE2 (blue)
 mission/loc 📍 LOCATION         MapPinIcon        #FF6B6B (coral)
 mission/pho 📸 PHOTO MISSION    CameraIcon        #FF6B6B (coral)
 mission/aud 🎤 AUDIO MISSION    MicrophoneIcon    #FF6B6B (coral)
-task        ⚡ CHALLENGE        LightningIcon     #9B59B6 (purple)
+task        ⚡ TASK             LightningIcon     #9B59B6 (purple)
 ```
 
 Badge derived from step.type + challenge.subtype at render time.
