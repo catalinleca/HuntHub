@@ -56,6 +56,8 @@ export const stripAnswers = (step: Step): StepPF => {
     type: step.type,
     challenge: challengePF,
     media: step.media,
-    // Explicitly NOT including: requiredLocation, hint, timeLimit, maxAttempts, metadata, timestamps
+    timeLimit: step.timeLimit,
+    maxAttempts: step.maxAttempts,
+    // Explicitly NOT including: requiredLocation, hint, metadata, timestamps
   };
 };
