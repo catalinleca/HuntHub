@@ -1,4 +1,4 @@
-export { ClueChallenge } from './ClueChallenge';
-export { QuizChallenge } from './QuizChallenge';
-export { MissionChallenge } from './MissionChallenge';
-export { TaskChallenge } from './TaskChallenge';
+export { ClueChallenge } from './Clue';
+export { QuizChallenge } from './Quiz';
+export { MissionChallenge } from './Mission';
+export { TaskChallenge } from './Task';

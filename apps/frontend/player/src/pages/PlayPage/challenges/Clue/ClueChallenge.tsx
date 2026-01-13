@@ -8,7 +8,7 @@ import {
   HintSection,
   TimeLimit,
   AttemptsCounter,
-} from './components';
+} from '../components';
 import type { ChallengeProps } from '@/types';
 import * as S from './ClueChallenge.styles';
 
