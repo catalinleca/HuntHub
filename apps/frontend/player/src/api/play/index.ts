@@ -4,3 +4,4 @@ export { useGetSession } from './useGetSession';
 export { useCurrentStep } from './useCurrentStep';
 export { usePrefetchNextStep } from './usePrefetchNextStep';
 export { useValidateAnswer } from './useValidateAnswer';
+export { useHint } from './useHint';

@@ -1,26 +1,48 @@
-import { useState } from 'react';
-import { Alert, Button, Box } from '@mui/material';
+import { Typography, CircularProgress } from '@mui/material';
+import { LightbulbIcon } from '@phosphor-icons/react';
+import { usePlaySession } from '@/context';
+import { useHint } from '@/api/play';
+import * as S from './HintSection.styles';
 
-interface HintSectionProps {
-  hint: string;
-}
+export const HintSection = () => {
+  const { sessionId } = usePlaySession();
+  const { requestHint, hint, isLoading, isError } = useHint(sessionId);
 
-export const HintSection = ({ hint }: HintSectionProps) => {
-  const [revealed, setRevealed] = useState(false);
+  if (hint) {
+    return (
+      <S.HintContainer>
+        <S.HintHeader>
+          <LightbulbIcon size={20} weight="duotone" />
+          <Typography variant="body2" fontWeight={600}>
+            Hint
+          </Typography>
+        </S.HintHeader>
+        <Typography variant="body2" color="text.secondary">
+          {hint}
+        </Typography>
+      </S.HintContainer>
+    );
+  }
 
-  const handleReveal = () => {
-    setRevealed(true);
-  };
+  if (isError) {
+    return (
+      <S.HintButton disabled>
+        <LightbulbIcon size={20} weight="duotone" />
+        <Typography variant="body2">No hint available</Typography>
+      </S.HintButton>
+    );
+  }
 
   return (
-    <Box sx={{ pt: 1 }}>
-      {revealed ? (
-        <Alert severity="info">{hint}</Alert>
+    <S.HintButton onClick={() => requestHint()} disabled={isLoading}>
+      {isLoading ? (
+        <CircularProgress size={16} />
       ) : (
-        <Button variant="text" size="small" onClick={handleReveal}>
-          Need a hint?
-        </Button>
+        <LightbulbIcon size={20} weight="duotone" />
       )}
-    </Box>
+      <Typography variant="body2">
+        {isLoading ? 'Loading...' : 'Need a hint?'}
+      </Typography>
+    </S.HintButton>
   );
 };
