@@ -45,7 +45,7 @@ components:
 
     MissionType:
       type: string
-      enum: [upload-media, match-location]
+      enum: [upload-media, match-location, upload-audio]
 
     MimeTypes:
       type: string

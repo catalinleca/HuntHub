@@ -78,6 +78,7 @@ export enum MimeTypes {
 export enum MissionType {
   UploadMedia = "upload-media",
   MatchLocation = "match-location",
+  UploadAudio = "upload-audio",
 }
 
 export enum OptionType {

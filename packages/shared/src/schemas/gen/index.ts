@@ -8,7 +8,7 @@ export const Location = z
 export const HuntAccessType = z.enum(['creator', 'viewer', 'editor']);
 export const ChallengeType = z.enum(['clue', 'quiz', 'mission', 'task']);
 export const OptionType = z.enum(['choice', 'input']);
-export const MissionType = z.enum(['upload-media', 'match-location']);
+export const MissionType = z.enum(['upload-media', 'match-location', 'upload-audio']);
 export const MimeTypes = z.enum([
   'image/jpeg',
   'image/png',
