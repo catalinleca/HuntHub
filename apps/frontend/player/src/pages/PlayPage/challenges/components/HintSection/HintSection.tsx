@@ -6,7 +6,7 @@ import * as S from './HintSection.styles';
 
 export const HintSection = () => {
   const { sessionId } = usePlaySession();
-  const { requestHint, hint, isLoading, isError } = useHint(sessionId);
+  const { requestHint, hint, isLoading, isError } = useHint();
 
   if (hint) {
     return (
@@ -34,7 +34,7 @@ export const HintSection = () => {
   }
 
   return (
-    <S.HintButton onClick={() => requestHint()} disabled={isLoading}>
+    <S.HintButton onClick={() => sessionId && requestHint({ sessionId })} disabled={isLoading || !sessionId}>
       {isLoading ? <CircularProgress size={16} /> : <LightbulbIcon size={20} weight="duotone" />}
       <Typography variant="body2">{isLoading ? 'Loading...' : 'Need a hint?'}</Typography>
     </S.HintButton>

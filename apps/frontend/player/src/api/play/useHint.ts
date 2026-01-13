@@ -7,14 +7,17 @@ interface HintResponse {
   maxHints: number;
 }
 
-export const useHint = (sessionId: string | null) => {
-  const mutation = useMutation<HintResponse, Error>({
-    mutationFn: async () => {
-      if (!sessionId) {
-        throw new Error('No session');
-      }
-      return mockRequestHint(sessionId);
-    },
+interface HintParams {
+  sessionId: string;
+}
+
+const requestHint = async (params: HintParams): Promise<HintResponse> => {
+  return mockRequestHint(params.sessionId);
+};
+
+export const useHint = () => {
+  const mutation = useMutation({
+    mutationFn: requestHint,
   });
 
   return {

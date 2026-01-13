@@ -18,4 +18,5 @@ export const playKeys = {
   session: (sessionId: string) => [...playKeys.all, 'session', sessionId] as const,
   currentStep: (sessionId: string) => [...playKeys.all, 'step', sessionId, 'current'] as const,
   nextStep: (sessionId: string) => [...playKeys.all, 'step', sessionId, 'next'] as const,
+  hint: (sessionId: string) => [...playKeys.all, 'hint', sessionId] as const,
 };
