@@ -1,4 +1,4 @@
-export { ChallengeLayout } from './ChallengeLayout';
+export { ChallengeCard } from './ChallengeCard';
 export { TypeBadge } from './TypeBadge';
 export { ActionButton } from './ActionButton';
 export { FeedbackDisplay } from './FeedbackDisplay';

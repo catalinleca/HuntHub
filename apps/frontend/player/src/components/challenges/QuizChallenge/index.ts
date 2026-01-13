@@ -1,1 +1,0 @@
-export { QuizChallenge } from './QuizChallenge';

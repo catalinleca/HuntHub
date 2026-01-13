@@ -3,7 +3,7 @@ import { Typography } from '@mui/material';
 import { ChallengeType } from '@hunthub/shared';
 import type { TaskPF } from '@hunthub/shared';
 import { CHALLENGE_BADGES } from '@/constants';
-import { ChallengeLayout, ActionButton, FeedbackDisplay } from '@/components/shared';
+import { ChallengeCard, ActionButton, FeedbackDisplay } from './components';
 import type { ChallengeProps } from '@/types';
 
 export const TaskChallenge = ({
@@ -18,21 +18,16 @@ export const TaskChallenge = ({
   };
 
   return (
-    <ChallengeLayout
+    <ChallengeCard
       badge={CHALLENGE_BADGES[ChallengeType.Task]}
       title={challenge.title}
       description={challenge.instructions}
       footer={
-        <ActionButton
-          onClick={handleSubmit}
-          isValidating={isValidating}
-          isLastStep={isLastStep}
-          label="Submit"
-        />
+        <ActionButton onClick={handleSubmit} isValidating={isValidating} isLastStep={isLastStep} label="Submit" />
       }
     >
       <Typography color="warning.main">Work in progress</Typography>
       <FeedbackDisplay feedback={feedback} />
-    </ChallengeLayout>
+    </ChallengeCard>
   );
 };

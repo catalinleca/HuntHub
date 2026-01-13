@@ -28,13 +28,7 @@ export const ActionButton = ({
   };
 
   return (
-    <Button
-      variant="contained"
-      size="large"
-      onClick={onClick}
-      disabled={isValidating || disabled}
-      fullWidth
-    >
+    <Button variant="contained" size="large" onClick={onClick} disabled={isValidating || disabled} fullWidth>
       {getButtonLabel()}
     </Button>
   );

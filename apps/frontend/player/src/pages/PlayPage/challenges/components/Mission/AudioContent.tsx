@@ -2,7 +2,7 @@ import React from 'react';
 import { Typography } from '@mui/material';
 import { MicrophoneIcon } from '@phosphor-icons/react';
 import type { MissionPF } from '@hunthub/shared';
-import * as S from './MissionContent.styles';
+import * as S from './Mission.styles';
 
 interface AudioContentProps {
   mission: MissionPF;

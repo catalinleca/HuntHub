@@ -1,19 +1,19 @@
 import React from 'react';
 import { Typography } from '@mui/material';
-import { MapPinIcon } from '@phosphor-icons/react';
+import { CameraIcon } from '@phosphor-icons/react';
 import type { MissionPF } from '@hunthub/shared';
-import * as S from './MissionContent.styles';
+import * as S from './Mission.styles';
 
-interface LocationContentProps {
+interface PhotoContentProps {
   mission: MissionPF;
 }
 
-export const LocationContent = ({ mission }: LocationContentProps) => {
+export const PhotoContent = ({ mission }: PhotoContentProps) => {
   return (
     <S.PlaceholderBox>
-      <MapPinIcon size={48} weight="duotone" />
+      <CameraIcon size={48} weight="duotone" />
       <Typography variant="body2" color="text.secondary">
-        Location check coming soon
+        Photo upload coming soon
       </Typography>
     </S.PlaceholderBox>
   );

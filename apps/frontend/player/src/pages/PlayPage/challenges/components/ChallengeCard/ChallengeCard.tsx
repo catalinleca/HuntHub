@@ -3,9 +3,9 @@ import { Typography } from '@mui/material';
 import type { BadgeConfig } from '@/constants';
 import { TypeBadge } from '../TypeBadge';
 import { HintSection } from '../HintSection';
-import * as S from './ChallengeLayout.styles';
+import * as S from './ChallengeCard.styles';
 
-interface ChallengeLayoutProps {
+interface ChallengeCardProps {
   children: React.ReactNode;
   badge: BadgeConfig;
   title?: string;
@@ -14,14 +14,7 @@ interface ChallengeLayoutProps {
   hint?: string | null;
 }
 
-export const ChallengeLayout = ({
-  badge,
-  title,
-  description,
-  children,
-  footer,
-  hint,
-}: ChallengeLayoutProps) => {
+export const ChallengeCard = ({ badge, title, description, children, footer, hint }: ChallengeCardProps) => {
   return (
     <S.Container>
       <TypeBadge {...badge} />

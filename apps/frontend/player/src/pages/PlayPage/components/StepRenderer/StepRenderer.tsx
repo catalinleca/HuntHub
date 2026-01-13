@@ -2,7 +2,7 @@ import React from 'react';
 import { ChallengeType } from '@hunthub/shared';
 import type { StepPF, ChallengePF } from '@hunthub/shared';
 import { useValidation } from '@/context';
-import { ClueChallenge, QuizChallenge, MissionChallenge, TaskChallenge } from '@/components/challenges';
+import { ClueChallenge, QuizChallenge, MissionChallenge, TaskChallenge } from '../../challenges';
 import type { BaseChallengeProps } from '@/types';
 
 interface StepRendererProps {

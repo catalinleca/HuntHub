@@ -12,13 +12,5 @@ export const InputContent = ({ value, onChange, disabled }: InputContentProps) =
     onChange(event.target.value);
   };
 
-  return (
-    <TextField
-      fullWidth
-      label="Your answer"
-      value={value}
-      onChange={handleChange}
-      disabled={disabled}
-    />
-  );
+  return <TextField fullWidth label="Your answer" value={value} onChange={handleChange} disabled={disabled} />;
 };

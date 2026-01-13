@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { AnswerType, OptionType } from '@hunthub/shared';
 import type { QuizPF } from '@hunthub/shared';
 import { QUIZ_BADGES } from '@/constants';
-import { ChallengeLayout, ActionButton, FeedbackDisplay } from '@/components/shared';
+import { ChallengeCard, ActionButton, FeedbackDisplay } from './components';
+import { ChoiceContent, InputContent } from './components/Quiz';
 import type { ChallengeProps } from '@/types';
-import { ChoiceContent } from './ChoiceContent';
-import { InputContent } from './InputContent';
 
 export const QuizChallenge = ({
   challenge,
@@ -35,7 +34,7 @@ export const QuizChallenge = ({
   const badge = QUIZ_BADGES[challenge.type];
 
   return (
-    <ChallengeLayout
+    <ChallengeCard
       badge={badge}
       title={challenge.title}
       description={challenge.description}
@@ -57,13 +56,9 @@ export const QuizChallenge = ({
           disabled={isValidating}
         />
       ) : (
-        <InputContent
-          value={inputAnswer}
-          onChange={setInputAnswer}
-          disabled={isValidating}
-        />
+        <InputContent value={inputAnswer} onChange={setInputAnswer} disabled={isValidating} />
       )}
       <FeedbackDisplay feedback={feedback} />
-    </ChallengeLayout>
+    </ChallengeCard>
   );
 };

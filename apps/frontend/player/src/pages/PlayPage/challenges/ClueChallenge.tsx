@@ -2,7 +2,7 @@ import React from 'react';
 import { AnswerType, ChallengeType } from '@hunthub/shared';
 import type { CluePF } from '@hunthub/shared';
 import { CHALLENGE_BADGES } from '@/constants';
-import { ChallengeLayout, ActionButton, FeedbackDisplay } from '@/components/shared';
+import { ChallengeCard, ActionButton, FeedbackDisplay } from './components';
 import type { ChallengeProps } from '@/types';
 
 export const ClueChallenge = ({
@@ -17,20 +17,15 @@ export const ClueChallenge = ({
   };
 
   return (
-    <ChallengeLayout
+    <ChallengeCard
       badge={CHALLENGE_BADGES[ChallengeType.Clue]}
       title={challenge.title}
       description={challenge.description}
       footer={
-        <ActionButton
-          onClick={handleContinue}
-          isValidating={isValidating}
-          isLastStep={isLastStep}
-          label="Continue"
-        />
+        <ActionButton onClick={handleContinue} isValidating={isValidating} isLastStep={isLastStep} label="Continue" />
       }
     >
       <FeedbackDisplay feedback={feedback} />
-    </ChallengeLayout>
+    </ChallengeCard>
   );
 };
