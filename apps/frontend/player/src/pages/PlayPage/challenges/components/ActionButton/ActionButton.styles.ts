@@ -1,5 +1,5 @@
 import styled, { css, keyframes } from 'styled-components';
-import { Button } from '@mui/material';
+import { Button, alpha } from '@mui/material';
 
 const pressAnimation = keyframes`
   0% { transform: scale(1); }
@@ -28,12 +28,12 @@ export const StyledButton = styled(Button)<StyledButtonProps>`
   ${({ $color, theme }) => {
     const baseColor = $color || theme.palette.primary.main;
     return css`
-      background: linear-gradient(135deg, ${baseColor} 0%, ${baseColor}dd 100%);
-      box-shadow: 0 4px 12px ${baseColor}40;
+      background: linear-gradient(135deg, ${baseColor} 0%, ${alpha(baseColor, 0.87)} 100%);
+      box-shadow: 0 4px 12px ${alpha(baseColor, 0.25)};
 
       &:hover:not(:disabled) {
-        background: linear-gradient(135deg, ${baseColor}ee 0%, ${baseColor}cc 100%);
-        box-shadow: 0 6px 16px ${baseColor}50;
+        background: linear-gradient(135deg, ${alpha(baseColor, 0.93)} 0%, ${alpha(baseColor, 0.8)} 100%);
+        box-shadow: 0 6px 16px ${alpha(baseColor, 0.31)};
         transform: translateY(-1px);
       }
     `;
@@ -53,6 +53,7 @@ export const StyledButton = styled(Button)<StyledButtonProps>`
     $isLoading &&
     css`
       pointer-events: none;
+      cursor: wait;
     `}
 `;
 
