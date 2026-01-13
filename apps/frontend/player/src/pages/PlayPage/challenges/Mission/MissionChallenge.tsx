@@ -1,34 +1,41 @@
-import React from 'react';
-import { MissionType } from '@hunthub/shared';
+import { useCallback } from 'react';
+import { MissionType, AnswerType } from '@hunthub/shared';
 import type { MissionPF } from '@hunthub/shared';
-import { MISSION_BADGES, MISSION_ACTION_LABELS } from '@/constants';
-import { ChallengeCard, ActionButton, FeedbackDisplay } from '../components';
+import { MISSION_BADGES } from '@/constants';
+import { ChallengeCard, FeedbackDisplay } from '../components';
 import { LocationContent, PhotoContent, AudioContent } from '../components/Mission';
 import type { ChallengeProps } from '@/types';
 
-const MISSION_CONTENT = {
-  [MissionType.MatchLocation]: LocationContent,
-  [MissionType.UploadMedia]: PhotoContent,
-  [MissionType.UploadAudio]: AudioContent,
-};
-
-export const MissionChallenge = ({
-  challenge,
-  onValidate,
-  isValidating,
-  isLastStep,
-  feedback,
-}: ChallengeProps<MissionPF>) => {
+export const MissionChallenge = ({ challenge, onValidate, isValidating, feedback }: ChallengeProps<MissionPF>) => {
   const badge = MISSION_BADGES[challenge.type];
-  const actionLabel = MISSION_ACTION_LABELS[challenge.type];
-  const ContentComponent = MISSION_CONTENT[challenge.type];
 
-  if (!ContentComponent) {
-    return null;
-  }
+  const handleLocationSubmit = useCallback(
+    (position: { lat: number; lng: number }) => {
+      onValidate(AnswerType.MissionLocation, { missionLocation: position });
+    },
+    [onValidate],
+  );
 
-  const handleSubmit = () => {
-    // TODO: Implement mission submission logic per type
+  const handleMediaSubmit = useCallback(() => {
+    // In mock/preview mode, we don't upload to server
+    // Just pass an empty payload - mock validation auto-passes
+    onValidate(AnswerType.MissionMedia, { missionMedia: { assetId: 0 } });
+  }, [onValidate]);
+
+  const renderContent = () => {
+    switch (challenge.type) {
+      case MissionType.MatchLocation:
+        return <LocationContent mission={challenge} onSubmit={handleLocationSubmit} disabled={isValidating} />;
+
+      case MissionType.UploadMedia:
+        return <PhotoContent mission={challenge} onSubmit={handleMediaSubmit} disabled={isValidating} />;
+
+      case MissionType.UploadAudio:
+        return <AudioContent mission={challenge} onSubmit={handleMediaSubmit} disabled={isValidating} />;
+
+      default:
+        return null;
+    }
   };
 
   return (
@@ -36,12 +43,9 @@ export const MissionChallenge = ({
       badge={badge}
       title={challenge.title}
       description={challenge.description}
-      footer={
-        <ActionButton onClick={handleSubmit} isValidating={isValidating} isLastStep={isLastStep} label={actionLabel} />
-      }
+      footer={<FeedbackDisplay feedback={feedback} />}
     >
-      <ContentComponent mission={challenge} />
-      <FeedbackDisplay feedback={feedback} />
+      {renderContent()}
     </ChallengeCard>
   );
 };

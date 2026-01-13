@@ -2,13 +2,7 @@ import { AnswerType, MediaType } from '@hunthub/shared';
 import type { CluePF } from '@hunthub/shared';
 import { StepContainer, StepContent, StepIndicators, StepActions } from '@/components/step';
 import { MediaDisplay } from '@/components/media';
-import {
-  ActionButton,
-  FeedbackDisplay,
-  HintSection,
-  TimeLimit,
-  AttemptsCounter,
-} from '../components';
+import { ActionButton, FeedbackDisplay, HintSection, TimeLimit, AttemptsCounter } from '../components';
 import type { ChallengeProps } from '@/types';
 import * as S from './ClueChallenge.styles';
 
