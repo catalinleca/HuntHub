@@ -23,6 +23,10 @@ export const MissionChallenge = ({
   const actionLabel = MISSION_ACTION_LABELS[challenge.type];
   const ContentComponent = MISSION_CONTENT[challenge.type];
 
+  if (!ContentComponent) {
+    return null;
+  }
+
   const handleSubmit = () => {
     // TODO: Implement mission submission logic per type
   };
