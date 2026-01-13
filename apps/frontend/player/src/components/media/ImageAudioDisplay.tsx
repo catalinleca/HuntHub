@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { ImageAudioMedia } from '@hunthub/shared';
 import * as S from './ImageAudioDisplay.styles';
 
@@ -9,6 +9,13 @@ interface ImageAudioDisplayProps {
 export const ImageAudioDisplay = ({ media }: ImageAudioDisplayProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    return () => {
+      audio?.pause();
+    };
+  }, []);
 
   const handleTogglePlay = async () => {
     if (!audioRef.current) return;

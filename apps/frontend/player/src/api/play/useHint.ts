@@ -27,5 +27,7 @@ export const useHint = () => {
     maxHints: mutation.data?.maxHints ?? 0,
     isLoading: mutation.isPending,
     isError: mutation.isError,
+    error: mutation.error,
+    reset: mutation.reset,
   };
 };
