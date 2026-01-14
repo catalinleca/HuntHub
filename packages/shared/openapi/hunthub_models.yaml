@@ -1488,9 +1488,11 @@ components:
           description: Total number of steps in the hunt
         startedAt:
           type: string
+          format: date-time
           description: When the session started
         completedAt:
           type: string
+          format: date-time
           description: When the session was completed (if finished)
         currentStep:
           $ref: '#/components/schemas/StepResponse'

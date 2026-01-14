@@ -7,6 +7,8 @@ import {
   ValidateAnswerResponse,
   HintResponse,
   PlayerExporter,
+  HuntProgressStatus,
+  Step,
 } from '@hunthub/shared';
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
@@ -56,7 +58,7 @@ export class PlayService implements IPlayService {
     return {
       sessionId: progress.sessionId,
       hunt: PlayerExporter.hunt(huntId, huntVersion),
-      status: 'in_progress',
+      status: HuntProgressStatus.InProgress,
       currentStepIndex: 0,
       totalSteps: huntVersion.stepOrder.length,
       startedAt: progress.startedAt.toISOString(),
@@ -69,7 +71,7 @@ export class PlayService implements IPlayService {
     const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version);
 
     const currentIndex = StepNavigator.getStepIndex(huntVersion.stepOrder, progress.currentStepId);
-    const isInProgress = progress.status === 'in_progress';
+    const isInProgress = progress.status === HuntProgressStatus.InProgress;
 
     let currentStep: StepResponse | undefined;
     if (isInProgress) {
@@ -218,19 +220,17 @@ export class PlayService implements IPlayService {
       throw new NotFoundError('No hint available for this step');
     }
 
-    // Check if hint already used (MVP: max 1)
-    const stepProgress = SessionManager.getCurrentStepProgress(progress);
-    if ((stepProgress?.hintsUsed ?? 0) >= 1) {
-      // We might need a better way to make sure we don't diverge from the hints in data and hintsUsed here so maybe add hints in the session (progress)
+    const maxHints = 1;
+    const hintsUsed = await SessionManager.incrementHintsUsedIfUnderLimit(sessionId, progress.currentStepId, maxHints);
+
+    if (hintsUsed === null) {
       throw new ConflictError('You have already used your hint for this step');
     }
-
-    const hintsUsed = await SessionManager.incrementHintsUsed(sessionId, progress.currentStepId);
 
     return {
       hint: step.hint,
       hintsUsed,
-      maxHints: 1,
+      maxHints,
     };
   }
 
@@ -267,9 +267,7 @@ export class PlayService implements IPlayService {
     const stepIndex = StepNavigator.getStepIndex(huntVersion.stepOrder, step.stepId);
     const nextStepId = StepNavigator.getNextStepId(huntVersion.stepOrder, step.stepId);
 
-    const stepPF = PlayerExporter.maybeRandomizeOptions(
-      PlayerExporter.step(step as unknown as Parameters<typeof PlayerExporter.step>[0]),
-    );
+    const stepPF = PlayerExporter.maybeRandomizeOptions(PlayerExporter.step(step.toObject() as Step));
 
     return {
       step: stepPF,
