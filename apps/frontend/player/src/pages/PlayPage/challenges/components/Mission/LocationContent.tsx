@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { Typography, Button, Alert, CircularProgress } from '@mui/material';
+import React, { useEffect } from 'react';
+import { Typography, Button, CircularProgress } from '@mui/material';
 import { MapPinIcon, NavigationArrowIcon } from '@phosphor-icons/react';
 import type { MissionPF } from '@hunthub/shared';
 import { useGeolocation } from '@/hooks';
@@ -11,15 +11,68 @@ interface LocationContentProps {
   disabled?: boolean;
 }
 
-export const LocationContent = ({ onSubmit, disabled }: LocationContentProps) => {
+type LocationStatus = 'idle' | 'loading' | 'error' | 'ready';
+
+const getStatus = (isLoading: boolean, error: string | null, hasPosition: boolean): LocationStatus => {
+  if (error) return 'error';
+  if (hasPosition) return 'ready';
+  if (isLoading) return 'loading';
+  return 'idle';
+};
+
+const LoadingPrompt = () => (
+  <>
+    <CircularProgress size={24} />
+    <Typography variant="body2" color="text.secondary">
+      Getting your location...
+    </Typography>
+  </>
+);
+
+const IdlePrompt = () => (
+  <>
+    <Typography variant="body1" fontWeight={500}>
+      Find the Location
+    </Typography>
+    <Typography variant="body2" color="text.secondary">
+      Navigate to the target area and check your position
+    </Typography>
+  </>
+);
+
+const ReadyPrompt = () => (
+  <>
+    <Typography variant="body1" fontWeight={500}>
+      Location Acquired
+    </Typography>
+    <Typography variant="body2" color="text.secondary">
+      Tap "Check Location" to verify you're at the right spot
+    </Typography>
+  </>
+);
+
+const ErrorPrompt = ({ message }: { message: string }) => (
+  <Typography variant="body2" color="error">
+    {message}
+  </Typography>
+);
+
+export const LocationContent = ({ onSubmit, disabled = false }: LocationContentProps) => {
   const { position, error, isLoading, watchPosition, clearWatch } = useGeolocation();
 
   useEffect(() => {
     watchPosition();
-    return () => {
-      clearWatch();
-    };
+    return clearWatch;
   }, [watchPosition, clearWatch]);
+
+  const status = getStatus(isLoading, error, !!position);
+
+  const prompts: Record<LocationStatus, React.ReactNode> = {
+    idle: <IdlePrompt />,
+    loading: <LoadingPrompt />,
+    error: <ErrorPrompt message={error || 'Location error'} />,
+    ready: <ReadyPrompt />,
+  };
 
   const handleCheckLocation = () => {
     if (position) {
@@ -33,46 +86,10 @@ export const LocationContent = ({ onSubmit, disabled }: LocationContentProps) =>
         <S.IconWrapper>
           <MapPinIcon size={32} weight="duotone" />
         </S.IconWrapper>
-
-        {isLoading && !position && (
-          <>
-            <CircularProgress size={24} />
-            <Typography variant="body2" color="text.secondary">
-              Getting your location...
-            </Typography>
-          </>
-        )}
-
-        {error && (
-          <Alert severity="error" sx={{ width: '100%' }}>
-            {error}
-          </Alert>
-        )}
-
-        {!isLoading && !error && !position && (
-          <>
-            <Typography variant="body1" fontWeight={500}>
-              Find the Location
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Navigate to the target area and check your position
-            </Typography>
-          </>
-        )}
-
-        {position && (
-          <>
-            <Typography variant="body1" fontWeight={500}>
-              Location Acquired
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Tap "Check Location" to verify you're at the right spot
-            </Typography>
-          </>
-        )}
+        {prompts[status]}
       </S.UploadZone>
 
-      {position && (
+      {status === 'ready' && (
         <S.StatusIndicator>
           <NavigationArrowIcon size={20} weight="fill" />
           <Typography variant="body2">GPS signal active</Typography>
@@ -84,10 +101,10 @@ export const LocationContent = ({ onSubmit, disabled }: LocationContentProps) =>
         fullWidth
         size="large"
         onClick={handleCheckLocation}
-        disabled={disabled || !position || isLoading}
+        disabled={disabled || status !== 'ready'}
         startIcon={<MapPinIcon size={20} weight="bold" />}
       >
-        {isLoading ? 'Getting location...' : 'Check Location'}
+        {status === 'loading' ? 'Getting location...' : 'Check Location'}
       </Button>
     </S.ContentContainer>
   );
