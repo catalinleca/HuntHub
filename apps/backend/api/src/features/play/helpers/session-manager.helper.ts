@@ -89,15 +89,13 @@ export class SessionManager {
       hintsUsed: 0,
     };
 
-    const result = await ProgressModel.updateOne(
+    const markResult = await ProgressModel.updateOne(
       {
         sessionId,
         currentStepId, // Optimistic lock on current position
       },
       {
-        currentStepId: nextStepId,
         $set: { 'steps.$[current].completed': true, 'steps.$[current].completedAt': new Date() },
-        $push: { steps: newStepProgress },
       },
       {
         session,
@@ -105,9 +103,18 @@ export class SessionManager {
       },
     );
 
-    if (result.modifiedCount === 0) {
+    if (markResult.modifiedCount === 0) {
       throw new ConflictError('Session state changed. Please retry.');
     }
+
+    await ProgressModel.updateOne(
+      { sessionId },
+      {
+        currentStepId: nextStepId,
+        $push: { steps: newStepProgress },
+      },
+      { session },
+    );
   }
 
   static async completeSession(sessionId: string, currentStepId: number, session?: ClientSession): Promise<void> {
