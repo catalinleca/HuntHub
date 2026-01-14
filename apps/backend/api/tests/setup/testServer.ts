@@ -17,6 +17,7 @@ import authRouter from '@/modules/auth/auth.routes';
 import assetRouter from '@/modules/assets/asset.routes';
 import publishingRouter from '@/features/publishing/publishing.routes';
 import huntShareRouter from '@/features/sharing/hunt-share.routes';
+import playRouter from '@/features/play/play.routes';
 import { errorHandler } from '@/shared/middlewares/error.middleware';
 import { authMiddleware } from '@/shared/middlewares/auth.middleware';
 
@@ -28,6 +29,11 @@ export const createTestApp = (): Express => {
 
   // Routes
   app.use('/auth', authRouter);
+
+  // Play API - PUBLIC (session ID acts as auth token)
+  app.use('/api/play', playRouter);
+
+  // Protected API routes
   app.use('/api', authMiddleware);
   app.use('/api/hunts', huntRouter);
   app.use('/api/hunts', stepRouter);

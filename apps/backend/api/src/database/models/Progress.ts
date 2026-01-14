@@ -22,6 +22,7 @@ const StepProgressSchema = new Schema<IStepProgress>(
     startedAt: Date,
     completedAt: Date,
     duration: { type: Number, default: 0 },
+    hintsUsed: { type: Number, default: 0 },
   },
   { _id: false },
 );
