@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { AnswerType, OptionType } from '@hunthub/shared';
 import type { QuizPF } from '@hunthub/shared';
 import { QUIZ_BADGES } from '@/constants';
-import { ChallengeCard, ActionButton, FeedbackDisplay } from '../components';
+import { ChallengeCard, ActionButton } from '../components';
 import { ChoiceContent, InputContent } from '../components/Quiz';
 import type { ChallengeProps } from '@/types';
 
@@ -12,32 +12,40 @@ export const QuizChallenge = ({
   isValidating,
   isLastStep,
   feedback,
+  currentAttempts,
+  media,
+  timeLimit,
+  maxAttempts,
 }: ChallengeProps<QuizPF>) => {
-  const [selectedOptionId, setSelectedOptionId] = useState<string>('');
-  const [inputAnswer, setInputAnswer] = useState<string>('');
+  const [selectedOptionId, setSelectedOptionId] = useState('');
+  const [inputAnswer, setInputAnswer] = useState('');
 
   const isChoiceMode = challenge.type === OptionType.Choice;
   const hasAnswer = isChoiceMode ? selectedOptionId !== '' : inputAnswer.trim() !== '';
 
-  const handleSubmit = () => {
-    if (!hasAnswer) {
-      return;
-    }
+  const handleSubmit = useCallback(() => {
+    if (!hasAnswer) return;
 
     if (isChoiceMode) {
       onValidate(AnswerType.QuizChoice, { quizChoice: { optionId: selectedOptionId } });
     } else {
       onValidate(AnswerType.QuizInput, { quizInput: { answer: inputAnswer.trim() } });
     }
-  };
-
-  const badge = QUIZ_BADGES[challenge.type];
+  }, [hasAnswer, isChoiceMode, selectedOptionId, inputAnswer, onValidate]);
 
   return (
     <ChallengeCard
-      badge={badge}
+      badge={QUIZ_BADGES[challenge.type]}
       title={challenge.title}
       description={challenge.description}
+      media={media}
+      timeLimit={timeLimit}
+      maxAttempts={maxAttempts}
+      currentAttempts={currentAttempts}
+      feedback={feedback}
+      onTimeExpire={handleSubmit}
+      onMaxAttempts={handleSubmit}
+      showHint
       footer={
         <ActionButton
           onClick={handleSubmit}
@@ -58,7 +66,6 @@ export const QuizChallenge = ({
       ) : (
         <InputContent value={inputAnswer} onChange={setInputAnswer} disabled={isValidating} />
       )}
-      <FeedbackDisplay feedback={feedback} />
     </ChallengeCard>
   );
 };

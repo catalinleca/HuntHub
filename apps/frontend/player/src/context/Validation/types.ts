@@ -20,6 +20,8 @@ export interface ValidationContextValue {
   isCorrect: boolean | null;
   /** Feedback message from validation */
   feedback: string | null;
+  /** Current attempt count for this step */
+  attemptCount: number;
   /** Reset validation state (e.g., when step changes) */
   reset: () => void;
 }

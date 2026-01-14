@@ -24,8 +24,7 @@ export const Overlay = styled(Box)<{ $isPlaying: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: ${({ $isPlaying }) =>
-    $isPlaying ? 'transparent' : alpha('#000', 0.3)};
+  background-color: ${({ $isPlaying }) => ($isPlaying ? 'transparent' : alpha('#000', 0.3))};
   cursor: pointer;
   transition: background-color 0.2s ease;
 

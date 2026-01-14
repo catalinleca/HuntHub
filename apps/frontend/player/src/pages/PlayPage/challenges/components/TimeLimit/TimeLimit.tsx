@@ -1,13 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { useInterval } from 'react-use';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-} from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography } from '@mui/material';
 import { TimerIcon } from '@phosphor-icons/react';
 import * as S from './TimeLimit.styles';
 
@@ -39,7 +32,7 @@ export const TimeLimit = ({ seconds, onExpire }: TimeLimitProps) => {
         setShowDialog(true);
       }
     },
-    hasExpired.current ? null : 1000
+    hasExpired.current ? null : 1000,
   );
 
   const handleAcknowledge = useCallback(() => {

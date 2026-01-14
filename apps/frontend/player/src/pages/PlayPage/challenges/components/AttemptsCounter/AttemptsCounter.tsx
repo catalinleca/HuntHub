@@ -1,12 +1,5 @@
 import { useState, useCallback } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-} from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography } from '@mui/material';
 import { TargetIcon } from '@phosphor-icons/react';
 import * as S from './AttemptsCounter.styles';
 
@@ -16,18 +9,13 @@ interface AttemptsCounterProps {
   onMaxAttempts?: () => void;
 }
 
-export const AttemptsCounter = ({
-  current,
-  max,
-  onMaxAttempts,
-}: AttemptsCounterProps) => {
+export const AttemptsCounter = ({ current, max, onMaxAttempts }: AttemptsCounterProps) => {
   const [acknowledged, setAcknowledged] = useState(false);
 
   const remaining = max - current;
   const isLastAttempt = remaining === 1;
   const isExhausted = remaining <= 0;
 
-  // Declarative: show dialog when exhausted and not yet acknowledged
   const showDialog = isExhausted && !acknowledged;
 
   const handleAcknowledge = useCallback(() => {
@@ -52,9 +40,7 @@ export const AttemptsCounter = ({
           </S.DialogHeader>
         </DialogTitle>
         <DialogContent>
-          <Typography>
-            You've used all available attempts for this step.
-          </Typography>
+          <Typography>You've used all available attempts for this step.</Typography>
         </DialogContent>
         <DialogActions>
           <Button variant="contained" onClick={handleAcknowledge}>

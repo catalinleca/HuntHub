@@ -41,22 +41,12 @@ export const ImageAudioDisplay = ({ media }: ImageAudioDisplayProps) => {
 
   return (
     <S.Container>
-      <S.Image
-        src={image.asset.url}
-        alt={image.alt || image.title || 'Step image'}
-      />
+      <S.Image src={image.asset.url} alt={image.alt || image.title || 'Step image'} />
       <S.Overlay $isPlaying={isPlaying} onClick={handleTogglePlay}>
-        <S.PlayButton $isPlaying={isPlaying}>
-          {isPlaying ? <S.PauseIcon /> : <S.PlayIcon />}
-        </S.PlayButton>
+        <S.PlayButton $isPlaying={isPlaying}>{isPlaying ? <S.PauseIcon /> : <S.PlayIcon />}</S.PlayButton>
       </S.Overlay>
       {isPlaying && <S.SpeakerIndicator />}
-      <audio
-        ref={audioRef}
-        src={audio.asset.url}
-        preload="metadata"
-        onEnded={handleAudioEnded}
-      />
+      <audio ref={audioRef} src={audio.asset.url} preload="metadata" onEnded={handleAudioEnded} />
     </S.Container>
   );
 };

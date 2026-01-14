@@ -1,47 +1,64 @@
-import React from 'react';
-import { MissionType } from '@hunthub/shared';
+import React, { useCallback } from 'react';
+import { MissionType, AnswerType } from '@hunthub/shared';
 import type { MissionPF } from '@hunthub/shared';
-import { MISSION_BADGES, MISSION_ACTION_LABELS } from '@/constants';
-import { ChallengeCard, ActionButton, FeedbackDisplay } from '../components';
+import { MISSION_BADGES } from '@/constants';
+import { ChallengeCard } from '../components';
 import { LocationContent, PhotoContent, AudioContent } from '../components/Mission';
 import type { ChallengeProps } from '@/types';
-
-const MISSION_CONTENT = {
-  [MissionType.MatchLocation]: LocationContent,
-  [MissionType.UploadMedia]: PhotoContent,
-  [MissionType.UploadAudio]: AudioContent,
-};
 
 export const MissionChallenge = ({
   challenge,
   onValidate,
   isValidating,
-  isLastStep,
   feedback,
+  currentAttempts,
+  media,
+  timeLimit,
+  maxAttempts,
 }: ChallengeProps<MissionPF>) => {
-  const badge = MISSION_BADGES[challenge.type];
-  const actionLabel = MISSION_ACTION_LABELS[challenge.type];
-  const ContentComponent = MISSION_CONTENT[challenge.type];
+  const handleLocationSubmit = useCallback(
+    (position: { lat: number; lng: number }) => {
+      onValidate(AnswerType.MissionLocation, { missionLocation: position });
+    },
+    [onValidate],
+  );
 
-  if (!ContentComponent) {
-    return null;
-  }
+  /**
+   * TODO: Implement proper media upload flow when backend is ready
+   *
+   * Current: Mock validation auto-passes, assetId is placeholder
+   *
+   * When BE ready:
+   * 1. Change PhotoContent/AudioContent signature: onSubmit(file: File | Blob)
+   * 2. PhotoContent passes captured file, AudioContent passes audioBlob
+   * 3. Here: upload file to asset endpoint → get assetId → then validate
+   *
+   * Flow: capture → onSubmit(file) → upload(file) → assetId → validate({ assetId })
+   */
+  const handleMediaSubmit = useCallback(() => {
+    onValidate(AnswerType.MissionMedia, { missionMedia: { assetId: 1 } });
+  }, [onValidate]);
 
-  const handleSubmit = () => {
-    // TODO: Implement mission submission logic per type
+  const contents: Record<MissionType, React.ReactNode> = {
+    [MissionType.MatchLocation]: <LocationContent onSubmit={handleLocationSubmit} disabled={isValidating} />,
+    [MissionType.UploadMedia]: <PhotoContent onSubmit={handleMediaSubmit} disabled={isValidating} />,
+    [MissionType.UploadAudio]: <AudioContent onSubmit={handleMediaSubmit} disabled={isValidating} />,
   };
 
   return (
     <ChallengeCard
-      badge={badge}
+      badge={MISSION_BADGES[challenge.type]}
       title={challenge.title}
       description={challenge.description}
-      footer={
-        <ActionButton onClick={handleSubmit} isValidating={isValidating} isLastStep={isLastStep} label={actionLabel} />
-      }
+      media={media}
+      timeLimit={timeLimit}
+      maxAttempts={maxAttempts}
+      currentAttempts={currentAttempts}
+      feedback={feedback}
+      showHint
+      footer={<></>}
     >
-      <ContentComponent mission={challenge} />
-      <FeedbackDisplay feedback={feedback} />
+      {contents[challenge.type]}
     </ChallengeCard>
   );
 };
