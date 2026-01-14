@@ -47,7 +47,7 @@ export const useGeolocation = () => {
     }));
   }, []);
 
-  const requestPosition = useCallback(async () => {
+  const requestPosition = useCallback(() => {
     if (!navigator.geolocation) {
       setState((prev) => ({
         ...prev,
@@ -93,12 +93,8 @@ export const useGeolocation = () => {
   }, [clearWatch]);
 
   useEffect(() => {
-    return () => {
-      if (watchIdRef.current !== null) {
-        navigator.geolocation.clearWatch(watchIdRef.current);
-      }
-    };
-  }, []);
+    return clearWatch;
+  }, [clearWatch]);
 
   return useMemo(
     () => ({
