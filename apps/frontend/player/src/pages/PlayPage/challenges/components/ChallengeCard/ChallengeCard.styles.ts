@@ -1,5 +1,5 @@
 import styled, { keyframes } from 'styled-components';
-import { Box, Paper, Stack } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 
 const fadeIn = keyframes`
   from {
@@ -18,12 +18,6 @@ export const Container = styled(Paper)`
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing(2)};
   animation: ${fadeIn} 0.3s ease-out;
-`;
-
-export const IndicatorsRow = styled(Stack)`
-  flex-direction: row;
-  justify-content: flex-end;
-  gap: ${({ theme }) => theme.spacing(1)};
 `;
 
 export const Content = styled(Box)`

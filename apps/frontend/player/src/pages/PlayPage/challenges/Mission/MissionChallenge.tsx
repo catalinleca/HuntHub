@@ -23,8 +23,20 @@ export const MissionChallenge = ({
     [onValidate],
   );
 
+  /**
+   * TODO: Implement proper media upload flow when backend is ready
+   *
+   * Current: Mock validation auto-passes, assetId is placeholder
+   *
+   * When BE ready:
+   * 1. Change PhotoContent/AudioContent signature: onSubmit(file: File | Blob)
+   * 2. PhotoContent passes captured file, AudioContent passes audioBlob
+   * 3. Here: upload file to asset endpoint → get assetId → then validate
+   *
+   * Flow: capture → onSubmit(file) → upload(file) → assetId → validate({ assetId })
+   */
   const handleMediaSubmit = useCallback(() => {
-    onValidate(AnswerType.MissionMedia, { missionMedia: { assetId: 0 } });
+    onValidate(AnswerType.MissionMedia, { missionMedia: { assetId: 1 } });
   }, [onValidate]);
 
   const contents: Record<MissionType, React.ReactNode> = {

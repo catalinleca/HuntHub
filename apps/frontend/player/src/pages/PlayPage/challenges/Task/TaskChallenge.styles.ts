@@ -1,13 +1,5 @@
 import styled from 'styled-components';
-import { Stack, Typography } from '@mui/material';
-
-export const ContentContainer = styled(Stack)`
-  gap: ${({ theme }) => theme.spacing(2)};
-`;
-
-export const TextareaContainer = styled(Stack)`
-  gap: ${({ theme }) => theme.spacing(1)};
-`;
+import { Typography } from '@mui/material';
 
 export const StyledTextarea = styled.textarea`
   width: 100%;

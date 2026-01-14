@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Typography, Button, CircularProgress } from '@mui/material';
+import { Typography, Button, CircularProgress, Stack } from '@mui/material';
 import { MapPinIcon, NavigationArrowIcon } from '@phosphor-icons/react';
 import { useGeolocation } from '@/hooks';
 import * as S from './Mission.styles';
@@ -79,7 +79,7 @@ export const LocationContent = ({ onSubmit, disabled = false }: LocationContentP
   };
 
   return (
-    <S.ContentContainer>
+    <Stack gap={2}>
       <S.UploadZone as="div" style={{ cursor: 'default' }}>
         <S.IconWrapper>
           <MapPinIcon size={32} weight="duotone" />
@@ -104,6 +104,6 @@ export const LocationContent = ({ onSubmit, disabled = false }: LocationContentP
       >
         {status === 'loading' ? 'Getting location...' : 'Check Location'}
       </Button>
-    </S.ContentContainer>
+    </Stack>
   );
 };

@@ -1,4 +1,5 @@
 import { useState, useCallback, type ChangeEvent } from 'react';
+import { Stack } from '@mui/material';
 import { ChallengeType, AnswerType } from '@hunthub/shared';
 import type { TaskPF } from '@hunthub/shared';
 import { CHALLENGE_BADGES } from '@/constants';
@@ -60,8 +61,8 @@ export const TaskChallenge = ({
         />
       }
     >
-      <S.ContentContainer>
-        <S.TextareaContainer>
+      <Stack gap={2}>
+        <Stack gap={1}>
           <S.StyledTextarea
             value={response}
             onChange={handleChange}
@@ -72,8 +73,8 @@ export const TaskChallenge = ({
           <S.CharacterCount variant="caption" $isWarning={isNearLimit && !isOverLimit} $isError={isOverLimit}>
             {charCount} / {MAX_CHARS}
           </S.CharacterCount>
-        </S.TextareaContainer>
-      </S.ContentContainer>
+        </Stack>
+      </Stack>
     </ChallengeCard>
   );
 };

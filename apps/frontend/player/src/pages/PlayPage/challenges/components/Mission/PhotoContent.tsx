@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Typography, Button, Alert } from '@mui/material';
+import { Typography, Button, Alert, Stack } from '@mui/material';
 import { CameraIcon, ArrowCounterClockwiseIcon, CheckIcon } from '@phosphor-icons/react';
 import { usePhotoCapture } from '@/hooks';
 import * as S from './Mission.styles';
@@ -24,12 +24,12 @@ const CapturePrompt = ({ onClick }: { onClick: () => void }) => (
 );
 
 const PhotoPreview = ({ src, onRetake }: { src: string; onRetake: () => void }) => (
-  <S.PreviewContainer>
+  <Stack gap={2} alignItems="center">
     <S.PreviewImage src={src} alt="Captured photo" />
     <Button variant="outlined" size="small" onClick={onRetake} startIcon={<ArrowCounterClockwiseIcon size={18} />}>
       Retake
     </Button>
-  </S.PreviewContainer>
+  </Stack>
 );
 
 export const PhotoContent = ({ onSubmit, disabled = false }: PhotoContentProps) => {
@@ -39,7 +39,7 @@ export const PhotoContent = ({ onSubmit, disabled = false }: PhotoContentProps) 
   const openCamera = () => inputRef.current?.click();
 
   return (
-    <S.ContentContainer>
+    <Stack gap={2}>
       {error && (
         <Alert severity="error" onClose={reset}>
           {error}
@@ -60,6 +60,6 @@ export const PhotoContent = ({ onSubmit, disabled = false }: PhotoContentProps) 
       >
         {hasPhoto ? 'Submit Photo' : 'Take Photo'}
       </Button>
-    </S.ContentContainer>
+    </Stack>
   );
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, Button, Alert } from '@mui/material';
+import { Typography, Button, Alert, Stack } from '@mui/material';
 import { MicrophoneIcon, StopIcon, ArrowCounterClockwiseIcon, CheckIcon } from '@phosphor-icons/react';
 import { useAudioRecorder, type Status } from '@/hooks';
 import * as S from './Mission.styles';
@@ -31,18 +31,18 @@ const ReadyPrompt = () => (
 
 const RecordingDisplay = ({ duration }: { duration: number }) => (
   <S.UploadZone as="div" style={{ cursor: 'default' }}>
-    <S.RecordingIndicator>
+    <Stack direction="row" alignItems="center" gap={1}>
       <S.RecordingDot />
       <Typography variant="body2" color="error">
         Recording
       </Typography>
-    </S.RecordingIndicator>
+    </Stack>
     <S.TimerDisplay variant="h4">{formatDuration(duration)}</S.TimerDisplay>
   </S.UploadZone>
 );
 
 const AudioPreview = ({ audioUrl, duration, onReset }: { audioUrl: string; duration: number; onReset: () => void }) => (
-  <S.PreviewContainer>
+  <Stack gap={2} alignItems="center">
     <S.AudioPlayerContainer>
       <audio src={audioUrl} controls style={{ width: '100%' }} />
     </S.AudioPlayerContainer>
@@ -52,7 +52,7 @@ const AudioPreview = ({ audioUrl, duration, onReset }: { audioUrl: string; durat
     <Button variant="outlined" size="small" onClick={onReset} startIcon={<ArrowCounterClockwiseIcon size={18} />}>
       Re-record
     </Button>
-  </S.PreviewContainer>
+  </Stack>
 );
 
 export const AudioContent = ({ onSubmit, disabled = false }: AudioContentProps) => {
@@ -136,13 +136,13 @@ export const AudioContent = ({ onSubmit, disabled = false }: AudioContentProps) 
   };
 
   return (
-    <S.ContentContainer>
+    <Stack gap={2}>
       {error && (
         <Alert severity="error" onClose={reset}>
           {error}
         </Alert>
       )}
       {views[status]}
-    </S.ContentContainer>
+    </Stack>
   );
 };

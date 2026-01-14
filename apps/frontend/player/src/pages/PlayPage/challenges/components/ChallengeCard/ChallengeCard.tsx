@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography } from '@mui/material';
+import { Typography, Stack } from '@mui/material';
 import { MediaType } from '@hunthub/shared';
 import type { Media } from '@hunthub/shared';
 import type { BadgeConfig } from '@/constants';
@@ -52,10 +52,10 @@ export const ChallengeCard = ({
   return (
     <S.Container>
       {hasIndicators && (
-        <S.IndicatorsRow>
+        <Stack direction="row" justifyContent="flex-end" gap={1}>
           {timeLimit && <TimeLimit seconds={timeLimit} onExpire={onTimeExpire} />}
           {maxAttempts && <AttemptsCounter current={currentAttempts} max={maxAttempts} onMaxAttempts={onMaxAttempts} />}
-        </S.IndicatorsRow>
+        </Stack>
       )}
 
       {hasVisualMedia && <MediaDisplay media={media} />}

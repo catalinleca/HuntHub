@@ -1,10 +1,6 @@
 import styled from 'styled-components';
 import { Box, Stack, Typography } from '@mui/material';
 
-export const ContentContainer = styled(Stack)`
-  gap: ${({ theme }) => theme.spacing(2)};
-`;
-
 export const UploadZone = styled(Box)`
   display: flex;
   flex-direction: column;
@@ -58,11 +54,6 @@ export const PreviewImage = styled.img`
   border-radius: ${({ theme }) => theme.shape.borderRadius}px;
 `;
 
-export const PreviewContainer = styled(Stack)`
-  gap: ${({ theme }) => theme.spacing(2)};
-  align-items: center;
-`;
-
 export const AudioPlayerContainer = styled(Box)`
   width: 100%;
   padding: ${({ theme }) => theme.spacing(2)};
@@ -73,12 +64,6 @@ export const AudioPlayerContainer = styled(Box)`
 export const TimerDisplay = styled(Typography)`
   font-variant-numeric: tabular-nums;
   font-weight: 600;
-`;
-
-export const RecordingIndicator = styled(Stack)`
-  flex-direction: row;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacing(1)};
 `;
 
 export const RecordingDot = styled(Box)`
