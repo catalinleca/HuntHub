@@ -16,7 +16,6 @@ export const AttemptsCounter = ({ current, max, onMaxAttempts }: AttemptsCounter
   const isLastAttempt = remaining === 1;
   const isExhausted = remaining <= 0;
 
-  // Declarative: show dialog when exhausted and not yet acknowledged
   const showDialog = isExhausted && !acknowledged;
 
   const handleAcknowledge = useCallback(() => {

@@ -1,6 +1,6 @@
 import { useReducer, useCallback, useEffect, useRef } from 'react';
 
-type Status = 'idle' | 'requesting' | 'recording' | 'stopped' | 'error';
+export type Status = 'idle' | 'requesting' | 'recording' | 'stopped' | 'error';
 
 interface State {
   status: Status;
