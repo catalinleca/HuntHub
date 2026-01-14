@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { AnswerType, OptionType } from '@hunthub/shared';
 import type { QuizPF } from '@hunthub/shared';
 import { QUIZ_BADGES } from '@/constants';
@@ -12,33 +12,19 @@ export const QuizChallenge = ({
   isValidating,
   isLastStep,
   feedback,
+  currentAttempts,
   media,
   timeLimit,
   maxAttempts,
 }: ChallengeProps<QuizPF>) => {
-  const [selectedOptionId, setSelectedOptionId] = useState<string>('');
-  const [inputAnswer, setInputAnswer] = useState<string>('');
-  const [attemptCount, setAttemptCount] = useState(0);
-  const prevFeedbackRef = useRef<string | null>(null);
+  const [selectedOptionId, setSelectedOptionId] = useState('');
+  const [inputAnswer, setInputAnswer] = useState('');
 
   const isChoiceMode = challenge.type === OptionType.Choice;
   const hasAnswer = isChoiceMode ? selectedOptionId !== '' : inputAnswer.trim() !== '';
 
-  // Track attempts when validation returns incorrect
-  useEffect(() => {
-    if (feedback && feedback !== prevFeedbackRef.current) {
-      const isIncorrect = !feedback.toLowerCase().includes('correct');
-      if (isIncorrect) {
-        setAttemptCount((prev) => prev + 1);
-      }
-    }
-    prevFeedbackRef.current = feedback;
-  }, [feedback]);
-
   const handleSubmit = useCallback(() => {
-    if (!hasAnswer) {
-      return;
-    }
+    if (!hasAnswer) return;
 
     if (isChoiceMode) {
       onValidate(AnswerType.QuizChoice, { quizChoice: { optionId: selectedOptionId } });
@@ -47,29 +33,18 @@ export const QuizChallenge = ({
     }
   }, [hasAnswer, isChoiceMode, selectedOptionId, inputAnswer, onValidate]);
 
-  const handleTimeExpire = useCallback(() => {
-    handleSubmit();
-  }, [handleSubmit]);
-
-  const handleMaxAttempts = useCallback(() => {
-    // Auto-submit current answer when max attempts reached
-    handleSubmit();
-  }, [handleSubmit]);
-
-  const badge = QUIZ_BADGES[challenge.type];
-
   return (
     <ChallengeCard
-      badge={badge}
+      badge={QUIZ_BADGES[challenge.type]}
       title={challenge.title}
       description={challenge.description}
       media={media}
       timeLimit={timeLimit}
       maxAttempts={maxAttempts}
-      currentAttempts={attemptCount}
+      currentAttempts={currentAttempts}
       feedback={feedback}
-      onTimeExpire={handleTimeExpire}
-      onMaxAttempts={handleMaxAttempts}
+      onTimeExpire={handleSubmit}
+      onMaxAttempts={handleSubmit}
       showHint
       footer={
         <ActionButton

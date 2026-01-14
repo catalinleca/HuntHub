@@ -1,12 +1,9 @@
-import { AnswerType, MediaType } from '@hunthub/shared';
+import { useCallback } from 'react';
+import { AnswerType, ChallengeType } from '@hunthub/shared';
 import type { CluePF } from '@hunthub/shared';
-import { StepContainer, StepContent, StepIndicators, StepActions } from '@/components/step';
-import { MediaDisplay } from '@/components/media';
-import { ActionButton, FeedbackDisplay, HintSection, TimeLimit, AttemptsCounter } from '../components';
+import { CHALLENGE_BADGES } from '@/constants';
+import { ChallengeCard, ActionButton } from '../components';
 import type { ChallengeProps } from '@/types';
-import * as S from './ClueChallenge.styles';
-
-const VISUAL_MEDIA_TYPES: MediaType[] = [MediaType.Image, MediaType.Video, MediaType.ImageAudio];
 
 export const ClueChallenge = ({
   challenge,
@@ -15,44 +12,32 @@ export const ClueChallenge = ({
   isValidating,
   isLastStep,
   feedback,
+  currentAttempts,
   timeLimit,
   maxAttempts,
 }: ChallengeProps<CluePF>) => {
-  const handleContinue = () => {
+  const handleContinue = useCallback(() => {
     onValidate(AnswerType.Clue, { clue: {} });
-  };
-
-  const hasVisualMedia = media && VISUAL_MEDIA_TYPES.includes(media.type);
-  const hasAudioOnly = media?.type === MediaType.Audio;
-  const hasIndicators = timeLimit || maxAttempts;
+  }, [onValidate]);
 
   return (
-    <StepContainer>
-      {hasIndicators && (
-        <StepIndicators>
-          {timeLimit && <TimeLimit seconds={timeLimit} onExpire={handleContinue} />}
-          {maxAttempts && <AttemptsCounter current={0} max={maxAttempts} onMaxAttempts={handleContinue} />}
-        </StepIndicators>
-      )}
-
-      <StepContent>
-        {hasVisualMedia && <MediaDisplay media={media} />}
-
-        <S.ClueContent>
-          {challenge.title && <S.ClueTitle variant="h5">{challenge.title}</S.ClueTitle>}
-          {challenge.description && <S.ClueDescription>{challenge.description}</S.ClueDescription>}
-        </S.ClueContent>
-
-        {hasAudioOnly && <MediaDisplay media={media} />}
-
-        <FeedbackDisplay feedback={feedback} />
-
-        <HintSection />
-      </StepContent>
-
-      <StepActions>
+    <ChallengeCard
+      badge={CHALLENGE_BADGES[ChallengeType.Clue]}
+      title={challenge.title}
+      description={challenge.description}
+      media={media}
+      timeLimit={timeLimit}
+      maxAttempts={maxAttempts}
+      currentAttempts={currentAttempts}
+      feedback={feedback}
+      onTimeExpire={handleContinue}
+      onMaxAttempts={handleContinue}
+      showHint
+      footer={
         <ActionButton onClick={handleContinue} isValidating={isValidating} isLastStep={isLastStep} label="Continue" />
-      </StepActions>
-    </StepContainer>
+      }
+    >
+      {null}
+    </ChallengeCard>
   );
 };

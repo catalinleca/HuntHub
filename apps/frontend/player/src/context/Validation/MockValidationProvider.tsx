@@ -7,11 +7,13 @@ import type { ValidationResult } from './types';
 interface ValidationState {
   isCorrect: boolean | null;
   feedback: string | null;
+  attemptCount: number;
 }
 
 const initialState: ValidationState = {
   isCorrect: null,
   feedback: null,
+  attemptCount: 0,
 };
 
 interface MockValidationProviderProps {
@@ -37,17 +39,19 @@ export const MockValidationProvider = ({ step, onValidated, children }: MockVali
       try {
         const result = checkAnswer(step, answerType, payload);
 
-        setState({
+        setState((prev) => ({
           isCorrect: result.isCorrect,
           feedback: result.feedback,
-        });
+          attemptCount: result.isCorrect ? prev.attemptCount : prev.attemptCount + 1,
+        }));
 
         onValidated?.(result);
       } catch {
-        setState({
+        setState((prev) => ({
           isCorrect: false,
           feedback: 'Something went wrong. Please try again.',
-        });
+          attemptCount: prev.attemptCount + 1,
+        }));
       }
     },
     [step, onValidated],
@@ -64,6 +68,7 @@ export const MockValidationProvider = ({ step, onValidated, children }: MockVali
         isValidating: false, // Always false - validation is instant
         isCorrect: state.isCorrect,
         feedback: state.feedback,
+        attemptCount: state.attemptCount,
         reset,
       }}
     >

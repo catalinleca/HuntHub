@@ -6,11 +6,13 @@ import { ValidationContext } from './context';
 interface ValidationState {
   isCorrect: boolean | null;
   feedback: string | null;
+  attemptCount: number;
 }
 
 const initialState: ValidationState = {
   isCorrect: null,
   feedback: null,
+  attemptCount: 0,
 };
 
 interface ApiValidationProviderProps {
@@ -31,24 +33,28 @@ export const ApiValidationProvider = ({ sessionId, children }: ApiValidationProv
   const validate = useCallback(
     async (answerType: AnswerType, payload: AnswerPayload) => {
       if (!sessionId) {
-        setState({
+        setState((prev) => ({
           isCorrect: false,
           feedback: 'Session not found. Please restart the hunt.',
-        });
+          attemptCount: prev.attemptCount + 1,
+        }));
         return;
       }
 
       try {
         const data = await validateAnswer({ sessionId, answerType, payload });
-        setState({
+        setState((prev) => ({
           isCorrect: data.correct,
           feedback: data.feedback ?? null,
-        });
+          // Use API attemptCount if available, otherwise track locally
+          attemptCount: data.correct ? prev.attemptCount : prev.attemptCount + 1,
+        }));
       } catch {
-        setState({
+        setState((prev) => ({
           isCorrect: false,
           feedback: 'Something went wrong. Please try again.',
-        });
+          attemptCount: prev.attemptCount + 1,
+        }));
       }
     },
     [sessionId, validateAnswer],
@@ -75,6 +81,7 @@ export const ApiValidationProvider = ({ sessionId, children }: ApiValidationProv
         isValidating,
         isCorrect: state.isCorrect,
         feedback: state.feedback,
+        attemptCount: state.attemptCount,
         reset,
       }}
     >
