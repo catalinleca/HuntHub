@@ -134,9 +134,6 @@ export class StepNavigator {
     return { href };
   }
 
-  /**
-   * Fetch multiple steps by IDs (for batching)
-   */
   static async getStepsByIds(
     huntId: number,
     huntVersion: number,
@@ -149,9 +146,6 @@ export class StepNavigator {
     });
   }
 
-  /**
-   * Get first N steps from stepOrder (for session start)
-   */
   static async getFirstNSteps(
     huntId: number,
     huntVersion: number,

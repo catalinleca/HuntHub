@@ -45,13 +45,10 @@ export class PlayService implements IPlayService {
 
     const firstStepId = huntVersion.stepOrder[0];
 
-    // Create session with initial step progress
     const progress = await SessionManager.createSession(huntId, liveVersion, playerName, firstStepId, userId);
 
-    // Get first batch of steps (2 for prefetching)
     const steps = await StepNavigator.getFirstNSteps(huntId, liveVersion, huntVersion.stepOrder, 2);
 
-    // Transform to player format
     const stepsPF = steps.map((step) => PlayMapper.maybeRandomizeOptions(PlayMapper.toStepPF(step)));
 
     return {
@@ -62,9 +59,6 @@ export class PlayService implements IPlayService {
     };
   }
 
-  /**
-   * Get session status (for resuming)
-   */
   async getSession(sessionId: string): Promise<SessionResponse> {
     const progress = await SessionManager.requireSession(sessionId);
     const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version);

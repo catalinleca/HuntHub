@@ -155,10 +155,6 @@ export class PlayMapper {
     };
   }
 
-  /**
-   * Randomize quiz options if randomizeOrder is true
-   * Uses Fisher-Yates shuffle for unbiased randomization
-   */
   static maybeRandomizeOptions(step: StepPF): StepPF {
     if (step.type !== ChallengeType.Quiz) {
       return step;
@@ -180,9 +176,6 @@ export class PlayMapper {
     };
   }
 
-  /**
-   * Fisher-Yates shuffle algorithm
-   */
   private static shuffleArray<T>(array: T[]): T[] {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -191,9 +184,6 @@ export class PlayMapper {
     return array;
   }
 
-  /**
-   * Transform multiple steps to StepPF array
-   */
   static toStepsPF(docs: HydratedDocument<IStep>[]): StepPF[] {
     return docs.map((doc) => this.toStepPF(doc));
   }

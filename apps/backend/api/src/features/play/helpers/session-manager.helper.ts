@@ -10,9 +10,6 @@ export class SessionManager {
     return randomUUID();
   }
 
-  /**
-   * Create a new session with Progress document
-   */
   static async createSession(
     huntId: number,
     version: number,

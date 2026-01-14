@@ -413,7 +413,29 @@ export const HintResponse = z
   .object({ hint: z.string(), hintsUsed: z.number().int(), maxHints: z.number().int() })
   .strict();
 export const StepLinks = z.object({ self: HateoasLink, next: HateoasLink.optional(), validate: HateoasLink }).strict();
-export const StepResponse = z.object({ step: StepPF, _links: StepLinks }).strict();
+export const StepResponse = z
+  .object({
+    step: StepPF,
+    stepIndex: z.number().int(),
+    totalSteps: z.number().int(),
+    attempts: z.number().int(),
+    maxAttempts: z.number().int().nullable(),
+    hintsUsed: z.number().int(),
+    maxHints: z.number().int(),
+    _links: StepLinks,
+  })
+  .strict();
+export const SessionResponse = z
+  .object({
+    sessionId: z.string().uuid(),
+    huntId: z.number().int(),
+    status: z.string(),
+    currentStepIndex: z.number().int(),
+    totalSteps: z.number().int(),
+    startedAt: z.string(),
+    completedAt: z.string().optional(),
+  })
+  .strict();
 export const SortOrder = z.enum(['asc', 'desc']);
 export const HuntSortField = z.enum(['createdAt', 'updatedAt']);
 export const AssetSortField = z.enum(['createdAt', 'originalFilename', 'size']);
@@ -516,6 +538,7 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   HintResponse,
   StepLinks,
   StepResponse,
+  SessionResponse,
   SortOrder,
   HuntSortField,
   AssetSortField,
