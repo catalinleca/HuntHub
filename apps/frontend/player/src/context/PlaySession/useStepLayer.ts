@@ -1,5 +1,4 @@
-import { usePrefetchNextStep } from '@/api';
-import type { StepResponse } from '@hunthub/shared';
+import { useStep } from '@/api';
 
 /**
  * Helper to extract stepId from HATEOAS link
@@ -15,22 +14,39 @@ const extractStepIdFromLink = (link: { href: string } | undefined): number | nul
 };
 
 /**
- * Step layer now uses the currentStep from SessionResponse
- * and handles prefetching of the next step via HATEOAS links
+ * Step layer fetches current step and prefetches next step.
+ *
+ * Flow:
+ * 1. Fetch current step by currentStepId (from session)
+ * 2. Extract nextStepId from HATEOAS links
+ * 3. Prefetch next step (same useStep hook, same cache pattern)
+ *
+ * When user completes a step:
+ * - Session updates currentStepId via setQueryData
+ * - This hook re-runs with new currentStepId
+ * - New current step is already in cache (was prefetched)
+ * - Zero network latency on step transitions
  */
-export const useStepLayer = (sessionId: string | null, currentStepResponse: StepResponse | null | undefined) => {
+export const useStepLayer = (sessionId: string | null, currentStepId: number | null) => {
+  const currentStepQuery = useStep(sessionId, currentStepId);
+  const currentStepResponse = currentStepQuery.data;
+
   const nextStepId = extractStepIdFromLink(currentStepResponse?._links?.next);
-  const prefetchQuery = usePrefetchNextStep(sessionId, nextStepId);
+  const prefetchQuery = useStep(sessionId, nextStepId);
 
   const hasNextLink = nextStepId !== null;
 
   return {
     currentStep: currentStepResponse?.step ?? null,
-    stepResponse: currentStepResponse,
+    stepResponse: currentStepResponse ?? null,
+    attempts: currentStepResponse?.attempts ?? 0,
+    maxAttempts: currentStepResponse?.maxAttempts ?? null,
+    hintsUsed: currentStepResponse?.hintsUsed ?? 0,
+    maxHints: currentStepResponse?.maxHints ?? 1,
     hasNextLink,
     nextStepId,
-    // Prefetch is loading if we have a next link and the query is loading
+    isLoading: currentStepQuery.isLoading,
     isPrefetching: hasNextLink && prefetchQuery.isLoading,
-    prefetchError: prefetchQuery.error ?? null,
+    error: currentStepQuery.error ?? null,
   };
 };

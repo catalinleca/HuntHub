@@ -17,6 +17,7 @@ const PlayPageContent = () => {
     totalSteps,
     isLastStep,
     startSession,
+    nextStepId,
   } = usePlaySession();
 
   if (isLoading) {
@@ -62,7 +63,7 @@ const PlayPageContent = () => {
       </S.Header>
 
       <S.Content>
-        <ApiValidationProvider key={currentStep.stepId} sessionId={sessionId!}>
+        <ApiValidationProvider key={currentStep.stepId} sessionId={sessionId!} nextStepId={nextStepId}>
           <StepRenderer step={currentStep} isLastStep={isLastStep} />
         </ApiValidationProvider>
       </S.Content>

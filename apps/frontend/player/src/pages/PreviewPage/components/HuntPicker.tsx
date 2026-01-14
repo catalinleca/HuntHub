@@ -45,16 +45,10 @@ export const HuntPicker = () => {
 
           {isLoading && <CircularProgress size={24} />}
 
-          {error && (
-            <Typography color="error">
-              Failed to load hunts. Is the backend running?
-            </Typography>
-          )}
+          {error && <Typography color="error">Failed to load hunts. Is the backend running?</Typography>}
 
           {data && data.hunts.length === 0 && (
-            <Typography color="text.secondary">
-              No published hunts found. Create and publish a hunt first.
-            </Typography>
+            <Typography color="text.secondary">No published hunts found. Create and publish a hunt first.</Typography>
           )}
 
           {data && data.hunts.length > 0 && (

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { ValidateAnswerResponse, AnswerType, AnswerPayload } from '@hunthub/shared';
+import type { ValidateAnswerResponse, AnswerType, AnswerPayload, SessionResponse } from '@hunthub/shared';
 import { playKeys } from './keys';
 import { validateAnswer } from './api';
 
@@ -7,6 +7,7 @@ interface ValidateParams {
   sessionId: string;
   answerType: AnswerType;
   payload: AnswerPayload;
+  nextStepId: number | null;
 }
 
 export const useValidateAnswer = () => {
@@ -16,12 +17,29 @@ export const useValidateAnswer = () => {
     mutationFn: (params: ValidateParams): Promise<ValidateAnswerResponse> =>
       validateAnswer(params.sessionId, params.answerType, params.payload),
     onSuccess: (data, variables) => {
-      const { sessionId } = variables;
+      const { sessionId, nextStepId } = variables;
 
       if (data.correct) {
-        // Invalidate session to get updated currentStep
-        // Note: Don't invalidate step queries - prefetched next step should remain in cache
-        queryClient.invalidateQueries({ queryKey: playKeys.session(sessionId) });
+        queryClient.setQueryData<SessionResponse>(playKeys.session(sessionId), (old) => {
+          if (!old) {
+            return old;
+          }
+
+          if (data.isComplete) {
+            return {
+              ...old,
+              status: 'completed',
+              currentStepIndex: old.currentStepIndex + 1,
+              currentStepId: null,
+            };
+          }
+
+          return {
+            ...old,
+            currentStepIndex: old.currentStepIndex + 1,
+            currentStepId: nextStepId,
+          };
+        });
       }
     },
   });

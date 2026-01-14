@@ -95,21 +95,14 @@ export class PlayService implements IPlayService {
     const firstStepId = huntVersion.stepOrder[0];
     const progress = await SessionManager.createSession(huntId, liveVersion, playerName, firstStepId, userId);
 
-    const step = await StepNavigator.getStepById(huntId, liveVersion, firstStepId);
-    if (!step) {
-      throw new NotFoundError('First step not found');
-    }
-
-    const stepProgress = progress.steps?.[0];
-
     return {
       sessionId: progress.sessionId,
       hunt: PlayerExporter.hunt(huntId, huntVersion),
       status: HuntProgressStatus.InProgress,
       currentStepIndex: 0,
+      currentStepId: firstStepId,
       totalSteps: huntVersion.stepOrder.length,
       startedAt: progress.startedAt.toISOString(),
-      currentStep: this.buildStepResponse(progress.sessionId, step, huntVersion, stepProgress),
     };
   }
 
@@ -120,24 +113,15 @@ export class PlayService implements IPlayService {
     const currentIndex = StepNavigator.getStepIndex(huntVersion.stepOrder, progress.currentStepId);
     const isInProgress = progress.status === HuntProgressStatus.InProgress;
 
-    let currentStep: StepResponse | undefined;
-    if (isInProgress) {
-      const step = await StepNavigator.getCurrentStepForSession(progress);
-      if (step) {
-        const stepProgress = SessionManager.getCurrentStepProgress(progress);
-        currentStep = this.buildStepResponse(sessionId, step, huntVersion, stepProgress ?? undefined);
-      }
-    }
-
     return {
       sessionId: progress.sessionId,
       hunt: PlayerExporter.hunt(progress.huntId, huntVersion),
       status: progress.status,
       currentStepIndex: currentIndex,
+      currentStepId: isInProgress ? progress.currentStepId : null,
       totalSteps: huntVersion.stepOrder.length,
       startedAt: progress.startedAt.toISOString(),
       completedAt: progress.completedAt?.toISOString(),
-      currentStep,
     };
   }
 

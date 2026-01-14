@@ -27,11 +27,7 @@ import { httpClient } from '@/services/http-client';
  * POST /play/:huntId/start
  * Creates a new session and returns initial state with first step
  */
-export const startSession = async (
-  huntId: number,
-  playerName: string,
-  email?: string,
-): Promise<SessionResponse> => {
+export const startSession = async (huntId: number, playerName: string, email?: string): Promise<SessionResponse> => {
   const response = await httpClient.post<SessionResponse>(`/play/${huntId}/start`, {
     playerName,
     ...(email && { email }),
@@ -81,13 +77,10 @@ export const validateAnswer = async (
   answerType: AnswerType,
   payload: AnswerPayload,
 ): Promise<ValidateAnswerResponse> => {
-  const response = await httpClient.post<ValidateAnswerResponse>(
-    `/play/sessions/${sessionId}/validate`,
-    {
-      answerType,
-      payload,
-    },
-  );
+  const response = await httpClient.post<ValidateAnswerResponse>(`/play/sessions/${sessionId}/validate`, {
+    answerType,
+    payload,
+  });
 
   return response.data;
 };

@@ -22,6 +22,7 @@ export interface SessionDerived {
   hasSession: boolean;
   isLastStep: boolean;
   isComplete: boolean;
+  nextStepId: number | null;
 }
 
 export type PlaySessionContextValue = SessionState & SessionData & SessionActions & SessionDerived;

@@ -33,6 +33,7 @@ export const MockPlaySessionProvider = ({ children, sessionId = 'mock-session' }
       hasSession: true,
       isLastStep: false,
       isComplete: false,
+      nextStepId: null,
     }),
     [sessionId],
   );

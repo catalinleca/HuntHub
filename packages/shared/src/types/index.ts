@@ -974,14 +974,20 @@ export interface SessionResponse {
   status: string;
   /** Current step index (0-based) */
   currentStepIndex: number;
+  /** Current step ID (null when session is completed) */
+  currentStepId?: number | null;
   /** Total number of steps in the hunt */
   totalSteps: number;
-  /** When the session started */
+  /**
+   * When the session started
+   * @format date-time
+   */
   startedAt: string;
-  /** When the session was completed (if finished) */
+  /**
+   * When the session was completed (if finished)
+   * @format date-time
+   */
   completedAt?: string;
-  /** Current step data (only present when status is 'in_progress') */
-  currentStep?: StepResponse;
 }
 
 /** Standard pagination query parameters */

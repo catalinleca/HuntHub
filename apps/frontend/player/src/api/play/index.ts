@@ -2,7 +2,6 @@ export { playKeys } from './keys';
 export { useStartSession } from './useStartSession';
 export { useGetSession } from './useGetSession';
 export { useStep } from './useStep';
-export { usePrefetchNextStep } from './usePrefetchNextStep';
 export { useValidateAnswer } from './useValidateAnswer';
 export { useHint } from './useHint';
 
