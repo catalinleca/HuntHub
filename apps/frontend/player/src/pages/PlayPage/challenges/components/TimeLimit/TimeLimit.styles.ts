@@ -14,8 +14,8 @@ const pulse = keyframes`
 export const TimerBadge = styled(Box)<{ $isWarning: boolean; $isExpired: boolean }>`
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing(0.5)};
-  padding: ${({ theme }) => theme.spacing(0.5, 1)};
+  gap: ${({ theme }) => theme.spacing(1)};
+  padding: ${({ theme }) => theme.spacing(1, 2)};
   border-radius: ${({ theme }) => theme.shape.sm}px;
   background-color: ${({ theme }) => alpha(theme.palette.grey[500], 0.1)};
   color: ${({ theme }) => theme.palette.text.secondary};
