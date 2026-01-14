@@ -1,12 +1,10 @@
 import React from 'react';
 import { Typography, Button, Alert } from '@mui/material';
 import { MicrophoneIcon, StopIcon, ArrowCounterClockwiseIcon, CheckIcon } from '@phosphor-icons/react';
-import type { MissionPF } from '@hunthub/shared';
 import { useAudioRecorder, type Status } from '@/hooks';
 import * as S from './Mission.styles';
 
 interface AudioContentProps {
-  mission: MissionPF;
   onSubmit: () => void;
   disabled?: boolean;
 }

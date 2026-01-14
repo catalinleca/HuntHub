@@ -36,8 +36,6 @@ export const ClueChallenge = ({
       footer={
         <ActionButton onClick={handleContinue} isValidating={isValidating} isLastStep={isLastStep} label="Continue" />
       }
-    >
-      {null}
-    </ChallengeCard>
+    />
   );
 };

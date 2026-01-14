@@ -28,15 +28,9 @@ export const MissionChallenge = ({
   }, [onValidate]);
 
   const contents: Record<MissionType, React.ReactNode> = {
-    [MissionType.MatchLocation]: (
-      <LocationContent mission={challenge} onSubmit={handleLocationSubmit} disabled={isValidating} />
-    ),
-    [MissionType.UploadMedia]: (
-      <PhotoContent mission={challenge} onSubmit={handleMediaSubmit} disabled={isValidating} />
-    ),
-    [MissionType.UploadAudio]: (
-      <AudioContent mission={challenge} onSubmit={handleMediaSubmit} disabled={isValidating} />
-    ),
+    [MissionType.MatchLocation]: <LocationContent onSubmit={handleLocationSubmit} disabled={isValidating} />,
+    [MissionType.UploadMedia]: <PhotoContent onSubmit={handleMediaSubmit} disabled={isValidating} />,
+    [MissionType.UploadAudio]: <AudioContent onSubmit={handleMediaSubmit} disabled={isValidating} />,
   };
 
   return (

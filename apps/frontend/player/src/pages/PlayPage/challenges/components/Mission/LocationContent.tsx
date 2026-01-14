@@ -1,12 +1,10 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Typography, Button, CircularProgress } from '@mui/material';
 import { MapPinIcon, NavigationArrowIcon } from '@phosphor-icons/react';
-import type { MissionPF } from '@hunthub/shared';
 import { useGeolocation } from '@/hooks';
 import * as S from './Mission.styles';
 
 interface LocationContentProps {
-  mission: MissionPF;
   onSubmit: (position: { lat: number; lng: number }) => void;
   disabled?: boolean;
 }

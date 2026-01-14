@@ -14,7 +14,7 @@ import * as S from './ChallengeCard.styles';
 const VISUAL_MEDIA_TYPES: MediaType[] = [MediaType.Image, MediaType.Video, MediaType.ImageAudio];
 
 interface ChallengeCardProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   badge: BadgeConfig;
   title?: string;
   description?: string;

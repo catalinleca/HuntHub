@@ -43,11 +43,11 @@ export const ApiValidationProvider = ({ sessionId, children }: ApiValidationProv
 
       try {
         const data = await validateAnswer({ sessionId, answerType, payload });
+        const apiAttemptCount = (data as { attemptCount?: number }).attemptCount;
         setState((prev) => ({
           isCorrect: data.correct,
           feedback: data.feedback ?? null,
-          // Use API attemptCount if available, otherwise track locally
-          attemptCount: data.correct ? prev.attemptCount : prev.attemptCount + 1,
+          attemptCount: apiAttemptCount ?? (data.correct ? prev.attemptCount : prev.attemptCount + 1),
         }));
       } catch {
         setState((prev) => ({

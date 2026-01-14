@@ -1,12 +1,10 @@
 import { useRef } from 'react';
 import { Typography, Button, Alert } from '@mui/material';
 import { CameraIcon, ArrowCounterClockwiseIcon, CheckIcon } from '@phosphor-icons/react';
-import type { MissionPF } from '@hunthub/shared';
 import { usePhotoCapture } from '@/hooks';
 import * as S from './Mission.styles';
 
 interface PhotoContentProps {
-  mission: MissionPF;
   onSubmit: () => void;
   disabled?: boolean;
 }
