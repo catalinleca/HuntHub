@@ -2,18 +2,16 @@ import { injectable } from 'inversify';
 import { HydratedDocument } from 'mongoose';
 import {
   StartSessionResponse,
+  SessionResponse,
+  StepResponse,
   ValidateAnswerRequest,
   ValidateAnswerResponse,
   HintResponse,
-  StepPF,
-  StepLinks,
-  AnswerType,
 } from '@hunthub/shared';
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import { IHunt } from '@/database/types/Hunt';
 import { IHuntVersion } from '@/database/types/HuntVersion';
-import { IProgress, IStepProgress } from '@/database/types/Progress';
 import { NotFoundError, ForbiddenError, ConflictError, ValidationError } from '@/shared/errors';
 import { PlayMapper } from '@/shared/mappers/play.mapper';
 import { withTransaction } from '@/shared/utils/transaction';
@@ -30,67 +28,17 @@ export interface IPlayService {
   requestHint(sessionId: string): Promise<HintResponse>;
 }
 
-/**
- * Response for getSession endpoint
- */
-interface SessionResponse {
-  sessionId: string;
-  huntId: number;
-  status: string;
-  currentStepIndex: number;
-  totalSteps: number;
-  startedAt: string;
-  completedAt?: string;
-}
-
-/**
- * Response for getCurrentStep and getNextStep endpoints
- */
-interface StepResponse {
-  step: StepPF;
-  stepIndex: number;
-  totalSteps: number;
-  attempts: number;
-  maxAttempts: number | null;
-  hintsUsed: number;
-  maxHints: number;
-  _links: StepLinks;
-}
-
-/**
- * PlayService - Orchestrates hunt gameplay
- *
- * Responsibilities:
- * - Start new sessions for live hunts
- * - Navigate through steps with HATEOAS links
- * - Validate answers with appropriate validators
- * - Handle hints and progress tracking
- * - Enforce time limits and max attempts
- *
- * Pattern: Feature module (orchestrates Hunt, HuntVersion, Step, Progress)
- */
 @injectable()
 export class PlayService implements IPlayService {
-  /**
-   * Start a new play session for a hunt
-   *
-   * @param huntId - The hunt to play
-   * @param playerName - Display name for the player
-   * @param userId - Optional Firebase user ID (anonymous if not provided)
-   * @returns Session with hunt metadata and first steps
-   */
   async startSession(huntId: number, playerName: string, userId?: string): Promise<StartSessionResponse> {
-    // Find hunt and verify it's live
     const hunt = await this.requireLiveHunt(huntId);
     const liveVersion = hunt.liveVersion!;
 
-    // Get the live HuntVersion
     const huntVersion = await HuntVersionModel.findPublishedVersion(huntId, liveVersion);
     if (!huntVersion) {
       throw new NotFoundError('Live hunt version not found');
     }
 
-    // Validate hunt has steps
     if (!huntVersion.stepOrder.length) {
       throw new ValidationError('This hunt has no steps to play', []);
     }
@@ -98,21 +46,10 @@ export class PlayService implements IPlayService {
     const firstStepId = huntVersion.stepOrder[0];
 
     // Create session with initial step progress
-    const progress = await SessionManager.createSession(
-      huntId,
-      liveVersion,
-      playerName,
-      firstStepId,
-      userId,
-    );
+    const progress = await SessionManager.createSession(huntId, liveVersion, playerName, firstStepId, userId);
 
     // Get first batch of steps (2 for prefetching)
-    const steps = await StepNavigator.getFirstNSteps(
-      huntId,
-      liveVersion,
-      huntVersion.stepOrder,
-      2,
-    );
+    const steps = await StepNavigator.getFirstNSteps(huntId, liveVersion, huntVersion.stepOrder, 2);
 
     // Transform to player format
     const stepsPF = steps.map((step) => PlayMapper.maybeRandomizeOptions(PlayMapper.toStepPF(step)));
@@ -295,12 +232,7 @@ export class PlayService implements IPlayService {
           // Advance to next step
           const nextStepId = StepNavigator.getNextStepId(huntVersion.stepOrder, progress.currentStepId);
           if (nextStepId !== null) {
-            await SessionManager.advanceToNextStep(
-              sessionId,
-              progress.currentStepId,
-              nextStepId,
-              session,
-            );
+            await SessionManager.advanceToNextStep(sessionId, progress.currentStepId, nextStepId, session);
           }
         }
       }
@@ -347,10 +279,7 @@ export class PlayService implements IPlayService {
     }
 
     // Increment hints used
-    const hintsUsed = await SessionManager.incrementHintsUsed(
-      sessionId,
-      progress.currentStepId,
-    );
+    const hintsUsed = await SessionManager.incrementHintsUsed(sessionId, progress.currentStepId);
 
     return {
       hint: step.hint,
@@ -383,10 +312,7 @@ export class PlayService implements IPlayService {
   /**
    * Get HuntVersion or throw NotFoundError
    */
-  private async requireHuntVersion(
-    huntId: number,
-    version: number,
-  ): Promise<HydratedDocument<IHuntVersion>> {
+  private async requireHuntVersion(huntId: number, version: number): Promise<HydratedDocument<IHuntVersion>> {
     const huntVersion = await HuntVersionModel.findPublishedVersion(huntId, version);
 
     if (!huntVersion) {
@@ -412,17 +338,7 @@ export class PlayService implements IPlayService {
     huntVersion: HydratedDocument<IHuntVersion>;
     currentStepId: number;
   }): ValidateAnswerResponse {
-    const {
-      correct,
-      feedback,
-      attempts,
-      maxAttempts,
-      isComplete,
-      expired,
-      exhausted,
-      sessionId,
-      isLastStep,
-    } = params;
+    const { correct, feedback, attempts, maxAttempts, isComplete, expired, exhausted, sessionId, isLastStep } = params;
 
     return {
       correct,
@@ -432,12 +348,7 @@ export class PlayService implements IPlayService {
       isComplete,
       expired,
       exhausted,
-      _links: StepNavigator.generateValidateLinks(
-        sessionId,
-        correct,
-        isLastStep,
-        isComplete ?? false,
-      ),
+      _links: StepNavigator.generateValidateLinks(sessionId, correct, isLastStep, isComplete ?? false),
     };
   }
 }

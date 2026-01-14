@@ -5,19 +5,7 @@ import ProgressModel from '@/database/models/Progress';
 import { IProgress, IStepProgress } from '@/database/types/Progress';
 import { NotFoundError, ConflictError } from '@/shared/errors';
 
-/**
- * SessionManager - Handles play session lifecycle
- *
- * Responsibilities:
- * - Generate unique session IDs
- * - Create Progress documents for new sessions
- * - Look up and validate existing sessions
- * - Advance session state on step completion
- */
 export class SessionManager {
-  /**
-   * Generate a UUID v4 session ID
-   */
   static generateSessionId(): string {
     return randomUUID();
   }

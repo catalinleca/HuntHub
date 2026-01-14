@@ -1461,11 +1461,70 @@ components:
       properties:
         step:
           $ref: '#/components/schemas/StepPF'
+        stepIndex:
+          type: integer
+          description: Current step index (0-based)
+        totalSteps:
+          type: integer
+          description: Total number of steps in the hunt
+        attempts:
+          type: integer
+          description: Number of attempts made on this step
+        maxAttempts:
+          type: integer
+          nullable: true
+          description: Maximum attempts allowed (null = unlimited)
+        hintsUsed:
+          type: integer
+          description: Number of hints used on this step
+        maxHints:
+          type: integer
+          description: Maximum hints available per step
         _links:
           $ref: '#/components/schemas/StepLinks'
       required:
         - step
+        - stepIndex
+        - totalSteps
+        - attempts
+        - maxAttempts
+        - hintsUsed
+        - maxHints
         - _links
+      additionalProperties: false
+
+    SessionResponse:
+      type: object
+      description: Response for getting session status
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+        huntId:
+          type: integer
+          description: Hunt ID being played
+        status:
+          type: string
+          description: "Session status: 'in_progress' or 'completed'"
+        currentStepIndex:
+          type: integer
+          description: Current step index (0-based)
+        totalSteps:
+          type: integer
+          description: Total number of steps in the hunt
+        startedAt:
+          type: string
+          description: When the session started
+        completedAt:
+          type: string
+          description: When the session was completed (if finished)
+      required:
+        - sessionId
+        - huntId
+        - status
+        - currentStepIndex
+        - totalSteps
+        - startedAt
       additionalProperties: false
 
     # ============================================================

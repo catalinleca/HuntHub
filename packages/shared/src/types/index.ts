@@ -962,8 +962,38 @@ export interface ValidateAnswerLinks {
 export interface StepResponse {
   /** Player Format - Step without answers or internal metadata */
   step: StepPF;
+  /** Current step index (0-based) */
+  stepIndex: number;
+  /** Total number of steps in the hunt */
+  totalSteps: number;
+  /** Number of attempts made on this step */
+  attempts: number;
+  /** Maximum attempts allowed (null = unlimited) */
+  maxAttempts: number | null;
+  /** Number of hints used on this step */
+  hintsUsed: number;
+  /** Maximum hints available per step */
+  maxHints: number;
   /** HATEOAS links for step navigation */
   _links: StepLinks;
+}
+
+/** Response for getting session status */
+export interface SessionResponse {
+  /** @format uuid */
+  sessionId: string;
+  /** Hunt ID being played */
+  huntId: number;
+  /** Session status: 'in_progress' or 'completed' */
+  status: string;
+  /** Current step index (0-based) */
+  currentStepIndex: number;
+  /** Total number of steps in the hunt */
+  totalSteps: number;
+  /** When the session started */
+  startedAt: string;
+  /** When the session was completed (if finished) */
+  completedAt?: string;
 }
 
 /** Standard pagination query parameters */
