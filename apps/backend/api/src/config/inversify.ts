@@ -19,6 +19,8 @@ import { AssetUsageTracker, IAssetUsageTracker } from '@/services/asset-usage';
 import { AssetValidator, IAssetValidator } from '@/services/asset-validation';
 import { HuntShareController, IHuntShareController } from '@/features/sharing/hunt-share.controller';
 import { HuntShareService, IHuntShareService } from '@/features/sharing/hunt-share.service';
+import { PlayController, IPlayController } from '@/features/play/play.controller';
+import { PlayService, IPlayService } from '@/features/play/play.service';
 
 const container = new Container();
 
@@ -28,6 +30,7 @@ container.bind<IStepController>(TYPES.StepController).to(StepController);
 container.bind<IAssetController>(TYPES.AssetController).to(AssetController);
 container.bind<IPublishingController>(TYPES.PublishingController).to(PublishingController);
 container.bind<IHuntShareController>(TYPES.HuntShareController).to(HuntShareController);
+container.bind<IPlayController>(TYPES.PlayController).to(PlayController);
 
 container.bind<IAuthService>(TYPES.AuthService).to(AuthService);
 container.bind<IUserService>(TYPES.UserService).to(UserService);
@@ -41,5 +44,6 @@ container.bind<IAuthorizationService>(TYPES.AuthorizationService).to(Authorizati
 container.bind<IAssetUsageTracker>(TYPES.AssetUsageTracker).to(AssetUsageTracker);
 container.bind<IAssetValidator>(TYPES.AssetValidator).to(AssetValidator);
 container.bind<IHuntShareService>(TYPES.HuntShareService).to(HuntShareService);
+container.bind<IPlayService>(TYPES.PlayService).to(PlayService);
 
 export { container };

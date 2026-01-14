@@ -5,6 +5,7 @@ export const TYPES = {
   AssetController: Symbol.for('AssetController'),
   PublishingController: Symbol.for('PublishingController'),
   HuntShareController: Symbol.for('HuntShareController'),
+  PlayController: Symbol.for('PlayController'),
 
   AuthService: Symbol.for('AuthService'),
   UserService: Symbol.for('UserService'),
@@ -18,6 +19,7 @@ export const TYPES = {
   HuntShareService: Symbol.for('HuntShareService'),
   AssetUsageTracker: Symbol.for('AssetUsageTracker'),
   AssetValidator: Symbol.for('AssetValidator'),
+  PlayService: Symbol.for('PlayService'),
 };
 
 export interface ISerializer<TModel, TDTO> {

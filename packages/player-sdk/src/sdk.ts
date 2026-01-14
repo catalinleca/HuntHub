@@ -1,4 +1,4 @@
-import type { Hunt } from '@hunthub/shared';
+import type { HuntMetaPF, StepPF } from '@hunthub/shared';
 
 export const EDITOR_MESSAGES = {
   RENDER_HUNT: 'RENDER_HUNT',
@@ -10,11 +10,17 @@ export const PLAYER_MESSAGES = {
   STEP_VALIDATED: 'STEP_VALIDATED',
 } as const;
 
+export interface PreviewData {
+  hunt: HuntMetaPF;
+  steps: StepPF[];
+}
+
 export const editorMessages = {
-  renderHunt: (hunt: Hunt) => {
+  renderHunt: (data: PreviewData) => {
     return {
       type: EDITOR_MESSAGES.RENDER_HUNT,
-      hunt,
+      hunt: data.hunt,
+      steps: data.steps,
     };
   },
   jumpToStep: (stepIndex: number) => {
@@ -54,12 +60,24 @@ export type PlayerEventCallback = (message: PlayerToEditorMessage) => void;
 /**
  * SDK for Editor to communicate with Player iframe via postMessage.
  *
+ * IMPORTANT: Use PlayerExporter to sanitize hunt data before sending!
+ *
+ * ```typescript
+ * import { PlayerExporter } from '@hunthub/shared';
+ *
+ * const previewData = {
+ *   hunt: PlayerExporter.hunt(hunt.huntId, hunt),
+ *   steps: PlayerExporter.steps(hunt.steps ?? []),
+ * };
+ * sdk.renderHunt(previewData);
+ * ```
+ *
  * Constructor:
  *   iframe - The iframe element containing Player
  *   targetOrigin - Security: which origin can receive messages ('*' = any)
  *
  * Commands (Editor → Player):
- *   renderHunt(hunt) - Send hunt data to render
+ *   renderHunt(data) - Send sanitized hunt data to render
  *   jumpToStep(index) - Navigate to specific step
  *
  * Events (Player → Editor):
@@ -83,8 +101,8 @@ export class PlayerSDK {
     window.addEventListener('message', this.messageHandler);
   }
 
-  renderHunt(hunt: Hunt): void {
-    this.send(editorMessages.renderHunt(hunt));
+  renderHunt(data: PreviewData): void {
+    this.send(editorMessages.renderHunt(data));
   }
 
   jumpToStep(stepIndex: number): void {

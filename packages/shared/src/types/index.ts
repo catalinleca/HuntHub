@@ -883,18 +883,6 @@ export interface StartSessionRequest {
   email?: string;
 }
 
-/** Response from starting a play session */
-export interface StartSessionResponse {
-  /** @format uuid */
-  sessionId: string;
-  /** Player Format - Hunt metadata (no steps) */
-  hunt: HuntMetaPF;
-  /** @default 0 */
-  currentStepIndex: number;
-  /** First batch of steps (typically 2) */
-  steps: StepPF[];
-}
-
 /** Request to validate a player's answer (session tracks current step) */
 export interface ValidateAnswerRequest {
   /** Type of answer being submitted */
@@ -903,7 +891,7 @@ export interface ValidateAnswerRequest {
   payload: AnswerPayload;
 }
 
-/** Response from validating an answer (HATEOAS format) */
+/** Lightweight response from validating an answer (client uses prefetched cache for next step) */
 export interface ValidateAnswerResponse {
   correct: boolean;
   /** Hint or explanation message */
@@ -911,15 +899,13 @@ export interface ValidateAnswerResponse {
   /** Whether the hunt is complete */
   isComplete?: boolean;
   /** Number of attempts on this step */
-  attempts?: number;
+  attempts: number;
   /** Maximum attempts allowed for this step */
   maxAttempts?: number;
   /** Whether the time limit expired */
   expired?: boolean;
   /** Whether all attempts have been used */
   exhausted?: boolean;
-  /** HATEOAS links returned after validation */
-  _links: ValidateAnswerLinks;
 }
 
 /** Request for a hint */
@@ -962,8 +948,40 @@ export interface ValidateAnswerLinks {
 export interface StepResponse {
   /** Player Format - Step without answers or internal metadata */
   step: StepPF;
+  /** Current step index (0-based) */
+  stepIndex: number;
+  /** Total number of steps in the hunt */
+  totalSteps: number;
+  /** Number of attempts made on this step */
+  attempts: number;
+  /** Maximum attempts allowed (null = unlimited) */
+  maxAttempts: number | null;
+  /** Number of hints used on this step */
+  hintsUsed: number;
+  /** Maximum hints available per step */
+  maxHints: number;
   /** HATEOAS links for step navigation */
   _links: StepLinks;
+}
+
+/** Unified session response - used for both starting and resuming a session */
+export interface SessionResponse {
+  /** @format uuid */
+  sessionId: string;
+  /** Hunt metadata (name, description, cover image) */
+  hunt: HuntMetaPF;
+  /** Session status: 'in_progress' or 'completed' */
+  status: string;
+  /** Current step index (0-based) */
+  currentStepIndex: number;
+  /** Total number of steps in the hunt */
+  totalSteps: number;
+  /** When the session started */
+  startedAt: string;
+  /** When the session was completed (if finished) */
+  completedAt?: string;
+  /** Current step data (only present when status is 'in_progress') */
+  currentStep?: StepResponse;
 }
 
 /** Standard pagination query parameters */

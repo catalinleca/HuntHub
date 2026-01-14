@@ -25,6 +25,7 @@ export interface IStepProgress {
   startedAt?: Date;
   completedAt?: Date;
   duration?: number; // Seconds
+  hintsUsed?: number;
 }
 
 /**

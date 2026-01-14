@@ -1,19 +1,21 @@
 # Backend Current State
 
-**Last updated:** 2025-11-07
+**Last updated:** 2025-01-14
 
-**🎉 Testing & Documentation Complete! (2025-11-07)**
+**🎉 Play API Complete! (2025-01-14)**
 
-**Most Recent Work (2025-11-07):**
+**Most Recent Work (2025-01-14):**
+- ✅ **Play API Complete** - Full player session and gameplay implementation
+- ✅ **PlayerExporter** - Shared sanitization utility (strips answers, used by backend + frontend)
+- ✅ **Unified SessionResponse** - Same type for start and resume
+- ✅ **Lightweight validation** - Returns only result, client prefetches next step
+- ✅ **Server-side step access** - `/step/:stepId` with access control (current or next only)
+- ✅ **Integration Tests** - 217/217 tests passing
+
+**Previous Work (2025-11-07):**
 - ✅ **Hunt Sharing Complete** - POST/PATCH/DELETE/GET /api/hunts/:id/access endpoints
 - ✅ **AuthorizationService** - Centralized permission checks with rich AccessContext
 - ✅ **HuntAccess Model** - Separate table design for sharing with three-tier permissions (Owner > Admin > View)
-- ✅ **Query Optimization** - N+1 prevention for getUserHunts() with permission map
-- ✅ **Security Guarantees** - Permission escalation prevention, owner immutability, cascade deletes
-- ✅ **Integration Tests Complete** - 185/185 tests passing across all features
-- ✅ **Test Coverage:** Hunt CRUD (23), Step CRUD (20), Assets (26), Publishing (34), Authorization (46), Sharing (36)
-- ✅ **Documentation Cleanup** - Merged implementation guides into conceptual overviews
-- ✅ **Bug Fixes** - Multi-user Firebase auth, population handling, userId extraction, DELETE status codes
 
 **Previous Work (2025-11-06):**
 - ✅ **Release API Fully Implemented** - PUT /api/publishing/:id/release, DELETE /api/publishing/:id/release
@@ -174,10 +176,8 @@ Step
 - [x] Step - Active (full CRUD with transactions)
 - [x] Asset - Active (full CRUD with S3 integration)
 - [x] HuntAccess - Active (hunt sharing and collaboration)
+- [x] Progress - Active (player sessions and step progress)
 - [x] Location (schema) - Active (used in hunts and steps)
-- [ ] Progress - Defined, not yet implemented (Week 5-6)
-- [ ] LiveHunt - Defined, not yet implemented (Week 5-6)
-- [ ] PublishedHunt - Defined, not yet implemented
 
 ### OpenAPI & Validation
 - [x] OpenAPI schema definition (hunthub_models.yaml)
@@ -269,70 +269,18 @@ Step
 - [x] Build scripts
 - [x] Test scripts (jest with coverage support)
 
-## 🚧 Known Issues & Technical Debt
-
-### Hunt Features
-- [x] Hunt sharing/access control - **COMPLETE** (HuntAccess model + AuthorizationService)
-
-### Challenge Types
-- [x] Types defined in OpenAPI (Clue, Quiz, Mission, Task)
-- [x] Challenge structure in steps (discriminated union)
-- [ ] Challenge validation by type (Strategy pattern - Week 2)
-- [ ] Challenge response handling (Player API - Week 5-6)
-- [ ] Scoring/completion logic (Player API - Week 5-6)
-
-### Data Models (Defined but Not Used)
-- [ ] Progress service/controller/routes (tracking user progress - Week 5-6)
-- [ ] LiveHunt service (active hunt instances - Week 5-6)
-
 ## ❌ Not Yet Implemented
 
-### Hunt Participation
-- [ ] Start a hunt (create LiveHunt)
-- [ ] Submit challenge responses
-- [ ] Validate location proximity
-- [ ] Track progress
-- [ ] Complete hunt
-- [ ] Leaderboards/scoring
-
-### Location Features
-- [ ] Location validation middleware
-- [ ] GPS proximity checks
-- [ ] Map integration
-
-### Media/Assets
-- [ ] File upload handling
-- [ ] Image/video storage
-- [ ] Asset CDN integration
-
-### Hunt Discovery
-- [ ] Public hunt listing
-- [ ] Search/filter hunts
-- [ ] Hunt categories/tags
-
-### Social Features
-- [ ] Hunt sharing
-- [ ] Collaboration/permissions
-- [ ] Comments/reviews
-
-### Advanced Features
-- [ ] Real-time updates (WebSockets?)
-- [ ] Push notifications
-- [ ] Analytics/insights
-- [ ] Admin dashboard
+- [ ] GPS proximity validation for location steps
+- [ ] AI validation for missions/tasks
+- [ ] Scoring/leaderboards
+- [ ] Public hunt discovery
+- [ ] Real-time updates
 
 ## Database Schema Status
 
 **Collections in use:**
-- `users` - Active (full CRUD)
-- `hunts` - Active (full CRUD with versioning)
-- `huntversions` - Active (content snapshots)
-- `steps` - Active (full CRUD with transactions)
-- `assets` - Active (full CRUD with S3 integration)
-- `huntaccess` - Active (hunt sharing and collaboration)
-- `progress` - Defined, not yet implemented (Week 5-6)
-- `livehunts` - Defined, not yet implemented (Week 5-6)
-- `publishedhunts` - Defined, not yet implemented
+- `users`, `hunts`, `huntversions`, `steps`, `assets`, `huntaccess`, `progress`
 
 ## API Endpoints
 
@@ -366,84 +314,36 @@ POST   /api/publishing/hunts/:id/publish   # Publish hunt (clone steps, mark pub
 PUT    /api/publishing/hunts/:id/release   # Release hunt (make version live for players)
 DELETE /api/publishing/hunts/:id/release   # Take hunt offline (remove from discovery)
 
-# Hunt Sharing (4/4) - Week 5 ✅
-POST   /api/hunts/:id/access        # Share hunt with user by email
-PATCH  /api/hunts/:id/access/:userId # Update permission level
-DELETE /api/hunts/:id/access/:userId # Revoke access
-GET    /api/hunts/:id/access        # List all collaborators
+# Hunt Sharing (4/4) ✅
+POST   /api/hunts/:id/access
+PATCH  /api/hunts/:id/access/:userId
+DELETE /api/hunts/:id/access/:userId
+GET    /api/hunts/:id/access
+
+# Play API (5/5) ✅
+POST   /api/play/:huntId/start              # Start session
+GET    /api/play/sessions/:sessionId        # Resume session
+GET    /api/play/sessions/:sessionId/step/:stepId  # Get step (current/next only)
+POST   /api/play/sessions/:sessionId/validate      # Submit answer
+POST   /api/play/sessions/:sessionId/hint          # Request hint
 ```
 
-**📋 Needed - Week 2 (Tree VIEW API):**
-```
-GET    /api/hunts/:id/tree                 # Get compact step list (lazy loading)
-GET    /api/steps/:id                      # Get full step details
-# + Add stepCount to GET /api/hunts response
-# + Database indexes
-```
+## Technical Debt
 
-**Needed - Playing:**
-```
-GET    /api/play/:huntId       # Get live hunt for playing
-POST   /api/play/:huntId/steps/:stepId/complete  # Submit step completion
-GET    /api/play/:huntId/progress  # Get user progress
-```
-
-## Technical Debt / TODOs
-
-1. ✅ **Numeric ID Migration** - COMPLETE for all active models
-2. ✅ **Validation schemas** - Domain-organized structure complete
-3. ✅ **OpenAPI schema inconsistencies** - Fixed type/challengeType mismatches
-4. ⚠️ **Error messages** - Some errors lack descriptive messages
-5. ✅ **Testing** - COMPLETE (185/185 integration tests passing)
-6. ⚠️ **Documentation** - No API docs yet (Swagger UI installed but not configured)
-7. ✅ **Step CRUD tests** - COMPLETE (20/20 step tests passing)
-8. ✅ **Publishing tests** - COMPLETE (34/34 publishing tests passing)
-9. ✅ **Authorization tests** - COMPLETE (46/46 authorization tests passing)
-10. ✅ **Hunt Sharing tests** - COMPLETE (36/36 sharing tests passing)
+- ⚠️ Error messages could be more descriptive in places
+- ⚠️ Swagger UI not configured yet
 
 ---
 
-## 🎯 Current Priority: Player API
+## 🎯 Backend Complete
 
-**🎉 Publishing, Release & Sharing Workflows COMPLETE!**
+**All core backend features implemented:**
+- ✅ Hunt CRUD with versioning
+- ✅ Step CRUD with transactions
+- ✅ Asset management (S3)
+- ✅ Publishing & Release workflow
+- ✅ Hunt Sharing & Collaboration
+- ✅ Play API (sessions, validation, hints)
+- ✅ 217/217 tests passing
 
-**All backend features for hunt creation and collaboration are done - now enable hunt playing!**
-
-**NEXT: Player API** (~1-2 weeks) - **RECOMMENDED**
-- GET /api/play/:huntId/start (create session)
-- POST /api/play/sessions/:sessionId/submit (validate answers)
-- POST /api/play/sessions/:sessionId/hint (request hints)
-- Progress tracking with PlaySession model
-- **Estimated:** 1-2 weeks
-
-**See:**
-- `.claude/player-api-design.md` for complete design
-- `.claude/features/hunt-release.md` for release architecture and design decisions
-- `.claude/features/hunt-sharing.md` for sharing architecture and design decisions
-- `.claude/features/numeric-id-strategy.md` for ID design and counter pattern
-
----
-
-## Next Steps (Priority Order)
-
-1. **🔥 Player API** (~1-2 weeks) - **RECOMMENDED NEXT**
-   - Start hunt session (anonymous + authenticated)
-   - Submit challenge completions by type
-   - Validate challenges
-   - Track progress
-   - **See:** `.claude/player-api-design.md`
-
-2. **Tree VIEW API** (~1 week) - **Better Editor UX**
-   - GET /api/hunts/:id/tree (compact step list)
-   - GET /api/steps/:id (full details, lazy loading)
-   - Add stepCount to hunt list
-   - Database indexes
-
-3. **Challenge Validation** (~2 days) - **Week 2**
-   - Strategy pattern for validators
-   - ClueValidator, QuizValidator, MissionValidator, TaskValidator
-
-4. **Testing** - **Ongoing**
-   - Add publishing integration tests
-   - Add Step CRUD integration tests
-   - Add Tree VIEW tests
+**See:** `.claude/guides/player-api-design.md` for Play API overview

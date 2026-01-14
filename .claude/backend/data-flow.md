@@ -621,5 +621,154 @@ async getHunt(): Promise<Hunt> { // ✅ API type
 
 ---
 
-**Last updated:** 2025-10-28
-**Next review:** When implementing Step mapper (use as template)
+## Play API Data Flow
+
+The Play API has a different pattern than CRUD mappers. Instead of DB↔API transformation, it uses **PlayerExporter** for security sanitization - stripping answers before sending to players.
+
+### Flow Diagram
+
+```
+                    EDITOR (Creator)                      PLAYER (Public)
+                         │                                     │
+                         ▼                                     ▼
+                   ┌─────────┐                           ┌─────────┐
+                   │ HuntDTO │  ← Full data              │SessionResponse│
+                   │ StepDTO │    with answers           │ StepPF  │  ← Sanitized
+                   └─────────┘                           └─────────┘
+                         ▲                                     ▲
+                         │                                     │
+                   HuntMapper                            PlayerExporter
+                   StepMapper                                  │
+                         │                                     │
+                         └──────────── Database ───────────────┘
+                                         │
+                                    ┌─────────┐
+                                    │  Step   │  (has answers)
+                                    │Progress │  (has session state)
+                                    └─────────┘
+```
+
+### What Gets Stripped
+
+```typescript
+// Database Step (internal)
+{
+  stepId: 1,
+  name: "Find the Cathedral",
+  challenge: {
+    type: "quiz",
+    question: "Who built this?",
+    options: [
+      { id: "a", text: "Gaudi", isCorrect: true },    // ← isCorrect exposed
+      { id: "b", text: "Picasso", isCorrect: false }
+    ],
+    expectedAnswer: "a"                               // ← answer exposed
+  },
+  hint: "Think modernist architecture",
+  ai: { model: "gpt-4", instructions: "..." }         // ← AI config exposed
+}
+
+// After PlayerExporter.step() → StepPF (player-safe)
+{
+  stepId: 1,
+  name: "Find the Cathedral",
+  challenge: {
+    type: "quiz",
+    question: "Who built this?",
+    options: [
+      { id: "a", text: "Gaudi" },     // ← isCorrect REMOVED
+      { id: "b", text: "Picasso" }
+    ]
+    // expectedAnswer REMOVED
+  }
+  // hint REMOVED (separate endpoint)
+  // ai REMOVED
+}
+```
+
+### Session Response Example
+
+When a player starts or resumes, they get a unified `SessionResponse`:
+
+```typescript
+// POST /play/:huntId/start or GET /play/sessions/:sessionId
+{
+  sessionId: "550e8400-e29b-41d4-a716-446655440000",
+  hunt: {
+    huntId: 42,
+    name: "Barcelona Adventure",
+    description: "Explore the city"
+    // No internal fields (creatorId, liveVersion, etc.)
+  },
+  status: "in_progress",
+  currentStepIndex: 0,
+  totalSteps: 5,
+  startedAt: "2025-01-14T10:00:00Z",
+  currentStep: {
+    step: { /* StepPF - sanitized */ },
+    stepIndex: 0,
+    totalSteps: 5,
+    attempts: 0,
+    maxAttempts: 3,
+    hintsUsed: 0,
+    maxHints: 1,
+    _links: {
+      self: { href: "/api/play/sessions/550e.../step/1" },
+      next: { href: "/api/play/sessions/550e.../step/2" },
+      validate: { href: "/api/play/sessions/550e.../validate" }
+    }
+  }
+}
+```
+
+### Validate Response (Lightweight)
+
+Validation returns minimal data - the client already prefetched the next step:
+
+```typescript
+// POST /play/sessions/:sessionId/validate
+// Request:
+{ answerType: "quiz", payload: { selectedOptionId: "a" } }
+
+// Response (correct):
+{
+  correct: true,
+  feedback: "Well done!",
+  attempts: 1,
+  maxAttempts: 3
+}
+
+// Response (wrong):
+{
+  correct: false,
+  feedback: "Try again",
+  attempts: 2,
+  maxAttempts: 3
+}
+
+// Response (hunt complete):
+{
+  correct: true,
+  attempts: 1,
+  isComplete: true
+}
+```
+
+No step data in response - client shows its prefetched cache instantly.
+
+### Where PlayerExporter Lives
+
+```
+packages/shared/src/exporters/PlayerExporter.ts
+```
+
+Used by both:
+- **Backend Play API** - sanitize before sending to player
+- **Frontend Editor Preview** - sanitize before sending to iframe (so answers don't appear in DevTools)
+
+Single source of truth for what players can see.
+
+---
+
+**Last updated:** 2025-01-14
+**Next review:** When adding new challenge types

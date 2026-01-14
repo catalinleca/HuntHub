@@ -85,6 +85,12 @@ export {
   ValidateAnswerRequest,
   ValidateAnswerResponse,
 
+  // Play Session (Player API)
+  StartSessionRequest,
+  SessionResponse,
+  HintRequest,
+  HintResponse,
+
   // Pagination
   SortOrder,
   HuntSortField,
