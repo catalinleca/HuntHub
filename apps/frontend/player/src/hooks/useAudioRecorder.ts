@@ -1,60 +1,89 @@
-import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { useReducer, useCallback, useEffect, useRef } from 'react';
 
-type RecordingStatus = 'idle' | 'requesting' | 'recording' | 'recorded' | 'error';
+type Status = 'idle' | 'requesting' | 'recording' | 'stopped' | 'error';
 
-interface AudioRecorderState {
-  status: RecordingStatus;
-  audioBlob: Blob | null;
+interface State {
+  status: Status;
   audioUrl: string | null;
   duration: number;
   error: string | null;
 }
 
-const initialState: AudioRecorderState = {
+type Action =
+  | { type: 'REQUEST_PERMISSION' }
+  | { type: 'START_RECORDING' }
+  | { type: 'TICK' }
+  | { type: 'STOP'; audioUrl: string }
+  | { type: 'ERROR'; error: string }
+  | { type: 'RESET' };
+
+const initialState: State = {
   status: 'idle',
-  audioBlob: null,
   audioUrl: null,
   duration: 0,
   error: null,
 };
 
-const AUDIO_MIME_TYPE = 'audio/webm;codecs=opus';
-const FALLBACK_MIME_TYPE = 'audio/webm';
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case 'REQUEST_PERMISSION':
+      return { ...initialState, status: 'requesting' };
+    case 'START_RECORDING':
+      return { ...state, status: 'recording', duration: 0 };
+    case 'TICK':
+      return { ...state, duration: state.duration + 1 };
+    case 'STOP':
+      return { ...state, status: 'stopped', audioUrl: action.audioUrl };
+    case 'ERROR':
+      return { ...initialState, status: 'error', error: action.error };
+    case 'RESET':
+      return initialState;
+    default:
+      return state;
+  }
+};
 
-const getSupportedMimeType = (): string => {
-  if (MediaRecorder.isTypeSupported(AUDIO_MIME_TYPE)) {
-    return AUDIO_MIME_TYPE;
+const getErrorMessage = (error: Error): string => {
+  switch (error.name) {
+    case 'NotAllowedError':
+    case 'PermissionDeniedError':
+      return 'Microphone access denied. Please allow microphone access and try again.';
+    case 'NotFoundError':
+      return 'No microphone found. Please connect a microphone.';
+    case 'NotReadableError':
+      return 'Microphone is already in use by another application.';
+    default:
+      return 'Could not access microphone. Please try again.';
   }
-  if (MediaRecorder.isTypeSupported(FALLBACK_MIME_TYPE)) {
-    return FALLBACK_MIME_TYPE;
-  }
-  return '';
+};
+
+const getSupportedMimeType = (): string | undefined => {
+  const types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'];
+  return types.find((type) => MediaRecorder.isTypeSupported(type));
 };
 
 export const useAudioRecorder = () => {
-  const [state, setState] = useState<AudioRecorderState>(initialState);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const audioUrlRef = useRef<string | null>(null);
   const timerRef = useRef<number | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
   const cleanup = useCallback(() => {
-    if (timerRef.current !== null) {
+    if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
 
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-      mediaRecorderRef.current.stop();
+    if (recorderRef.current?.state === 'recording') {
+      recorderRef.current.stop();
     }
-    mediaRecorderRef.current = null;
+    recorderRef.current = null;
 
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
 
     if (audioUrlRef.current) {
       URL.revokeObjectURL(audioUrlRef.current);
@@ -64,134 +93,89 @@ export const useAudioRecorder = () => {
     chunksRef.current = [];
   }, []);
 
+  useEffect(() => {
+    return cleanup;
+  }, [cleanup]);
+
   const startRecording = useCallback(async () => {
     if (!navigator.mediaDevices?.getUserMedia) {
-      setState((prev) => ({
-        ...prev,
-        status: 'error',
-        error: 'Audio recording is not supported in this browser',
-      }));
+      dispatch({ type: 'ERROR', error: 'Audio recording is not supported in this browser.' });
       return;
     }
 
     cleanup();
-    setState((prev) => ({ ...prev, status: 'requesting', error: null }));
+    dispatch({ type: 'REQUEST_PERMISSION' });
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-        },
+        audio: { echoCancellation: true, noiseSuppression: true },
       });
-
       streamRef.current = stream;
 
       const mimeType = getSupportedMimeType();
-      const options = mimeType ? { mimeType } : undefined;
+      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+      recorderRef.current = recorder;
 
-      const mediaRecorder = new MediaRecorder(stream, options);
-      mediaRecorderRef.current = mediaRecorder;
-
-      mediaRecorder.ondataavailable = (event) => {
+      recorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           chunksRef.current.push(event.data);
         }
       };
 
-      mediaRecorder.onstop = () => {
+      recorder.onstop = () => {
         const blob = new Blob(chunksRef.current, { type: mimeType || 'audio/webm' });
         const url = URL.createObjectURL(blob);
         audioUrlRef.current = url;
 
-        if (streamRef.current) {
-          streamRef.current.getTracks().forEach((track) => track.stop());
-        }
+        streamRef.current?.getTracks().forEach((track) => track.stop());
 
-        if (timerRef.current !== null) {
+        if (timerRef.current) {
           clearInterval(timerRef.current);
           timerRef.current = null;
         }
 
-        setState((prev) => ({
-          ...prev,
-          status: 'recorded',
-          audioBlob: blob,
-          audioUrl: url,
-        }));
+        dispatch({ type: 'STOP', audioUrl: url });
       };
 
-      mediaRecorder.onerror = () => {
+      recorder.onerror = () => {
         cleanup();
-        setState((prev) => ({
-          ...prev,
-          status: 'error',
-          error: 'Recording failed. Please try again.',
-        }));
+        dispatch({ type: 'ERROR', error: 'Recording failed. Please try again.' });
       };
 
-      mediaRecorder.start();
-
-      setState((prev) => ({
-        ...prev,
-        status: 'recording',
-        duration: 0,
-      }));
+      recorder.start();
+      dispatch({ type: 'START_RECORDING' });
 
       timerRef.current = window.setInterval(() => {
-        setState((prev) => ({
-          ...prev,
-          duration: prev.duration + 1,
-        }));
+        dispatch({ type: 'TICK' });
       }, 1000);
     } catch (err) {
       cleanup();
-
-      const error = err as Error;
-      let errorMessage = 'Could not access microphone';
-
-      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-        errorMessage = 'Microphone permission denied. Please enable microphone access.';
-      } else if (error.name === 'NotFoundError') {
-        errorMessage = 'No microphone found. Please connect a microphone.';
-      }
-
-      setState((prev) => ({
-        ...prev,
-        status: 'error',
-        error: errorMessage,
-      }));
+      dispatch({ type: 'ERROR', error: getErrorMessage(err as Error) });
     }
   }, [cleanup]);
 
   const stopRecording = useCallback(() => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-      mediaRecorderRef.current.stop();
+    if (recorderRef.current?.state === 'recording') {
+      recorderRef.current.stop();
     }
   }, []);
 
   const reset = useCallback(() => {
     cleanup();
-    setState(initialState);
+    dispatch({ type: 'RESET' });
   }, [cleanup]);
 
-  useEffect(() => {
-    return () => {
-      cleanup();
-    };
-  }, [cleanup]);
-
-  return useMemo(
-    () => ({
-      ...state,
-      startRecording,
-      stopRecording,
-      reset,
-      isRecording: state.status === 'recording',
-      hasRecording: state.status === 'recorded',
-    }),
-    [state, startRecording, stopRecording, reset],
-  );
+  return {
+    status: state.status,
+    audioUrl: state.audioUrl,
+    duration: state.duration,
+    error: state.error,
+    isRecording: state.status === 'recording',
+    hasRecording: state.status === 'stopped',
+    startRecording,
+    stopRecording,
+    reset,
+  };
 };
 
 export type UseAudioRecorderReturn = ReturnType<typeof useAudioRecorder>;
