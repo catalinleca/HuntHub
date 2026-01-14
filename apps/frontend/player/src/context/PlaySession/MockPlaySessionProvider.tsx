@@ -28,6 +28,7 @@ export const MockPlaySessionProvider = ({ children, sessionId = 'mock-session' }
 
       // Session actions (no-op in mock)
       startSession: () => {},
+      abandonSession: () => {},
 
       // Derived state
       hasSession: true,

@@ -1,9 +1,20 @@
-import React from 'react';
-import { Typography, Stack } from '@mui/material';
+import React, { useState } from 'react';
+import {
+  Typography,
+  Stack,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from '@mui/material';
+import { XIcon } from '@phosphor-icons/react';
 import { MediaType } from '@hunthub/shared';
 import type { Media } from '@hunthub/shared';
 import type { BadgeConfig } from '@/constants';
 import { MediaDisplay } from '@/components/media';
+import { usePlaySession } from '@/context';
 import { TypeBadge } from '../TypeBadge';
 import { HintSection } from '../HintSection';
 import { TimeLimit } from '../TimeLimit';
@@ -45,18 +56,29 @@ export const ChallengeCard = ({
   onTimeExpire,
   onMaxAttempts,
 }: ChallengeCardProps) => {
+  const { abandonSession } = usePlaySession();
+  const [showAbandonDialog, setShowAbandonDialog] = useState(false);
+
   const hasIndicators = timeLimit || maxAttempts;
   const hasVisualMedia = media && VISUAL_MEDIA_TYPES.includes(media.type);
   const hasAudioOnly = media?.type === MediaType.Audio;
 
+  // TODO: fix Dialog, move it into its own folder and code properly
   return (
     <S.Container>
-      {hasIndicators && (
-        <Stack direction="row" justifyContent="flex-end" gap={1}>
-          {timeLimit && <TimeLimit seconds={timeLimit} onExpire={onTimeExpire} />}
-          {maxAttempts && <AttemptsCounter current={currentAttempts} max={maxAttempts} onMaxAttempts={onMaxAttempts} />}
-        </Stack>
-      )}
+      <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+        <IconButton size="small" onClick={() => setShowAbandonDialog(true)}>
+          <XIcon size={20} />
+        </IconButton>
+        {hasIndicators && (
+          <Stack direction="row" gap={1}>
+            {timeLimit && <TimeLimit seconds={timeLimit} onExpire={onTimeExpire} />}
+            {maxAttempts && (
+              <AttemptsCounter current={currentAttempts} max={maxAttempts} onMaxAttempts={onMaxAttempts} />
+            )}
+          </Stack>
+        )}
+      </Stack>
 
       {hasVisualMedia && <MediaDisplay media={media} />}
 
@@ -75,6 +97,19 @@ export const ChallengeCard = ({
       {showHint && <HintSection />}
 
       <S.Footer>{footer}</S.Footer>
+
+      <Dialog open={showAbandonDialog} onClose={() => setShowAbandonDialog(false)}>
+        <DialogTitle>Abandon Hunt?</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to abandon this hunt? Your progress will be lost.</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowAbandonDialog(false)}>No, Continue</Button>
+          <Button variant="contained" color="error" onClick={abandonSession}>
+            Yes, Abandon
+          </Button>
+        </DialogActions>
+      </Dialog>
     </S.Container>
   );
 };

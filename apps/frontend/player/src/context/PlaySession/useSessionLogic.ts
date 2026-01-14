@@ -21,6 +21,7 @@ export const useSessionLogic = (huntId: number): PlaySessionContextValue => {
     totalSteps: sessionLayer.totalSteps,
 
     startSession: sessionLayer.startSession,
+    abandonSession: sessionLayer.abandonSession,
 
     hasSession,
     isLastStep,

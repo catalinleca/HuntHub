@@ -16,6 +16,7 @@ export interface SessionData {
 
 export interface SessionActions {
   startSession: (playerName: string, email?: string) => void;
+  abandonSession: () => void;
 }
 
 export interface SessionDerived {

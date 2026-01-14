@@ -1,8 +1,11 @@
-import { useStartSession, useGetSession } from '@/api';
+import { useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useStartSession, useGetSession, playKeys } from '@/api';
 import { sessionStorage } from '@/context';
 import { useClearInvalidSession } from './useClearInvalidSession';
 
 export const useSessionLayer = (huntId: number) => {
+  const queryClient = useQueryClient();
   const savedSessionId = sessionStorage.get(huntId);
   const sessionQuery = useGetSession(savedSessionId);
   const startMutation = useStartSession(huntId);
@@ -26,6 +29,12 @@ export const useSessionLayer = (huntId: number) => {
     );
   };
 
+  const abandonSession = useCallback(() => {
+    sessionStorage.clear(huntId);
+    queryClient.removeQueries({ queryKey: playKeys.all });
+    window.location.reload();
+  }, [huntId, queryClient]);
+
   const session = sessionQuery.data;
 
   return {
@@ -37,6 +46,7 @@ export const useSessionLayer = (huntId: number) => {
     totalSteps: session?.totalSteps ?? 0,
     status: session?.status ?? null,
     startSession,
+    abandonSession,
     isLoading: sessionQuery.isLoading || startMutation.isPending,
     error: sessionQuery.error ?? startMutation.error ?? null,
   };
