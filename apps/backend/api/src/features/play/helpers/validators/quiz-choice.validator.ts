@@ -23,6 +23,14 @@ export const QuizChoiceValidator: IAnswerValidator = {
       };
     }
 
+    const validOptionIds = quiz.options?.map((o) => o.id) ?? [];
+    if (!validOptionIds.includes(submittedOptionId)) {
+      return {
+        isCorrect: false,
+        feedback: 'Invalid option selected',
+      };
+    }
+
     const isCorrect = submittedOptionId === quiz.targetId;
 
     return {

@@ -7,6 +7,8 @@ import {
   ValidateAnswerResponse,
   HintResponse,
   PlayerExporter,
+  HuntProgressStatus,
+  Step,
 } from '@hunthub/shared';
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
@@ -103,7 +105,7 @@ export class PlayService implements IPlayService {
     return {
       sessionId: progress.sessionId,
       hunt: PlayerExporter.hunt(huntId, huntVersion),
-      status: 'in_progress',
+      status: HuntProgressStatus.InProgress,
       currentStepIndex: 0,
       totalSteps: huntVersion.stepOrder.length,
       startedAt: progress.startedAt.toISOString(),
@@ -116,7 +118,7 @@ export class PlayService implements IPlayService {
     const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version);
 
     const currentIndex = StepNavigator.getStepIndex(huntVersion.stepOrder, progress.currentStepId);
-    const isInProgress = progress.status === 'in_progress';
+    const isInProgress = progress.status === HuntProgressStatus.InProgress;
 
     let currentStep: StepResponse | undefined;
     if (isInProgress) {
@@ -189,34 +191,40 @@ export class PlayService implements IPlayService {
     }
 
     const stepProgress = SessionManager.getCurrentStepProgress(progress);
-    const currentAttempts = (stepProgress?.attempts ?? 0) + 1;
     const isLastStep = StepNavigator.isLastStep(huntVersion.stepOrder, progress.currentStepId);
 
+    // Time limit check (pre-transaction - read-only check is fine)
     if (step.timeLimit && stepProgress?.startedAt) {
       const elapsedSeconds = (Date.now() - stepProgress.startedAt.getTime()) / 1000;
       if (elapsedSeconds > step.timeLimit) {
         return {
           correct: false,
           expired: true,
-          attempts: currentAttempts,
+          attempts: stepProgress.attempts ?? 0,
           maxAttempts: step.maxAttempts ?? undefined,
         };
       }
     }
 
-    if (step.maxAttempts && currentAttempts > step.maxAttempts) {
-      return {
-        correct: false,
-        exhausted: true,
-        attempts: currentAttempts - 1,
-        maxAttempts: step.maxAttempts,
-      };
-    }
-
     const validationResult = AnswerValidator.validate(request.answerType, request.payload, step);
 
     return withTransaction(async (session) => {
-      await SessionManager.incrementAttempts(sessionId, progress.currentStepId, session);
+      // Atomic increment with limit check (prevents race condition)
+      const newAttempts = await SessionManager.incrementAttemptsIfUnderLimit(
+        sessionId,
+        progress.currentStepId,
+        step.maxAttempts ?? null,
+        session,
+      );
+
+      if (newAttempts === null) {
+        return {
+          correct: false,
+          exhausted: true,
+          attempts: step.maxAttempts!,
+          maxAttempts: step.maxAttempts,
+        };
+      }
 
       await SessionManager.recordSubmission(
         sessionId,
@@ -244,7 +252,7 @@ export class PlayService implements IPlayService {
       return {
         correct: validationResult.isCorrect,
         feedback: validationResult.feedback,
-        attempts: currentAttempts,
+        attempts: newAttempts,
         maxAttempts: step.maxAttempts ?? undefined,
         isComplete: isComplete || undefined,
       };
@@ -265,19 +273,17 @@ export class PlayService implements IPlayService {
       throw new NotFoundError('No hint available for this step');
     }
 
-    // Check if hint already used (MVP: max 1)
-    const stepProgress = SessionManager.getCurrentStepProgress(progress);
-    if ((stepProgress?.hintsUsed ?? 0) >= 1) {
-      // We might need a better way to make sure we don't diverge from the hints in data and hintsUsed here so maybe add hints in the session (progress)
+    const maxHints = 1;
+    const hintsUsed = await SessionManager.incrementHintsUsedIfUnderLimit(sessionId, progress.currentStepId, maxHints);
+
+    if (hintsUsed === null) {
       throw new ConflictError('You have already used your hint for this step');
     }
-
-    const hintsUsed = await SessionManager.incrementHintsUsed(sessionId, progress.currentStepId);
 
     return {
       hint: step.hint,
       hintsUsed,
-      maxHints: 1,
+      maxHints,
     };
   }
 
@@ -314,9 +320,7 @@ export class PlayService implements IPlayService {
     const stepIndex = StepNavigator.getStepIndex(huntVersion.stepOrder, step.stepId);
     const nextStepId = StepNavigator.getNextStepId(huntVersion.stepOrder, step.stepId);
 
-    const stepPF = PlayerExporter.maybeRandomizeOptions(
-      PlayerExporter.step(step as unknown as Parameters<typeof PlayerExporter.step>[0]),
-    );
+    const stepPF = PlayerExporter.maybeRandomizeOptions(PlayerExporter.step(step.toObject() as Step));
 
     return {
       step: stepPF,

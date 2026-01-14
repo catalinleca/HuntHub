@@ -50,6 +50,9 @@ export class StepNavigator {
 
   static isLastStep(stepOrder: number[], stepId: number): boolean {
     const index = stepOrder.indexOf(stepId);
+    if (index === -1) {
+      return false;
+    }
     return index === stepOrder.length - 1;
   }
 

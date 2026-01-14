@@ -33,6 +33,20 @@ export const MissionLocationValidator: IAnswerValidator = {
       };
     }
 
+    if (!Number.isFinite(submittedLocation.lat) || !Number.isFinite(submittedLocation.lng)) {
+      return {
+        isCorrect: false,
+        feedback: 'Invalid location coordinates',
+      };
+    }
+
+    if (!Number.isFinite(targetLocation.lat) || !Number.isFinite(targetLocation.lng)) {
+      return {
+        isCorrect: false,
+        feedback: 'Invalid mission configuration - invalid target coordinates',
+      };
+    }
+
     const distance = haversineDistance(
       submittedLocation.lat,
       submittedLocation.lng,
