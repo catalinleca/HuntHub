@@ -1,6 +1,6 @@
-import { useRef, useEffect, useCallback } from 'react';
-import { PlayerSDK, PLAYER_MESSAGES } from '@hunthub/player-sdk';
-import type { Hunt } from '@hunthub/shared';
+import { useRef, useEffect, useCallback, useMemo } from 'react';
+import { PlayerSDK, PLAYER_MESSAGES, type PreviewData } from '@hunthub/player-sdk';
+import { PlayerExporter, type Hunt } from '@hunthub/shared';
 import * as S from './HuntPreview.styles';
 
 const PLAYER_URL = import.meta.env.VITE_PLAYER_URL || 'http://localhost:5175';
@@ -28,6 +28,19 @@ const PreviewIframe = ({ hunt, selectedStepIndex }: PreviewIframeProps) => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const sdkRef = useRef<PlayerSDK | null>(null);
 
+  // Sanitize hunt data - strip answers before sending to Player
+  const previewData: PreviewData = useMemo(() => {
+    return {
+      hunt: PlayerExporter.hunt(hunt.huntId, {
+        name: hunt.name,
+        description: hunt.description,
+        stepOrder: hunt.stepOrder,
+        coverImage: hunt.coverImage,
+      }),
+      steps: PlayerExporter.steps(hunt.steps ?? []),
+    };
+  }, [hunt]);
+
   useEffect(() => {
     return () => {
       sdkRef.current?.destroy();
@@ -35,8 +48,8 @@ const PreviewIframe = ({ hunt, selectedStepIndex }: PreviewIframeProps) => {
   }, []);
 
   useEffect(() => {
-    sdkRef.current?.renderHunt(hunt);
-  }, [hunt]);
+    sdkRef.current?.renderHunt(previewData);
+  }, [previewData]);
 
   useEffect(() => {
     if (selectedStepIndex >= 0) {
@@ -53,7 +66,7 @@ const PreviewIframe = ({ hunt, selectedStepIndex }: PreviewIframeProps) => {
     sdkRef.current = sdk;
 
     sdk.onReady(() => {
-      sdk.renderHunt(hunt);
+      sdk.renderHunt(previewData);
       if (selectedStepIndex >= 0) {
         sdk.jumpToStep(selectedStepIndex);
       }
@@ -64,7 +77,7 @@ const PreviewIframe = ({ hunt, selectedStepIndex }: PreviewIframeProps) => {
         console.log('Step validated:', msg.isCorrect, msg.feedback);
       }
     });
-  }, [hunt, selectedStepIndex]);
+  }, [previewData, selectedStepIndex]);
 
   return <S.Iframe ref={iframeRef} src={`${PLAYER_URL}/preview`} onLoad={handleIframeLoad} title="Hunt Preview" />;
 };

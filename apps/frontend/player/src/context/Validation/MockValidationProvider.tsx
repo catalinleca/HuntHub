@@ -1,6 +1,5 @@
 import { useState, useCallback, type ReactNode } from 'react';
-import type { Step, AnswerType, AnswerPayload } from '@hunthub/shared';
-import { checkAnswer } from '@/utils/checkAnswer';
+import type { StepPF, AnswerType, AnswerPayload } from '@hunthub/shared';
 import { ValidationContext } from './context';
 import type { ValidationResult } from './types';
 
@@ -16,17 +15,40 @@ const initialState: ValidationState = {
   attemptCount: 0,
 };
 
+/**
+ * Simulated validation for preview mode.
+ * Since preview data is sanitized (no answers), we simulate validation.
+ * All submissions are marked as correct after a brief delay feeling.
+ */
+const simulateValidation = (answerType: AnswerType): ValidationResult => {
+  switch (answerType) {
+    case 'clue':
+      return { isCorrect: true, feedback: 'Got it! Moving on...' };
+    case 'quiz-choice':
+    case 'quiz-input':
+      return { isCorrect: true, feedback: 'Correct! (Preview mode - always valid)' };
+    case 'mission-location':
+      return { isCorrect: true, feedback: 'Location found! (Preview mode)' };
+    case 'mission-media':
+      return { isCorrect: true, feedback: 'Media received! (Preview mode)' };
+    case 'task':
+      return { isCorrect: true, feedback: 'Task completed! (Preview mode)' };
+    default:
+      return { isCorrect: true, feedback: 'Validated (Preview mode)' };
+  }
+};
+
 interface MockValidationProviderProps {
-  /** Full Step with answers (for client-side validation) */
-  step: Step;
+  /** Sanitized step (StepPF) - no answers available in preview mode */
+  step: StepPF;
   /** Callback when validation completes (for postMessage to Editor, or auto-advance) */
   onValidated?: (result: ValidationResult) => void;
   children: ReactNode;
 }
 
 /**
- * Provides client-side validation for /preview route.
- * Validation is instant (no API call).
+ * Provides simulated validation for /preview route.
+ * Since preview data is sanitized (no answers), all validations succeed.
  *
  * IMPORTANT: Use key={stepId} on this component to reset state when step changes.
  * Example: <MockValidationProvider key={stepId} step={step}>
@@ -35,26 +57,18 @@ export const MockValidationProvider = ({ step, onValidated, children }: MockVali
   const [state, setState] = useState<ValidationState>(initialState);
 
   const validate = useCallback(
-    (answerType: AnswerType, payload: AnswerPayload) => {
-      try {
-        const result = checkAnswer(step, answerType, payload);
+    (answerType: AnswerType, _payload: AnswerPayload) => {
+      const result = simulateValidation(answerType);
 
-        setState((prev) => ({
-          isCorrect: result.isCorrect,
-          feedback: result.feedback,
-          attemptCount: result.isCorrect ? prev.attemptCount : prev.attemptCount + 1,
-        }));
+      setState((prev) => ({
+        isCorrect: result.isCorrect,
+        feedback: result.feedback,
+        attemptCount: prev.attemptCount + 1,
+      }));
 
-        onValidated?.(result);
-      } catch {
-        setState((prev) => ({
-          isCorrect: false,
-          feedback: 'Something went wrong. Please try again.',
-          attemptCount: prev.attemptCount + 1,
-        }));
-      }
+      onValidated?.(result);
     },
-    [step, onValidated],
+    [onValidated],
   );
 
   const reset = useCallback(() => {

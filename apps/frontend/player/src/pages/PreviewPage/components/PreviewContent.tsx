@@ -1,14 +1,13 @@
 import { Typography, CircularProgress } from '@mui/material';
-import type { Hunt, Step } from '@hunthub/shared';
+import type { HuntMetaPF, StepPF } from '@hunthub/shared';
 import { MockValidationProvider, MockPlaySessionProvider, type ValidationResult } from '@/context';
-import { stripAnswers } from '@/utils';
 import { StepRenderer } from '../../PlayPage/components/StepRenderer';
 import { PreviewToolbar } from './PreviewToolbar';
 import * as S from '../PreviewPage.styles';
 
 interface PreviewContentProps {
-  hunt: Hunt | null;
-  currentStep: Step | null;
+  hunt: HuntMetaPF | null;
+  currentStep: StepPF | null;
   stepIndex: number;
   totalSteps: number;
   isLastStep: boolean;
@@ -74,8 +73,7 @@ export const PreviewContent = ({
     );
   }
 
-  const stepForPlayer = stripAnswers(currentStep);
-
+  // Data is already sanitized by PlayerExporter (no need for stripAnswers)
   return (
     <S.Container>
       {showToolbar && (
@@ -85,7 +83,7 @@ export const PreviewContent = ({
       <S.Content>
         <MockPlaySessionProvider>
           <MockValidationProvider key={currentStep.stepId} step={currentStep} onValidated={onValidated}>
-            <StepRenderer step={stepForPlayer} isLastStep={isLastStep} />
+            <StepRenderer step={currentStep} isLastStep={isLastStep} />
           </MockValidationProvider>
         </MockPlaySessionProvider>
       </S.Content>

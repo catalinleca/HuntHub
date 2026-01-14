@@ -8,6 +8,11 @@ import { startSessionSchema, validateAnswerSchema } from './play.validation';
 const router = Router();
 const controller = container.get<IPlayController>(TYPES.PlayController);
 
+// Public discovery endpoint - no auth needed
+router.get('/discover', (req, res, next) => {
+  controller.discoverHunts(req, res).catch(next);
+});
+
 router.post('/:huntId/start', optionalAuthMiddleware, validateRequest(startSessionSchema), (req, res, next) => {
   controller.startSession(req, res).catch(next);
 });

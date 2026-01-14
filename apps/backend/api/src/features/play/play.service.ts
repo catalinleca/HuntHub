@@ -20,7 +20,18 @@ import { SessionManager } from './helpers/session-manager.helper';
 import { StepNavigator } from './helpers/step-navigator.helper';
 import { AnswerValidator } from './helpers/answer-validator.helper';
 
+export interface DiscoverHuntsResponse {
+  hunts: Array<{
+    huntId: number;
+    name: string;
+    description?: string;
+    totalSteps: number;
+  }>;
+  total: number;
+}
+
 export interface IPlayService {
+  discoverHunts(page: number, limit: number): Promise<DiscoverHuntsResponse>;
   startSession(huntId: number, playerName: string, userId?: string): Promise<SessionResponse>;
   getSession(sessionId: string): Promise<SessionResponse>;
   getStep(sessionId: string, stepId: number): Promise<StepResponse>;
@@ -30,6 +41,42 @@ export interface IPlayService {
 
 @injectable()
 export class PlayService implements IPlayService {
+  async discoverHunts(page: number, limit: number): Promise<DiscoverHuntsResponse> {
+    const skip = (page - 1) * limit;
+
+    const [hunts, total] = await Promise.all([
+      HuntModel.find({ liveVersion: { $ne: null }, isDeleted: false })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      HuntModel.countDocuments({ liveVersion: { $ne: null }, isDeleted: false }),
+    ]);
+
+    if (hunts.length === 0) {
+      return { hunts: [], total };
+    }
+
+    // Batch fetch all versions in a single query (avoid N+1)
+    const versionQueries = hunts.map((h) => ({ huntId: h.huntId, version: h.liveVersion, isPublished: true }));
+    const versions = await HuntVersionModel.find({ $or: versionQueries }).lean();
+
+    // Create lookup map for O(1) access
+    const versionMap = new Map(versions.map((v) => [`${v.huntId}-${v.version}`, v]));
+
+    const sanitizedHunts = hunts.map((hunt) => {
+      const version = versionMap.get(`${hunt.huntId}-${hunt.liveVersion}`);
+      return {
+        huntId: hunt.huntId,
+        name: version?.name ?? 'Untitled Hunt',
+        description: version?.description,
+        totalSteps: version?.stepOrder?.length ?? 0,
+      };
+    });
+
+    return { hunts: sanitizedHunts, total };
+  }
+
   async startSession(huntId: number, playerName: string, userId?: string): Promise<SessionResponse> {
     const hunt = await this.requireLiveHunt(huntId);
     const liveVersion = hunt.liveVersion!;
