@@ -144,7 +144,6 @@ export class PlayService implements IPlayService {
     }
 
     const stepProgress = SessionManager.getCurrentStepProgress(progress);
-    const currentAttempts = (stepProgress?.attempts ?? 0) + 1;
     const isLastStep = StepNavigator.isLastStep(huntVersion.stepOrder, progress.currentStepId);
 
     if (step.timeLimit && stepProgress?.startedAt) {
@@ -153,25 +152,30 @@ export class PlayService implements IPlayService {
         return {
           correct: false,
           expired: true,
-          attempts: currentAttempts,
+          attempts: stepProgress.attempts ?? 0,
           maxAttempts: step.maxAttempts ?? undefined,
         };
       }
     }
 
-    if (step.maxAttempts && currentAttempts > step.maxAttempts) {
-      return {
-        correct: false,
-        exhausted: true,
-        attempts: currentAttempts - 1,
-        maxAttempts: step.maxAttempts,
-      };
-    }
-
     const validationResult = AnswerValidator.validate(request.answerType, request.payload, step);
 
     return withTransaction(async (session) => {
-      await SessionManager.incrementAttempts(sessionId, progress.currentStepId, session);
+      const newAttempts = await SessionManager.incrementAttemptsIfUnderLimit(
+        sessionId,
+        progress.currentStepId,
+        step.maxAttempts ?? null,
+        session,
+      );
+
+      if (newAttempts === null) {
+        return {
+          correct: false,
+          exhausted: true,
+          attempts: step.maxAttempts!,
+          maxAttempts: step.maxAttempts,
+        };
+      }
 
       await SessionManager.recordSubmission(
         sessionId,
@@ -199,7 +203,7 @@ export class PlayService implements IPlayService {
       return {
         correct: validationResult.isCorrect,
         feedback: validationResult.feedback,
-        attempts: currentAttempts,
+        attempts: newAttempts,
         maxAttempts: step.maxAttempts ?? undefined,
         isComplete: isComplete || undefined,
       };
