@@ -51,7 +51,6 @@ async function bootstrap() {
 
   app.use('/api/play', playRouter);
 
-  // Protected API routes - require Firebase auth
   app.use('/api', authMiddleware);
   app.use('/api/hunts', huntRouter);
   app.use('/api/hunts', stepRouter);

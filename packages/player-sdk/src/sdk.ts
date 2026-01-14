@@ -10,10 +10,6 @@ export const PLAYER_MESSAGES = {
   STEP_VALIDATED: 'STEP_VALIDATED',
 } as const;
 
-/**
- * Player-safe preview data (no answers, no AI instructions)
- * Use PlayerExporter from @hunthub/shared to transform Hunt → PreviewData
- */
 export interface PreviewData {
   hunt: HuntMetaPF;
   steps: StepPF[];
@@ -105,11 +101,6 @@ export class PlayerSDK {
     window.addEventListener('message', this.messageHandler);
   }
 
-  /**
-   * Send sanitized hunt data to Player for rendering
-   *
-   * @param data - Player-safe preview data (use PlayerExporter to create)
-   */
   renderHunt(data: PreviewData): void {
     this.send(editorMessages.renderHunt(data));
   }
