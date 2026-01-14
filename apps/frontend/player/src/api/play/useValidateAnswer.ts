@@ -20,9 +20,8 @@ export const useValidateAnswer = () => {
 
       if (data.correct) {
         // Invalidate session to get updated currentStep
+        // Note: Don't invalidate step queries - prefetched next step should remain in cache
         queryClient.invalidateQueries({ queryKey: playKeys.session(sessionId) });
-        // Also invalidate step queries
-        queryClient.invalidateQueries({ queryKey: [...playKeys.all, 'step', sessionId] });
       }
     },
   });
