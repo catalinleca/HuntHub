@@ -1319,30 +1319,6 @@ components:
         - playerName
       additionalProperties: false
 
-    StartSessionResponse:
-      type: object
-      description: Response from starting a play session
-      properties:
-        sessionId:
-          type: string
-          format: uuid
-        hunt:
-          $ref: '#/components/schemas/HuntMetaPF'
-        currentStepIndex:
-          type: integer
-          default: 0
-        steps:
-          type: array
-          items:
-            $ref: '#/components/schemas/StepPF'
-          description: First batch of steps (typically 2)
-      required:
-        - sessionId
-        - hunt
-        - currentStepIndex
-        - steps
-      additionalProperties: false
-
     ValidateAnswerRequest:
       type: object
       description: Request to validate a player's answer (session tracks current step)
@@ -1358,7 +1334,7 @@ components:
 
     ValidateAnswerResponse:
       type: object
-      description: Response from validating an answer (HATEOAS format)
+      description: Lightweight response from validating an answer (client uses prefetched cache for next step)
       properties:
         correct:
           type: boolean
@@ -1380,11 +1356,9 @@ components:
         exhausted:
           type: boolean
           description: Whether all attempts have been used
-        _links:
-          $ref: '#/components/schemas/ValidateAnswerLinks'
       required:
         - correct
-        - _links
+        - attempts
       additionalProperties: false
 
     HintRequest:
@@ -1495,14 +1469,14 @@ components:
 
     SessionResponse:
       type: object
-      description: Response for getting session status
+      description: Unified session response - used for both starting and resuming a session
       properties:
         sessionId:
           type: string
           format: uuid
-        huntId:
-          type: integer
-          description: Hunt ID being played
+        hunt:
+          $ref: '#/components/schemas/HuntMetaPF'
+          description: Hunt metadata (name, description, cover image)
         status:
           type: string
           description: "Session status: 'in_progress' or 'completed'"
@@ -1518,9 +1492,12 @@ components:
         completedAt:
           type: string
           description: When the session was completed (if finished)
+        currentStep:
+          $ref: '#/components/schemas/StepResponse'
+          description: Current step data (only present when status is 'in_progress')
       required:
         - sessionId
-        - huntId
+        - hunt
         - status
         - currentStepIndex
         - totalSteps

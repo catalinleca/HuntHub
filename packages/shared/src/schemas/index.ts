@@ -87,7 +87,7 @@ export {
 
   // Play Session (Player API)
   StartSessionRequest,
-  StartSessionResponse,
+  SessionResponse,
   HintRequest,
   HintResponse,
 

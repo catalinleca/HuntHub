@@ -8,8 +8,7 @@ import { ValidationError } from '@/shared/errors';
 export interface IPlayController {
   startSession(req: Request, res: Response): Promise<Response>;
   getSession(req: Request, res: Response): Promise<Response>;
-  getCurrentStep(req: Request, res: Response): Promise<Response>;
-  getNextStep(req: Request, res: Response): Promise<Response>;
+  getStep(req: Request, res: Response): Promise<Response>;
   validateAnswer(req: Request, res: Response): Promise<Response>;
   requestHint(req: Request, res: Response): Promise<Response>;
 }
@@ -59,26 +58,19 @@ export class PlayController implements IPlayController {
     return res.status(200).json(result);
   }
 
-  async getCurrentStep(req: Request, res: Response): Promise<Response> {
-    const { sessionId } = req.params;
+  async getStep(req: Request, res: Response): Promise<Response> {
+    const { sessionId, stepId } = req.params;
 
     if (!sessionId || !this.isValidUUID(sessionId)) {
       throw new ValidationError('Invalid session ID', []);
     }
 
-    const result = await this.playService.getCurrentStep(sessionId);
-
-    return res.status(200).json(result);
-  }
-
-  async getNextStep(req: Request, res: Response): Promise<Response> {
-    const { sessionId } = req.params;
-
-    if (!sessionId || !this.isValidUUID(sessionId)) {
-      throw new ValidationError('Invalid session ID', []);
+    const parsedStepId = parseNumericId(stepId);
+    if (isNaN(parsedStepId)) {
+      throw new ValidationError('Invalid step ID', []);
     }
 
-    const result = await this.playService.getNextStep(sessionId);
+    const result = await this.playService.getStep(sessionId, parsedStepId);
 
     return res.status(200).json(result);
   }
@@ -119,7 +111,6 @@ export class PlayController implements IPlayController {
     return res.status(200).json(result);
   }
 
-  // TODO: I am sure we can use a built in library or something
   private isValidUUID(str: string): boolean {
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     return uuidRegex.test(str);

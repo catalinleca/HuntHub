@@ -2,11 +2,6 @@ import { AnswerPayload, Challenge } from '@hunthub/shared';
 import { IStep } from '@/database/types/Step';
 import { IAnswerValidator, ValidationResult } from '../answer-validator.helper';
 
-/**
- * QuizChoiceValidator - Validates multiple choice quiz answers
- *
- * Compares submitted optionId against the quiz's targetId.
- */
 export const QuizChoiceValidator: IAnswerValidator = {
   validate(payload: AnswerPayload, step: IStep): ValidationResult {
     const challenge = step.challenge as Challenge;
@@ -32,7 +27,7 @@ export const QuizChoiceValidator: IAnswerValidator = {
 
     return {
       isCorrect,
-      feedback: isCorrect ? 'Correct!' : 'That\'s not quite right. Try again!',
+      feedback: isCorrect ? 'Correct!' : "That's not quite right. Try again!",
     };
   },
 };

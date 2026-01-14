@@ -1,17 +1,16 @@
 import { HydratedDocument } from 'mongoose';
-import { StepLinks, ValidateAnswerLinks, HateoasLink } from '@hunthub/shared';
 import StepModel from '@/database/models/Step';
 import { IStep } from '@/database/types/Step';
-import { IHuntVersion } from '@/database/types/HuntVersion';
 import { IProgress } from '@/database/types/Progress';
 
 /**
- * StepNavigator - Handles step traversal and HATEOAS link generation
+ * StepNavigator - Handles step traversal
  *
  * Responsibilities:
  * - Get steps by ID or index
- * - Generate HATEOAS navigation links
  * - Determine step position in hunt
+ *
+ * Note: Link generation is done in PlayService (links include step IDs)
  */
 export class StepNavigator {
   /**
@@ -48,11 +47,9 @@ export class StepNavigator {
 
   /**
    * Get current step for session based on Progress.currentStepId
+   * Uses progress.version as source of truth (version player started with)
    */
-  static async getCurrentStepForSession(
-    progress: IProgress,
-    huntVersion: IHuntVersion,
-  ): Promise<HydratedDocument<IStep> | null> {
+  static async getCurrentStepForSession(progress: IProgress): Promise<HydratedDocument<IStep> | null> {
     return this.getStepById(progress.huntId, progress.version, progress.currentStepId);
   }
 
@@ -82,56 +79,6 @@ export class StepNavigator {
   static isLastStep(stepOrder: number[], stepId: number): boolean {
     const index = stepOrder.indexOf(stepId);
     return index === stepOrder.length - 1;
-  }
-
-  /**
-   * Generate HATEOAS links for step response
-   */
-  static generateStepLinks(sessionId: string, stepOrder: number[], currentStepId: number): StepLinks {
-    const currentIndex = stepOrder.indexOf(currentStepId);
-    const hasNext = currentIndex < stepOrder.length - 1;
-
-    const links: StepLinks = {
-      self: this.makeLink(`/api/play/sessions/${sessionId}/step/current`),
-      validate: this.makeLink(`/api/play/sessions/${sessionId}/validate`),
-    };
-
-    if (hasNext) {
-      links.next = this.makeLink(`/api/play/sessions/${sessionId}/step/next`);
-    }
-
-    return links;
-  }
-
-  /**
-   * Generate HATEOAS links for validate response
-   */
-  static generateValidateLinks(
-    sessionId: string,
-    isCorrect: boolean,
-    isLastStep: boolean,
-    isComplete: boolean,
-  ): ValidateAnswerLinks {
-    const links: ValidateAnswerLinks = {
-      currentStep: this.makeLink(`/api/play/sessions/${sessionId}/step/current`),
-    };
-
-    // Only include nextStep link if:
-    // - Answer was correct (player is advancing)
-    // - Not the last step
-    // - Hunt is not complete
-    if (isCorrect && !isLastStep && !isComplete) {
-      links.nextStep = this.makeLink(`/api/play/sessions/${sessionId}/step/next`);
-    }
-
-    return links;
-  }
-
-  /**
-   * Helper to create HateoasLink object
-   */
-  private static makeLink(href: string): HateoasLink {
-    return { href };
   }
 
   static async getStepsByIds(

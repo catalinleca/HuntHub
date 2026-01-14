@@ -46,9 +46,6 @@ export class SessionManager {
     return progress;
   }
 
-  /**
-   * Find session by sessionId
-   */
   static async getSession(sessionId: string): Promise<HydratedDocument<IProgress> | null> {
     return ProgressModel.findBySession(sessionId);
   }

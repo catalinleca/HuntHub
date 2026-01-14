@@ -1,36 +1,36 @@
 import { injectable } from 'inversify';
 import { HydratedDocument } from 'mongoose';
 import {
-  StartSessionResponse,
   SessionResponse,
   StepResponse,
   ValidateAnswerRequest,
   ValidateAnswerResponse,
   HintResponse,
+  PlayerExporter,
 } from '@hunthub/shared';
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import { IHunt } from '@/database/types/Hunt';
 import { IHuntVersion } from '@/database/types/HuntVersion';
+import { IStep } from '@/database/types/Step';
+import { IStepProgress } from '@/database/types/Progress';
 import { NotFoundError, ForbiddenError, ConflictError, ValidationError } from '@/shared/errors';
-import { PlayMapper } from '@/shared/mappers/play.mapper';
 import { withTransaction } from '@/shared/utils/transaction';
 import { SessionManager } from './helpers/session-manager.helper';
 import { StepNavigator } from './helpers/step-navigator.helper';
 import { AnswerValidator } from './helpers/answer-validator.helper';
 
 export interface IPlayService {
-  startSession(huntId: number, playerName: string, userId?: string): Promise<StartSessionResponse>;
+  startSession(huntId: number, playerName: string, userId?: string): Promise<SessionResponse>;
   getSession(sessionId: string): Promise<SessionResponse>;
-  getCurrentStep(sessionId: string): Promise<StepResponse>;
-  getNextStep(sessionId: string): Promise<StepResponse>;
+  getStep(sessionId: string, stepId: number): Promise<StepResponse>;
   validateAnswer(sessionId: string, request: ValidateAnswerRequest): Promise<ValidateAnswerResponse>;
   requestHint(sessionId: string): Promise<HintResponse>;
 }
 
 @injectable()
 export class PlayService implements IPlayService {
-  async startSession(huntId: number, playerName: string, userId?: string): Promise<StartSessionResponse> {
+  async startSession(huntId: number, playerName: string, userId?: string): Promise<SessionResponse> {
     const hunt = await this.requireLiveHunt(huntId);
     const liveVersion = hunt.liveVersion!;
 
@@ -44,18 +44,23 @@ export class PlayService implements IPlayService {
     }
 
     const firstStepId = huntVersion.stepOrder[0];
-
     const progress = await SessionManager.createSession(huntId, liveVersion, playerName, firstStepId, userId);
 
-    const steps = await StepNavigator.getFirstNSteps(huntId, liveVersion, huntVersion.stepOrder, 2);
+    const step = await StepNavigator.getStepById(huntId, liveVersion, firstStepId);
+    if (!step) {
+      throw new NotFoundError('First step not found');
+    }
 
-    const stepsPF = steps.map((step) => PlayMapper.maybeRandomizeOptions(PlayMapper.toStepPF(step)));
+    const stepProgress = progress.steps?.[0];
 
     return {
       sessionId: progress.sessionId,
-      hunt: PlayMapper.toHuntMetaPF(huntId, huntVersion),
+      hunt: PlayerExporter.hunt(huntId, huntVersion),
+      status: 'in_progress',
       currentStepIndex: 0,
-      steps: stepsPF,
+      totalSteps: huntVersion.stepOrder.length,
+      startedAt: progress.startedAt.toISOString(),
+      currentStep: this.buildStepResponse(progress.sessionId, step, huntVersion, stepProgress),
     };
   }
 
@@ -64,86 +69,60 @@ export class PlayService implements IPlayService {
     const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version);
 
     const currentIndex = StepNavigator.getStepIndex(huntVersion.stepOrder, progress.currentStepId);
+    const isInProgress = progress.status === 'in_progress';
+
+    let currentStep: StepResponse | undefined;
+    if (isInProgress) {
+      const step = await StepNavigator.getCurrentStepForSession(progress);
+      if (step) {
+        const stepProgress = SessionManager.getCurrentStepProgress(progress);
+        currentStep = this.buildStepResponse(sessionId, step, huntVersion, stepProgress ?? undefined);
+      }
+    }
 
     return {
       sessionId: progress.sessionId,
-      huntId: progress.huntId,
+      hunt: PlayerExporter.hunt(progress.huntId, huntVersion),
       status: progress.status,
       currentStepIndex: currentIndex,
       totalSteps: huntVersion.stepOrder.length,
       startedAt: progress.startedAt.toISOString(),
       completedAt: progress.completedAt?.toISOString(),
+      currentStep,
     };
   }
 
-  /**
-   * Get current step for session
-   */
-  async getCurrentStep(sessionId: string): Promise<StepResponse> {
-    const progress = await SessionManager.requireSession(sessionId);
-    SessionManager.validateSessionActive(progress);
-
-    const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version);
-    const step = await StepNavigator.getCurrentStepForSession(progress, huntVersion);
-
-    if (!step) {
-      throw new NotFoundError('Current step not found');
-    }
-
-    const stepProgress = SessionManager.getCurrentStepProgress(progress);
-    const stepIndex = StepNavigator.getStepIndex(huntVersion.stepOrder, progress.currentStepId);
-
-    const stepPF = PlayMapper.maybeRandomizeOptions(PlayMapper.toStepPF(step));
-
-    return {
-      step: stepPF,
-      stepIndex,
-      totalSteps: huntVersion.stepOrder.length,
-      attempts: stepProgress?.attempts ?? 0,
-      maxAttempts: step.maxAttempts ?? null,
-      hintsUsed: stepProgress?.hintsUsed ?? 0,
-      maxHints: 1, // MVP: Always 1 hint per step
-      _links: StepNavigator.generateStepLinks(sessionId, huntVersion.stepOrder, progress.currentStepId),
-    };
-  }
-
-  /**
-   * Get next step (for prefetching)
-   */
-  async getNextStep(sessionId: string): Promise<StepResponse> {
+  async getStep(sessionId: string, requestedStepId: number): Promise<StepResponse> {
     const progress = await SessionManager.requireSession(sessionId);
     SessionManager.validateSessionActive(progress);
 
     const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version);
 
-    const nextStepId = StepNavigator.getNextStepId(huntVersion.stepOrder, progress.currentStepId);
-    if (nextStepId === null) {
-      throw new NotFoundError('No next step - you are on the last step');
+    // SERVER STATE is source of truth
+    const currentIndex = huntVersion.stepOrder.indexOf(progress.currentStepId);
+    const currentStepId = progress.currentStepId;
+    const nextStepId = huntVersion.stepOrder[currentIndex + 1]; // may be undefined
+
+    const allowedStepIds = [currentStepId, nextStepId].filter((id): id is number => id !== undefined);
+    if (!allowedStepIds.includes(requestedStepId)) {
+      throw new ForbiddenError('Step not accessible from current position');
     }
 
-    const step = await StepNavigator.getStepById(progress.huntId, progress.version, nextStepId);
+    const step = await StepNavigator.getStepById(progress.huntId, progress.version, requestedStepId);
     if (!step) {
-      throw new NotFoundError('Next step not found');
+      throw new NotFoundError('Step not found');
     }
 
-    const stepIndex = StepNavigator.getStepIndex(huntVersion.stepOrder, nextStepId);
-    const stepPF = PlayMapper.maybeRandomizeOptions(PlayMapper.toStepPF(step));
+    const stepProgress =
+      requestedStepId === currentStepId ? SessionManager.getCurrentStepProgress(progress) : undefined;
 
-    // Next step has no progress yet - it's a prefetch
-    return {
-      step: stepPF,
-      stepIndex,
-      totalSteps: huntVersion.stepOrder.length,
-      attempts: 0,
-      maxAttempts: step.maxAttempts ?? null,
-      hintsUsed: 0,
-      maxHints: 1,
-      _links: StepNavigator.generateStepLinks(sessionId, huntVersion.stepOrder, nextStepId),
-    };
+    return this.buildStepResponse(sessionId, step, huntVersion, stepProgress ?? undefined);
   }
 
   /**
    * Validate player's answer submission
+   *
+   * Returns lightweight response - client uses prefetched cache for next step
    *
    * Wrapped in transaction for atomic state updates:
    * - Increment attempts
@@ -156,7 +135,7 @@ export class PlayService implements IPlayService {
     SessionManager.validateSessionActive(progress);
 
     const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version);
-    const step = await StepNavigator.getCurrentStepForSession(progress, huntVersion);
+    const step = await StepNavigator.getCurrentStepForSession(progress);
 
     if (!step) {
       throw new NotFoundError('Current step not found');
@@ -166,46 +145,32 @@ export class PlayService implements IPlayService {
     const currentAttempts = (stepProgress?.attempts ?? 0) + 1;
     const isLastStep = StepNavigator.isLastStep(huntVersion.stepOrder, progress.currentStepId);
 
-    // Check time limit if set
     if (step.timeLimit && stepProgress?.startedAt) {
       const elapsedSeconds = (Date.now() - stepProgress.startedAt.getTime()) / 1000;
       if (elapsedSeconds > step.timeLimit) {
-        return this.buildValidateResponse({
+        return {
           correct: false,
           expired: true,
           attempts: currentAttempts,
-          maxAttempts: step.maxAttempts ?? null,
-          sessionId,
-          isLastStep,
-          huntVersion,
-          currentStepId: progress.currentStepId,
-        });
+          maxAttempts: step.maxAttempts ?? undefined,
+        };
       }
     }
 
-    // Check max attempts if set
     if (step.maxAttempts && currentAttempts > step.maxAttempts) {
-      return this.buildValidateResponse({
+      return {
         correct: false,
         exhausted: true,
-        attempts: currentAttempts - 1, // Don't count this invalid attempt
+        attempts: currentAttempts - 1,
         maxAttempts: step.maxAttempts,
-        sessionId,
-        isLastStep,
-        huntVersion,
-        currentStepId: progress.currentStepId,
-      });
+      };
     }
 
-    // Validate the answer
     const validationResult = AnswerValidator.validate(request.answerType, request.payload, step);
 
-    // Wrap state updates in transaction
     return withTransaction(async (session) => {
-      // Atomically increment attempts
       await SessionManager.incrementAttempts(sessionId, progress.currentStepId, session);
 
-      // Record submission
       await SessionManager.recordSubmission(
         sessionId,
         progress.currentStepId,
@@ -219,11 +184,9 @@ export class PlayService implements IPlayService {
 
       if (validationResult.isCorrect) {
         if (isLastStep) {
-          // Complete the session
           await SessionManager.completeSession(sessionId, progress.currentStepId, session);
           isComplete = true;
         } else {
-          // Advance to next step
           const nextStepId = StepNavigator.getNextStepId(huntVersion.stepOrder, progress.currentStepId);
           if (nextStepId !== null) {
             await SessionManager.advanceToNextStep(sessionId, progress.currentStepId, nextStepId, session);
@@ -231,37 +194,26 @@ export class PlayService implements IPlayService {
         }
       }
 
-      return this.buildValidateResponse({
+      return {
         correct: validationResult.isCorrect,
         feedback: validationResult.feedback,
         attempts: currentAttempts,
-        maxAttempts: step.maxAttempts ?? null,
-        isComplete,
-        sessionId,
-        isLastStep,
-        huntVersion,
-        currentStepId: progress.currentStepId,
-      });
+        maxAttempts: step.maxAttempts ?? undefined,
+        isComplete: isComplete || undefined,
+      };
     });
   }
 
-  /**
-   * Request hint for current step
-   *
-   * MVP: 1 hint per step
-   */
   async requestHint(sessionId: string): Promise<HintResponse> {
     const progress = await SessionManager.requireSession(sessionId);
     SessionManager.validateSessionActive(progress);
 
-    const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version);
-    const step = await StepNavigator.getCurrentStepForSession(progress, huntVersion);
+    const step = await StepNavigator.getCurrentStepForSession(progress);
 
     if (!step) {
       throw new NotFoundError('Current step not found');
     }
 
-    // Check if step has a hint
     if (!step.hint) {
       throw new NotFoundError('No hint available for this step');
     }
@@ -269,10 +221,10 @@ export class PlayService implements IPlayService {
     // Check if hint already used (MVP: max 1)
     const stepProgress = SessionManager.getCurrentStepProgress(progress);
     if ((stepProgress?.hintsUsed ?? 0) >= 1) {
+      // We might need a better way to make sure we don't diverge from the hints in data and hintsUsed here so maybe add hints in the session (progress)
       throw new ConflictError('You have already used your hint for this step');
     }
 
-    // Increment hints used
     const hintsUsed = await SessionManager.incrementHintsUsed(sessionId, progress.currentStepId);
 
     return {
@@ -282,13 +234,6 @@ export class PlayService implements IPlayService {
     };
   }
 
-  // ============================================
-  // Private Helpers
-  // ============================================
-
-  /**
-   * Find hunt and verify it's live (has liveVersion)
-   */
   private async requireLiveHunt(huntId: number): Promise<HydratedDocument<IHunt>> {
     const hunt = await HuntModel.findOne({ huntId, isDeleted: false });
 
@@ -303,9 +248,6 @@ export class PlayService implements IPlayService {
     return hunt;
   }
 
-  /**
-   * Get HuntVersion or throw NotFoundError
-   */
   private async requireHuntVersion(huntId: number, version: number): Promise<HydratedDocument<IHuntVersion>> {
     const huntVersion = await HuntVersionModel.findPublishedVersion(huntId, version);
 
@@ -316,33 +258,32 @@ export class PlayService implements IPlayService {
     return huntVersion;
   }
 
-  /**
-   * Build ValidateAnswerResponse with HATEOAS links
-   */
-  private buildValidateResponse(params: {
-    correct: boolean;
-    feedback?: string;
-    attempts: number;
-    maxAttempts: number | null;
-    isComplete?: boolean;
-    expired?: boolean;
-    exhausted?: boolean;
-    sessionId: string;
-    isLastStep: boolean;
-    huntVersion: HydratedDocument<IHuntVersion>;
-    currentStepId: number;
-  }): ValidateAnswerResponse {
-    const { correct, feedback, attempts, maxAttempts, isComplete, expired, exhausted, sessionId, isLastStep } = params;
+  private buildStepResponse(
+    sessionId: string,
+    step: HydratedDocument<IStep>,
+    huntVersion: HydratedDocument<IHuntVersion>,
+    stepProgress?: IStepProgress,
+  ): StepResponse {
+    const stepIndex = StepNavigator.getStepIndex(huntVersion.stepOrder, step.stepId);
+    const nextStepId = StepNavigator.getNextStepId(huntVersion.stepOrder, step.stepId);
+
+    const stepPF = PlayerExporter.maybeRandomizeOptions(
+      PlayerExporter.step(step as unknown as Parameters<typeof PlayerExporter.step>[0]),
+    );
 
     return {
-      correct,
-      feedback,
-      attempts,
-      maxAttempts: maxAttempts ?? undefined,
-      isComplete,
-      expired,
-      exhausted,
-      _links: StepNavigator.generateValidateLinks(sessionId, correct, isLastStep, isComplete ?? false),
+      step: stepPF,
+      stepIndex,
+      totalSteps: huntVersion.stepOrder.length,
+      attempts: stepProgress?.attempts ?? 0,
+      maxAttempts: step.maxAttempts ?? null,
+      hintsUsed: stepProgress?.hintsUsed ?? 0,
+      maxHints: 1,
+      _links: {
+        self: { href: `/api/play/sessions/${sessionId}/step/${step.stepId}` },
+        ...(nextStepId !== null && { next: { href: `/api/play/sessions/${sessionId}/step/${nextStepId}` } }),
+        validate: { href: `/api/play/sessions/${sessionId}/validate` },
+      },
     };
   }
 }

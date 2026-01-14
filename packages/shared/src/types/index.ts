@@ -883,18 +883,6 @@ export interface StartSessionRequest {
   email?: string;
 }
 
-/** Response from starting a play session */
-export interface StartSessionResponse {
-  /** @format uuid */
-  sessionId: string;
-  /** Player Format - Hunt metadata (no steps) */
-  hunt: HuntMetaPF;
-  /** @default 0 */
-  currentStepIndex: number;
-  /** First batch of steps (typically 2) */
-  steps: StepPF[];
-}
-
 /** Request to validate a player's answer (session tracks current step) */
 export interface ValidateAnswerRequest {
   /** Type of answer being submitted */
@@ -903,7 +891,7 @@ export interface ValidateAnswerRequest {
   payload: AnswerPayload;
 }
 
-/** Response from validating an answer (HATEOAS format) */
+/** Lightweight response from validating an answer (client uses prefetched cache for next step) */
 export interface ValidateAnswerResponse {
   correct: boolean;
   /** Hint or explanation message */
@@ -911,15 +899,13 @@ export interface ValidateAnswerResponse {
   /** Whether the hunt is complete */
   isComplete?: boolean;
   /** Number of attempts on this step */
-  attempts?: number;
+  attempts: number;
   /** Maximum attempts allowed for this step */
   maxAttempts?: number;
   /** Whether the time limit expired */
   expired?: boolean;
   /** Whether all attempts have been used */
   exhausted?: boolean;
-  /** HATEOAS links returned after validation */
-  _links: ValidateAnswerLinks;
 }
 
 /** Request for a hint */
@@ -978,12 +964,12 @@ export interface StepResponse {
   _links: StepLinks;
 }
 
-/** Response for getting session status */
+/** Unified session response - used for both starting and resuming a session */
 export interface SessionResponse {
   /** @format uuid */
   sessionId: string;
-  /** Hunt ID being played */
-  huntId: number;
+  /** Hunt metadata (name, description, cover image) */
+  hunt: HuntMetaPF;
   /** Session status: 'in_progress' or 'completed' */
   status: string;
   /** Current step index (0-based) */
@@ -994,6 +980,8 @@ export interface SessionResponse {
   startedAt: string;
   /** When the session was completed (if finished) */
   completedAt?: string;
+  /** Current step data (only present when status is 'in_progress') */
+  currentStep?: StepResponse;
 }
 
 /** Standard pagination query parameters */

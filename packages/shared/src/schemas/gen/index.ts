@@ -385,34 +385,25 @@ export const AnswerPayload = z
 export const StartSessionRequest = z
   .object({ playerName: z.string().min(1).max(50), email: z.string().email().optional() })
   .strict();
-export const StartSessionResponse = z
-  .object({
-    sessionId: z.string().uuid(),
-    hunt: HuntMetaPF,
-    currentStepIndex: z.number().int().default(0),
-    steps: z.array(StepPF),
-  })
-  .strict();
 export const ValidateAnswerRequest = z.object({ answerType: AnswerType, payload: AnswerPayload }).strict();
-export const HateoasLink = z.object({ href: z.string() }).strict();
-export const ValidateAnswerLinks = z.object({ currentStep: HateoasLink, nextStep: HateoasLink.optional() }).strict();
 export const ValidateAnswerResponse = z
   .object({
     correct: z.boolean(),
     feedback: z.string().optional(),
     isComplete: z.boolean().optional(),
-    attempts: z.number().int().optional(),
+    attempts: z.number().int(),
     maxAttempts: z.number().int().optional(),
     expired: z.boolean().optional(),
     exhausted: z.boolean().optional(),
-    _links: ValidateAnswerLinks,
   })
   .strict();
 export const HintRequest = z.object({ stepIndex: z.number().int() }).strict();
 export const HintResponse = z
   .object({ hint: z.string(), hintsUsed: z.number().int(), maxHints: z.number().int() })
   .strict();
+export const HateoasLink = z.object({ href: z.string() }).strict();
 export const StepLinks = z.object({ self: HateoasLink, next: HateoasLink.optional(), validate: HateoasLink }).strict();
+export const ValidateAnswerLinks = z.object({ currentStep: HateoasLink, nextStep: HateoasLink.optional() }).strict();
 export const StepResponse = z
   .object({
     step: StepPF,
@@ -428,12 +419,13 @@ export const StepResponse = z
 export const SessionResponse = z
   .object({
     sessionId: z.string().uuid(),
-    huntId: z.number().int(),
+    hunt: HuntMetaPF,
     status: z.string(),
     currentStepIndex: z.number().int(),
     totalSteps: z.number().int(),
     startedAt: z.string(),
     completedAt: z.string().optional(),
+    currentStep: StepResponse.optional(),
   })
   .strict();
 export const SortOrder = z.enum(['asc', 'desc']);
@@ -529,14 +521,13 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   TaskAnswerPayload,
   AnswerPayload,
   StartSessionRequest,
-  StartSessionResponse,
   ValidateAnswerRequest,
-  HateoasLink,
-  ValidateAnswerLinks,
   ValidateAnswerResponse,
   HintRequest,
   HintResponse,
+  HateoasLink,
   StepLinks,
+  ValidateAnswerLinks,
   StepResponse,
   SessionResponse,
   SortOrder,

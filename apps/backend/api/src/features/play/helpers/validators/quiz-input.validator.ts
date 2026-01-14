@@ -45,7 +45,7 @@ export const QuizInputValidator: IAnswerValidator = {
 
     return {
       isCorrect,
-      feedback: isCorrect ? 'Correct!' : 'That\'s not quite right. Try again!',
+      feedback: isCorrect ? 'Correct!' : "That's not quite right. Try again!",
     };
   },
 };
