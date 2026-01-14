@@ -49,8 +49,6 @@ async function bootstrap() {
 
   app.use('/auth', authRouter);
 
-  // Play API - PUBLIC (session ID acts as auth token)
-  // Must be mounted BEFORE authMiddleware
   app.use('/api/play', playRouter);
 
   // Protected API routes - require Firebase auth

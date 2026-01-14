@@ -50,9 +50,6 @@ export class SessionManager {
     return ProgressModel.findBySession(sessionId);
   }
 
-  /**
-   * Get session or throw NotFoundError
-   */
   static async requireSession(sessionId: string): Promise<HydratedDocument<IProgress>> {
     const progress = await this.getSession(sessionId);
 
@@ -63,9 +60,6 @@ export class SessionManager {
     return progress;
   }
 
-  /**
-   * Validate session is active (not completed or abandoned)
-   */
   static validateSessionActive(progress: IProgress): void {
     if (progress.status === HuntProgressStatus.Completed) {
       throw new ConflictError('This session has already been completed');
@@ -76,17 +70,10 @@ export class SessionManager {
     }
   }
 
-  /**
-   * Get current step progress from session
-   */
   static getCurrentStepProgress(progress: IProgress): IStepProgress | undefined {
     return progress.steps?.find((sp) => sp.stepId === progress.currentStepId);
   }
 
-  /**
-   * Advance to next step (atomic operation)
-   * Creates new StepProgress entry for the next step
-   */
   static async advanceToNextStep(
     sessionId: string,
     currentStepId: number,
@@ -102,7 +89,6 @@ export class SessionManager {
       hintsUsed: 0,
     };
 
-    // Mark current step complete and advance to next
     const result = await ProgressModel.updateOne(
       {
         sessionId,
@@ -124,14 +110,7 @@ export class SessionManager {
     }
   }
 
-  /**
-   * Mark session as completed (hunt finished)
-   */
-  static async completeSession(
-    sessionId: string,
-    currentStepId: number,
-    session?: ClientSession,
-  ): Promise<void> {
+  static async completeSession(sessionId: string, currentStepId: number, session?: ClientSession): Promise<void> {
     const now = new Date();
 
     const result = await ProgressModel.updateOne(
@@ -156,14 +135,7 @@ export class SessionManager {
     }
   }
 
-  /**
-   * Increment attempt count atomically
-   */
-  static async incrementAttempts(
-    sessionId: string,
-    stepId: number,
-    session?: ClientSession,
-  ): Promise<void> {
+  static async incrementAttempts(sessionId: string, stepId: number, session?: ClientSession): Promise<void> {
     await ProgressModel.updateOne(
       { sessionId, 'steps.stepId': stepId },
       { $inc: { 'steps.$.attempts': 1 } },
@@ -171,9 +143,6 @@ export class SessionManager {
     );
   }
 
-  /**
-   * Record submission in step progress
-   */
   static async recordSubmission(
     sessionId: string,
     stepId: number,
@@ -196,14 +165,7 @@ export class SessionManager {
     );
   }
 
-  /**
-   * Increment hints used for current step
-   */
-  static async incrementHintsUsed(
-    sessionId: string,
-    stepId: number,
-    session?: ClientSession,
-  ): Promise<number> {
+  static async incrementHintsUsed(sessionId: string, stepId: number, session?: ClientSession): Promise<number> {
     const result = await ProgressModel.findOneAndUpdate(
       { sessionId, 'steps.stepId': stepId },
       { $inc: { 'steps.$.hintsUsed': 1 } },
