@@ -11,6 +11,13 @@ export interface AudioValidationParams {
   aiInstructions?: string;
 }
 
+export interface ImageValidationParams {
+  imageBuffer: Buffer;
+  mimeType: string;
+  instructions: string;
+  aiInstructions?: string;
+}
+
 export interface ValidationResponse {
   isValid: boolean;
   confidence: number;
@@ -29,4 +36,9 @@ export interface ITextValidationProvider {
 export interface IAudioValidationProvider {
   readonly name: string;
   validateAudio(params: AudioValidationParams): Promise<AudioValidationResponse>;
+}
+
+export interface IImageValidationProvider {
+  readonly name: string;
+  validateImage(params: ImageValidationParams): Promise<ValidationResponse>;
 }

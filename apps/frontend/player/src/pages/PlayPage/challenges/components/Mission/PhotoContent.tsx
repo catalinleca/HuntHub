@@ -5,8 +5,9 @@ import { usePhotoCapture } from '@/hooks';
 import * as S from './Mission.styles';
 
 interface PhotoContentProps {
-  onSubmit: () => void;
+  onSubmit: (file: File) => void;
   disabled?: boolean;
+  uploadError?: string | null;
 }
 
 const CapturePrompt = ({ onClick }: { onClick: () => void }) => (
@@ -32,11 +33,17 @@ const PhotoPreview = ({ src, onRetake }: { src: string; onRetake: () => void }) 
   </Stack>
 );
 
-export const PhotoContent = ({ onSubmit, disabled = false }: PhotoContentProps) => {
-  const { preview, error, handleCapture, reset, hasPhoto } = usePhotoCapture();
+export const PhotoContent = ({ onSubmit, disabled = false, uploadError }: PhotoContentProps) => {
+  const { file, preview, error, handleCapture, reset, hasPhoto } = usePhotoCapture();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const openCamera = () => inputRef.current?.click();
+
+  const handleSubmit = () => {
+    if (file) {
+      onSubmit(file);
+    }
+  };
 
   return (
     <Stack gap={2}>
@@ -46,6 +53,8 @@ export const PhotoContent = ({ onSubmit, disabled = false }: PhotoContentProps) 
         </Alert>
       )}
 
+      {uploadError && !error && <Alert severity="error">{uploadError}</Alert>}
+
       {hasPhoto ? <PhotoPreview src={preview!} onRetake={reset} /> : <CapturePrompt onClick={openCamera} />}
 
       <S.HiddenInput ref={inputRef} type="file" accept="image/*" capture="environment" onChange={handleCapture} />
@@ -54,8 +63,8 @@ export const PhotoContent = ({ onSubmit, disabled = false }: PhotoContentProps) 
         variant="contained"
         fullWidth
         size="large"
-        onClick={onSubmit}
-        disabled={disabled || !hasPhoto}
+        onClick={handleSubmit}
+        disabled={disabled || !hasPhoto || !file}
         startIcon={hasPhoto ? <CheckIcon size={20} weight="bold" /> : <CameraIcon size={20} weight="bold" />}
       >
         {hasPhoto ? 'Submit Photo' : 'Take Photo'}

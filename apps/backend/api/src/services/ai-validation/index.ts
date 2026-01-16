@@ -5,8 +5,10 @@ export { GeminiProvider } from './gemini.provider';
 export type {
   ITextValidationProvider,
   IAudioValidationProvider,
+  IImageValidationProvider,
   TextValidationParams,
   AudioValidationParams,
+  ImageValidationParams,
   ValidationResponse,
 } from './interfaces';
 

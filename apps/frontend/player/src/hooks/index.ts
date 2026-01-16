@@ -11,3 +11,6 @@ export { useAudioRecorder } from './useAudioRecorder';
 export type { UseAudioRecorderReturn, Status } from './useAudioRecorder';
 
 export { useUploadAudio } from './useUploadAudio';
+
+export { useUploadPhoto } from './useUploadPhoto';
+export type { UseUploadPhotoReturn } from './useUploadPhoto';
