@@ -66,14 +66,14 @@ const validateNumericRange = (
   expected: string,
   tolerance: number,
 ): { isCorrect: boolean; feedback: string } => {
-  const submittedNum = parseFloat(submitted);
-  const expectedNum = parseFloat(expected);
+  const submittedNum = Number(submitted);
+  const expectedNum = Number(expected);
 
-  if (isNaN(submittedNum)) {
+  if (!Number.isFinite(submittedNum)) {
     return { isCorrect: false, feedback: 'Please enter a valid number' };
   }
 
-  if (isNaN(expectedNum)) {
+  if (!Number.isFinite(expectedNum)) {
     return { isCorrect: false, feedback: 'Invalid quiz configuration - expected answer is not a number' };
   }
 
