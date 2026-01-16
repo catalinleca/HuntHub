@@ -24,6 +24,7 @@ import { isDev } from '@/config/env.config';
 import { TYPES } from '@/shared/types';
 import { IStorageService } from '@/services/storage/storage.service';
 import { ALLOWED_EXTENSIONS, isAllowedMimeType, getBaseMimeType } from '@/shared/utils/mimeTypes';
+import { awsS3Bucket } from '@/config/env.config';
 import { SYSTEM_USER_ID } from '@/shared/constants';
 import { AssetMapper, AssetDTO } from '@/shared/mappers/asset.mapper';
 import { SessionManager } from './helpers/session-manager.helper';
@@ -386,7 +387,7 @@ export class PlayService implements IPlayService {
       mimeType: getBaseMimeType(assetData.mime),
       originalFilename: assetData.name,
       size: assetData.sizeBytes,
-      storageLocation: { path: assetData.s3Key },
+      storageLocation: { bucket: awsS3Bucket, path: assetData.s3Key },
     });
 
     return AssetMapper.fromDocument(asset);

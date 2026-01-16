@@ -20,4 +20,8 @@ export class MockStorageService implements IStorageService {
   getPublicUrl(s3Key: string): string {
     return `https://d2vf5nl8r3do9r.cloudfront.net/${s3Key}`;
   }
+
+  validateS3KeyPrefix(s3Key: string, expectedPrefix: string): boolean {
+    return s3Key.startsWith(expectedPrefix);
+  }
 }

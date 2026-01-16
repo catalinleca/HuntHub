@@ -43,7 +43,9 @@ export const MissionMediaValidator: IAnswerValidator = {
     const challenge = step.challenge as Challenge;
     const mission = challenge.mission;
 
-    if (isAudioMimeType(asset.mimeType) && mission?.aiInstructions) {
+    const instructions = mission?.title || mission?.description;
+
+    if (isAudioMimeType(asset.mimeType) && mission?.aiInstructions && instructions) {
       try {
         const audioBuffer = await fetchAudioBuffer(asset.url);
         const aiService = container.get<IAIValidationService>(TYPES.AIValidationService);
@@ -51,7 +53,7 @@ export const MissionMediaValidator: IAnswerValidator = {
         const result = await aiService.validateAudioResponse(
           audioBuffer,
           asset.mimeType,
-          mission.title || mission.description || '',
+          instructions,
           mission.aiInstructions,
         );
 
