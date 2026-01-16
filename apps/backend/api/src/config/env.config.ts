@@ -32,5 +32,6 @@ export const s3UseAcceleration = process.env.S3_USE_ACCELERATION === 'true';
 
 export const openaiApiKey = process.env.OPENAI_API_KEY;
 export const groqApiKey = process.env.GROQ_API_KEY;
+export const geminiApiKey = process.env.GEMINI_API_KEY;
 
 export const isDev = process.env.NODE_ENV !== 'production';
