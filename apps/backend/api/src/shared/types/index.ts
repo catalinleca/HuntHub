@@ -20,6 +20,8 @@ export const TYPES = {
   AssetUsageTracker: Symbol.for('AssetUsageTracker'),
   AssetValidator: Symbol.for('AssetValidator'),
   PlayService: Symbol.for('PlayService'),
+  AIProvider: Symbol.for('AIProvider'),
+  AIValidationService: Symbol.for('AIValidationService'),
 };
 
 export interface ISerializer<TModel, TDTO> {

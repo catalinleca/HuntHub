@@ -79,12 +79,11 @@ export const Mission = z
   .strict();
 export const Task = z
   .object({
-    title: z.string(),
+    title: z.string().optional(),
     instructions: z.string(),
-    aiInstructions: z.string(),
-    aiModel: z.enum(['gpt-4', 'claude', 'gemini']),
+    aiInstructions: z.string().optional(),
+    aiModel: z.enum(['gpt-4', 'claude', 'gemini']).optional(),
   })
-  .partial()
   .strict();
 export const Challenge = z.object({ clue: Clue, quiz: Quiz, mission: Mission, task: Task }).partial().strict();
 export const Step = z

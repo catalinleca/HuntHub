@@ -5,7 +5,7 @@ import { IAnswerValidator, ValidationResult } from '../answer-validator.helper';
 const DEFAULT_RADIUS_METERS = 50;
 
 export const MissionLocationValidator: IAnswerValidator = {
-  validate(payload: AnswerPayload, step: IStep): ValidationResult {
+  async validate(payload: AnswerPayload, step: IStep): Promise<ValidationResult> {
     const challenge = step.challenge as Challenge;
     const mission = challenge.mission;
 

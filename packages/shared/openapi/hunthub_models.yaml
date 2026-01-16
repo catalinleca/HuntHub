@@ -547,11 +547,13 @@ components:
           description: What the player should do (shown to player)
         aiInstructions:
           type: string
-          description: Instructions for AI to validate player's response
+          description: Optional. Specific criteria for AI validation. If not provided, AI validates against the instructions field.
         aiModel:
           type: string
           enum: [gpt-4, claude, gemini]
           description: Which AI model to use for validation (future feature)
+      required:
+        - instructions
       additionalProperties: false
 
 

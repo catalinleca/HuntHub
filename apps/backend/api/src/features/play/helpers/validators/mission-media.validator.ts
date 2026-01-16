@@ -9,7 +9,7 @@ import { IAnswerValidator, ValidationResult } from '../answer-validator.helper';
  * Future: AI-based validation of uploaded content
  */
 export const MissionMediaValidator: IAnswerValidator = {
-  validate(payload: AnswerPayload, _step: IStep): ValidationResult {
+  async validate(payload: AnswerPayload, _step: IStep): Promise<ValidationResult> {
     const assetId = payload.missionMedia?.assetId;
 
     if (!assetId) {

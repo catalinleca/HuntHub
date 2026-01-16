@@ -406,8 +406,8 @@ export interface Mission {
 export interface Task {
   title?: string;
   /** What the player should do (shown to player) */
-  instructions?: string;
-  /** Instructions for AI to validate player's response */
+  instructions: string;
+  /** Optional. Specific criteria for AI validation. If not provided, AI validates against the instructions field. */
   aiInstructions?: string;
   /** Which AI model to use for validation (future feature) */
   aiModel?: "gpt-4" | "claude" | "gemini";

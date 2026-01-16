@@ -188,7 +188,7 @@ export class PlayService implements IPlayService {
       exhausted = true;
     }
 
-    const validationResult = AnswerValidator.validate(request.answerType, request.payload, step);
+    const validationResult = await AnswerValidator.validate(request.answerType, request.payload, step);
 
     return withTransaction(async (session) => {
       const newAttempts = await SessionManager.incrementAttempts(sessionId, progress.currentStepId, session);

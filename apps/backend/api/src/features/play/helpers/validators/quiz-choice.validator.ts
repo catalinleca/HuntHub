@@ -3,7 +3,7 @@ import { IStep } from '@/database/types/Step';
 import { IAnswerValidator, ValidationResult } from '../answer-validator.helper';
 
 export const QuizChoiceValidator: IAnswerValidator = {
-  validate(payload: AnswerPayload, step: IStep): ValidationResult {
+  async validate(payload: AnswerPayload, step: IStep): Promise<ValidationResult> {
     const challenge = step.challenge as Challenge;
     const quiz = challenge.quiz;
 

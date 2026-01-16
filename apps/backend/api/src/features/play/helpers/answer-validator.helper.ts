@@ -15,7 +15,7 @@ export interface ValidationResult {
 }
 
 export interface IAnswerValidator {
-  validate(payload: AnswerPayload, step: IStep): ValidationResult;
+  validate(payload: AnswerPayload, step: IStep): Promise<ValidationResult>;
 }
 
 const ANSWER_TYPE_TO_CHALLENGE_TYPE: Record<AnswerType, ChallengeType> = {
@@ -37,7 +37,7 @@ export class AnswerValidator {
     [AnswerType.Task]: TaskValidator,
   };
 
-  static validate(answerType: AnswerType, payload: AnswerPayload, step: IStep): ValidationResult {
+  static async validate(answerType: AnswerType, payload: AnswerPayload, step: IStep): Promise<ValidationResult> {
     const expectedChallengeType = ANSWER_TYPE_TO_CHALLENGE_TYPE[answerType];
     if (step.type !== expectedChallengeType) {
       throw new ValidationError(
