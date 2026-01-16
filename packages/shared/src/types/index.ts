@@ -73,6 +73,8 @@ export enum MimeTypes {
   AudioMpeg = "audio/mpeg",
   AudioWav = "audio/wav",
   AudioOgg = "audio/ogg",
+  AudioWebm = "audio/webm",
+  AudioMp4 = "audio/mp4",
 }
 
 export enum MissionType {

@@ -5,7 +5,7 @@ import { useAudioRecorder, type Status } from '@/hooks';
 import * as S from './Mission.styles';
 
 interface AudioContentProps {
-  onSubmit: () => void;
+  onSubmit: (blob: Blob, mimeType: string) => void;
   disabled?: boolean;
 }
 
@@ -56,7 +56,8 @@ const AudioPreview = ({ audioUrl, duration, onReset }: { audioUrl: string; durat
 );
 
 export const AudioContent = ({ onSubmit, disabled = false }: AudioContentProps) => {
-  const { status, audioUrl, duration, error, startRecording, stopRecording, reset } = useAudioRecorder();
+  const { status, audioUrl, audioBlob, mimeType, duration, error, startRecording, stopRecording, discardRecording } =
+    useAudioRecorder();
 
   const views: Record<Status, React.ReactNode> = {
     idle: (
@@ -120,12 +121,12 @@ export const AudioContent = ({ onSubmit, disabled = false }: AudioContentProps) 
     ),
     stopped: (
       <>
-        <AudioPreview audioUrl={audioUrl!} duration={duration} onReset={reset} />
+        <AudioPreview audioUrl={audioUrl!} duration={duration} onReset={discardRecording} />
         <Button
           variant="contained"
           fullWidth
           size="large"
-          onClick={onSubmit}
+          onClick={() => onSubmit(audioBlob!, mimeType!)}
           disabled={disabled}
           startIcon={<CheckIcon size={20} weight="bold" />}
         >
@@ -138,7 +139,7 @@ export const AudioContent = ({ onSubmit, disabled = false }: AudioContentProps) 
   return (
     <Stack gap={2}>
       {error && (
-        <Alert severity="error" onClose={reset}>
+        <Alert severity="error" onClose={discardRecording}>
           {error}
         </Alert>
       )}
