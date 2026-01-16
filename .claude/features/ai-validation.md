@@ -1,8 +1,29 @@
 # AI Validation Feature
 
-**Status:** Planning
+**Status:** Ready to Implement
 **Created:** 2025-01-16
 **Last Updated:** 2025-01-16
+
+---
+
+## Quick Context (For New Sessions)
+
+**What:** AI-powered validation for player submissions in treasure hunts
+**Scale:** ~100 validations/month (premium feature)
+**Cost:** ~$1-2/month with OpenAI
+**Provider:** OpenAI only (GPT-4o for vision/text, Whisper for audio)
+
+**Key Files:**
+- This doc: `.claude/features/ai-validation.md`
+- Existing validators: `apps/backend/api/src/features/play/helpers/validators/`
+- Types already support AI: `aiInstructions` and `aiModel` fields in Mission/Task
+
+**Decisions Made:**
+- OpenAI as sole provider (simpler, cost difference negligible at this scale)
+- Synchronous validation (player waits max 15s)
+- Auto-pass fallback when AI unavailable
+- Accept with feedback for medium confidence (0.40-0.79)
+- Backend only (no editor UI changes needed)
 
 ---
 
