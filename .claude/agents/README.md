@@ -6,12 +6,12 @@ Custom subagents for code quality, architecture, and reliability reviews.
 
 | Agent | Model | Purpose | When to Run |
 |-------|-------|---------|-------------|
+| `frontend-standards` | Haiku | MUI patterns, React patterns, simplicity | Frontend file changes |
+| `backend-standards` | Haiku | Service patterns, MongoDB, SOLID, simplicity | Backend file changes |
+| `api-reviewer` | Opus | API stability, types, frontend-backend alignment | Endpoint/response changes |
 | `data-model-steward` | Haiku | Schema sanity, invariants, migrations | Model/schema changes |
-| `api-contract-guardian` | Opus | API stability, types, error envelopes | Endpoint changes |
-| `ui-backend-mapper` | Opus | Frontend-backend alignment | API response changes |
-| `architecture-reviewer` | Haiku | Patterns, SOLID, simplicity | Any significant code |
-| `test-failure-modes` | Opus | Test coverage, reliability | Before PR / milestones |
 | `security-sentinel` | Haiku | AuthZ, data exposure, anti-cheat | Auth/permission changes |
+| `test-failure-modes` | Opus | Test coverage, reliability | Before PR / milestones |
 | `patterns-researcher` | Opus | Research with source quality | On-demand (foreground) |
 
 > **Why Opus for complex tasks?** Claude Opus 4.5 uses 50-76% fewer tokens than Sonnet for equivalent tasks, making it actually cheaper despite higher per-token pricing. See [Anthropic's announcement](https://www.anthropic.com/news/claude-opus-4-5).
@@ -36,10 +36,12 @@ Custom subagents for code quality, architecture, and reliability reviews.
 
 ### Strategic usage (recommended for token efficiency)
 ```
+Frontend changes → frontend-standards (includes simplicity checks)
+Backend changes  → backend-standards (includes SOLID + simplicity)
+API changes      → api-reviewer (contract + frontend alignment)
 Model changes    → data-model-steward
-Endpoint changes → api-contract-guardian + ui-backend-mapper
-Any code         → architecture-reviewer
-Before PR        → test-failure-modes + security-sentinel
+Auth changes     → security-sentinel
+Before PR        → test-failure-modes
 Novel problem    → patterns-researcher (foreground)
 ```
 

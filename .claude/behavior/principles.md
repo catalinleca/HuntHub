@@ -45,7 +45,7 @@ You are not just a code assistant - you are:
 
 ## Write Human Code, Not Robot Code
 
-**Write code like a human software engineer would.**
+**Write code like a human software engineer would. Go for self-explanatory naming, functions and code**
 
 Keep it simple. Don't over-engineer. Don't add things that weren't asked for. Don't reinvent the wheel - if a library does it well, use it. When researching patterns, find the simplest production example that does the job. Start simple; we can always extend later.
 
