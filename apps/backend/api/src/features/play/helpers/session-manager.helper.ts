@@ -78,8 +78,12 @@ export class SessionManager {
     sessionId: string,
     currentStepId: number,
     nextStepId: number,
-    session?: ClientSession,
+    session: ClientSession,
   ): Promise<void> {
+    if (!session) {
+      throw new Error('advanceToNextStep requires a transaction session for atomicity');
+    }
+
     const newStepProgress: IStepProgress = {
       stepId: nextStepId,
       attempts: 0,
@@ -89,13 +93,18 @@ export class SessionManager {
       hintsUsed: 0,
     };
 
+    // Two operations required - MongoDB can't $set array element AND $push to same array
     const markResult = await ProgressModel.updateOne(
       {
         sessionId,
-        currentStepId, // Optimistic lock on current position
+        currentStepId,
       },
       {
-        $set: { 'steps.$[current].completed': true, 'steps.$[current].completedAt': new Date() },
+        $set: {
+          currentStepId: nextStepId,
+          'steps.$[current].completed': true,
+          'steps.$[current].completedAt': new Date(),
+        },
       },
       {
         session,
@@ -108,11 +117,8 @@ export class SessionManager {
     }
 
     await ProgressModel.updateOne(
-      { sessionId },
-      {
-        currentStepId: nextStepId,
-        $push: { steps: newStepProgress },
-      },
+      { sessionId, currentStepId: nextStepId },
+      { $push: { steps: newStepProgress } },
       { session },
     );
   }
