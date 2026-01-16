@@ -9,18 +9,17 @@ export const PreviewPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const huntId = searchParams.get('huntId');
+  const isEmbedded = isInIframe();
 
-  // Embedded mode - Editor sends data via SDK
-  if (isInIframe()) {
-    return <EmbeddedPreview />;
-  }
-
-  // Standalone with huntId - redirect to play route
   useEffect(() => {
-    if (huntId) {
+    if (!isEmbedded && huntId) {
       navigate(`/play/${huntId}`, { replace: true });
     }
-  }, [huntId, navigate]);
+  }, [isEmbedded, huntId, navigate]);
+
+  if (isEmbedded) {
+    return <EmbeddedPreview />;
+  }
 
   if (huntId) {
     return null;

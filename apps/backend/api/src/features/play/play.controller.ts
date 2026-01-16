@@ -26,8 +26,7 @@ export class PlayController implements IPlayController {
   ) {}
 
   async discoverHunts(req: Request, res: Response): Promise<Response> {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+    const { page, limit } = req.query as { page: number; limit: number };
 
     const result = await this.playService.discoverHunts(page, limit);
 

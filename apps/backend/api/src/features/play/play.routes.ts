@@ -2,14 +2,14 @@ import { Router } from 'express';
 import { TYPES } from '@/shared/types';
 import { container } from '@/config/inversify';
 import { IPlayController } from './play.controller';
-import { validateRequest, optionalAuthMiddleware } from '@/shared/middlewares';
-import { startSessionSchema, validateAnswerSchema, hintRequestSchema } from './play.validation';
+import { validateRequest, validateQuery, optionalAuthMiddleware } from '@/shared/middlewares';
+import { startSessionSchema, validateAnswerSchema, hintRequestSchema, discoverQuerySchema } from './play.validation';
 
 const router = Router();
 const controller = container.get<IPlayController>(TYPES.PlayController);
 
 // Public discovery endpoint - no auth needed
-router.get('/discover', (req, res, next) => {
+router.get('/discover', validateQuery(discoverQuerySchema), (req, res, next) => {
   controller.discoverHunts(req, res).catch(next);
 });
 
