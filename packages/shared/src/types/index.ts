@@ -77,6 +77,20 @@ export enum MimeTypes {
   AudioMp4 = "audio/mp4",
 }
 
+/**
+ * Validation mode for quiz input answers:
+ * - exact: Case-insensitive exact match (default)
+ * - fuzzy: Levenshtein distance similarity match
+ * - contains: Substring match
+ * - numeric-range: Numeric value within tolerance
+ */
+export enum ValidationMode {
+  Exact = "exact",
+  Fuzzy = "fuzzy",
+  Contains = "contains",
+  NumericRange = "numeric-range",
+}
+
 export enum MissionType {
   UploadMedia = "upload-media",
   MatchLocation = "match-location",
@@ -365,14 +379,34 @@ export interface Option {
   text: string;
 }
 
-/** Validation configuration for quiz answers (future feature) */
+/** Validation configuration for quiz input answers */
 export interface QuizValidation {
-  mode?: "exact" | "fuzzy" | "contains" | "numeric-range";
+  /**
+   * Validation mode for quiz input answers:
+   * - exact: Case-insensitive exact match (default)
+   * - fuzzy: Levenshtein distance similarity match
+   * - contains: Substring match
+   * - numeric-range: Numeric value within tolerance
+   */
+  mode?: ValidationMode;
+  /**
+   * Whether validation should be case-sensitive (default false)
+   * @default false
+   */
   caseSensitive?: boolean;
-  range?: {
-    min?: number;
-    max?: number;
-  };
+  /**
+   * Similarity threshold percentage for fuzzy mode (1-100%, default 80%)
+   * @min 1
+   * @max 100
+   * @default 80
+   */
+  fuzzyThreshold?: number;
+  /**
+   * Tolerance for numeric-range mode (expectedAnswer +/- tolerance)
+   * @min 0
+   */
+  numericTolerance?: number;
+  /** Additional acceptable answers (any match is correct) */
   acceptableAnswers?: string[];
 }
 
@@ -388,7 +422,7 @@ export interface Quiz {
   expectedAnswer?: string;
   /** Whether to randomize option order when displayed to player */
   randomizeOrder?: boolean;
-  /** Validation configuration for quiz answers (future feature) */
+  /** Validation configuration for quiz input answers */
   validation?: QuizValidation;
 }
 

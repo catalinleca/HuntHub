@@ -1,7 +1,16 @@
-import { Divider, Stack, Typography } from '@mui/material';
-import { useWatch } from 'react-hook-form';
-import { ChallengeType, OptionType } from '@hunthub/shared';
-import { FormInput, FormTextArea, FormToggleButtonGroup, FormMediaInput, getFieldPath } from '@/components/form';
+import { useEffect } from 'react';
+import { Divider, Grid2, Stack, Typography } from '@mui/material';
+import { useFormContext, useWatch } from 'react-hook-form';
+import { ChallengeType, OptionType, ValidationMode } from '@hunthub/shared';
+import {
+  FormInput,
+  FormNumberInput,
+  FormTextArea,
+  FormToggleButtonGroup,
+  FormMediaInput,
+  FormSelect,
+  getFieldPath,
+} from '@/components/form';
 import { WithTransition } from '@/components/common';
 import { Section, SectionTitle, StepCard } from './components';
 import { StepSettings } from './StepSettings';
@@ -21,6 +30,9 @@ const getQuizFieldNames = (stepIndex: number) => ({
   options: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.options),
   targetId: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.targetId),
   media: getFieldPath((h) => h.hunt.steps[stepIndex].media),
+  validationMode: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.validation.mode),
+  fuzzyThreshold: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.validation.fuzzyThreshold),
+  numericTolerance: getFieldPath((h) => h.hunt.steps[stepIndex].challenge.quiz.validation.numericTolerance),
 });
 
 const QUIZ_TYPE_OPTIONS = [
@@ -28,12 +40,29 @@ const QUIZ_TYPE_OPTIONS = [
   { value: OptionType.Input, label: 'Text Input', icon: <TextTIcon size={16} weight="bold" /> },
 ];
 
+const VALIDATION_MODE_OPTIONS = [
+  { value: ValidationMode.Exact, label: 'Exact Match' },
+  { value: ValidationMode.Fuzzy, label: 'Fuzzy (typo-tolerant)' },
+  { value: ValidationMode.NumericRange, label: 'Numeric Range' },
+];
+
 export const QuizInput = ({ stepIndex }: QuizInputProps) => {
   const fields = getQuizFieldNames(stepIndex);
   const { color } = STEP_TYPE_CONFIG[ChallengeType.Quiz];
+  const { setValue } = useFormContext();
 
   const quizType = useWatch({ name: fields.type });
+  const validationMode = useWatch({ name: fields.validationMode });
+
+  useEffect(() => {
+    if (!validationMode) {
+      setValue(fields.validationMode, ValidationMode.Exact);
+    }
+  }, [validationMode, fields.validationMode, setValue]);
+
   const isMultipleChoice = quizType === OptionType.Choice;
+  const showFuzzyThreshold = validationMode === ValidationMode.Fuzzy;
+  const showNumericTolerance = validationMode === ValidationMode.NumericRange;
 
   const text = isMultipleChoice ? 'Answer Options (click ✓ to mark correct)' : 'Expected Answer';
 
@@ -57,12 +86,54 @@ export const QuizInput = ({ stepIndex }: QuizInputProps) => {
             {isMultipleChoice ? (
               <MultipleChoiceEditor stepIndex={stepIndex} />
             ) : (
-              <FormInput
-                name={fields.expectedAnswer}
-                label="Correct Answer"
-                placeholder="1892"
-                helperText="The answer players need to provide"
-              />
+              <Stack gap={2}>
+                <FormInput
+                  name={fields.expectedAnswer}
+                  label="Correct Answer"
+                  placeholder="1892"
+                  helperText="The answer players need to provide"
+                />
+
+                <Grid2 container spacing={2} alignItems="flex-start">
+                  <Grid2 size={6}>
+                    <FormSelect
+                      name={fields.validationMode}
+                      label="Validation Mode"
+                      options={VALIDATION_MODE_OPTIONS}
+                    />
+                  </Grid2>
+
+                  {showFuzzyThreshold && (
+                    <Grid2 size={6}>
+                      <FormNumberInput
+                        name={fields.fuzzyThreshold}
+                        label="Similarity Threshold"
+                        placeholder="80"
+                        helperText="1-100% similarity required"
+                        min={1}
+                        max={100}
+                        step={1}
+                        slotProps={{
+                          input: { endAdornment: '%' },
+                        }}
+                      />
+                    </Grid2>
+                  )}
+
+                  {showNumericTolerance && (
+                    <Grid2 size={6}>
+                      <FormNumberInput
+                        name={fields.numericTolerance}
+                        label="Tolerance (±)"
+                        placeholder="5"
+                        helperText="Answer ± this value"
+                        min={0}
+                        step={1}
+                      />
+                    </Grid2>
+                  )}
+                </Grid2>
+              </Stack>
             )}
           </Stack>
         </WithTransition>
