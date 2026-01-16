@@ -35,5 +35,11 @@ Validation criteria: ${criteria}
 Listen to the audio and determine if it meets the criteria.
 The audio might contain speech, sounds, music, or environmental audio.
 
+IMPORTANT:
+- isValid must be true ONLY if the audio clearly meets the validation criteria
+- isValid must be false if the audio does NOT meet the criteria (even partially)
+- confidence is how certain you are about your isValid decision (0.0 to 1.0)
+- feedback should be encouraging but honest about whether they succeeded or need to try again
+
 Respond with ONLY a JSON object (no markdown, no code blocks): ${JSON.stringify(AUDIO_RESPONSE_FORMAT_EXAMPLE)}
 `;
