@@ -27,6 +27,7 @@ export const TaskValidator: IAnswerValidator = {
     }
 
     const aiService = container.get<IAIValidationService>(TYPES.AIValidationService);
+
     const result = await aiService.validateTaskResponse(response, task.instructions, task.aiInstructions);
 
     return {

@@ -41,6 +41,7 @@ export const MissionMediaValidator: IAnswerValidator = {
     if (isAudioMimeType(asset.mimeType) && mission?.aiInstructions) {
       const audioBuffer = await fetchAudioBuffer(asset.url);
       const aiService = container.get<IAIValidationService>(TYPES.AIValidationService);
+
       const result = await aiService.validateAudioResponse(
         audioBuffer,
         asset.mimeType,
