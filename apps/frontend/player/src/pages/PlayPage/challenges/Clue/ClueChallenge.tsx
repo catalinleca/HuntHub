@@ -32,7 +32,7 @@ export const ClueChallenge = ({
       feedback={feedback}
       onTimeExpire={handleContinue}
       onMaxAttempts={handleContinue}
-      showHint
+      showHint={false}
       footer={
         <ActionButton onClick={handleContinue} isValidating={isValidating} isLastStep={isLastStep} label="Continue" />
       }

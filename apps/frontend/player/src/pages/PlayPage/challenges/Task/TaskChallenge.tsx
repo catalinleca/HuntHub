@@ -19,6 +19,7 @@ export const TaskChallenge = ({
   media,
   timeLimit,
   maxAttempts,
+  hasHint,
 }: ChallengeProps<TaskPF>) => {
   const [response, setResponse] = useState('');
 
@@ -50,7 +51,7 @@ export const TaskChallenge = ({
       feedback={feedback}
       onTimeExpire={handleSubmit}
       onMaxAttempts={handleSubmit}
-      showHint
+      showHint={hasHint}
       footer={
         <ActionButton
           onClick={handleSubmit}

@@ -44,6 +44,7 @@ export class PlayerExporter {
       media: step.media,
       timeLimit: step.timeLimit ?? null,
       maxAttempts: step.maxAttempts ?? null,
+      hasHint: !!step.hint,
     };
   }
 

@@ -802,6 +802,8 @@ export interface StepPF {
   timeLimit?: number | null;
   /** Maximum attempts allowed (for display - server enforces) */
   maxAttempts?: number | null;
+  /** Whether this step has a hint available */
+  hasHint: boolean;
 }
 
 /** Player Format - Hunt metadata (no steps) */
@@ -908,10 +910,8 @@ export interface ValidateAnswerResponse {
   exhausted?: boolean;
 }
 
-/** Request for a hint */
-export interface HintRequest {
-  stepIndex: number;
-}
+/** Request for a hint (session tracks current step) */
+export type HintRequest = object;
 
 /** Response with hint data */
 export interface HintResponse {
