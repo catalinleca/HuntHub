@@ -11,7 +11,7 @@ import { IAnswerValidator, ValidationResult } from '../answer-validator.helper';
  * Future: Support validation modes (fuzzy, contains, numeric-range)
  */
 export const QuizInputValidator: IAnswerValidator = {
-  validate(payload: AnswerPayload, step: IStep): ValidationResult {
+  async validate(payload: AnswerPayload, step: IStep): Promise<ValidationResult> {
     const challenge = step.challenge as Challenge;
     const quiz = challenge.quiz;
 

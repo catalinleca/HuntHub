@@ -3,7 +3,7 @@ import { IStep } from '@/database/types/Step';
 import { IAnswerValidator, ValidationResult } from '../answer-validator.helper';
 
 export const ClueValidator: IAnswerValidator = {
-  validate(_payload: AnswerPayload, _step: IStep): ValidationResult {
+  async validate(_payload: AnswerPayload, _step: IStep): Promise<ValidationResult> {
     return {
       isCorrect: true,
     };

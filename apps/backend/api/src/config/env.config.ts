@@ -29,3 +29,7 @@ export const awsAccessKeyId = process.env.AWS_ACCESS_KEY_ID;
 export const awsProfile = process.env.AWS_PROFILE;
 
 export const s3UseAcceleration = process.env.S3_USE_ACCELERATION === 'true';
+
+export const openaiApiKey = process.env.OPENAI_API_KEY;
+
+export const isDev = process.env.NODE_ENV !== 'production';

@@ -406,8 +406,8 @@ export interface Mission {
 export interface Task {
   title?: string;
   /** What the player should do (shown to player) */
-  instructions?: string;
-  /** Instructions for AI to validate player's response */
+  instructions: string;
+  /** Optional. Specific criteria for AI validation. If not provided, AI validates against the instructions field. */
   aiInstructions?: string;
   /** Which AI model to use for validation (future feature) */
   aiModel?: "gpt-4" | "claude" | "gemini";
@@ -828,7 +828,10 @@ export interface QuizChoicePayload {
 
 /** Free text quiz answer */
 export interface QuizInputPayload {
-  /** @minLength 1 */
+  /**
+   * @minLength 1
+   * @maxLength 500
+   */
   answer: string;
 }
 
@@ -854,7 +857,10 @@ export interface MissionMediaPayload {
 
 /** Free text response for tasks */
 export interface TaskAnswerPayload {
-  /** @minLength 1 */
+  /**
+   * @minLength 1
+   * @maxLength 500
+   */
   response: string;
 }
 

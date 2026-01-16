@@ -1,15 +1,12 @@
-import { AnswerPayload } from '@hunthub/shared';
+import { AnswerPayload, Challenge } from '@hunthub/shared';
 import { IStep } from '@/database/types/Step';
+import { container } from '@/config/inversify';
+import { TYPES } from '@/shared/types';
+import type { IAIValidationService } from '@/services/ai-validation';
 import { IAnswerValidator, ValidationResult } from '../answer-validator.helper';
 
-/**
- * TaskValidator - Validates free-text task responses
- *
- * MVP: Auto-pass if response is provided
- * Future: AI-based validation of response quality
- */
 export const TaskValidator: IAnswerValidator = {
-  validate(payload: AnswerPayload, _step: IStep): ValidationResult {
+  async validate(payload: AnswerPayload, step: IStep): Promise<ValidationResult> {
     const response = payload.task?.response?.trim();
 
     if (!response) {
@@ -19,10 +16,22 @@ export const TaskValidator: IAnswerValidator = {
       };
     }
 
-    // MVP: Auto-pass - AI validation will be added later
+    const challenge = step.challenge as Challenge;
+    const task = challenge.task;
+
+    if (!task?.instructions) {
+      return {
+        isCorrect: true,
+        feedback: 'Response recorded!',
+      };
+    }
+
+    const aiService = container.get<IAIValidationService>(TYPES.AIValidationService);
+    const result = await aiService.validateTaskResponse(response, task.instructions, task.aiInstructions);
+
     return {
-      isCorrect: true,
-      feedback: 'Response recorded!',
+      isCorrect: result.isCorrect,
+      feedback: result.feedback,
     };
   },
 };

@@ -18,6 +18,7 @@ import { IStep } from '@/database/types/Step';
 import { IStepProgress } from '@/database/types/Progress';
 import { NotFoundError, ForbiddenError, ConflictError, ValidationError } from '@/shared/errors';
 import { withTransaction } from '@/shared/utils/transaction';
+import { isDev } from '@/config/env.config';
 import { SessionManager } from './helpers/session-manager.helper';
 import { StepNavigator } from './helpers/step-navigator.helper';
 import { AnswerValidator } from './helpers/answer-validator.helper';
@@ -59,7 +60,7 @@ export class PlayService implements IPlayService {
       return { hunts: [], total };
     }
 
-    const versionQueries = hunts.map((h) => ({ huntId: h.huntId, version: h.liveVersion, isPublished: true }));
+    const versionQueries = hunts.map((h) => ({ huntId: h.huntId, version: h.liveVersion }));
     const versions = await HuntVersionModel.find({ $or: versionQueries }).lean();
 
     const versionMap = new Map(versions.map((v) => [`${v.huntId}-${v.version}`, v]));
@@ -81,7 +82,7 @@ export class PlayService implements IPlayService {
     const hunt = await this.requireLiveHunt(huntId);
     const liveVersion = hunt.liveVersion!;
 
-    const huntVersion = await HuntVersionModel.findPublishedVersion(huntId, liveVersion);
+    const huntVersion = await this.requireHuntVersion(huntId, liveVersion);
     if (!huntVersion) {
       throw new NotFoundError('Live hunt version not found');
     }
@@ -188,7 +189,7 @@ export class PlayService implements IPlayService {
       exhausted = true;
     }
 
-    const validationResult = AnswerValidator.validate(request.answerType, request.payload, step);
+    const validationResult = await AnswerValidator.validate(request.answerType, request.payload, step);
 
     return withTransaction(async (session) => {
       const newAttempts = await SessionManager.incrementAttempts(sessionId, progress.currentStepId, session);
@@ -271,7 +272,9 @@ export class PlayService implements IPlayService {
   }
 
   private async requireHuntVersion(huntId: number, version: number): Promise<HydratedDocument<IHuntVersion>> {
-    const huntVersion = await HuntVersionModel.findPublishedVersion(huntId, version);
+    const huntVersion = isDev
+      ? await HuntVersionModel.findOne({ huntId, version })
+      : await HuntVersionModel.findPublishedVersion(huntId, version);
 
     if (!huntVersion) {
       throw new NotFoundError('Hunt version not found');

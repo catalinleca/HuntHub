@@ -21,6 +21,8 @@ import { HuntShareController, IHuntShareController } from '@/features/sharing/hu
 import { HuntShareService, IHuntShareService } from '@/features/sharing/hunt-share.service';
 import { PlayController, IPlayController } from '@/features/play/play.controller';
 import { PlayService, IPlayService } from '@/features/play/play.service';
+import { OpenAIProvider, AIValidationService } from '@/services/ai-validation';
+import type { IAIProvider, IAIValidationService } from '@/services/ai-validation';
 
 const container = new Container();
 
@@ -45,5 +47,7 @@ container.bind<IAssetUsageTracker>(TYPES.AssetUsageTracker).to(AssetUsageTracker
 container.bind<IAssetValidator>(TYPES.AssetValidator).to(AssetValidator);
 container.bind<IHuntShareService>(TYPES.HuntShareService).to(HuntShareService);
 container.bind<IPlayService>(TYPES.PlayService).to(PlayService);
+container.bind<IAIProvider>(TYPES.AIProvider).to(OpenAIProvider).inSingletonScope();
+container.bind<IAIValidationService>(TYPES.AIValidationService).to(AIValidationService);
 
 export { container };

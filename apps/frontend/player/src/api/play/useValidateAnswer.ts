@@ -34,38 +34,38 @@ export const useValidateAnswer = () => {
   const mutation = useMutation({
     mutationFn: (params: ValidateParams): Promise<ValidateAnswerResponse> =>
       validateAnswer(params.sessionId, params.answerType, params.payload),
-    onSuccess: (data, variables) => {
-      const { sessionId, nextStepId } = variables;
-
-      if (data.correct) {
-        queryClient.setQueryData<SessionResponse>(playKeys.session(sessionId), (old) => {
-          if (!old) {
-            return old;
-          }
-
-          if (data.isComplete) {
-            return {
-              ...old,
-              status: HuntProgressStatus.Completed,
-              currentStepIndex: old.currentStepIndex + 1,
-              currentStepId: null,
-            };
-          }
-
-          return {
-            ...old,
-            currentStepIndex: old.currentStepIndex + 1,
-            currentStepId: nextStepId,
-          };
-        });
-      }
-    },
   });
+
+  const advanceToNextStep = (sessionId: string, nextStepId: number | null, isComplete: boolean) => {
+    queryClient.setQueryData<SessionResponse>(playKeys.session(sessionId), (old) => {
+      if (!old) return old;
+
+      if (isComplete) {
+        return {
+          ...old,
+          status: HuntProgressStatus.Completed,
+          currentStepId: null,
+        };
+      }
+
+      if (nextStepId === null) {
+        return old;
+      }
+
+      return {
+        ...old,
+        currentStepIndex: old.currentStepIndex + 1,
+        currentStepId: nextStepId,
+      };
+    });
+  };
 
   return {
     validate: mutation.mutateAsync,
     isValidating: mutation.isPending,
+    data: mutation.data,
     error: mutation.error,
     reset: mutation.reset,
+    advanceToNextStep,
   };
 };
