@@ -175,38 +175,23 @@ export class PlayService implements IPlayService {
     const stepProgress = SessionManager.getCurrentStepProgress(progress);
     const isLastStep = StepNavigator.isLastStep(huntVersion.stepOrder, progress.currentStepId);
 
-    // Time limit check (pre-transaction - read-only check is fine)
+    let expired = false;
+    let exhausted = false;
+
     if (step.timeLimit && stepProgress?.startedAt) {
       const elapsedSeconds = (Date.now() - stepProgress.startedAt.getTime()) / 1000;
-      if (elapsedSeconds > step.timeLimit) {
-        return {
-          correct: false,
-          expired: true,
-          attempts: stepProgress.attempts ?? 0,
-          maxAttempts: step.maxAttempts ?? undefined,
-        };
-      }
+      expired = elapsedSeconds > step.timeLimit;
+    }
+
+    const currentAttempts = stepProgress?.attempts ?? 0;
+    if (step.maxAttempts && currentAttempts >= step.maxAttempts) {
+      exhausted = true;
     }
 
     const validationResult = AnswerValidator.validate(request.answerType, request.payload, step);
 
     return withTransaction(async (session) => {
-      // Atomic increment with limit check (prevents race condition)
-      const newAttempts = await SessionManager.incrementAttemptsIfUnderLimit(
-        sessionId,
-        progress.currentStepId,
-        step.maxAttempts ?? null,
-        session,
-      );
-
-      if (newAttempts === null) {
-        return {
-          correct: false,
-          exhausted: true,
-          attempts: step.maxAttempts!,
-          maxAttempts: step.maxAttempts,
-        };
-      }
+      const newAttempts = await SessionManager.incrementAttempts(sessionId, progress.currentStepId, session);
 
       await SessionManager.recordSubmission(
         sessionId,
@@ -237,6 +222,8 @@ export class PlayService implements IPlayService {
         attempts: newAttempts,
         maxAttempts: step.maxAttempts ?? undefined,
         isComplete: isComplete || undefined,
+        expired: expired || undefined,
+        exhausted: exhausted || undefined,
       };
     });
   }

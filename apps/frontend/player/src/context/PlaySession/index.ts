@@ -1,5 +1,5 @@
 export { PlaySessionProvider } from './PlaySessionProvider';
-export { MockPlaySessionProvider } from './MockPlaySessionProvider';
+export { EditorPreviewSessionProvider } from './EditorPreviewSessionProvider';
 export { usePlaySession, useStepProgress } from './hooks';
 export { sessionStorage } from './sessionStorage';
 

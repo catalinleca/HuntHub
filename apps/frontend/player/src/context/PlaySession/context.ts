@@ -12,6 +12,7 @@ export interface SessionData {
   currentStep: StepPF | null;
   currentStepIndex: number;
   totalSteps: number;
+  previewHint?: string;
 }
 
 export interface SessionActions {

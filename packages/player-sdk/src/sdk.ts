@@ -3,7 +3,12 @@ import type { HuntMetaPF, StepPF } from '@hunthub/shared';
 export const EDITOR_MESSAGES = {
   RENDER_HUNT: 'RENDER_HUNT',
   JUMP_TO_STEP: 'JUMP_TO_STEP',
+  SET_VALIDATION_MODE: 'SET_VALIDATION_MODE',
+  SET_HINTS: 'SET_HINTS',
 } as const;
+
+export type ValidationMode = 'success' | 'fail';
+export type HintsMap = Record<number, string>;
 
 export const PLAYER_MESSAGES = {
   PREVIEW_READY: 'PREVIEW_READY',
@@ -29,6 +34,18 @@ export const editorMessages = {
       stepIndex,
     };
   },
+  setValidationMode: (mode: ValidationMode) => {
+    return {
+      type: EDITOR_MESSAGES.SET_VALIDATION_MODE,
+      mode,
+    };
+  },
+  setHints: (hints: HintsMap) => {
+    return {
+      type: EDITOR_MESSAGES.SET_HINTS,
+      hints,
+    };
+  },
 };
 
 export const playerMessages = {
@@ -50,50 +67,18 @@ export type EditorToPlayerMessage = ReturnType<(typeof editorMessages)[keyof typ
 
 export type PlayerToEditorMessage = ReturnType<(typeof playerMessages)[keyof typeof playerMessages]>;
 
-// TODO: Replace '*' with specific editor origin (e.g., VITE_EDITOR_ORIGIN) for production security
 export const sendToEditor = (message: PlayerToEditorMessage): void => {
   window.parent.postMessage(message, '*');
 };
 
 export type PlayerEventCallback = (message: PlayerToEditorMessage) => void;
 
-/**
- * SDK for Editor to communicate with Player iframe via postMessage.
- *
- * IMPORTANT: Use PlayerExporter to sanitize hunt data before sending!
- *
- * ```typescript
- * import { PlayerExporter } from '@hunthub/shared';
- *
- * const previewData = {
- *   hunt: PlayerExporter.hunt(hunt.huntId, hunt),
- *   steps: PlayerExporter.steps(hunt.steps ?? []),
- * };
- * sdk.renderHunt(previewData);
- * ```
- *
- * Constructor:
- *   iframe - The iframe element containing Player
- *   targetOrigin - Security: which origin can receive messages ('*' = any)
- *
- * Commands (Editor → Player):
- *   renderHunt(data) - Send sanitized hunt data to render
- *   jumpToStep(index) - Navigate to specific step
- *
- * Events (Player → Editor):
- *   onMessage(callback) - Listen to all messages, returns unsubscribe fn
- *   onReady(callback) - Fires when Player sends PREVIEW_READY
- *
- * Cleanup:
- *   destroy() - Remove listeners, call on unmount
- */
 export class PlayerSDK {
   private iframe: HTMLIFrameElement;
   private targetOrigin: string;
   private listeners: Set<PlayerEventCallback> = new Set();
   private messageHandler: (event: MessageEvent) => void;
 
-  // TODO: In production, pass specific origin instead of '*' for security
   constructor(iframe: HTMLIFrameElement, targetOrigin: string = '*') {
     this.iframe = iframe;
     this.targetOrigin = targetOrigin;
@@ -107,6 +92,14 @@ export class PlayerSDK {
 
   jumpToStep(stepIndex: number): void {
     this.send(editorMessages.jumpToStep(stepIndex));
+  }
+
+  setValidationMode(mode: ValidationMode): void {
+    this.send(editorMessages.setValidationMode(mode));
+  }
+
+  setHints(hints: HintsMap): void {
+    this.send(editorMessages.setHints(hints));
   }
 
   onMessage(callback: PlayerEventCallback): () => void {
@@ -133,7 +126,6 @@ export class PlayerSDK {
     this.iframe.contentWindow?.postMessage(message, this.targetOrigin);
   }
 
-  // TODO: Add event.origin validation when targetOrigin is not '*' for production security
   private handleMessage(event: MessageEvent): void {
     if (event.source !== this.iframe.contentWindow) {
       return;
