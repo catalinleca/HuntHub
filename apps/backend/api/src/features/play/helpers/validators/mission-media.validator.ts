@@ -77,11 +77,9 @@ export const MissionMediaValidator: IAnswerValidator = {
     const mission = challenge.mission;
     const instructions = mission?.title || mission?.description;
     const aiInstructions = mission?.aiInstructions;
-
     const aiMediaType = getAIMediaType(asset.mimeType);
-    const canUseAI = aiMediaType !== null && !!aiInstructions && !!instructions;
 
-    if (!canUseAI) {
+    if (!aiMediaType || !aiInstructions || !instructions) {
       return { isCorrect: true, feedback: 'Media received!' };
     }
 

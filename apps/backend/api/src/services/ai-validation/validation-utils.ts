@@ -37,7 +37,7 @@ export const parseJsonResponse = (
   }
 
   try {
-    const cleaned = content.replace(/```json\n?|\n?```/g, '').trim();
+    const cleaned = content.replace(/```json\n?|\n?```/gi, '').trim();
     return JSON.parse(cleaned);
   } catch {
     throw new Error(`Invalid JSON response from ${providerName}`);
