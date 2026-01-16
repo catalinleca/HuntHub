@@ -1,105 +1,98 @@
-import { useState, useCallback, type ReactNode } from 'react';
-import type { AnswerType, AnswerPayload } from '@hunthub/shared';
+import { useCallback, type ReactNode } from 'react';
+import type { AnswerType, AnswerPayload, ValidateAnswerResponse } from '@hunthub/shared';
 import { useValidateAnswer } from '@/api';
 import { ValidationContext } from './context';
-
-interface ValidationState {
-  isCorrect: boolean | null;
-  feedback: string | null;
-  attemptCount: number;
-  isExpired: boolean;
-  isExhausted: boolean;
-}
-
-const initialState: ValidationState = {
-  isCorrect: null,
-  feedback: null,
-  attemptCount: 0,
-  isExpired: false,
-  isExhausted: false,
-};
+import { SuccessDialog } from './SuccessDialog';
 
 interface ApiValidationProviderProps {
   sessionId: string;
   nextStepId: number | null;
+  showSuccessDialog?: boolean;
   children: ReactNode;
+}
+
+function getFeedback(data: ValidateAnswerResponse | undefined): string | null {
+  if (!data) {
+    return null;
+  }
+
+  if (data.expired) {
+    return 'Time expired for this step.';
+  }
+
+  if (data.exhausted) {
+    return 'No attempts remaining.';
+  }
+
+  return data.feedback ?? null;
 }
 
 /**
  * Provides API-based validation for /play route.
  *
- * IMPORTANT: Use key={stepId} on this component to reset state when step changes. "You might not need an effect"
- * Example: <ApiValidationProvider key={stepId} sessionId={sessionId}> instead of useEffect with stepId dep and setState(initial)
+ * IMPORTANT: Use key={stepId} on this component to reset state when step changes.
  */
-export const ApiValidationProvider = ({ sessionId, nextStepId, children }: ApiValidationProviderProps) => {
-  const { validate: validateAnswer, isValidating, reset: resetMutation } = useValidateAnswer();
-  const [state, setState] = useState<ValidationState>(initialState);
+export const ApiValidationProvider = ({
+  sessionId,
+  nextStepId,
+  showSuccessDialog = false,
+  children,
+}: ApiValidationProviderProps) => {
+  const { validate: validateAnswer, isValidating, data, reset, advanceToNextStep } = useValidateAnswer();
+
+  const handleValidationSuccess = useCallback(
+    (responseData: ValidateAnswerResponse) => {
+      if (showSuccessDialog) {
+        return;
+      }
+      advanceToNextStep(sessionId, nextStepId, responseData.isComplete ?? false);
+    },
+    [showSuccessDialog, advanceToNextStep, sessionId, nextStepId],
+  );
 
   const validate = useCallback(
     async (answerType: AnswerType, payload: AnswerPayload) => {
-      if (!sessionId) {
-        setState((prev) => ({
-          ...prev,
-          isCorrect: false,
-          feedback: 'Session not found. Please restart the hunt.',
-          attemptCount: prev.attemptCount + 1,
-        }));
-        return;
-      }
+      const responseData = await validateAnswer({ sessionId, answerType, payload, nextStepId });
 
-      try {
-        const data = await validateAnswer({ sessionId, answerType, payload, nextStepId });
-        setState((prev) => ({
-          isCorrect: data.correct,
-          feedback: data.expired
-            ? 'Time expired for this step.'
-            : data.exhausted
-              ? 'No attempts remaining.'
-              : (data.feedback ?? null),
-          attemptCount: data.attempts ?? (data.correct ? prev.attemptCount : prev.attemptCount + 1),
-          isExpired: data.expired ?? false,
-          isExhausted: data.exhausted ?? false,
-        }));
-      } catch {
-        setState((prev) => ({
-          ...prev,
-          isCorrect: false,
-          feedback: 'Something went wrong. Please try again.',
-          attemptCount: prev.attemptCount + 1,
-        }));
+      if (responseData.correct) {
+        handleValidationSuccess(responseData);
       }
     },
-    [sessionId, nextStepId, validateAnswer],
+    [sessionId, nextStepId, validateAnswer, handleValidationSuccess],
   );
 
-  /**
-   * Reset both local state and mutation state to keep them in sync.
-   *
-   * Example without resetMutation():
-   * 1. User submits wrong answer → mutation catches error internally
-   * 2. User moves to next step → reset() clears our state
-   * 3. But mutation's internal error/isError still holds the old error
-   * 4. If we ever expose error from context, it would be stale
-   */
-  const reset = useCallback(() => {
-    setState(initialState);
-    resetMutation();
-  }, [resetMutation]);
+  const handleDialogContinue = useCallback(() => {
+    advanceToNextStep(sessionId, nextStepId, data?.isComplete ?? false);
+  }, [advanceToNextStep, sessionId, nextStepId, data?.isComplete]);
+
+  const isCorrect = data?.correct ?? null;
+  const feedback = getFeedback(data);
+  const attemptCount = data?.attempts ?? 0;
+  const isExpired = data?.expired ?? false;
+  const isExhausted = data?.exhausted ?? false;
+
+  const dialogOpen = showSuccessDialog && isCorrect === true;
 
   return (
     <ValidationContext.Provider
       value={{
         validate,
         isValidating,
-        isCorrect: state.isCorrect,
-        feedback: state.feedback,
-        attemptCount: state.attemptCount,
-        isExpired: state.isExpired,
-        isExhausted: state.isExhausted,
+        isCorrect,
+        feedback,
+        attemptCount,
+        isExpired,
+        isExhausted,
         reset,
       }}
     >
       {children}
+      <SuccessDialog
+        open={dialogOpen}
+        feedback={feedback}
+        isHuntComplete={data?.isComplete ?? false}
+        onContinue={handleDialogContinue}
+      />
     </ValidationContext.Provider>
   );
 };

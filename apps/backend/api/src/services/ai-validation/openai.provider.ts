@@ -53,6 +53,7 @@ Be encouraging but accurate. The feedback should be 1-2 sentences.`;
     });
 
     const content = response.choices[0]?.message?.content;
+
     if (!content) {
       throw new Error('Empty response from OpenAI');
     }

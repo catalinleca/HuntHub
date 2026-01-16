@@ -60,17 +60,8 @@ export class AIValidationService implements IAIValidationService {
         this.config.timeoutMs,
       );
 
-      const { high, low } = this.config.confidenceThresholds;
-      const isCorrect = providerResponse.confidence >= low;
-
-      let feedback = providerResponse.feedback;
-      if (providerResponse.confidence >= high) {
-        // High confidence - use feedback as-is
-      } else if (providerResponse.confidence >= low) {
-        feedback = `Accepted! ${providerResponse.feedback}`;
-      } else {
-        feedback = `Try again. ${providerResponse.feedback}`;
-      }
+      const isCorrect = providerResponse.isValid;
+      const feedback = providerResponse.feedback;
 
       return {
         isCorrect,

@@ -21,7 +21,8 @@ import { HuntShareController, IHuntShareController } from '@/features/sharing/hu
 import { HuntShareService, IHuntShareService } from '@/features/sharing/hunt-share.service';
 import { PlayController, IPlayController } from '@/features/play/play.controller';
 import { PlayService, IPlayService } from '@/features/play/play.service';
-import { OpenAIProvider, IAIProvider, AIValidationService, IAIValidationService } from '@/services/ai-validation';
+import { OpenAIProvider, AIValidationService } from '@/services/ai-validation';
+import type { IAIProvider, IAIValidationService } from '@/services/ai-validation';
 
 const container = new Container();
 

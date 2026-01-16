@@ -2,7 +2,7 @@ import { AnswerPayload, Challenge } from '@hunthub/shared';
 import { IStep } from '@/database/types/Step';
 import { container } from '@/config/inversify';
 import { TYPES } from '@/shared/types';
-import { IAIValidationService } from '@/services/ai-validation';
+import type { IAIValidationService } from '@/services/ai-validation';
 import { IAnswerValidator, ValidationResult } from '../answer-validator.helper';
 
 export const TaskValidator: IAnswerValidator = {

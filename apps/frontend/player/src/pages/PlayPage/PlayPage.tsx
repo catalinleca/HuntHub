@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { Typography, CircularProgress } from '@mui/material';
+import { ChallengeType } from '@hunthub/shared';
 import { PlaySessionProvider, usePlaySession, ApiValidationProvider } from '@/context';
 import { PlayerIdentification } from './components/PlayerIdentification';
 import { StepRenderer } from './components/StepRenderer';
@@ -63,7 +64,12 @@ const PlayPageContent = () => {
       </S.Header>
 
       <S.Content>
-        <ApiValidationProvider key={currentStep.stepId} sessionId={sessionId!} nextStepId={nextStepId}>
+        <ApiValidationProvider
+          key={currentStep.stepId}
+          sessionId={sessionId!}
+          nextStepId={nextStepId}
+          showSuccessDialog={currentStep.type === ChallengeType.Task}
+        >
           <StepRenderer step={currentStep} isLastStep={isLastStep} />
         </ApiValidationProvider>
       </S.Content>
