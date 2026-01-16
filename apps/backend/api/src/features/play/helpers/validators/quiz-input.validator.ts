@@ -199,8 +199,12 @@ export const QuizInputValidator: IAnswerValidator = {
       };
     }
 
-    for (const acceptable of config.acceptableAnswers) {
-      const result = validateAnswer(submittedAnswer, acceptable.trim(), config);
+    const acceptableAnswers = config.acceptableAnswers
+      .map((answer) => answer.trim())
+      .filter((answer) => answer.length > 0);
+
+    for (const acceptable of acceptableAnswers) {
+      const result = validateAnswer(submittedAnswer, acceptable, config);
       if (result.isCorrect) {
         return { isCorrect: true, feedback: 'Correct!', confidence: result.confidence };
       }
