@@ -1,6 +1,7 @@
 import { Typography, CircularProgress } from '@mui/material';
 import type { HuntMetaPF, StepPF } from '@hunthub/shared';
-import { MockValidationProvider, MockPlaySessionProvider, type ValidationResult } from '@/context';
+import type { ValidationMode } from '@hunthub/player-sdk';
+import { EditorPreviewProvider, EditorPreviewSessionProvider } from '@/context';
 import { StepRenderer } from '../../PlayPage/components/StepRenderer';
 import { PreviewToolbar } from './PreviewToolbar';
 import * as S from '../PreviewPage.styles';
@@ -14,7 +15,8 @@ interface PreviewContentProps {
   isLoading: boolean;
   error: string | null;
   showToolbar: boolean;
-  onValidated: (result: ValidationResult) => void;
+  validationMode: ValidationMode;
+  previewHint?: string;
   onPrev: () => void;
   onNext: () => void;
   emptyStateMessage: string;
@@ -29,7 +31,8 @@ export const PreviewContent = ({
   isLoading,
   error,
   showToolbar,
-  onValidated,
+  validationMode,
+  previewHint,
   onPrev,
   onNext,
   emptyStateMessage,
@@ -80,11 +83,11 @@ export const PreviewContent = ({
       )}
 
       <S.Content>
-        <MockPlaySessionProvider>
-          <MockValidationProvider key={currentStep.stepId} step={currentStep} onValidated={onValidated}>
+        <EditorPreviewSessionProvider previewHint={previewHint}>
+          <EditorPreviewProvider key={currentStep.stepId} validationMode={validationMode}>
             <StepRenderer step={currentStep} isLastStep={isLastStep} />
-          </MockValidationProvider>
-        </MockPlaySessionProvider>
+          </EditorPreviewProvider>
+        </EditorPreviewSessionProvider>
       </S.Content>
     </S.Container>
   );

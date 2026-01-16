@@ -149,41 +149,18 @@ export class SessionManager {
   }
 
   /**
-   * Atomically increment attempts only if under the limit.
-   * Returns null if limit already reached (prevents race condition).
-   * Returns the new attempt count on success.
+   * Increment attempts counter (non-blocking - always succeeds).
+   * Returns the new attempt count.
    */
-  static async incrementAttemptsIfUnderLimit(
-    sessionId: string,
-    stepId: number,
-    maxAttempts: number | null,
-    session?: ClientSession,
-  ): Promise<number | null> {
-    // No limit - always allow
-    const query: Record<string, unknown> = maxAttempts
-      ? {
-          sessionId,
-          steps: {
-            $elemMatch: {
-              stepId,
-              $or: [{ attempts: { $lt: maxAttempts } }, { attempts: { $exists: false } }],
-            },
-          },
-        }
-      : { sessionId, 'steps.stepId': stepId };
-
+  static async incrementAttempts(sessionId: string, stepId: number, session?: ClientSession): Promise<number> {
     const result = await ProgressModel.findOneAndUpdate(
-      query,
+      { sessionId, 'steps.stepId': stepId },
       { $inc: { 'steps.$.attempts': 1 } },
       { new: true, session },
     );
 
     if (!result) {
-      const exists = await ProgressModel.exists({ sessionId, 'steps.stepId': stepId });
-      if (!exists) {
-        throw new NotFoundError('Session or step not found');
-      }
-      return null; // Limit reached
+      throw new NotFoundError('Session or step not found');
     }
 
     const stepProgress = result.steps?.find((sp) => sp.stepId === stepId);

@@ -1,27 +1,17 @@
 import type { AnswerType, AnswerPayload } from '@hunthub/shared';
 
-/**
- * Result from validation (mock or API)
- */
 export interface ValidationResult {
   isCorrect: boolean;
   feedback: string;
 }
 
-/**
- * Validation context value - same interface for both API and Mock providers
- */
 export interface ValidationContextValue {
-  /** Validate an answer (async for API, sync for mock) */
   validate: (answerType: AnswerType, payload: AnswerPayload) => Promise<void> | void;
-  /** Whether validation is in progress */
   isValidating: boolean;
-  /** Whether the last answer was correct (null if not yet validated) */
   isCorrect: boolean | null;
-  /** Feedback message from validation */
   feedback: string | null;
-  /** Current attempt count for this step */
   attemptCount: number;
-  /** Reset validation state (e.g., when step changes) */
+  isExpired: boolean;
+  isExhausted: boolean;
   reset: () => void;
 }

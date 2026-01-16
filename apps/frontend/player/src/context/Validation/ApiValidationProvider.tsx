@@ -7,12 +7,16 @@ interface ValidationState {
   isCorrect: boolean | null;
   feedback: string | null;
   attemptCount: number;
+  isExpired: boolean;
+  isExhausted: boolean;
 }
 
 const initialState: ValidationState = {
   isCorrect: null,
   feedback: null,
   attemptCount: 0,
+  isExpired: false,
+  isExhausted: false,
 };
 
 interface ApiValidationProviderProps {
@@ -35,6 +39,7 @@ export const ApiValidationProvider = ({ sessionId, nextStepId, children }: ApiVa
     async (answerType: AnswerType, payload: AnswerPayload) => {
       if (!sessionId) {
         setState((prev) => ({
+          ...prev,
           isCorrect: false,
           feedback: 'Session not found. Please restart the hunt.',
           attemptCount: prev.attemptCount + 1,
@@ -46,11 +51,18 @@ export const ApiValidationProvider = ({ sessionId, nextStepId, children }: ApiVa
         const data = await validateAnswer({ sessionId, answerType, payload, nextStepId });
         setState((prev) => ({
           isCorrect: data.correct,
-          feedback: data.feedback ?? null,
+          feedback: data.expired
+            ? 'Time expired for this step.'
+            : data.exhausted
+              ? 'No attempts remaining.'
+              : (data.feedback ?? null),
           attemptCount: data.attempts ?? (data.correct ? prev.attemptCount : prev.attemptCount + 1),
+          isExpired: data.expired ?? false,
+          isExhausted: data.exhausted ?? false,
         }));
       } catch {
         setState((prev) => ({
+          ...prev,
           isCorrect: false,
           feedback: 'Something went wrong. Please try again.',
           attemptCount: prev.attemptCount + 1,
@@ -82,6 +94,8 @@ export const ApiValidationProvider = ({ sessionId, nextStepId, children }: ApiVa
         isCorrect: state.isCorrect,
         feedback: state.feedback,
         attemptCount: state.attemptCount,
+        isExpired: state.isExpired,
+        isExhausted: state.isExhausted,
         reset,
       }}
     >
