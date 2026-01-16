@@ -19,7 +19,8 @@ export interface IAIProvider {
   validateText(params: TextValidationParams): Promise<AIProviderResponse>;
 }
 
-const MAX_INPUT_CHARS = 500;
+const MAX_RESPONSE_CHARS = 500;
+const MAX_INSTRUCTIONS_CHARS = 2000;
 
 @injectable()
 export class OpenAIProvider implements IAIProvider {
@@ -35,18 +36,20 @@ export class OpenAIProvider implements IAIProvider {
   async validateText(params: TextValidationParams): Promise<AIProviderResponse> {
     const { userResponse, instructions, aiInstructions } = params;
 
-    if (userResponse.length > MAX_INPUT_CHARS) {
-      throw new Error(`Response too long: ${userResponse.length} chars (max ${MAX_INPUT_CHARS})`);
+    if (userResponse.length > MAX_RESPONSE_CHARS) {
+      throw new Error(`Response too long: ${userResponse.length} chars (max ${MAX_RESPONSE_CHARS})`);
     }
 
-    const validationCriteria = aiInstructions || instructions;
+    const safeInstructions = instructions.slice(0, MAX_INSTRUCTIONS_CHARS);
+    const safeAiInstructions = aiInstructions?.slice(0, MAX_INSTRUCTIONS_CHARS);
+    const validationCriteria = safeAiInstructions || safeInstructions;
 
     const systemPrompt = `You are a treasure hunt validation assistant.
 Your job is to determine if a player's text response meets the specified criteria.
 Respond with a JSON object: { "isValid": boolean, "confidence": number (0-1), "feedback": string }
 Be encouraging but accurate. The feedback should be 1-2 sentences.`;
 
-    const userPrompt = `Task: ${instructions}\n\nValidation criteria: ${validationCriteria}\n\nPlayer's response: "${userResponse}"\n\nDoes this response meet the criteria?`;
+    const userPrompt = `Task: ${safeInstructions}\n\nValidation criteria: ${validationCriteria}\n\nPlayer's response: "${userResponse}"\n\nDoes this response meet the criteria?`;
 
     const response = await this.client.chat.completions.create({
       model: 'gpt-4o',
