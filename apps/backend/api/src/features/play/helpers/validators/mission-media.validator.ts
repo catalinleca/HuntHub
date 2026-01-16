@@ -1,15 +1,28 @@
-import { AnswerPayload } from '@hunthub/shared';
+import { AnswerPayload, Challenge, MimeTypes } from '@hunthub/shared';
 import { IStep } from '@/database/types/Step';
+import { container } from '@/config/inversify';
+import { TYPES } from '@/shared/types';
+import AssetModel from '@/database/models/Asset';
+import type { IAIValidationService } from '@/services/ai-validation';
+import { AUDIO_MIME_TYPES } from '@/shared/utils/mimeTypes';
 import { IAnswerValidator, ValidationResult } from '../answer-validator.helper';
 
-/**
- * MissionMediaValidator - Validates media upload missions
- *
- * MVP: Auto-pass if assetId is provided
- * Future: AI-based validation of uploaded content
- */
+const isAudioMimeType = (mimeType: MimeTypes): boolean =>
+  AUDIO_MIME_TYPES.includes(mimeType as (typeof AUDIO_MIME_TYPES)[number]);
+
+const fetchAudioBuffer = async (url: string): Promise<Buffer> => {
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch audio: ${response.status} ${response.statusText}`);
+  }
+
+  const arrayBuffer = await response.arrayBuffer();
+  return Buffer.from(arrayBuffer);
+};
+
 export const MissionMediaValidator: IAnswerValidator = {
-  async validate(payload: AnswerPayload, _step: IStep): Promise<ValidationResult> {
+  async validate(payload: AnswerPayload, step: IStep): Promise<ValidationResult> {
     const assetId = payload.missionMedia?.assetId;
 
     if (!assetId) {
@@ -19,7 +32,49 @@ export const MissionMediaValidator: IAnswerValidator = {
       };
     }
 
-    // MVP: Auto-pass - AI validation will be added later
+    const asset = await AssetModel.findOne({ assetId });
+    if (!asset) {
+      return {
+        isCorrect: false,
+        feedback: 'Media not found',
+      };
+    }
+
+    const challenge = step.challenge as Challenge;
+    const mission = challenge.mission;
+
+    const instructions = mission?.title || mission?.description;
+
+    if (isAudioMimeType(asset.mimeType) && mission?.aiInstructions && instructions) {
+      try {
+        const audioBuffer = await fetchAudioBuffer(asset.url);
+        const aiService = container.get<IAIValidationService>(TYPES.AIValidationService);
+
+        const result = await aiService.validateAudioResponse(
+          audioBuffer,
+          asset.mimeType,
+          instructions,
+          mission.aiInstructions,
+        );
+
+        return {
+          isCorrect: result.isCorrect,
+          feedback: result.feedback,
+          transcript: result.transcript,
+          confidence: result.confidence,
+        };
+      } catch (error) {
+        console.error(
+          '[MissionMediaValidator] Audio validation failed:',
+          error instanceof Error ? error.message : 'Unknown error',
+        );
+        return {
+          isCorrect: false,
+          feedback: 'Unable to process your audio. Please try again.',
+        };
+      }
+    }
+
     return {
       isCorrect: true,
       feedback: 'Media received!',

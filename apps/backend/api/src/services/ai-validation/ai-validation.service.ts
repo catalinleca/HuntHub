@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/shared/types';
-import { IAIProvider } from './openai.provider';
+import type { ITextValidationProvider, IAudioValidationProvider } from './interfaces';
 
 export interface AIValidationResult {
   isCorrect: boolean;
@@ -9,6 +9,7 @@ export interface AIValidationResult {
   aiModel?: string;
   processingTimeMs?: number;
   fallbackUsed?: boolean;
+  transcript?: string;
 }
 
 interface AIValidationConfig {
@@ -22,6 +23,13 @@ export interface IAIValidationService {
     aiInstructions?: string,
   ): Promise<AIValidationResult>;
 
+  validateAudioResponse(
+    audioBuffer: Buffer,
+    mimeType: string,
+    instructions: string,
+    aiInstructions?: string,
+  ): Promise<AIValidationResult>;
+
   isAvailable(): boolean;
 }
 
@@ -29,7 +37,10 @@ export interface IAIValidationService {
 export class AIValidationService implements IAIValidationService {
   private config: AIValidationConfig;
 
-  constructor(@inject(TYPES.AIProvider) private provider: IAIProvider) {
+  constructor(
+    @inject(TYPES.TextValidationProvider) private textProvider: ITextValidationProvider,
+    @inject(TYPES.AudioValidationProvider) private audioProvider: IAudioValidationProvider,
+  ) {
     this.config = {
       timeoutMs: parseInt(process.env.AI_VALIDATION_TIMEOUT_MS || '15000', 10),
     };
@@ -43,8 +54,8 @@ export class AIValidationService implements IAIValidationService {
     const startTime = Date.now();
 
     try {
-      const providerResponse = await this.withTimeout(
-        this.provider.validateText({
+      const response = await this.withTimeout(
+        this.textProvider.validateText({
           userResponse,
           instructions,
           aiInstructions,
@@ -52,19 +63,50 @@ export class AIValidationService implements IAIValidationService {
         this.config.timeoutMs,
       );
 
-      const isCorrect = providerResponse.isValid;
-      const feedback = providerResponse.feedback;
-
       return {
-        isCorrect,
-        feedback,
-        confidence: providerResponse.confidence,
-        aiModel: this.provider.name,
+        isCorrect: response.isValid,
+        feedback: response.feedback,
+        confidence: response.confidence,
+        aiModel: this.textProvider.name,
         processingTimeMs: Date.now() - startTime,
         fallbackUsed: false,
       };
     } catch (error) {
       console.error('[AIValidation] Task validation failed:', error);
+      return this.createFallbackResult();
+    }
+  }
+
+  async validateAudioResponse(
+    audioBuffer: Buffer,
+    mimeType: string,
+    instructions: string,
+    aiInstructions?: string,
+  ): Promise<AIValidationResult> {
+    const startTime = Date.now();
+
+    try {
+      const response = await this.withTimeout(
+        this.audioProvider.validateAudio({
+          audioBuffer,
+          mimeType,
+          instructions,
+          aiInstructions,
+        }),
+        this.config.timeoutMs,
+      );
+
+      return {
+        isCorrect: response.isValid,
+        feedback: response.feedback,
+        confidence: response.confidence,
+        aiModel: this.audioProvider.name,
+        processingTimeMs: Date.now() - startTime,
+        fallbackUsed: false,
+        transcript: response.transcript,
+      };
+    } catch (error) {
+      console.error('[AIValidation] Audio validation failed:', error);
       return this.createFallbackResult();
     }
   }
@@ -82,7 +124,6 @@ export class AIValidationService implements IAIValidationService {
     ]);
   }
 
-  // TODO: Fail-open by design for game UX. Revisit if validation becomes high-stakes.
   private createFallbackResult(): AIValidationResult {
     return {
       isCorrect: true,

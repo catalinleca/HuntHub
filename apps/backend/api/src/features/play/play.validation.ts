@@ -1,8 +1,9 @@
 import { z } from 'zod';
-import { StartSessionRequest, ValidateAnswerRequest } from '@hunthub/shared/schemas';
+import { StartSessionRequest, ValidateAnswerRequest, AssetCreate } from '@hunthub/shared/schemas';
 
 export const startSessionSchema = StartSessionRequest;
 export const validateAnswerSchema = ValidateAnswerRequest;
+export const createAssetSchema = AssetCreate;
 
 export const discoverQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),

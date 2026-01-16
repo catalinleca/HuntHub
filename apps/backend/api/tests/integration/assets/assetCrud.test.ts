@@ -134,6 +134,7 @@ describe('Asset CRUD Integration Tests', () => {
   describe('POST /api/assets - Create Asset', () => {
     it('should create a new asset and return 201', async () => {
       const assetData = generateAssetCreateData({
+        userId: testUser.id,
         name: 'test-image.jpg',
         mime: MimeTypes.ImageJpeg,
         sizeBytes: 2048000,
@@ -177,6 +178,7 @@ describe('Asset CRUD Integration Tests', () => {
 
     it('should reject invalid MIME type', async () => {
       const assetData = generateAssetCreateData({
+        userId: testUser.id,
         mime: 'application/exe',
       });
 
@@ -192,6 +194,7 @@ describe('Asset CRUD Integration Tests', () => {
 
     it('should reject file size exceeding limit', async () => {
       const assetData = generateAssetCreateData({
+        userId: testUser.id,
         sizeBytes: 11 * 1024 * 1024,
       });
 

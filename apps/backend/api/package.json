@@ -30,6 +30,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.922.0",
     "@aws-sdk/s3-request-presigner": "^3.922.0",
+    "@google/generative-ai": "^0.24.1",
     "@hunthub/shared": "*",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",

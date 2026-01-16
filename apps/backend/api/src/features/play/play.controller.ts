@@ -12,6 +12,8 @@ export interface IPlayController {
   getStep(req: Request, res: Response): Promise<Response>;
   validateAnswer(req: Request, res: Response): Promise<Response>;
   requestHint(req: Request, res: Response): Promise<Response>;
+  requestUpload(req: Request, res: Response): Promise<Response>;
+  createAsset(req: Request, res: Response): Promise<Response>;
 }
 
 /**
@@ -118,6 +120,35 @@ export class PlayController implements IPlayController {
     const result = await this.playService.requestHint(sessionId);
 
     return res.status(200).json(result);
+  }
+
+  async requestUpload(req: Request, res: Response): Promise<Response> {
+    const { sessionId } = req.params;
+    const { extension } = req.query;
+
+    if (!sessionId || !this.isValidUUID(sessionId)) {
+      throw new ValidationError('Invalid session ID', []);
+    }
+
+    if (!extension || typeof extension !== 'string') {
+      throw new ValidationError('Extension is required', [{ field: 'extension', message: 'Extension is required' }]);
+    }
+
+    const result = await this.playService.requestUpload(sessionId, extension);
+
+    return res.status(200).json(result);
+  }
+
+  async createAsset(req: Request, res: Response): Promise<Response> {
+    const { sessionId } = req.params;
+
+    if (!sessionId || !this.isValidUUID(sessionId)) {
+      throw new ValidationError('Invalid session ID', []);
+    }
+
+    const result = await this.playService.createAsset(sessionId, req.body);
+
+    return res.status(201).json(result);
   }
 
   private isValidUUID(str: string): boolean {

@@ -20,7 +20,8 @@ export const TYPES = {
   AssetUsageTracker: Symbol.for('AssetUsageTracker'),
   AssetValidator: Symbol.for('AssetValidator'),
   PlayService: Symbol.for('PlayService'),
-  AIProvider: Symbol.for('AIProvider'),
+  TextValidationProvider: Symbol.for('TextValidationProvider'),
+  AudioValidationProvider: Symbol.for('AudioValidationProvider'),
   AIValidationService: Symbol.for('AIValidationService'),
 };
 

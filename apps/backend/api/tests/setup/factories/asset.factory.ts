@@ -55,15 +55,17 @@ export const generateAssetCreateData = (
     sizeBytes: number;
     url: string;
     s3Key: string;
+    userId: string;
   }> = {},
 ) => {
+  const userId = options.userId || faker.string.uuid();
+  const s3Key = options.s3Key || `${userId}/${faker.system.fileName({ extensionCount: 1 })}`;
+
   return {
     name: options.name || faker.system.fileName({ extensionCount: 1 }),
     mime: options.mime || MimeTypes.ImageJpeg,
     sizeBytes: options.sizeBytes || faker.number.int({ min: 1000, max: 5000000 }),
-    url:
-      options.url ||
-      `https://d2vf5nl8r3do9r.cloudfront.net/${faker.string.uuid()}.${faker.system.fileExt('image/jpeg')}`,
-    s3Key: options.s3Key || `${faker.string.uuid()}/${faker.system.fileName({ extensionCount: 1 })}`,
+    url: options.url || `https://d2vf5nl8r3do9r.cloudfront.net/${s3Key}`,
+    s3Key,
   };
 };

@@ -20,6 +20,7 @@ interface UploadUrls {
 export interface IStorageService {
   generateUploadUrls(userId: string, extension: string): Promise<UploadUrls>;
   getPublicUrl(s3Key: string): string;
+  validateS3KeyPrefix(s3Key: string, expectedPrefix: string): boolean;
 }
 
 @injectable()
@@ -58,6 +59,10 @@ export class StorageService implements IStorageService {
 
   getPublicUrl = (s3Key: string): string => {
     return `https://${this.cdnDomain}/${s3Key}`;
+  };
+
+  validateS3KeyPrefix = (s3Key: string, expectedPrefix: string): boolean => {
+    return s3Key.startsWith(expectedPrefix);
   };
 
   generateUploadUrls = async (userId: string, extension: string): Promise<UploadUrls> => {

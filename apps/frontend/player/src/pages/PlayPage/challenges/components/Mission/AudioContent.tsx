@@ -5,8 +5,9 @@ import { useAudioRecorder, type Status } from '@/hooks';
 import * as S from './Mission.styles';
 
 interface AudioContentProps {
-  onSubmit: () => void;
+  onSubmit: (blob: Blob, mimeType: string) => void;
   disabled?: boolean;
+  uploadError?: string | null;
 }
 
 const formatDuration = (seconds: number): string => {
@@ -55,8 +56,11 @@ const AudioPreview = ({ audioUrl, duration, onReset }: { audioUrl: string; durat
   </Stack>
 );
 
-export const AudioContent = ({ onSubmit, disabled = false }: AudioContentProps) => {
-  const { status, audioUrl, duration, error, startRecording, stopRecording, reset } = useAudioRecorder();
+export const AudioContent = ({ onSubmit, disabled = false, uploadError }: AudioContentProps) => {
+  const { status, audioUrl, audioBlob, mimeType, duration, error, startRecording, stopRecording, discardRecording } =
+    useAudioRecorder();
+
+  const displayError = error || uploadError;
 
   const views: Record<Status, React.ReactNode> = {
     idle: (
@@ -120,13 +124,13 @@ export const AudioContent = ({ onSubmit, disabled = false }: AudioContentProps) 
     ),
     stopped: (
       <>
-        <AudioPreview audioUrl={audioUrl!} duration={duration} onReset={reset} />
+        <AudioPreview audioUrl={audioUrl!} duration={duration} onReset={discardRecording} />
         <Button
           variant="contained"
           fullWidth
           size="large"
-          onClick={onSubmit}
-          disabled={disabled}
+          onClick={() => audioBlob && mimeType && onSubmit(audioBlob, mimeType)}
+          disabled={disabled || !audioBlob || !mimeType}
           startIcon={<CheckIcon size={20} weight="bold" />}
         >
           Submit Recording
@@ -137,9 +141,9 @@ export const AudioContent = ({ onSubmit, disabled = false }: AudioContentProps) 
 
   return (
     <Stack gap={2}>
-      {error && (
-        <Alert severity="error" onClose={reset}>
-          {error}
+      {displayError && (
+        <Alert severity="error" onClose={discardRecording}>
+          {displayError}
         </Alert>
       )}
       {views[status]}

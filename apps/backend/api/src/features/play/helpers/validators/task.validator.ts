@@ -26,12 +26,20 @@ export const TaskValidator: IAnswerValidator = {
       };
     }
 
-    const aiService = container.get<IAIValidationService>(TYPES.AIValidationService);
-    const result = await aiService.validateTaskResponse(response, task.instructions, task.aiInstructions);
+    try {
+      const aiService = container.get<IAIValidationService>(TYPES.AIValidationService);
+      const result = await aiService.validateTaskResponse(response, task.instructions, task.aiInstructions);
 
-    return {
-      isCorrect: result.isCorrect,
-      feedback: result.feedback,
-    };
+      return {
+        isCorrect: result.isCorrect,
+        feedback: result.feedback,
+      };
+    } catch (error) {
+      console.error('[TaskValidator] AI validation failed:', error instanceof Error ? error.message : 'Unknown error');
+      return {
+        isCorrect: false,
+        feedback: 'Unable to validate your response. Please try again.',
+      };
+    }
   },
 };

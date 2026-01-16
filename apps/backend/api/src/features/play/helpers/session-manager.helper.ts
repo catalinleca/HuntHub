@@ -173,6 +173,7 @@ export class SessionManager {
     content: unknown,
     isCorrect: boolean,
     feedback?: string,
+    metadata?: Record<string, unknown>,
     session?: ClientSession,
   ): Promise<void> {
     const submission = {
@@ -180,6 +181,7 @@ export class SessionManager {
       content,
       isCorrect,
       feedback,
+      metadata,
     };
 
     const result = await ProgressModel.updateOne(

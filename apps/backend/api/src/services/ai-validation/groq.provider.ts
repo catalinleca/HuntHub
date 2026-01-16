@@ -1,13 +1,11 @@
 import Groq from 'groq-sdk';
 import { injectable } from 'inversify';
 import { groqApiKey } from '@/config/env.config';
-import type { IAIProvider, TextValidationParams, AIProviderResponse } from './openai.provider';
-
-const MAX_RESPONSE_CHARS = 500;
-const MAX_INSTRUCTIONS_CHARS = 2000;
+import type { ITextValidationProvider, TextValidationParams, ValidationResponse } from './interfaces';
+import { MAX_RESPONSE_CHARS, MAX_INSTRUCTIONS_CHARS, buildTextPrompt } from './validation.constants';
 
 @injectable()
-export class GroqProvider implements IAIProvider {
+export class GroqProvider implements ITextValidationProvider {
   readonly name = 'groq';
   private client: Groq;
 
@@ -15,12 +13,10 @@ export class GroqProvider implements IAIProvider {
     if (!groqApiKey) {
       console.warn('[GroqProvider] GROQ_API_KEY not set - AI validation will use fallback');
     }
-    this.client = new Groq({
-      apiKey: groqApiKey,
-    });
+    this.client = new Groq({ apiKey: groqApiKey });
   }
 
-  async validateText(params: TextValidationParams): Promise<AIProviderResponse> {
+  async validateText(params: TextValidationParams): Promise<ValidationResponse> {
     const { userResponse, instructions, aiInstructions } = params;
 
     if (userResponse.length > MAX_RESPONSE_CHARS) {
@@ -37,23 +33,13 @@ export class GroqProvider implements IAIProvider {
       console.warn('[GroqProvider] Instructions truncated to', MAX_INSTRUCTIONS_CHARS, 'chars');
     }
 
-    const validationCriteria = safeAiInstructions || safeInstructions;
-
-    const systemPrompt = `You are a treasure hunt validation assistant.
-Your job is to determine if a player's text response meets the specified criteria.
-Respond with a JSON object: { "isValid": boolean, "confidence": number (0-1), "feedback": string }
-Be encouraging but accurate. The feedback should be 1-2 sentences.`;
-
-    const userPrompt = `Task: ${safeInstructions}\n\nValidation criteria: ${validationCriteria}\n\nPlayer's response: "${userResponse}"\n\nDoes this response meet the criteria?`;
+    const criteria = safeAiInstructions || safeInstructions;
+    const prompt = buildTextPrompt(safeInstructions, criteria, userResponse);
 
     const response = await this.client.chat.completions.create({
       model: 'llama-3.3-70b-versatile',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
+      messages: [{ role: 'user', content: prompt }],
       response_format: { type: 'json_object' },
-      max_tokens: 300,
       temperature: 0.3,
     });
 
@@ -65,7 +51,8 @@ Be encouraging but accurate. The feedback should be 1-2 sentences.`;
 
     let result;
     try {
-      result = JSON.parse(content);
+      const cleaned = content.replace(/```json\n?|\n?```/g, '').trim();
+      result = JSON.parse(cleaned);
     } catch {
       throw new Error('Invalid JSON response from Groq');
     }
