@@ -34,7 +34,7 @@ export const useSessionLayer = (huntId: number) => {
 
   const abandonSession = useCallback(() => {
     sessionStorage.clear(huntId);
-    queryClient.removeQueries({ queryKey: playKeys.all });
+    queryClient.removeQueries({ queryKey: playKeys.all, exact: false });
     window.location.reload();
   }, [huntId, queryClient]);
 
