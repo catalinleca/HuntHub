@@ -13,10 +13,6 @@ export interface AIValidationResult {
 
 interface AIValidationConfig {
   timeoutMs: number;
-  confidenceThresholds: {
-    high: number;
-    low: number;
-  };
 }
 
 export interface IAIValidationService {
@@ -36,10 +32,6 @@ export class AIValidationService implements IAIValidationService {
   constructor(@inject(TYPES.AIProvider) private provider: IAIProvider) {
     this.config = {
       timeoutMs: parseInt(process.env.AI_VALIDATION_TIMEOUT_MS || '15000', 10),
-      confidenceThresholds: {
-        high: parseFloat(process.env.AI_CONFIDENCE_THRESHOLD_HIGH || '0.80'),
-        low: parseFloat(process.env.AI_CONFIDENCE_THRESHOLD_LOW || '0.40'),
-      },
     };
   }
 
