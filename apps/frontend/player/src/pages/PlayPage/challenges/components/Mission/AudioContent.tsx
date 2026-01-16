@@ -129,8 +129,8 @@ export const AudioContent = ({ onSubmit, disabled = false, uploadError }: AudioC
           variant="contained"
           fullWidth
           size="large"
-          onClick={() => onSubmit(audioBlob!, mimeType!)}
-          disabled={disabled}
+          onClick={() => audioBlob && mimeType && onSubmit(audioBlob, mimeType)}
+          disabled={disabled || !audioBlob || !mimeType}
           startIcon={<CheckIcon size={20} weight="bold" />}
         >
           Submit Recording

@@ -25,6 +25,7 @@ export const EXTENSION_TO_MIME: Record<string, MimeTypes> = {
   gif: MimeTypes.ImageGif,
   mp4: MimeTypes.VideoMp4,
   webm: MimeTypes.VideoWebm,
+  weba: MimeTypes.AudioWebm,
   mp3: MimeTypes.AudioMpeg,
   wav: MimeTypes.AudioWav,
   ogg: MimeTypes.AudioOgg,
