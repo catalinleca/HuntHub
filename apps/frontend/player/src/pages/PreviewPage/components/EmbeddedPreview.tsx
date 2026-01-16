@@ -23,7 +23,6 @@ export const EmbeddedPreview = () => {
 
       switch (message.type) {
         case EDITOR_MESSAGES.RENDER_HUNT: {
-          // Pass full PreviewData { hunt, steps } to setHunt
           coreRef.current.setHunt({ hunt: message.hunt, steps: message.steps });
           break;
         }

@@ -52,10 +52,6 @@ export const usePreviewCore = () => {
     });
   }, []);
 
-  /**
-   * Set hunt data from Editor via SDK
-   * Receives sanitized PreviewData { hunt: HuntMetaPF, steps: StepPF[] }
-   */
   const setHunt = useCallback((data: PreviewData) => {
     setState((prev) => {
       const preservedStepIndex = clampStepIndex(data.steps, prev.stepIndex);

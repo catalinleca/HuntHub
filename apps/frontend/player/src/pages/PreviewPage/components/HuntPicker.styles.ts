@@ -1,6 +1,5 @@
 import { styled, Box, Stack } from '@mui/material';
 
-// Phone dimensions (same as Editor preview)
 const PHONE_WIDTH = 320;
 const PHONE_HEIGHT = 580;
 

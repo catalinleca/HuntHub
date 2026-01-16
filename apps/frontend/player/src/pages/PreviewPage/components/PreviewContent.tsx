@@ -73,7 +73,6 @@ export const PreviewContent = ({
     );
   }
 
-  // Data is already sanitized by PlayerExporter (no need for stripAnswers)
   return (
     <S.Container>
       {showToolbar && (
