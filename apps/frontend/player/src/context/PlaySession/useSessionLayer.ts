@@ -18,16 +18,19 @@ export const useSessionLayer = (huntId: number) => {
     error: sessionQuery.error,
   });
 
-  const startSession = (playerName: string, email?: string) => {
-    startMutation.mutate(
-      { playerName, email },
-      {
-        onSuccess: (data) => {
-          sessionStorage.set(huntId, data.sessionId);
+  const startSession = useCallback(
+    (playerName: string, email?: string) => {
+      startMutation.mutate(
+        { playerName, email },
+        {
+          onSuccess: (data) => {
+            sessionStorage.set(huntId, data.sessionId);
+          },
         },
-      },
-    );
-  };
+      );
+    },
+    [huntId, startMutation],
+  );
 
   const abandonSession = useCallback(() => {
     sessionStorage.clear(huntId);
