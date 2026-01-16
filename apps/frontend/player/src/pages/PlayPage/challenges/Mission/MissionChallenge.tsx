@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { MissionType, AnswerType } from '@hunthub/shared';
 import type { MissionPF } from '@hunthub/shared';
 import { MISSION_BADGES } from '@/constants';
-import { useUploadAudio } from '@/hooks';
+import { useUploadAudio, useUploadPhoto } from '@/hooks';
 import { usePlaySession } from '@/context';
 import { ChallengeCard } from '../components';
 import { LocationContent, PhotoContent, AudioContent } from '../components/Mission';
@@ -20,7 +20,8 @@ export const MissionChallenge = ({
   hasHint,
 }: ChallengeProps<MissionPF>) => {
   const { sessionId } = usePlaySession();
-  const { upload: uploadAudio, isUploading, error: uploadError } = useUploadAudio();
+  const { upload: uploadAudio, isUploading: isUploadingAudio, error: uploadAudioError } = useUploadAudio();
+  const { upload: uploadPhoto, isUploading: isUploadingPhoto, error: uploadPhotoError } = useUploadPhoto();
 
   const handleLocationSubmit = useCallback(
     (position: { lat: number; lng: number }) => {
@@ -29,9 +30,19 @@ export const MissionChallenge = ({
     [onValidate],
   );
 
-  const handlePhotoSubmit = useCallback(() => {
-    onValidate(AnswerType.MissionMedia, { missionMedia: { assetId: 1 } });
-  }, [onValidate]);
+  const handlePhotoSubmit = useCallback(
+    async (file: File) => {
+      if (!sessionId) {
+        return;
+      }
+
+      const assetId = await uploadPhoto(sessionId, file);
+      if (assetId !== -1) {
+        onValidate(AnswerType.MissionMedia, { missionMedia: { assetId } });
+      }
+    },
+    [sessionId, uploadPhoto, onValidate],
+  );
 
   const handleAudioSubmit = useCallback(
     async (blob: Blob, mimeType: string) => {
@@ -47,13 +58,15 @@ export const MissionChallenge = ({
     [sessionId, uploadAudio, onValidate],
   );
 
-  const isDisabled = isValidating || isUploading;
+  const isDisabled = isValidating || isUploadingAudio || isUploadingPhoto;
 
   const contents: Record<MissionType, React.ReactNode> = {
     [MissionType.MatchLocation]: <LocationContent onSubmit={handleLocationSubmit} disabled={isDisabled} />,
-    [MissionType.UploadMedia]: <PhotoContent onSubmit={handlePhotoSubmit} disabled={isDisabled} />,
+    [MissionType.UploadMedia]: (
+      <PhotoContent onSubmit={handlePhotoSubmit} disabled={isDisabled} uploadError={uploadPhotoError} />
+    ),
     [MissionType.UploadAudio]: (
-      <AudioContent onSubmit={handleAudioSubmit} disabled={isDisabled} uploadError={uploadError} />
+      <AudioContent onSubmit={handleAudioSubmit} disabled={isDisabled} uploadError={uploadAudioError} />
     ),
   };
 

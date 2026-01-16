@@ -22,7 +22,12 @@ import { HuntShareService, IHuntShareService } from '@/features/sharing/hunt-sha
 import { PlayController, IPlayController } from '@/features/play/play.controller';
 import { PlayService, IPlayService } from '@/features/play/play.service';
 import { GroqProvider, GeminiProvider, AIValidationService } from '@/services/ai-validation';
-import type { ITextValidationProvider, IAudioValidationProvider, IAIValidationService } from '@/services/ai-validation';
+import type {
+  ITextValidationProvider,
+  IAudioValidationProvider,
+  IImageValidationProvider,
+  IAIValidationService,
+} from '@/services/ai-validation';
 
 const container = new Container();
 
@@ -50,6 +55,7 @@ container.bind<IPlayService>(TYPES.PlayService).to(PlayService);
 
 container.bind<ITextValidationProvider>(TYPES.TextValidationProvider).to(GroqProvider).inSingletonScope();
 container.bind<IAudioValidationProvider>(TYPES.AudioValidationProvider).to(GeminiProvider).inSingletonScope();
+container.bind<IImageValidationProvider>(TYPES.ImageValidationProvider).to(GeminiProvider).inSingletonScope();
 container.bind<IAIValidationService>(TYPES.AIValidationService).to(AIValidationService);
 
 export { container };
