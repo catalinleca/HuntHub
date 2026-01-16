@@ -39,8 +39,6 @@ export const PhotoContent = ({ onSubmit, disabled = false, uploadError }: PhotoC
 
   const openCamera = () => inputRef.current?.click();
 
-  const displayError = error || uploadError;
-
   const handleSubmit = () => {
     if (file) {
       onSubmit(file);
@@ -49,11 +47,13 @@ export const PhotoContent = ({ onSubmit, disabled = false, uploadError }: PhotoC
 
   return (
     <Stack gap={2}>
-      {displayError && (
+      {error && (
         <Alert severity="error" onClose={reset}>
-          {displayError}
+          {error}
         </Alert>
       )}
+
+      {uploadError && !error && <Alert severity="error">{uploadError}</Alert>}
 
       {hasPhoto ? <PhotoPreview src={preview!} onRetake={reset} /> : <CapturePrompt onClick={openCamera} />}
 
