@@ -1173,10 +1173,14 @@ components:
           type: integer
           nullable: true
           description: Maximum attempts allowed (for display - server enforces)
+        hasHint:
+          type: boolean
+          description: Whether this step has a hint available
       required:
         - stepId
         - type
         - challenge
+        - hasHint
       additionalProperties: false
 
     HuntMetaPF:
@@ -1359,16 +1363,6 @@ components:
       required:
         - correct
         - attempts
-      additionalProperties: false
-
-    HintRequest:
-      type: object
-      description: Request for a hint
-      properties:
-        stepIndex:
-          type: integer
-      required:
-        - stepIndex
       additionalProperties: false
 
     HintResponse:

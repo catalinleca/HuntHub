@@ -351,6 +351,7 @@ export const StepPF = z
     media: Media.optional(),
     timeLimit: z.number().int().nullish(),
     maxAttempts: z.number().int().nullish(),
+    hasHint: z.boolean(),
   })
   .strict();
 export const HuntMetaPF = z
@@ -397,7 +398,6 @@ export const ValidateAnswerResponse = z
     exhausted: z.boolean().optional(),
   })
   .strict();
-export const HintRequest = z.object({ stepIndex: z.number().int() }).strict();
 export const HintResponse = z
   .object({ hint: z.string(), hintsUsed: z.number().int(), maxHints: z.number().int() })
   .strict();
@@ -523,7 +523,6 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   StartSessionRequest,
   ValidateAnswerRequest,
   ValidateAnswerResponse,
-  HintRequest,
   HintResponse,
   HateoasLink,
   StepLinks,

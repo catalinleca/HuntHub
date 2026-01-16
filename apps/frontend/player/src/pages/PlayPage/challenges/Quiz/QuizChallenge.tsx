@@ -16,6 +16,7 @@ export const QuizChallenge = ({
   media,
   timeLimit,
   maxAttempts,
+  hasHint,
 }: ChallengeProps<QuizPF>) => {
   const [selectedOptionId, setSelectedOptionId] = useState('');
   const [inputAnswer, setInputAnswer] = useState('');
@@ -45,7 +46,7 @@ export const QuizChallenge = ({
       feedback={feedback}
       onTimeExpire={handleSubmit}
       onMaxAttempts={handleSubmit}
-      showHint
+      showHint={hasHint}
       footer={
         <ActionButton
           onClick={handleSubmit}

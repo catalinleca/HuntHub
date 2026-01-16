@@ -28,6 +28,7 @@ export const StepRenderer = ({ step, isLastStep }: StepRendererProps) => {
     media: step.media,
     timeLimit: step.timeLimit,
     maxAttempts: step.maxAttempts,
+    hasHint: step.hasHint,
   };
 
   const renderChallenge = CHALLENGES[step.type];

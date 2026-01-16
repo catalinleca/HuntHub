@@ -15,6 +15,7 @@ export const MissionChallenge = ({
   media,
   timeLimit,
   maxAttempts,
+  hasHint,
 }: ChallengeProps<MissionPF>) => {
   const handleLocationSubmit = useCallback(
     (position: { lat: number; lng: number }) => {
@@ -55,7 +56,7 @@ export const MissionChallenge = ({
       maxAttempts={maxAttempts}
       currentAttempts={currentAttempts}
       feedback={feedback}
-      showHint
+      showHint={hasHint}
       footer={<></>}
     >
       {contents[challenge.type]}
