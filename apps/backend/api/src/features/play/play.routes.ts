@@ -3,7 +3,7 @@ import { TYPES } from '@/shared/types';
 import { container } from '@/config/inversify';
 import { IPlayController } from './play.controller';
 import { validateRequest, validateQuery, optionalAuthMiddleware } from '@/shared/middlewares';
-import { startSessionSchema, validateAnswerSchema, hintRequestSchema, discoverQuerySchema } from './play.validation';
+import { startSessionSchema, validateAnswerSchema, discoverQuerySchema } from './play.validation';
 
 const router = Router();
 const controller = container.get<IPlayController>(TYPES.PlayController);
@@ -39,7 +39,7 @@ router.post('/sessions/:sessionId/validate', validateRequest(validateAnswerSchem
   controller.validateAnswer(req, res).catch(next);
 });
 
-router.post('/sessions/:sessionId/hint', validateRequest(hintRequestSchema), (req, res, next) => {
+router.post('/sessions/:sessionId/hint', (req, res, next) => {
   controller.requestHint(req, res).catch(next);
 });
 

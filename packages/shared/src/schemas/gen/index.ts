@@ -398,7 +398,6 @@ export const ValidateAnswerResponse = z
     exhausted: z.boolean().optional(),
   })
   .strict();
-export const HintRequest = z.object({}).partial().strict();
 export const HintResponse = z
   .object({ hint: z.string(), hintsUsed: z.number().int(), maxHints: z.number().int() })
   .strict();
@@ -524,7 +523,6 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   StartSessionRequest,
   ValidateAnswerRequest,
   ValidateAnswerResponse,
-  HintRequest,
   HintResponse,
   HateoasLink,
   StepLinks,

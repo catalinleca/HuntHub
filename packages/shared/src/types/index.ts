@@ -910,9 +910,6 @@ export interface ValidateAnswerResponse {
   exhausted?: boolean;
 }
 
-/** Request for a hint (session tracks current step) */
-export type HintRequest = object;
-
 /** Response with hint data */
 export interface HintResponse {
   hint: string;

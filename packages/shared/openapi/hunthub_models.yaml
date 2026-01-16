@@ -1365,12 +1365,6 @@ components:
         - attempts
       additionalProperties: false
 
-    HintRequest:
-      type: object
-      description: Request for a hint (session tracks current step)
-      properties: {}
-      additionalProperties: false
-
     HintResponse:
       type: object
       description: Response with hint data

@@ -88,7 +88,6 @@ export {
   // Play Session (Player API)
   StartSessionRequest,
   SessionResponse,
-  HintRequest,
   HintResponse,
 
   // Pagination
