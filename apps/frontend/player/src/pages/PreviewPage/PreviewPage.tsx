@@ -3,7 +3,14 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { EmbeddedPreview } from './components/EmbeddedPreview';
 import { HuntPicker } from './components/HuntPicker';
 
-const isInIframe = () => window.parent !== window;
+const isInIframe = (): boolean => {
+  try {
+    return typeof window !== 'undefined' && window.parent !== window;
+  } catch {
+    // Cross-origin iframe access throws - means we're in an iframe
+    return true;
+  }
+};
 
 export const PreviewPage = () => {
   const [searchParams] = useSearchParams();

@@ -1,5 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { ValidateAnswerResponse, AnswerType, AnswerPayload, SessionResponse } from '@hunthub/shared';
+import {
+  HuntProgressStatus,
+  type ValidateAnswerResponse,
+  type AnswerType,
+  type AnswerPayload,
+  type SessionResponse,
+} from '@hunthub/shared';
 import { httpClient } from '@/services/http-client';
 import { playKeys } from './keys';
 
@@ -40,7 +46,7 @@ export const useValidateAnswer = () => {
           if (data.isComplete) {
             return {
               ...old,
-              status: 'completed',
+              status: HuntProgressStatus.Completed,
               currentStepIndex: old.currentStepIndex + 1,
               currentStepId: null,
             };

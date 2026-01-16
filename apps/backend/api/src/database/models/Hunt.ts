@@ -46,6 +46,7 @@ huntSchema.index({ huntId: 1 }, { unique: true });
 huntSchema.index({ creatorId: 1 });
 huntSchema.index({ liveVersion: 1 });
 huntSchema.index({ creatorId: 1, isDeleted: 1 }); // For user's active hunts
+huntSchema.index({ liveVersion: 1, isDeleted: 1, createdAt: -1 }); // For discover hunts query
 
 interface IHuntModel extends Model<IHunt> {
   findUserHunts(userId: string): Promise<HydratedDocument<IHunt>[]>;
