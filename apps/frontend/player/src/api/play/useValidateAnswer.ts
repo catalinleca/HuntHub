@@ -1,7 +1,19 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { ValidateAnswerResponse, AnswerType, AnswerPayload, SessionResponse } from '@hunthub/shared';
+import { httpClient } from '@/services/http-client';
 import { playKeys } from './keys';
-import { validateAnswer } from './api';
+
+const validateAnswer = async (
+  sessionId: string,
+  answerType: AnswerType,
+  payload: AnswerPayload,
+): Promise<ValidateAnswerResponse> => {
+  const { data } = await httpClient.post<ValidateAnswerResponse>(`/play/sessions/${sessionId}/validate`, {
+    answerType,
+    payload,
+  });
+  return data;
+};
 
 interface ValidateParams {
   sessionId: string;

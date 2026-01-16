@@ -28,7 +28,6 @@ const PreviewIframe = ({ hunt, selectedStepIndex }: PreviewIframeProps) => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const sdkRef = useRef<PlayerSDK | null>(null);
 
-  // Sanitize hunt data - strip answers before sending to Player
   const previewData: PreviewData = useMemo(() => {
     return {
       hunt: PlayerExporter.hunt(hunt.huntId, {

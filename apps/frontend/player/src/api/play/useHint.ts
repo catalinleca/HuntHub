@@ -1,6 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import type { HintResponse } from '@hunthub/shared';
-import { requestHint } from './api';
+import { httpClient } from '@/services/http-client';
+
+const requestHint = async (sessionId: string): Promise<HintResponse> => {
+  const { data } = await httpClient.post<HintResponse>(`/play/sessions/${sessionId}/hint`);
+  return data;
+};
 
 interface HintParams {
   sessionId: string;

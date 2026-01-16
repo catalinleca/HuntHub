@@ -59,11 +59,9 @@ export class PlayService implements IPlayService {
       return { hunts: [], total };
     }
 
-    // Batch fetch all versions in a single query (avoid N+1)
     const versionQueries = hunts.map((h) => ({ huntId: h.huntId, version: h.liveVersion, isPublished: true }));
     const versions = await HuntVersionModel.find({ $or: versionQueries }).lean();
 
-    // Create lookup map for O(1) access
     const versionMap = new Map(versions.map((v) => [`${v.huntId}-${v.version}`, v]));
 
     const sanitizedHunts = hunts.map((hunt) => {

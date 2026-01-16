@@ -1,6 +1,12 @@
 import { useQuery, skipToken } from '@tanstack/react-query';
+import type { StepResponse } from '@hunthub/shared';
+import { httpClient } from '@/services/http-client';
 import { playKeys, SKIP_KEY } from './keys';
-import { getStep } from './api';
+
+const getStep = async (sessionId: string, stepId: number): Promise<StepResponse> => {
+  const { data } = await httpClient.get<StepResponse>(`/play/sessions/${sessionId}/step/${stepId}`);
+  return data;
+};
 
 /**
  * Fetch a specific step by ID.

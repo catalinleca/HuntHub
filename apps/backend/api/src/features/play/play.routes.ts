@@ -8,10 +8,20 @@ import { startSessionSchema, validateAnswerSchema, hintRequestSchema, discoverQu
 const router = Router();
 const controller = container.get<IPlayController>(TYPES.PlayController);
 
-// Public discovery endpoint - no auth needed
-router.get('/discover', validateQuery(discoverQuerySchema), (req, res, next) => {
-  controller.discoverHunts(req, res).catch(next);
-});
+// Discovery endpoint - development only
+router.get(
+  '/discover',
+  (req, res, next) => {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(404).json({ error: 'Not found' });
+    }
+    next();
+  },
+  validateQuery(discoverQuerySchema),
+  (req, res, next) => {
+    controller.discoverHunts(req, res).catch(next);
+  },
+);
 
 router.post('/:huntId/start', optionalAuthMiddleware, validateRequest(startSessionSchema), (req, res, next) => {
   controller.startSession(req, res).catch(next);
