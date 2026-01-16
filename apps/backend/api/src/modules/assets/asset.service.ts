@@ -55,6 +55,10 @@ export class AssetService implements IAssetService {
   }
 
   async createAsset(userId: string, assetCreate: AssetCreate): Promise<AssetDTO> {
+    if (!this.storageService.validateS3KeyPrefix(assetCreate.s3Key, `${userId}/`)) {
+      throw new ValidationError('Invalid s3Key for this user', []);
+    }
+
     if (!isAllowedMimeType(assetCreate.mime)) {
       throw new ValidationError(`MIME type '${assetCreate.mime}' not allowed`, []);
     }
@@ -63,7 +67,8 @@ export class AssetService implements IAssetService {
       throw new ValidationError(`File size exceeds ${this.maxSizeBytes} bytes`, []);
     }
 
-    const assetData = AssetMapper.toDocument(assetCreate, userId);
+    const url = this.storageService.getPublicUrl(assetCreate.s3Key);
+    const assetData = AssetMapper.toDocument({ ...assetCreate, url }, userId);
     const asset = await AssetModel.create(assetData);
 
     return AssetMapper.fromDocument(asset);

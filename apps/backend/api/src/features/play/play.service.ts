@@ -366,6 +366,10 @@ export class PlayService implements IPlayService {
   async createAsset(sessionId: string, assetData: AssetCreate): Promise<AssetDTO> {
     const progress = await SessionManager.requireSession(sessionId);
 
+    if (!this.storageService.validateS3KeyPrefix(assetData.s3Key, `sessions/${sessionId}/`)) {
+      throw new ValidationError('Invalid s3Key for this session', []);
+    }
+
     if (!isAllowedMimeType(assetData.mime)) {
       throw new ValidationError(`MIME type '${assetData.mime}' not allowed`, []);
     }
@@ -374,9 +378,11 @@ export class PlayService implements IPlayService {
       throw new ValidationError(`File size exceeds ${MAX_SIZE_BYTES} bytes`, []);
     }
 
+    const url = this.storageService.getPublicUrl(assetData.s3Key);
+
     const asset = await AssetModel.create({
       ownerId: progress.userId ? new Types.ObjectId(progress.userId) : SYSTEM_USER_ID,
-      url: assetData.url,
+      url,
       mimeType: getBaseMimeType(assetData.mime),
       originalFilename: assetData.name,
       size: assetData.sizeBytes,
