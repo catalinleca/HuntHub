@@ -3,6 +3,7 @@ import { MissionType, AnswerType } from '@hunthub/shared';
 import type { MissionPF } from '@hunthub/shared';
 import { MISSION_BADGES } from '@/constants';
 import { useUploadAudio } from '@/hooks';
+import { usePlaySession } from '@/context';
 import { ChallengeCard } from '../components';
 import { LocationContent, PhotoContent, AudioContent } from '../components/Mission';
 import type { ChallengeProps } from '@/types';
@@ -18,6 +19,7 @@ export const MissionChallenge = ({
   maxAttempts,
   hasHint,
 }: ChallengeProps<MissionPF>) => {
+  const { sessionId } = usePlaySession();
   const { upload: uploadAudio, isUploading } = useUploadAudio();
 
   const handleLocationSubmit = useCallback(
@@ -33,10 +35,11 @@ export const MissionChallenge = ({
 
   const handleAudioSubmit = useCallback(
     async (blob: Blob, mimeType: string) => {
-      const assetId = await uploadAudio(blob, mimeType);
+      if (!sessionId) return;
+      const assetId = await uploadAudio(sessionId, blob, mimeType);
       onValidate(AnswerType.MissionMedia, { missionMedia: { assetId } });
     },
-    [uploadAudio, onValidate],
+    [sessionId, uploadAudio, onValidate],
   );
 
   const isDisabled = isValidating || isUploading;

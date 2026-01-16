@@ -43,4 +43,12 @@ router.post('/sessions/:sessionId/hint', (req, res, next) => {
   controller.requestHint(req, res).catch(next);
 });
 
+router.post('/sessions/:sessionId/upload', (req, res, next) => {
+  controller.requestUpload(req, res).catch(next);
+});
+
+router.post('/sessions/:sessionId/assets', (req, res, next) => {
+  controller.createAsset(req, res).catch(next);
+});
+
 export default router;

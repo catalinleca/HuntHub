@@ -6,7 +6,7 @@ import { ConflictError } from '@/shared/errors/ConflictError';
 import { MimeTypes } from '@/database/types';
 import { AssetCreate, AssetDTO, AssetMapper } from '@/shared/mappers/asset.mapper';
 import { AssetModel } from '@/database/models';
-import { ALLOWED_EXTENSIONS, ALLOWED_MIME_TYPES } from '@/shared/utils/mimeTypes';
+import { ALLOWED_EXTENSIONS, isAllowedMimeType } from '@/shared/utils/mimeTypes';
 import { TYPES } from '@/shared/types';
 import {
   PaginationParams,
@@ -55,7 +55,7 @@ export class AssetService implements IAssetService {
   }
 
   async createAsset(userId: string, assetCreate: AssetCreate): Promise<AssetDTO> {
-    if (!ALLOWED_MIME_TYPES.includes(assetCreate.mime as MimeTypes)) {
+    if (!isAllowedMimeType(assetCreate.mime)) {
       throw new ValidationError(`MIME type '${assetCreate.mime}' not allowed`, []);
     }
 

@@ -1,4 +1,4 @@
-import { injectable } from 'inversify';
+import { injectable, inject } from 'inversify';
 import { HydratedDocument } from 'mongoose';
 import {
   SessionResponse,
@@ -9,9 +9,12 @@ import {
   PlayerExporter,
   HuntProgressStatus,
   Step,
+  AssetCreate,
+  Asset,
 } from '@hunthub/shared';
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
+import AssetModel from '@/database/models/Asset';
 import { IHunt } from '@/database/types/Hunt';
 import { IHuntVersion } from '@/database/types/HuntVersion';
 import { IStep } from '@/database/types/Step';
@@ -19,9 +22,15 @@ import { IStepProgress } from '@/database/types/Progress';
 import { NotFoundError, ForbiddenError, ConflictError, ValidationError } from '@/shared/errors';
 import { withTransaction } from '@/shared/utils/transaction';
 import { isDev } from '@/config/env.config';
+import { TYPES } from '@/shared/types';
+import { IStorageService } from '@/services/storage/storage.service';
+import { ALLOWED_EXTENSIONS, isAllowedMimeType } from '@/shared/utils/mimeTypes';
+import { AssetMapper, AssetDTO } from '@/shared/mappers/asset.mapper';
 import { SessionManager } from './helpers/session-manager.helper';
 import { StepNavigator } from './helpers/step-navigator.helper';
 import { AnswerValidator } from './helpers/answer-validator.helper';
+
+const MAX_SIZE_BYTES = 10 * 1024 * 1024;
 
 export interface DiscoverHuntsResponse {
   hunts: Array<{
@@ -33,6 +42,12 @@ export interface DiscoverHuntsResponse {
   total: number;
 }
 
+export interface UploadUrlResponse {
+  signedUrl: string;
+  publicUrl: string;
+  s3Key: string;
+}
+
 export interface IPlayService {
   discoverHunts(page: number, limit: number): Promise<DiscoverHuntsResponse>;
   startSession(huntId: number, playerName: string, userId?: string): Promise<SessionResponse>;
@@ -40,10 +55,17 @@ export interface IPlayService {
   getStep(sessionId: string, stepId: number): Promise<StepResponse>;
   validateAnswer(sessionId: string, request: ValidateAnswerRequest): Promise<ValidateAnswerResponse>;
   requestHint(sessionId: string): Promise<HintResponse>;
+  requestUpload(sessionId: string, extension: string): Promise<UploadUrlResponse>;
+  createAsset(sessionId: string, assetData: AssetCreate): Promise<AssetDTO>;
 }
 
 @injectable()
 export class PlayService implements IPlayService {
+  constructor(
+    @inject(TYPES.StorageService)
+    private storageService: IStorageService,
+  ) {}
+
   async discoverHunts(page: number, limit: number): Promise<DiscoverHuntsResponse> {
     const skip = (page - 1) * limit;
 
@@ -308,5 +330,43 @@ export class PlayService implements IPlayService {
         validate: { href: `/api/play/sessions/${sessionId}/validate` },
       },
     };
+  }
+
+  async requestUpload(sessionId: string, extension: string): Promise<UploadUrlResponse> {
+    await SessionManager.requireSession(sessionId);
+
+    if (!ALLOWED_EXTENSIONS.includes(extension.toLowerCase())) {
+      throw new ValidationError(`Extension '${extension}' not allowed`, []);
+    }
+
+    const { signedUrl, publicUrl, s3Key } = await this.storageService.generateUploadUrls(
+      `sessions/${sessionId}`,
+      extension,
+    );
+
+    return { signedUrl, publicUrl, s3Key };
+  }
+
+  async createAsset(sessionId: string, assetData: AssetCreate): Promise<AssetDTO> {
+    const progress = await SessionManager.requireSession(sessionId);
+
+    if (!isAllowedMimeType(assetData.mime)) {
+      throw new ValidationError(`MIME type '${assetData.mime}' not allowed`, []);
+    }
+
+    if (assetData.sizeBytes > MAX_SIZE_BYTES) {
+      throw new ValidationError(`File size exceeds ${MAX_SIZE_BYTES} bytes`, []);
+    }
+
+    const asset = await AssetModel.create({
+      ownerId: progress.userId || null,
+      url: assetData.url,
+      mimeType: assetData.mime,
+      originalFilename: assetData.name,
+      size: assetData.sizeBytes,
+      storageLocation: { path: assetData.s3Key },
+    });
+
+    return AssetMapper.fromDocument(asset);
   }
 }

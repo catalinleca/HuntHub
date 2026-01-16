@@ -7,7 +7,7 @@ import { requestUpload, uploadToS3 } from '@/api/asset';
 type UploadStatus = 'idle' | 'uploading' | 'success' | 'error';
 
 interface UseUploadAudioReturn {
-  upload: (blob: Blob, mimeType: string) => Promise<number>;
+  upload: (sessionId: string, blob: Blob, mimeType: string) => Promise<number>;
   status: UploadStatus;
   isUploading: boolean;
   error: string | null;
@@ -17,18 +17,18 @@ export const useUploadAudio = (): UseUploadAudioReturn => {
   const [status, setStatus] = useState<UploadStatus>('idle');
   const [error, setError] = useState<string | null>(null);
 
-  const upload = useCallback(async (blob: Blob, mimeType: string): Promise<number> => {
+  const upload = useCallback(async (sessionId: string, blob: Blob, mimeType: string): Promise<number> => {
     setStatus('uploading');
     setError(null);
 
     try {
       const extension = getExtensionFromMimeType(mimeType);
-      const { signedUrl, publicUrl, s3Key } = await requestUpload(extension);
+      const { signedUrl, publicUrl, s3Key } = await requestUpload(sessionId, extension);
 
       const file = new File([blob], `recording.${extension}`, { type: mimeType });
       await uploadToS3(signedUrl, file);
 
-      const { data: asset } = await httpClient.post<Asset>('/assets', {
+      const { data: asset } = await httpClient.post<Asset>(`/play/sessions/${sessionId}/assets`, {
         name: `recording.${extension}`,
         mime: mimeType,
         sizeBytes: blob.size,

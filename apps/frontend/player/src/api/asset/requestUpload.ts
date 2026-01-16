@@ -6,8 +6,8 @@ export interface UploadUrlResponse {
   s3Key: string;
 }
 
-export const requestUpload = async (extension: string): Promise<UploadUrlResponse> => {
-  const { data } = await httpClient.post<UploadUrlResponse>('/assets/request-upload', undefined, {
+export const requestUpload = async (sessionId: string, extension: string): Promise<UploadUrlResponse> => {
+  const { data } = await httpClient.post<UploadUrlResponse>(`/play/sessions/${sessionId}/upload`, undefined, {
     params: { extension },
   });
   return data;
