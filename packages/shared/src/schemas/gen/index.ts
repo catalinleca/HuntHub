@@ -365,12 +365,12 @@ export const HuntMetaPF = z
 export const AnswerType = z.enum(['clue', 'quiz-choice', 'quiz-input', 'mission-location', 'mission-media', 'task']);
 export const ClueAnswerPayload = z.object({}).partial().strict();
 export const QuizChoicePayload = z.object({ optionId: z.string().min(1) }).strict();
-export const QuizInputPayload = z.object({ answer: z.string().min(1) }).strict();
+export const QuizInputPayload = z.object({ answer: z.string().min(1).max(500) }).strict();
 export const MissionLocationPayload = z
   .object({ lat: z.number().gte(-90).lte(90), lng: z.number().gte(-180).lte(180) })
   .strict();
 export const MissionMediaPayload = z.object({ assetId: z.number().int().gte(1) }).strict();
-export const TaskAnswerPayload = z.object({ response: z.string().min(1) }).strict();
+export const TaskAnswerPayload = z.object({ response: z.string().min(1).max(500) }).strict();
 export const AnswerPayload = z
   .object({
     clue: ClueAnswerPayload,

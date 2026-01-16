@@ -90,6 +90,7 @@ export class AIValidationService implements IAIValidationService {
     ]);
   }
 
+  // TODO: Fail-open by design for game UX. Revisit if validation becomes high-stakes.
   private createFallbackResult(): AIValidationResult {
     return {
       isCorrect: true,

@@ -828,7 +828,10 @@ export interface QuizChoicePayload {
 
 /** Free text quiz answer */
 export interface QuizInputPayload {
-  /** @minLength 1 */
+  /**
+   * @minLength 1
+   * @maxLength 500
+   */
   answer: string;
 }
 
@@ -854,7 +857,10 @@ export interface MissionMediaPayload {
 
 /** Free text response for tasks */
 export interface TaskAnswerPayload {
-  /** @minLength 1 */
+  /**
+   * @minLength 1
+   * @maxLength 500
+   */
   response: string;
 }
 

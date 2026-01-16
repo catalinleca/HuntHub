@@ -11,7 +11,7 @@ interface ApiValidationProviderProps {
   children: ReactNode;
 }
 
-function getFeedback(data: ValidateAnswerResponse | undefined): string | null {
+const getFeedback = (data: ValidateAnswerResponse | undefined): string | null => {
   if (!data) {
     return null;
   }
@@ -25,7 +25,7 @@ function getFeedback(data: ValidateAnswerResponse | undefined): string | null {
   }
 
   return data.feedback ?? null;
-}
+};
 
 /**
  * Provides API-based validation for /play route.

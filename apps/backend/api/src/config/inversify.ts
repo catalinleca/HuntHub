@@ -47,7 +47,7 @@ container.bind<IAssetUsageTracker>(TYPES.AssetUsageTracker).to(AssetUsageTracker
 container.bind<IAssetValidator>(TYPES.AssetValidator).to(AssetValidator);
 container.bind<IHuntShareService>(TYPES.HuntShareService).to(HuntShareService);
 container.bind<IPlayService>(TYPES.PlayService).to(PlayService);
-container.bind<IAIProvider>(TYPES.AIProvider).to(OpenAIProvider);
+container.bind<IAIProvider>(TYPES.AIProvider).to(OpenAIProvider).inSingletonScope();
 container.bind<IAIValidationService>(TYPES.AIValidationService).to(AIValidationService);
 
 export { container };

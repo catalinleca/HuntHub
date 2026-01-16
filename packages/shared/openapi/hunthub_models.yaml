@@ -1245,6 +1245,7 @@ components:
         answer:
           type: string
           minLength: 1
+          maxLength: 500
       required:
         - answer
       additionalProperties: false
@@ -1284,6 +1285,7 @@ components:
         response:
           type: string
           minLength: 1
+          maxLength: 500
       required:
         - response
       additionalProperties: false

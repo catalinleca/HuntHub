@@ -19,6 +19,8 @@ export interface IAIProvider {
   validateText(params: TextValidationParams): Promise<AIProviderResponse>;
 }
 
+const MAX_INPUT_CHARS = 500;
+
 @injectable()
 export class OpenAIProvider implements IAIProvider {
   readonly name = 'openai';
@@ -32,6 +34,11 @@ export class OpenAIProvider implements IAIProvider {
 
   async validateText(params: TextValidationParams): Promise<AIProviderResponse> {
     const { userResponse, instructions, aiInstructions } = params;
+
+    if (userResponse.length > MAX_INPUT_CHARS) {
+      throw new Error(`Response too long: ${userResponse.length} chars (max ${MAX_INPUT_CHARS})`);
+    }
+
     const validationCriteria = aiInstructions || instructions;
 
     const systemPrompt = `You are a treasure hunt validation assistant.
