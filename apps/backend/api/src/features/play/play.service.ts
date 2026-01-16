@@ -1,5 +1,5 @@
 import { injectable, inject } from 'inversify';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import {
   SessionResponse,
   StepResponse,
@@ -24,7 +24,8 @@ import { withTransaction } from '@/shared/utils/transaction';
 import { isDev } from '@/config/env.config';
 import { TYPES } from '@/shared/types';
 import { IStorageService } from '@/services/storage/storage.service';
-import { ALLOWED_EXTENSIONS, isAllowedMimeType } from '@/shared/utils/mimeTypes';
+import { ALLOWED_EXTENSIONS, isAllowedMimeType, getBaseMimeType } from '@/shared/utils/mimeTypes';
+import { SYSTEM_USER_ID } from '@/shared/constants';
 import { AssetMapper, AssetDTO } from '@/shared/mappers/asset.mapper';
 import { SessionManager } from './helpers/session-manager.helper';
 import { StepNavigator } from './helpers/step-navigator.helper';
@@ -359,9 +360,9 @@ export class PlayService implements IPlayService {
     }
 
     const asset = await AssetModel.create({
-      ownerId: progress.userId || null,
+      ownerId: progress.userId ? new Types.ObjectId(progress.userId) : SYSTEM_USER_ID,
       url: assetData.url,
-      mimeType: assetData.mime,
+      mimeType: getBaseMimeType(assetData.mime),
       originalFilename: assetData.name,
       size: assetData.sizeBytes,
       storageLocation: { path: assetData.s3Key },

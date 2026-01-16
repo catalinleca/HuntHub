@@ -4,11 +4,11 @@ import { container } from '@/config/inversify';
 import { TYPES } from '@/shared/types';
 import AssetModel from '@/database/models/Asset';
 import type { IAIValidationService } from '@/services/ai-validation';
+import { AUDIO_MIME_TYPES } from '@/shared/utils/mimeTypes';
 import { IAnswerValidator, ValidationResult } from '../answer-validator.helper';
 
-const AUDIO_MIME_TYPES: MimeTypes[] = [MimeTypes.AudioMpeg, MimeTypes.AudioWav, MimeTypes.AudioOgg];
-
-const isAudioMimeType = (mimeType: MimeTypes): boolean => AUDIO_MIME_TYPES.includes(mimeType);
+const isAudioMimeType = (mimeType: MimeTypes): boolean =>
+  AUDIO_MIME_TYPES.includes(mimeType as (typeof AUDIO_MIME_TYPES)[number]);
 
 const fetchAudioBuffer = async (url: string): Promise<Buffer> => {
   const response = await fetch(url);
