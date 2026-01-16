@@ -3,7 +3,7 @@ import { TYPES } from '@/shared/types';
 import { container } from '@/config/inversify';
 import { IPlayController } from './play.controller';
 import { validateRequest, validateQuery, optionalAuthMiddleware } from '@/shared/middlewares';
-import { startSessionSchema, validateAnswerSchema, discoverQuerySchema } from './play.validation';
+import { startSessionSchema, validateAnswerSchema, discoverQuerySchema, createAssetSchema } from './play.validation';
 
 const router = Router();
 const controller = container.get<IPlayController>(TYPES.PlayController);
@@ -47,7 +47,7 @@ router.post('/sessions/:sessionId/upload', (req, res, next) => {
   controller.requestUpload(req, res).catch(next);
 });
 
-router.post('/sessions/:sessionId/assets', (req, res, next) => {
+router.post('/sessions/:sessionId/assets', validateRequest(createAssetSchema), (req, res, next) => {
   controller.createAsset(req, res).catch(next);
 });
 

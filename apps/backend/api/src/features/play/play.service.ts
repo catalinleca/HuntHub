@@ -10,7 +10,6 @@ import {
   HuntProgressStatus,
   Step,
   AssetCreate,
-  Asset,
 } from '@hunthub/shared';
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';

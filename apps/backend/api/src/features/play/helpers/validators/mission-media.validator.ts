@@ -12,6 +12,11 @@ const isAudioMimeType = (mimeType: MimeTypes): boolean =>
 
 const fetchAudioBuffer = async (url: string): Promise<Buffer> => {
   const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch audio: ${response.status} ${response.statusText}`);
+  }
+
   const arrayBuffer = await response.arrayBuffer();
   return Buffer.from(arrayBuffer);
 };
@@ -39,22 +44,30 @@ export const MissionMediaValidator: IAnswerValidator = {
     const mission = challenge.mission;
 
     if (isAudioMimeType(asset.mimeType) && mission?.aiInstructions) {
-      const audioBuffer = await fetchAudioBuffer(asset.url);
-      const aiService = container.get<IAIValidationService>(TYPES.AIValidationService);
+      try {
+        const audioBuffer = await fetchAudioBuffer(asset.url);
+        const aiService = container.get<IAIValidationService>(TYPES.AIValidationService);
 
-      const result = await aiService.validateAudioResponse(
-        audioBuffer,
-        asset.mimeType,
-        mission.title || mission.description || '',
-        mission.aiInstructions,
-      );
+        const result = await aiService.validateAudioResponse(
+          audioBuffer,
+          asset.mimeType,
+          mission.title || mission.description || '',
+          mission.aiInstructions,
+        );
 
-      return {
-        isCorrect: result.isCorrect,
-        feedback: result.feedback,
-        transcript: result.transcript,
-        confidence: result.confidence,
-      };
+        return {
+          isCorrect: result.isCorrect,
+          feedback: result.feedback,
+          transcript: result.transcript,
+          confidence: result.confidence,
+        };
+      } catch (error) {
+        console.error('[MissionMediaValidator] Audio validation failed:', error);
+        return {
+          isCorrect: false,
+          feedback: 'Unable to process your audio. Please try again.',
+        };
+      }
     }
 
     return {
