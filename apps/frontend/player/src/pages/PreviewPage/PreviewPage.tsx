@@ -25,6 +25,5 @@ export const PreviewPage = () => {
     return null;
   }
 
-  // Standalone without huntId - show hunt picker in phone container
   return <HuntPicker />;
 };
