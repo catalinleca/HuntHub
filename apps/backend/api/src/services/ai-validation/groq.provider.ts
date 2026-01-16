@@ -53,7 +53,7 @@ Be encouraging but accurate. The feedback should be 1-2 sentences.`;
         { role: 'user', content: userPrompt },
       ],
       response_format: { type: 'json_object' },
-      max_tokens: 300,
+      max_tokens: 300, // TODO
       temperature: 0.3,
     });
 
