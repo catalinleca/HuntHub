@@ -78,6 +78,8 @@ progressSchema.index({ huntId: 1, status: 1 }); // Hunt analytics (completed vs 
 progressSchema.index({ sessionId: 1 }, { unique: true }); // Session lookup
 progressSchema.index({ completedAt: -1, huntId: 1 }); // Recent completions per hunt
 
+// Dev: 1 day (all sessions) for testing cleanup
+// Prod: 7 days (anonymous only)
 if (process.env.NODE_ENV === 'production') {
   progressSchema.index(
     { startedAt: 1 },
@@ -86,6 +88,8 @@ if (process.env.NODE_ENV === 'production') {
       partialFilterExpression: { isAnonymous: true },
     },
   );
+} else {
+  progressSchema.index({ startedAt: 1 }, { expireAfterSeconds: 24 * 60 * 60 });
 }
 
 interface IProgressModel extends Model<IProgress> {

@@ -422,10 +422,10 @@ export const SessionResponse = z
     hunt: HuntMetaPF,
     status: z.string(),
     currentStepIndex: z.number().int(),
+    currentStepId: z.number().int().nullish(),
     totalSteps: z.number().int(),
-    startedAt: z.string(),
-    completedAt: z.string().optional(),
-    currentStep: StepResponse.optional(),
+    startedAt: z.string().datetime({ offset: true }),
+    completedAt: z.string().datetime({ offset: true }).optional(),
   })
   .strict();
 export const SortOrder = z.enum(['asc', 'desc']);

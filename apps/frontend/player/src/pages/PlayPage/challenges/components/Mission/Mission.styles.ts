@@ -40,7 +40,7 @@ export const StatusIndicator = styled(Stack)<{ $isSuccess?: boolean }>`
   flex-direction: row;
   align-items: center;
   gap: ${({ theme }) => theme.spacing(1)};
-  padding: ${({ theme }) => theme.spacing(1.5)} ${({ theme }) => theme.spacing(2)};
+  padding: ${({ theme }) => theme.spacing(3, 2)};
   background-color: ${({ theme, $isSuccess }) =>
     $isSuccess ? theme.palette.success.light + '20' : theme.palette.grey[100]};
   border-radius: ${({ theme }) => theme.shape.borderRadius}px;

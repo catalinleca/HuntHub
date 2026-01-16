@@ -4,11 +4,11 @@ import type { PlaySessionContextValue } from './context';
 
 export const useSessionLogic = (huntId: number): PlaySessionContextValue => {
   const sessionLayer = useSessionLayer(huntId);
-  const stepLayer = useStepLayer(sessionLayer.sessionId);
+  const stepLayer = useStepLayer(sessionLayer.sessionId, sessionLayer.currentStepId);
 
   const hasSession = !!sessionLayer.session;
   const isLastStep = hasSession && !stepLayer.hasNextLink && stepLayer.currentStep !== null;
-  const isComplete = hasSession && stepLayer.currentStep === null;
+  const isComplete = hasSession && sessionLayer.status === 'completed';
 
   return {
     isLoading: sessionLayer.isLoading || stepLayer.isLoading,
@@ -18,12 +18,15 @@ export const useSessionLogic = (huntId: number): PlaySessionContextValue => {
     huntMeta: sessionLayer.huntMeta,
     currentStep: stepLayer.currentStep,
     currentStepIndex: sessionLayer.currentStepIndex,
-    totalSteps: sessionLayer.huntMeta?.totalSteps ?? 0,
+    totalSteps: sessionLayer.totalSteps,
 
     startSession: sessionLayer.startSession,
+    abandonSession: sessionLayer.abandonSession,
 
     hasSession,
     isLastStep,
     isComplete,
+
+    nextStepId: stepLayer.nextStepId,
   };
 };

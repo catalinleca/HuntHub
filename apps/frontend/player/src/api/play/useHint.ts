@@ -1,23 +1,19 @@
 import { useMutation } from '@tanstack/react-query';
-import { mockRequestHint } from './mockData';
+import type { HintResponse } from '@hunthub/shared';
+import { httpClient } from '@/services/http-client';
 
-interface HintResponse {
-  hint: string;
-  hintsUsed: number;
-  maxHints: number;
-}
+const requestHint = async (sessionId: string): Promise<HintResponse> => {
+  const { data } = await httpClient.post<HintResponse>(`/play/sessions/${sessionId}/hint`);
+  return data;
+};
 
 interface HintParams {
   sessionId: string;
 }
 
-const requestHint = async (params: HintParams): Promise<HintResponse> => {
-  return mockRequestHint(params.sessionId);
-};
-
 export const useHint = () => {
   const mutation = useMutation({
-    mutationFn: requestHint,
+    mutationFn: (params: HintParams): Promise<HintResponse> => requestHint(params.sessionId),
   });
 
   return {

@@ -6,6 +6,7 @@ import { parseNumericId } from '@/shared/utils/parseId';
 import { ValidationError } from '@/shared/errors';
 
 export interface IPlayController {
+  discoverHunts(req: Request, res: Response): Promise<Response>;
   startSession(req: Request, res: Response): Promise<Response>;
   getSession(req: Request, res: Response): Promise<Response>;
   getStep(req: Request, res: Response): Promise<Response>;
@@ -23,6 +24,14 @@ export class PlayController implements IPlayController {
     @inject(TYPES.PlayService)
     private playService: IPlayService,
   ) {}
+
+  async discoverHunts(req: Request, res: Response): Promise<Response> {
+    const { page, limit } = req.query as unknown as { page: number; limit: number };
+
+    const result = await this.playService.discoverHunts(page, limit);
+
+    return res.status(200).json(result);
+  }
 
   async startSession(req: Request, res: Response): Promise<Response> {
     const huntId = parseNumericId(req.params.huntId);

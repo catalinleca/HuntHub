@@ -1,12 +1,36 @@
+import { useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { EmbeddedPreview } from './components/EmbeddedPreview';
-import { StandalonePreview } from './components/StandalonePreview';
+import { HuntPicker } from './components/HuntPicker';
 
-const isRunningInIframe = (): boolean => {
-  return window.parent !== window;
+const isInIframe = (): boolean => {
+  try {
+    return typeof window !== 'undefined' && window.parent !== window;
+  } catch {
+    // Cross-origin iframe access throws - means we're in an iframe
+    return true;
+  }
 };
 
 export const PreviewPage = () => {
-  const isEmbedded = isRunningInIframe();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const huntId = searchParams.get('huntId');
+  const isEmbedded = isInIframe();
 
-  return isEmbedded ? <EmbeddedPreview /> : <StandalonePreview />;
+  useEffect(() => {
+    if (!isEmbedded && huntId) {
+      navigate(`/play/${huntId}`, { replace: true });
+    }
+  }, [isEmbedded, huntId, navigate]);
+
+  if (isEmbedded) {
+    return <EmbeddedPreview />;
+  }
+
+  if (huntId) {
+    return null;
+  }
+
+  return <HuntPicker />;
 };

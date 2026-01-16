@@ -22,7 +22,18 @@ import { SessionManager } from './helpers/session-manager.helper';
 import { StepNavigator } from './helpers/step-navigator.helper';
 import { AnswerValidator } from './helpers/answer-validator.helper';
 
+export interface DiscoverHuntsResponse {
+  hunts: Array<{
+    huntId: number;
+    name: string;
+    description?: string;
+    totalSteps: number;
+  }>;
+  total: number;
+}
+
 export interface IPlayService {
+  discoverHunts(page: number, limit: number): Promise<DiscoverHuntsResponse>;
   startSession(huntId: number, playerName: string, userId?: string): Promise<SessionResponse>;
   getSession(sessionId: string): Promise<SessionResponse>;
   getStep(sessionId: string, stepId: number): Promise<StepResponse>;
@@ -32,6 +43,40 @@ export interface IPlayService {
 
 @injectable()
 export class PlayService implements IPlayService {
+  async discoverHunts(page: number, limit: number): Promise<DiscoverHuntsResponse> {
+    const skip = (page - 1) * limit;
+
+    const [hunts, total] = await Promise.all([
+      HuntModel.find({ liveVersion: { $ne: null }, isDeleted: false })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      HuntModel.countDocuments({ liveVersion: { $ne: null }, isDeleted: false }),
+    ]);
+
+    if (hunts.length === 0) {
+      return { hunts: [], total };
+    }
+
+    const versionQueries = hunts.map((h) => ({ huntId: h.huntId, version: h.liveVersion, isPublished: true }));
+    const versions = await HuntVersionModel.find({ $or: versionQueries }).lean();
+
+    const versionMap = new Map(versions.map((v) => [`${v.huntId}-${v.version}`, v]));
+
+    const sanitizedHunts = hunts.map((hunt) => {
+      const version = versionMap.get(`${hunt.huntId}-${hunt.liveVersion}`);
+      return {
+        huntId: hunt.huntId,
+        name: version?.name ?? 'Untitled Hunt',
+        description: version?.description,
+        totalSteps: version?.stepOrder?.length ?? 0,
+      };
+    });
+
+    return { hunts: sanitizedHunts, total };
+  }
+
   async startSession(huntId: number, playerName: string, userId?: string): Promise<SessionResponse> {
     const hunt = await this.requireLiveHunt(huntId);
     const liveVersion = hunt.liveVersion!;
@@ -48,21 +93,14 @@ export class PlayService implements IPlayService {
     const firstStepId = huntVersion.stepOrder[0];
     const progress = await SessionManager.createSession(huntId, liveVersion, playerName, firstStepId, userId);
 
-    const step = await StepNavigator.getStepById(huntId, liveVersion, firstStepId);
-    if (!step) {
-      throw new NotFoundError('First step not found');
-    }
-
-    const stepProgress = progress.steps?.[0];
-
     return {
       sessionId: progress.sessionId,
       hunt: PlayerExporter.hunt(huntId, huntVersion),
       status: HuntProgressStatus.InProgress,
       currentStepIndex: 0,
+      currentStepId: firstStepId,
       totalSteps: huntVersion.stepOrder.length,
       startedAt: progress.startedAt.toISOString(),
-      currentStep: this.buildStepResponse(progress.sessionId, step, huntVersion, stepProgress),
     };
   }
 
@@ -73,24 +111,15 @@ export class PlayService implements IPlayService {
     const currentIndex = StepNavigator.getStepIndex(huntVersion.stepOrder, progress.currentStepId);
     const isInProgress = progress.status === HuntProgressStatus.InProgress;
 
-    let currentStep: StepResponse | undefined;
-    if (isInProgress) {
-      const step = await StepNavigator.getCurrentStepForSession(progress);
-      if (step) {
-        const stepProgress = SessionManager.getCurrentStepProgress(progress);
-        currentStep = this.buildStepResponse(sessionId, step, huntVersion, stepProgress ?? undefined);
-      }
-    }
-
     return {
       sessionId: progress.sessionId,
       hunt: PlayerExporter.hunt(progress.huntId, huntVersion),
       status: progress.status,
       currentStepIndex: currentIndex,
+      currentStepId: isInProgress ? progress.currentStepId : null,
       totalSteps: huntVersion.stepOrder.length,
       startedAt: progress.startedAt.toISOString(),
       completedAt: progress.completedAt?.toISOString(),
-      currentStep,
     };
   }
 
@@ -146,6 +175,7 @@ export class PlayService implements IPlayService {
     const stepProgress = SessionManager.getCurrentStepProgress(progress);
     const isLastStep = StepNavigator.isLastStep(huntVersion.stepOrder, progress.currentStepId);
 
+    // Time limit check (pre-transaction - read-only check is fine)
     if (step.timeLimit && stepProgress?.startedAt) {
       const elapsedSeconds = (Date.now() - stepProgress.startedAt.getTime()) / 1000;
       if (elapsedSeconds > step.timeLimit) {
@@ -161,6 +191,7 @@ export class PlayService implements IPlayService {
     const validationResult = AnswerValidator.validate(request.answerType, request.payload, step);
 
     return withTransaction(async (session) => {
+      // Atomic increment with limit check (prevents race condition)
       const newAttempts = await SessionManager.incrementAttemptsIfUnderLimit(
         sessionId,
         progress.currentStepId,

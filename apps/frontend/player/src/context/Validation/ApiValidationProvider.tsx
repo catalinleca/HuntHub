@@ -17,6 +17,7 @@ const initialState: ValidationState = {
 
 interface ApiValidationProviderProps {
   sessionId: string;
+  nextStepId: number | null;
   children: ReactNode;
 }
 
@@ -26,7 +27,7 @@ interface ApiValidationProviderProps {
  * IMPORTANT: Use key={stepId} on this component to reset state when step changes. "You might not need an effect"
  * Example: <ApiValidationProvider key={stepId} sessionId={sessionId}> instead of useEffect with stepId dep and setState(initial)
  */
-export const ApiValidationProvider = ({ sessionId, children }: ApiValidationProviderProps) => {
+export const ApiValidationProvider = ({ sessionId, nextStepId, children }: ApiValidationProviderProps) => {
   const { validate: validateAnswer, isValidating, reset: resetMutation } = useValidateAnswer();
   const [state, setState] = useState<ValidationState>(initialState);
 
@@ -42,7 +43,7 @@ export const ApiValidationProvider = ({ sessionId, children }: ApiValidationProv
       }
 
       try {
-        const data = await validateAnswer({ sessionId, answerType, payload });
+        const data = await validateAnswer({ sessionId, answerType, payload, nextStepId });
         setState((prev) => ({
           isCorrect: data.correct,
           feedback: data.feedback ?? null,
@@ -56,7 +57,7 @@ export const ApiValidationProvider = ({ sessionId, children }: ApiValidationProv
         }));
       }
     },
-    [sessionId, validateAnswer],
+    [sessionId, nextStepId, validateAnswer],
   );
 
   /**

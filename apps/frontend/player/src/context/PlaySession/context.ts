@@ -16,12 +16,14 @@ export interface SessionData {
 
 export interface SessionActions {
   startSession: (playerName: string, email?: string) => void;
+  abandonSession: () => void;
 }
 
 export interface SessionDerived {
   hasSession: boolean;
   isLastStep: boolean;
   isComplete: boolean;
+  nextStepId: number | null;
 }
 
 export type PlaySessionContextValue = SessionState & SessionData & SessionActions & SessionDerived;

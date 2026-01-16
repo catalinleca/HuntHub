@@ -1483,6 +1483,10 @@ components:
         currentStepIndex:
           type: integer
           description: Current step index (0-based)
+        currentStepId:
+          type: integer
+          nullable: true
+          description: Current step ID (null when session is completed)
         totalSteps:
           type: integer
           description: Total number of steps in the hunt
@@ -1494,9 +1498,6 @@ components:
           type: string
           format: date-time
           description: When the session was completed (if finished)
-        currentStep:
-          $ref: '#/components/schemas/StepResponse'
-          description: Current step data (only present when status is 'in_progress')
       required:
         - sessionId
         - hunt

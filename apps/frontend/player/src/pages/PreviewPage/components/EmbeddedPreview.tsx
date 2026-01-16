@@ -23,7 +23,7 @@ export const EmbeddedPreview = () => {
 
       switch (message.type) {
         case EDITOR_MESSAGES.RENDER_HUNT: {
-          coreRef.current.setHunt(message.hunt);
+          coreRef.current.setHunt({ hunt: message.hunt, steps: message.steps });
           break;
         }
         case EDITOR_MESSAGES.JUMP_TO_STEP: {
