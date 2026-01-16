@@ -7,6 +7,7 @@ import * as S from './Mission.styles';
 interface AudioContentProps {
   onSubmit: (blob: Blob, mimeType: string) => void;
   disabled?: boolean;
+  uploadError?: string | null;
 }
 
 const formatDuration = (seconds: number): string => {
@@ -55,9 +56,11 @@ const AudioPreview = ({ audioUrl, duration, onReset }: { audioUrl: string; durat
   </Stack>
 );
 
-export const AudioContent = ({ onSubmit, disabled = false }: AudioContentProps) => {
+export const AudioContent = ({ onSubmit, disabled = false, uploadError }: AudioContentProps) => {
   const { status, audioUrl, audioBlob, mimeType, duration, error, startRecording, stopRecording, discardRecording } =
     useAudioRecorder();
+
+  const displayError = error || uploadError;
 
   const views: Record<Status, React.ReactNode> = {
     idle: (
@@ -138,9 +141,9 @@ export const AudioContent = ({ onSubmit, disabled = false }: AudioContentProps) 
 
   return (
     <Stack gap={2}>
-      {error && (
+      {displayError && (
         <Alert severity="error" onClose={discardRecording}>
-          {error}
+          {displayError}
         </Alert>
       )}
       {views[status]}

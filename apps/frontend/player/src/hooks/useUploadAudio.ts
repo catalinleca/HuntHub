@@ -41,11 +41,8 @@ export const useUploadAudio = (): UseUploadAudioReturn => {
       return asset.assetId;
     } catch (err) {
       setStatus('error');
-
-      const message = err instanceof Error ? err.message : 'Upload failed';
-      setError(message);
-
-      throw err;
+      setError(err instanceof Error ? err.message : 'Upload failed');
+      return -1;
     }
   }, []);
 

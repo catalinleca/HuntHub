@@ -11,7 +11,7 @@ export class OpenAIProvider implements ITextValidationProvider {
 
   constructor() {
     if (!openaiApiKey) {
-      console.warn('[OpenAIProvider] OPENAI_API_KEY not set - AI validation will use fallback');
+      console.warn('[OpenAIProvider] OPENAI_API_KEY not set - text validation calls will fail');
     }
     this.client = new OpenAI({ apiKey: openaiApiKey });
   }

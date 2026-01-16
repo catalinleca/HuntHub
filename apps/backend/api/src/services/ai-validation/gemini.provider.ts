@@ -12,7 +12,7 @@ export class GeminiProvider implements IAudioValidationProvider {
 
   constructor() {
     if (!geminiApiKey) {
-      console.warn('[GeminiProvider] GEMINI_API_KEY not set - audio validation will use fallback');
+      console.warn('[GeminiProvider] GEMINI_API_KEY not set - audio validation calls will fail');
     }
     this.client = new GoogleGenerativeAI(geminiApiKey || '');
   }
@@ -33,7 +33,7 @@ export class GeminiProvider implements IAudioValidationProvider {
     const criteria = safeAiInstructions || safeInstructions;
     const prompt = buildAudioPrompt(safeInstructions, criteria);
 
-    const model = this.client.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = this.client.getGenerativeModel({ model: 'gemini-2.0-flash-001' });
 
     const response = await model.generateContent([
       prompt,

@@ -20,7 +20,7 @@ export const MissionChallenge = ({
   hasHint,
 }: ChallengeProps<MissionPF>) => {
   const { sessionId } = usePlaySession();
-  const { upload: uploadAudio, isUploading } = useUploadAudio();
+  const { upload: uploadAudio, isUploading, error: uploadError } = useUploadAudio();
 
   const handleLocationSubmit = useCallback(
     (position: { lat: number; lng: number }) => {
@@ -35,9 +35,14 @@ export const MissionChallenge = ({
 
   const handleAudioSubmit = useCallback(
     async (blob: Blob, mimeType: string) => {
-      if (!sessionId) return;
+      if (!sessionId) {
+        return;
+      }
+
       const assetId = await uploadAudio(sessionId, blob, mimeType);
-      onValidate(AnswerType.MissionMedia, { missionMedia: { assetId } });
+      if (assetId !== -1) {
+        onValidate(AnswerType.MissionMedia, { missionMedia: { assetId } });
+      }
     },
     [sessionId, uploadAudio, onValidate],
   );
@@ -47,7 +52,9 @@ export const MissionChallenge = ({
   const contents: Record<MissionType, React.ReactNode> = {
     [MissionType.MatchLocation]: <LocationContent onSubmit={handleLocationSubmit} disabled={isDisabled} />,
     [MissionType.UploadMedia]: <PhotoContent onSubmit={handlePhotoSubmit} disabled={isDisabled} />,
-    [MissionType.UploadAudio]: <AudioContent onSubmit={handleAudioSubmit} disabled={isDisabled} />,
+    [MissionType.UploadAudio]: (
+      <AudioContent onSubmit={handleAudioSubmit} disabled={isDisabled} uploadError={uploadError} />
+    ),
   };
 
   return (

@@ -44,7 +44,7 @@ export function getMimeTypeFromExtension(extension: string): string {
 }
 
 export function getBaseMimeType(mimeType: string): string {
-  return mimeType.split(';')[0];
+  return mimeType.split(';')[0].trim().toLowerCase();
 }
 
 export function isAllowedMimeType(mimeType: string): boolean {
