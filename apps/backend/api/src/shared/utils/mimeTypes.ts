@@ -15,10 +15,7 @@ export const AUDIO_MIME_TYPES: ReadonlyArray<MimeTypes> = [
   MimeTypes.AudioMp4,
 ];
 
-export const VIDEO_MIME_TYPES: ReadonlyArray<MimeTypes> = [
-  MimeTypes.VideoMp4,
-  MimeTypes.VideoWebm,
-];
+export const VIDEO_MIME_TYPES: ReadonlyArray<MimeTypes> = [MimeTypes.VideoMp4, MimeTypes.VideoWebm];
 
 export const EXTENSION_TO_MIME: Record<string, MimeTypes> = {
   jpg: MimeTypes.ImageJpeg,

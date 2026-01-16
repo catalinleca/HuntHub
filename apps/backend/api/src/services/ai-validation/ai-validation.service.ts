@@ -9,6 +9,7 @@ export interface AIValidationResult {
   aiModel?: string;
   processingTimeMs?: number;
   fallbackUsed?: boolean;
+  transcript?: string;
 }
 
 interface AIValidationConfig {
@@ -102,6 +103,7 @@ export class AIValidationService implements IAIValidationService {
         aiModel: this.audioProvider.name,
         processingTimeMs: Date.now() - startTime,
         fallbackUsed: false,
+        transcript: response.transcript,
       };
     } catch (error) {
       console.error('[AIValidation] Audio validation failed:', error);

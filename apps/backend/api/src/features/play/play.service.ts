@@ -214,8 +214,23 @@ export class PlayService implements IPlayService {
 
     const validationResult = await AnswerValidator.validate(request.answerType, request.payload, step);
 
+    console.log('[Validation]', {
+      sessionId,
+      stepId: progress.currentStepId,
+      answerType: request.answerType,
+      isCorrect: validationResult.isCorrect,
+      feedback: validationResult.feedback,
+      transcript: validationResult.transcript,
+      confidence: validationResult.confidence,
+    });
+
     return withTransaction(async (session) => {
       const newAttempts = await SessionManager.incrementAttempts(sessionId, progress.currentStepId, session);
+
+      const metadata = {
+        ...(validationResult.transcript && { transcript: validationResult.transcript }),
+        ...(validationResult.confidence && { confidence: validationResult.confidence }),
+      };
 
       await SessionManager.recordSubmission(
         sessionId,
@@ -223,6 +238,7 @@ export class PlayService implements IPlayService {
         request.payload,
         validationResult.isCorrect,
         validationResult.feedback,
+        metadata,
         session,
       );
 

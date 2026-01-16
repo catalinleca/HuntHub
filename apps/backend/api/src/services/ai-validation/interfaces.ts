@@ -17,6 +17,10 @@ export interface ValidationResponse {
   feedback: string;
 }
 
+export interface AudioValidationResponse extends ValidationResponse {
+  transcript?: string;
+}
+
 export interface ITextValidationProvider {
   readonly name: string;
   validateText(params: TextValidationParams): Promise<ValidationResponse>;
@@ -24,5 +28,5 @@ export interface ITextValidationProvider {
 
 export interface IAudioValidationProvider {
   readonly name: string;
-  validateAudio(params: AudioValidationParams): Promise<ValidationResponse>;
+  validateAudio(params: AudioValidationParams): Promise<AudioValidationResponse>;
 }

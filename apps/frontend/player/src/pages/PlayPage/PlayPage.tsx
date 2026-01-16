@@ -68,7 +68,7 @@ const PlayPageContent = () => {
           key={currentStep.stepId}
           sessionId={sessionId!}
           nextStepId={nextStepId}
-          showSuccessDialog={currentStep.type === ChallengeType.Task}
+          showSuccessDialog={currentStep.type === ChallengeType.Task || currentStep.type === ChallengeType.Mission}
         >
           <StepRenderer step={currentStep} isLastStep={isLastStep} />
         </ApiValidationProvider>

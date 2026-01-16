@@ -12,6 +12,8 @@ import { TaskValidator } from './validators/task.validator';
 export interface ValidationResult {
   isCorrect: boolean;
   feedback?: string;
+  transcript?: string;
+  confidence?: number;
 }
 
 export interface IAnswerValidator {

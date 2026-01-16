@@ -38,7 +38,6 @@ export const MissionMediaValidator: IAnswerValidator = {
     const challenge = step.challenge as Challenge;
     const mission = challenge.mission;
 
-    // Only validate audio with aiInstructions
     if (isAudioMimeType(asset.mimeType) && mission?.aiInstructions) {
       const audioBuffer = await fetchAudioBuffer(asset.url);
       const aiService = container.get<IAIValidationService>(TYPES.AIValidationService);
@@ -52,10 +51,11 @@ export const MissionMediaValidator: IAnswerValidator = {
       return {
         isCorrect: result.isCorrect,
         feedback: result.feedback,
+        transcript: result.transcript,
+        confidence: result.confidence,
       };
     }
 
-    // No AI validation needed - auto-pass
     return {
       isCorrect: true,
       feedback: 'Media received!',

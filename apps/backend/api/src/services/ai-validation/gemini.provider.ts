@@ -1,7 +1,8 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { injectable } from 'inversify';
 import { geminiApiKey } from '@/config/env.config';
-import type { IAudioValidationProvider, AudioValidationParams, ValidationResponse } from './interfaces';
+import { parseBoolean } from '@/shared/utils/parsing';
+import type { IAudioValidationProvider, AudioValidationParams, AudioValidationResponse } from './interfaces';
 import { MAX_INSTRUCTIONS_CHARS, buildAudioPrompt } from './validation.constants';
 
 @injectable()
@@ -16,7 +17,7 @@ export class GeminiProvider implements IAudioValidationProvider {
     this.client = new GoogleGenerativeAI(geminiApiKey || '');
   }
 
-  async validateAudio(params: AudioValidationParams): Promise<ValidationResponse> {
+  async validateAudio(params: AudioValidationParams): Promise<AudioValidationResponse> {
     const { audioBuffer, mimeType, instructions, aiInstructions } = params;
 
     const safeInstructions = instructions.slice(0, MAX_INSTRUCTIONS_CHARS);
@@ -58,14 +59,16 @@ export class GeminiProvider implements IAudioValidationProvider {
       throw new Error('Invalid JSON response from Gemini');
     }
 
-    if (typeof result.isValid !== 'boolean') {
+    const isValid = parseBoolean(result.isValid);
+    if (isValid === null) {
       throw new Error('Missing or invalid isValid in Gemini response');
     }
 
     return {
-      isValid: result.isValid,
+      isValid,
       confidence: typeof result.confidence === 'number' ? result.confidence : 0.5,
       feedback: typeof result.feedback === 'string' ? result.feedback : 'Audio evaluated.',
+      transcript: typeof result.transcript === 'string' ? result.transcript : undefined,
     };
   }
 }
