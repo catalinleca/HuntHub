@@ -1,13 +1,11 @@
 # HuntHub Project - Claude Code Memory
 
 This file auto-loads every time you start Claude Code in this project.
-It imports all context about the project, so Claude always knows:
-- How to behave (senior engineer mindset)
-- What the application does
-- Current backend architecture and patterns
-- What's implemented vs what's pending
-- Requirements and technical decisions
-- Current priority work
+
+**What gets loaded:**
+- Working style (how I think and interact)
+- Code standards (enforceable patterns)
+- Current project state
 
 ---
 
@@ -33,84 +31,41 @@ It imports all context about the project, so Claude always knows:
 
 ---
 
-## Core Behavior & Principles
+## Working Style & Mindset
 
-@.claude/behavior/principles.md
-@.claude/decisions/solid-principles.md
+@.claude/behavior/working-style.md
 
 When working with libraries like React Query, MUI, React Hook Form, Zustand, Zod, or CSS/layout patterns, always understand the problem first. Search for best practices in official docs and community resources.
 
-For common problems, search for standardized solutions. However, when you encounter an edge case or unique situation that doesn't have a clear standard approach, explain it to me so we can decide the best approach together.
+---
 
-## 🚀 Quick Start & Current Focus
+## Code Standards (Enforceable Patterns)
+
+@.claude/standards/frontend.md
+@.claude/standards/backend.md
+
+---
+
+## Current Project State
 
 @.claude/core/NEXT-SESSION.md
 @.claude/core/PROJECT.md
-<!-- Commented out for frontend work - uncomment when needed -->
-<!-- @.claude/core/ROADMAP.md -->
-
-<!-- ## High-Level Architecture -->
-<!-- @.claude/core/ARCHITECTURE.md -->
-
-<!-- ## Feature-Specific Documentation -->
-<!-- @.claude/features/hunt-sharing.md -->
-<!-- @.claude/features/hunt-release.md -->
-<!-- @.claude/features/numeric-id-strategy.md -->
-<!-- @.claude/features/versioning-system.md -->
-<!-- @.claude/features/release-concept.md -->
-
-<!-- ## Backend Context -->
-<!-- @.claude/backend/architecture.md -->
-<!-- @.claude/backend/patterns.md -->
-<!-- @.claude/backend/current-state.md -->
-
-<!-- ## Technical Decisions (Why We Chose This) -->
-<!-- @.claude/decisions/mongodb-vs-postgres.md -->
-<!-- @.claude/decisions/schema-sharing-final-strategy.md -->
-<!-- @.claude/decisions/production-best-practices-type-sharing.md -->
-<!-- @.claude/decisions/schema-validation-strategy.md -->
-
-## 🎨 Frontend Context (CURRENT FOCUS - Editor App)
-
-@.claude/frontend/FRONTEND-ARCHITECTURE.md
-@.claude/frontend/codebase-tools/UI-decision.md
-@.claude/frontend/codebase-tools/MUI-implementation-guide-suggestion.md
-@.claude/frontend/codebase-tools/react-19-usage-guide-hunthub.md
-
-**Note:** Player app is separate - ignore `.claude/frontend/player/` and `.claude/frontend/_archive/` folders
-
-<!-- ## Deployment (Future) -->
-<!-- @.claude/deployment/strategy.md -->
 
 ---
 
-## 📚 Reference Library (NOT auto-loaded - access manually)
+## 📚 Reference Library (NOT auto-loaded)
 
-Use Read tool to access these when needed:
+Use Read tool to access when needed:
 
-**Frontend Reference (Editor-specific):**
-- `.claude/frontend/reference/Design-decisions.md` - Editor layout rationale (timeline approach)
-- `.claude/frontend/reference/Component-specs.md` - Editor component specs (StepCard, Timeline, etc.)
-- `.claude/frontend/reference/performance-patterns.md` - Performance optimization patterns
+@.claude/reference/README.md
 
-**Guides (Learning Materials):**
-- `.claude/guides/challenge-types-guide.md` - Challenge type reference
-- `.claude/guides/data-model-decisions.md` - Data model design rationale
-- `.claude/guides/player-api-design.md` - Player API design (future feature)
-- `.claude/guides/tree-and-branching-strategy.md` - Tree VIEW API design
-
-**Reference (Historical/Archived):**
-- `.claude/reference/decisions-needed.md` - Old decision log
-- `.claude/reference/design-concerns.md` - Historical discussions
-- `.claude/reference/sessions/` - Old session summaries
+**Quick links:**
+- Architecture: `core/ARCHITECTURE.md`, `backend/architecture.md`
+- Frontend guides: `frontend/codebase-tools/` folder
+- Feature docs: `features/` folder
+- Design decisions: `frontend/reference/` folder
 
 ---
-
-## 🚀 Quick Commands
-
-**Update memory:** Type `/memory` to edit these files
-**Add quick note:** Start your message with `#` to add to memory
-**View loaded memory:** All files above are auto-loaded at startup
 
 ## 🎯 How to Work Together
 
@@ -119,14 +74,15 @@ Use Read tool to access these when needed:
 3. Claude flags issues and suggests improvements
 4. Together we build a well-architected, consistent application
 
-I want you to remember that when talking about aws, and getting
-instructions nad everything, it is really important you give me
-accurate data and info. I don't want any outdated stuff, it is
-difficult to work with them and ideally you should count and use
-on the aws mcp that we installed
+---
+
+## Important Notes
+
+- When talking about AWS, give accurate and up-to-date info. Use the AWS MCP when available.
+- Phosphor icons use `Icon` suffix: `MapPinIcon` not `MapPin`
+- Thorough review and quality are non-negotiable: avoid shortcuts, validate patterns, deliver production-grade code
+- Player app is separate - ignore `.claude/frontend/player/` and `.claude/frontend/_archive/` folders
 
 ---
 
-**Memory auto-loads from:** `/Users/catalinleca/leca/HuntHub/.claude/`
-- phosphor icons have Icon suffix now, whenever you import a Phosphor icon you import it like NameIcon, example MapPin is now MapPinIcon
-- Thorough review and quality are non-negotiable: avoid shortcuts, validate patterns, and deliver production-grade code
+**Memory auto-loads from:** `/Users/catalinleca/HuntHub-worktree/.claude/`
