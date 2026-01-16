@@ -17,10 +17,8 @@ export const MIME_TO_EXTENSION: Record<string, string> = {
 };
 
 export const getExtensionFromMimeType = (mimeType: string): string => {
-  const extension = MIME_TO_EXTENSION[mimeType];
-  if (extension) {
-    return extension;
-  }
-  const subtype = mimeType.split('/')[1]?.split(';')[0];
-  return subtype || 'bin';
+  const normalized = mimeType.trim().toLowerCase();
+  const baseType = normalized.split(';')[0];
+
+  return MIME_TO_EXTENSION[normalized] || MIME_TO_EXTENSION[baseType] || baseType.split('/')[1] || 'bin';
 };

@@ -35,7 +35,7 @@ export const TaskValidator: IAnswerValidator = {
         feedback: result.feedback,
       };
     } catch (error) {
-      console.error('[TaskValidator] AI validation failed:', error);
+      console.error('[TaskValidator] AI validation failed:', error instanceof Error ? error.message : 'Unknown error');
       return {
         isCorrect: false,
         feedback: 'Unable to validate your response. Please try again.',

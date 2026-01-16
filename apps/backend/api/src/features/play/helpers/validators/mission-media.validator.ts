@@ -62,7 +62,10 @@ export const MissionMediaValidator: IAnswerValidator = {
           confidence: result.confidence,
         };
       } catch (error) {
-        console.error('[MissionMediaValidator] Audio validation failed:', error);
+        console.error(
+          '[MissionMediaValidator] Audio validation failed:',
+          error instanceof Error ? error.message : 'Unknown error',
+        );
         return {
           isCorrect: false,
           feedback: 'Unable to process your audio. Please try again.',
