@@ -38,7 +38,7 @@ export const ApiValidationProvider = ({
   showSuccessDialog = false,
   children,
 }: ApiValidationProviderProps) => {
-  const { validate: validateAnswer, isValidating, data, reset, advanceToNextStep } = useValidateAnswer();
+  const { validate: validateAnswer, isValidating, data, error, reset, advanceToNextStep } = useValidateAnswer();
 
   const handleValidationSuccess = useCallback(
     (responseData: ValidateAnswerResponse) => {
@@ -65,8 +65,8 @@ export const ApiValidationProvider = ({
     advanceToNextStep(sessionId, nextStepId, data?.isComplete ?? false);
   }, [advanceToNextStep, sessionId, nextStepId, data?.isComplete]);
 
-  const isCorrect = data?.correct ?? null;
-  const feedback = getFeedback(data);
+  const isCorrect = error ? false : (data?.correct ?? null);
+  const feedback = error ? 'Something went wrong. Please try again.' : getFeedback(data);
   const attemptCount = data?.attempts ?? 0;
   const isExpired = data?.expired ?? false;
   const isExhausted = data?.exhausted ?? false;

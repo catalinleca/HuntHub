@@ -44,9 +44,12 @@ export const useValidateAnswer = () => {
         return {
           ...old,
           status: HuntProgressStatus.Completed,
-          currentStepIndex: old.currentStepIndex + 1,
           currentStepId: null,
         };
+      }
+
+      if (nextStepId === null) {
+        return old;
       }
 
       return {
