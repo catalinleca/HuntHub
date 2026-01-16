@@ -1,4 +1,5 @@
 export { OpenAIProvider } from './openai.provider';
+export { GroqProvider } from './groq.provider';
 export type { IAIProvider, TextValidationParams, AIProviderResponse } from './openai.provider';
 
 export { AIValidationService } from './ai-validation.service';
