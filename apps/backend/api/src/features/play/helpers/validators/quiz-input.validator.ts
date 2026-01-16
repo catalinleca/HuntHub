@@ -106,11 +106,7 @@ const levenshteinDistance = (a: string, b: string): number => {
     curr[0] = j;
     for (let i = 1; i <= m; i++) {
       const cost = shorter[i - 1] === longer[j - 1] ? 0 : 1;
-      curr[i] = Math.min(
-        prev[i] + 1,
-        curr[i - 1] + 1,
-        prev[i - 1] + cost,
-      );
+      curr[i] = Math.min(prev[i] + 1, curr[i - 1] + 1, prev[i - 1] + cost);
     }
     [prev, curr] = [curr, prev];
   }

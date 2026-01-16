@@ -13,12 +13,12 @@ export interface FormNumberInputProps extends FormFieldProps<TextFieldProps> {
 }
 
 const numberRegisterOptions = {
-  setValueAs: (value: string | number) => {
+  setValueAs: (value: string | number): number | undefined => {
     if (value === '' || value == null) {
-      return 0;
+      return undefined;
     }
     const numValue = Number(value);
-    return isNaN(numValue) ? 0 : numValue;
+    return isNaN(numValue) ? undefined : numValue;
   },
 };
 
