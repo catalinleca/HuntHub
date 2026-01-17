@@ -3,6 +3,7 @@ import { TYPES } from '@/shared/types';
 import { IUserService } from '@/modules/users/user.service';
 import { container } from '@/config/inversify';
 import { CompactUser } from '@/shared/types/CompactUser';
+import { logger } from '@/utils/logger';
 
 const parseFullName = (fullName?: string): { firstName: string; lastName?: string } => {
   if (!fullName) return { firstName: '' };
@@ -25,7 +26,7 @@ export const authUser = async (token: DecodedIdToken): Promise<CompactUser> => {
   let user = await userService.getUserByFirebaseUid(token.uid);
 
   if (!user) {
-    console.log(`User with firebaseUid ${token.uid} not found. Creating OAuth user`);
+    logger.info({ firebaseUid: token.uid }, 'Creating OAuth user');
 
     const { firstName, lastName } = parseFullName(token.name);
 

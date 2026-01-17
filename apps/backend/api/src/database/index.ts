@@ -1,5 +1,6 @@
 import 'dotenv';
 import mongoose from 'mongoose';
+import { logger } from '@/utils/logger';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function baseTransform(_: unknown, ret: any) {
@@ -27,9 +28,9 @@ export default async function mustConnectDb(connectionURI: string) {
       transform: baseTransform,
     });
 
-    console.log('Connected to MongoDB');
+    logger.info('Connected to MongoDB');
   } catch (err) {
-    console.error('MongoDB connection error:', err);
+    logger.error({ err }, 'MongoDB connection failed');
     process.exit(1);
   }
 }

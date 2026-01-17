@@ -6,6 +6,7 @@ import AssetModel from '@/database/models/Asset';
 import type { IAIValidationService } from '@/services/ai-validation';
 import { AUDIO_MIME_TYPES, IMAGE_MIME_TYPES } from '@/shared/utils/mimeTypes';
 import { IAnswerValidator, ValidationResult } from '../answer-validator.helper';
+import { logger } from '@/utils/logger';
 
 type AIMediaType = 'audio' | 'image';
 
@@ -86,10 +87,7 @@ export const MissionMediaValidator: IAnswerValidator = {
     try {
       return await validateWithAI(aiMediaType, asset.url, asset.mimeType, instructions, aiInstructions);
     } catch (error) {
-      console.error(
-        `[MissionMediaValidator] ${aiMediaType} validation failed:`,
-        error instanceof Error ? error.message : 'Unknown error',
-      );
+      logger.error({ err: error, mediaType: aiMediaType }, 'Media validation failed');
       return { isCorrect: false, feedback: `Unable to process your ${aiMediaType}. Please try again.` };
     }
   },

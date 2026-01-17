@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { auth } from 'firebase-admin';
 import { authUser } from '@/shared/utils/auth';
 import { UnauthorizedError } from '@/shared/errors';
+import { logger } from '@/utils/logger';
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -16,7 +17,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     }
     next();
   } catch (err) {
-    console.error(err);
+    logger.warn({ err }, 'Auth token verification failed');
     next(new UnauthorizedError());
   }
 };

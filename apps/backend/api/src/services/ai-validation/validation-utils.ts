@@ -1,6 +1,7 @@
 import { parseBoolean } from '@/shared/utils/parsing';
 import { MAX_INSTRUCTIONS_CHARS } from './validation.constants';
 import type { ValidationResponse } from './interfaces';
+import { logger } from '@/utils/logger';
 
 export interface SanitizedInstructions {
   safeInstructions: string;
@@ -19,7 +20,7 @@ export const sanitizeInstructions = (
     instructions.length > MAX_INSTRUCTIONS_CHARS ||
     (aiInstructions && aiInstructions.length > MAX_INSTRUCTIONS_CHARS)
   ) {
-    console.warn(`[${providerName}] Instructions truncated to`, MAX_INSTRUCTIONS_CHARS, 'chars');
+    logger.warn({ provider: providerName, maxChars: MAX_INSTRUCTIONS_CHARS }, 'Instructions truncated');
   }
 
   return {

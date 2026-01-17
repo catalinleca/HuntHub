@@ -1,16 +1,39 @@
 import { NextFunction, Request, Response, ErrorRequestHandler } from 'express';
-import { AppError, ValidationError } from '@/shared/errors';
+import { AppError, ValidationError, InternalServerError } from '@/shared/errors';
+import { logger } from '@/utils/logger';
+import { Sentry } from '@/config/sentry';
 
-export const errorHandler: ErrorRequestHandler = (err: Error, req: Request, res: Response, _: NextFunction) => {
-  console.error(err);
-
+export const errorHandler: ErrorRequestHandler = (err: Error, _req: Request, res: Response, _next: NextFunction) => {
   if (err instanceof ValidationError) {
-    res.status(err.statusCode).send({ message: err.message, errors: err.errors });
-  } else if (err instanceof AppError) {
-    res.status(err.statusCode).send({ message: err.message });
-  } else {
-    res.status(500).send({
-      message: 'Something went wrong',
+    logger.warn({ err }, err.message);
+
+    res.status(err.statusCode).json({
+      code: err.code,
+      message: err.message,
+      errors: err.errors,
     });
+
+    return;
   }
+
+  if (err instanceof AppError) {
+    logger.warn({ err }, err.message);
+
+    res.status(err.statusCode).json({
+      code: err.code,
+      message: err.message,
+    });
+
+    return;
+  }
+
+  const internalError = new InternalServerError(undefined, err);
+
+  logger.error({ err }, internalError.message);
+  Sentry.captureException(err);
+
+  res.status(internalError.statusCode).json({
+    code: internalError.code,
+    message: internalError.message,
+  });
 };

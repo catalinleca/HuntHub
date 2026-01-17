@@ -1,5 +1,6 @@
 import { StepCreate, StepUpdate, Media, MediaType } from '@hunthub/shared';
 import { ExtractedAssets, AssetSource } from '@/services/asset-usage';
+import { logger } from '@/utils/logger';
 
 export const AssetExtractor = {
   fromDTO(step: StepCreate | StepUpdate): ExtractedAssets {
@@ -71,7 +72,7 @@ export const AssetExtractor = {
         break;
 
       default:
-        console.warn(`Unknown media type: ${mediaType}`);
+        logger.warn({ mediaType }, 'Unknown media type');
     }
   },
 

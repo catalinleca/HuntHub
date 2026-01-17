@@ -5,12 +5,12 @@ import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 
-const result = dotenv.config({ path: '.env.local' });
-if (!result.error) {
-  console.log('Environment loaded from .env.local');
-} else {
-  console.error('.env.local not found');
-}
+dotenv.config({ path: '.env.local' });
+
+import { logger } from '@/utils/logger';
+import { initSentry } from '@/config/sentry';
+
+initSentry();
 
 import mustConnectDb from './database';
 import { databaseUrl } from './config/env.config';
@@ -25,7 +25,7 @@ import huntShareRouter from '@/features/sharing/hunt-share.routes';
 import playRouter from '@/features/play/play.routes';
 import cloneRouter from '@/features/cloning/clone.routes';
 
-import { errorHandler, authMiddleware } from '@/shared/middlewares';
+import { errorHandler, authMiddleware, requestLogger } from '@/shared/middlewares';
 
 async function bootstrap() {
   if (!databaseUrl) {
@@ -47,6 +47,7 @@ async function bootstrap() {
   );
 
   app.use(bodyParser.json());
+  app.use(requestLogger);
 
   app.use('/auth', authRouter);
 
@@ -64,7 +65,7 @@ async function bootstrap() {
 
   const PORT = process?.env.PORT || 3000;
   app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    logger.info({ port: PORT }, 'Server started');
   });
 }
 

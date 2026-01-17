@@ -19,6 +19,7 @@ import { IHuntVersion } from '@/database/types/HuntVersion';
 import { IStep } from '@/database/types/Step';
 import { IStepProgress } from '@/database/types/Progress';
 import { NotFoundError, ForbiddenError, ConflictError, ValidationError } from '@/shared/errors';
+import { logger } from '@/utils/logger';
 import { withTransaction } from '@/shared/utils/transaction';
 import { isDev } from '@/config/env.config';
 import { TYPES } from '@/shared/types';
@@ -214,15 +215,15 @@ export class PlayService implements IPlayService {
 
     const validationResult = await AnswerValidator.validate(request.answerType, request.payload, step);
 
-    console.log('[Validation]', {
-      sessionId,
-      stepId: progress.currentStepId,
-      answerType: request.answerType,
-      isCorrect: validationResult.isCorrect,
-      feedback: validationResult.feedback,
-      transcript: validationResult.transcript,
-      confidence: validationResult.confidence,
-    });
+    logger.debug(
+      {
+        sessionId,
+        stepId: progress.currentStepId,
+        answerType: request.answerType,
+        isCorrect: validationResult.isCorrect,
+      },
+      'Validation result',
+    );
 
     return withTransaction(async (session) => {
       const newAttempts = await SessionManager.incrementAttempts(sessionId, progress.currentStepId, session);

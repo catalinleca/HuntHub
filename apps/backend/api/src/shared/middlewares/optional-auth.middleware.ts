@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { auth } from 'firebase-admin';
 import { authUser } from '@/shared/utils/auth';
+import { logger } from '@/utils/logger';
 
 export const optionalAuthMiddleware = async (req: Request, _res: Response, next: NextFunction) => {
   try {
@@ -13,7 +14,7 @@ export const optionalAuthMiddleware = async (req: Request, _res: Response, next:
       }
     }
   } catch {
-    console.log('Anonymous user');
+    logger.debug('Anonymous user - no valid auth token');
   }
 
   next();

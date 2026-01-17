@@ -1,6 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/shared/types';
 import type { ITextValidationProvider, IAudioValidationProvider, IImageValidationProvider } from './interfaces';
+import { logger } from '@/utils/logger';
 
 export interface AIValidationResult {
   isCorrect: boolean;
@@ -80,7 +81,7 @@ export class AIValidationService implements IAIValidationService {
         fallbackUsed: false,
       };
     } catch (error) {
-      console.error('[AIValidation] Task validation failed:', error);
+      logger.error({ err: error }, 'Task validation failed');
       return this.createFallbackResult();
     }
   }
@@ -114,7 +115,7 @@ export class AIValidationService implements IAIValidationService {
         transcript: response.transcript,
       };
     } catch (error) {
-      console.error('[AIValidation] Audio validation failed:', error);
+      logger.error({ err: error }, 'Audio validation failed');
       return this.createFallbackResult();
     }
   }
@@ -147,7 +148,7 @@ export class AIValidationService implements IAIValidationService {
         fallbackUsed: false,
       };
     } catch (error) {
-      console.error('[AIValidation] Image validation failed:', error);
+      logger.error({ err: error }, 'Image validation failed');
       return this.createFallbackResult();
     }
   }
