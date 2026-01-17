@@ -345,7 +345,9 @@ components:
         challenge:
           $ref: '#/components/schemas/Challenge'
         media:
-          $ref: '#/components/schemas/Media'
+          allOf:
+            - $ref: '#/components/schemas/Media'
+          nullable: true
           description: Optional media attachment for this step
         requiredLocation:
           allOf:
@@ -388,7 +390,9 @@ components:
         challenge:
           $ref: '#/components/schemas/Challenge'
         media:
-          $ref: '#/components/schemas/Media'
+          allOf:
+            - $ref: '#/components/schemas/Media'
+          nullable: true
           description: Optional media attachment for this step
         requiredLocation:
           allOf:
@@ -417,7 +421,9 @@ components:
         challenge:
           $ref: '#/components/schemas/Challenge'
         media:
-          $ref: '#/components/schemas/Media'
+          allOf:
+            - $ref: '#/components/schemas/Media'
+          nullable: true
           description: Optional media attachment for this step
         requiredLocation:
           allOf:

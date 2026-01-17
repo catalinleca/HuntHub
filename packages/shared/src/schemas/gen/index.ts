@@ -96,7 +96,7 @@ export const Step = z
     huntId: z.number().int(),
     type: ChallengeType,
     challenge: Challenge,
-    media: Media.optional(),
+    media: Media.nullish(),
     requiredLocation: Location.nullish(),
     hint: z.string().nullish(),
     timeLimit: z.number().nullish(),
@@ -135,7 +135,7 @@ export const StepCreate = z
   .object({
     type: ChallengeType,
     challenge: Challenge,
-    media: Media.optional(),
+    media: Media.nullish(),
     requiredLocation: Location.nullish(),
     hint: z.string().nullish(),
     timeLimit: z.number().nullish(),
@@ -165,7 +165,7 @@ export const StepUpdate = z
   .object({
     type: ChallengeType,
     challenge: Challenge,
-    media: Media.optional(),
+    media: Media.nullish(),
     requiredLocation: Location.nullish(),
     hint: z.string().nullish(),
     timeLimit: z.number().nullish(),
