@@ -51,11 +51,7 @@ export class AuthorizationService implements IAuthorizationService {
     return this.createSharedContext(huntDoc, userId, permission);
   }
 
-  async requireAccess(
-    huntId: number,
-    userId: string,
-    requiredPermission: HuntPermission,
-  ): Promise<AccessContext> {
+  async requireAccess(huntId: number, userId: string, requiredPermission: HuntPermission): Promise<AccessContext> {
     const access = await this.getAccess(huntId, userId);
     if (!access) {
       throw new NotFoundError('Hunt not found or access denied');

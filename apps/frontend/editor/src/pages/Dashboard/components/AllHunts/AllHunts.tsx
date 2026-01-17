@@ -51,7 +51,7 @@ export const AllHunts = ({ hunts }: AllHuntsProps) => {
                 },
               });
             },
-          }
+          },
         );
       },
     });

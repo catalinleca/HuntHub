@@ -135,7 +135,11 @@ huntShareSchema.statics.shareHunt = function (
   ).exec();
 };
 
-huntShareSchema.statics.updatePermission = function (huntId: number, sharedWithId: string, permission: StoredPermission) {
+huntShareSchema.statics.updatePermission = function (
+  huntId: number,
+  sharedWithId: string,
+  permission: StoredPermission,
+) {
   return this.findOneAndUpdate({ huntId, sharedWithId }, { permission }, { new: true, runValidators: true }).exec();
 };
 

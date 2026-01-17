@@ -8,7 +8,12 @@ import { NotFoundError, ForbiddenError, ValidationError } from '@/shared/errors'
 import { HuntShareMapper } from '@/shared/mappers';
 
 export interface IHuntShareService {
-  shareHunt(huntId: number, sharedWithEmail: string, permission: StoredPermission, userId: string): Promise<ShareResult>;
+  shareHunt(
+    huntId: number,
+    sharedWithEmail: string,
+    permission: StoredPermission,
+    userId: string,
+  ): Promise<ShareResult>;
   updatePermission(
     huntId: number,
     sharedWithId: string,
