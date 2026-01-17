@@ -1,4 +1,5 @@
 export { CreateHuntForm } from './CreateHuntForm';
+export { ErrorFallback } from './ErrorFallback';
 export { NavBar } from './NavBar';
 export { UserMenu } from './UserMenu';
 export { ConfirmationDialog } from './ConfirmationDialog';
