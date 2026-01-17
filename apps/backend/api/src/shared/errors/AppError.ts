@@ -1,14 +1,15 @@
+import { ErrorCode } from './error-codes';
+
 export class AppError extends Error {
   constructor(
-    public message: string = 'Something went wrong',
+    public message: string = 'An unexpected error occurred',
     public statusCode: number = 500,
+    public code: ErrorCode = ErrorCode.INTERNAL_ERROR,
   ) {
     super(message);
 
-    // Err name to class name
     this.name = this.constructor.name;
 
-    // Ensure prototype chain
     Object.setPrototypeOf(this, AppError.prototype);
 
     if (Error?.captureStackTrace) {

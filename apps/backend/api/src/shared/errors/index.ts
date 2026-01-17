@@ -5,4 +5,6 @@ export { UnauthorizedError } from './UnauthorizedError';
 export { ForbiddenError } from './ForbiddenError';
 export { ConflictError } from './ConflictError';
 export { FirebaseAuthError } from './FirebaseAuthError';
+export { InternalServerError } from './InternalServerError';
+export { ErrorCode } from './error-codes';
 export { handleWithFirebaseError } from './handleFirebaseCall';

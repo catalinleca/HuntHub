@@ -35,3 +35,7 @@ export const groqApiKey = process.env.GROQ_API_KEY;
 export const geminiApiKey = process.env.GEMINI_API_KEY;
 
 export const isDev = process.env.NODE_ENV !== 'production';
+export const isProduction = process.env.NODE_ENV === 'production';
+
+export const logLevel = process.env.LOG_LEVEL || 'info';
+export const sentryDsn = process.env.SENTRY_DSN;

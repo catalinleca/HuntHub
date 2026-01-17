@@ -1,8 +1,9 @@
 import { AppError } from './AppError';
+import { ErrorCode } from './error-codes';
 
 export class FirebaseAuthError extends AppError {
   readonly originalError: Error;
-  readonly errorCode: string;
+  readonly firebaseCode: string;
 
   private static ERROR_MAP: Record<string, { message: string; statusCode: number }> = {
     'auth/invalid-email': {
@@ -49,16 +50,16 @@ export class FirebaseAuthError extends AppError {
 
   constructor(error: unknown) {
     const originalError = error instanceof Error ? error : new Error(String(error));
-    const errorCode = (originalError as Error & { code?: string }).code || 'unknown';
+    const fbCode = (originalError as Error & { code?: string }).code || 'unknown';
 
-    const errorConfig = FirebaseAuthError.ERROR_MAP[errorCode] || {
+    const errorConfig = FirebaseAuthError.ERROR_MAP[fbCode] || {
       message: 'Authentication failed',
       statusCode: 500,
     };
 
-    super(errorConfig.message, errorConfig.statusCode);
+    super(errorConfig.message, errorConfig.statusCode, ErrorCode.FIREBASE_AUTH_ERROR);
 
-    this.errorCode = errorCode;
+    this.firebaseCode = fbCode;
     this.originalError = originalError;
 
     Object.setPrototypeOf(this, FirebaseAuthError.prototype);

@@ -1,5 +1,6 @@
 import 'dotenv';
 import mongoose from 'mongoose';
+import { logger } from '@/utils/logger';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function baseTransform(_: unknown, ret: any) {
