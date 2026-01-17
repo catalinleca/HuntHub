@@ -139,13 +139,13 @@ export class PlayerExporter {
       throw new Error('Quiz challenge missing quiz data');
     }
 
-    if (!quiz.title || !quiz.description || !quiz.type) {
-      throw new Error('Quiz challenge missing required fields');
+    if (!quiz.title || !quiz.type) {
+      throw new Error('Quiz challenge missing required fields (title, type)');
     }
 
     return {
       title: quiz.title,
-      description: quiz.description,
+      description: quiz.description ?? '',
       type: quiz.type,
       options: quiz.options,
       randomizeOrder: quiz.randomizeOrder,
@@ -162,13 +162,13 @@ export class PlayerExporter {
       throw new Error('Mission challenge missing mission data');
     }
 
-    if (!mission.title || !mission.description || !mission.type) {
-      throw new Error('Mission challenge missing required fields');
+    if (!mission.title || !mission.type) {
+      throw new Error('Mission challenge missing required fields (title, type)');
     }
 
     return {
       title: mission.title,
-      description: mission.description,
+      description: mission.description ?? '',
       type: mission.type,
       referenceAssetIds: mission.referenceAssetIds,
       // STRIPPED: targetLocation, aiInstructions, aiModel
@@ -183,14 +183,15 @@ export class PlayerExporter {
     if (!task) {
       throw new Error('Task challenge missing task data');
     }
+    console.log('===task: ', task);
 
-    if (!task.title || !task.instructions) {
+    if (!task.title) {
       throw new Error('Task challenge missing required fields');
     }
 
     return {
       title: task.title,
-      instructions: task.instructions,
+      instructions: task.instructions ?? '',
       // STRIPPED: aiInstructions, aiModel
     };
   }

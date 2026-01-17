@@ -79,15 +79,15 @@ export const ChallengeCard = ({
         )}
       </Stack>
 
+      <BadgeContainer>
+        <TypeBadge {...badge} />
+      </BadgeContainer>
+
       {hasVisualMedia && (
         <S.MediaCard>
           <MediaDisplay media={media} />
         </S.MediaCard>
       )}
-
-      <BadgeContainer>
-        <TypeBadge {...badge} />
-      </BadgeContainer>
 
       {hasContent && (
         <S.ContentCard elevation={0}>
