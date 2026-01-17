@@ -11,10 +11,13 @@ export const OptionCard = styled(Box)<{ $selected?: boolean; $disabled?: boolean
   background-color: ${({ theme, $selected }) => ($selected ? alpha(theme.palette.accent.main, 0.08) : 'transparent')};
 
   &:hover {
-    border-color: ${({ theme, $disabled }) => ($disabled ? undefined : theme.palette.accent.main)};
+    border-color: ${({ theme, $disabled, $selected }) =>
+      $disabled ? ($selected ? theme.palette.accent.main : theme.palette.grey[300]) : theme.palette.accent.main};
     background-color: ${({ theme, $disabled, $selected }) =>
       $disabled
-        ? undefined
+        ? $selected
+          ? alpha(theme.palette.accent.main, 0.08)
+          : 'transparent'
         : $selected
           ? alpha(theme.palette.accent.main, 0.12)
           : alpha(theme.palette.grey[500], 0.08)};
