@@ -4,6 +4,7 @@ import { groqApiKey } from '@/config/env.config';
 import type { ITextValidationProvider, TextValidationParams, ValidationResponse } from './interfaces';
 import { MAX_RESPONSE_CHARS, buildTextPrompt } from './validation.constants';
 import { sanitizeInstructions, parseJsonResponse, normalizeValidationResponse } from './validation-utils';
+import { logger } from '@/utils/logger';
 
 @injectable()
 export class GroqProvider implements ITextValidationProvider {
@@ -12,7 +13,7 @@ export class GroqProvider implements ITextValidationProvider {
 
   constructor() {
     if (!groqApiKey) {
-      console.warn('[GroqProvider] GROQ_API_KEY not set - AI validation will use fallback');
+      logger.warn('GROQ_API_KEY not set - AI validation will use fallback');
     }
     this.client = new Groq({ apiKey: groqApiKey });
   }

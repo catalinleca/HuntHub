@@ -4,6 +4,7 @@ import { openaiApiKey } from '@/config/env.config';
 import type { ITextValidationProvider, TextValidationParams, ValidationResponse } from './interfaces';
 import { MAX_RESPONSE_CHARS, buildTextPrompt } from './validation.constants';
 import { sanitizeInstructions, parseJsonResponse, normalizeValidationResponse } from './validation-utils';
+import { logger } from '@/utils/logger';
 
 @injectable()
 export class OpenAIProvider implements ITextValidationProvider {
@@ -12,7 +13,7 @@ export class OpenAIProvider implements ITextValidationProvider {
 
   constructor() {
     if (!openaiApiKey) {
-      console.warn('[OpenAIProvider] OPENAI_API_KEY not set - text validation calls will fail');
+      logger.warn('OPENAI_API_KEY not set - text validation calls will fail');
     }
     this.client = new OpenAI({ apiKey: openaiApiKey });
   }

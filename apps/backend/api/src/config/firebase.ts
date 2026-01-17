@@ -10,6 +10,7 @@ import {
   firebaseMessagingSenderId,
   firebaseAppId,
 } from './env.config';
+import { logger } from '@/utils/logger';
 
 function initializeFirebaseAdmin() {
   // Test environment - use dummy credentials
@@ -60,6 +61,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-console.log('Firebase initialized');
+logger.info('Firebase initialized');
 export const auth = getAuth(app);
 export const adminAuth = getAdminAuth(adminApp);

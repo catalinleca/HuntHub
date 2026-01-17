@@ -4,6 +4,7 @@ import { container } from '@/config/inversify';
 import { TYPES } from '@/shared/types';
 import type { IAIValidationService } from '@/services/ai-validation';
 import { IAnswerValidator, ValidationResult } from '../answer-validator.helper';
+import { logger } from '@/utils/logger';
 
 export const TaskValidator: IAnswerValidator = {
   async validate(payload: AnswerPayload, step: IStep): Promise<ValidationResult> {
@@ -35,7 +36,7 @@ export const TaskValidator: IAnswerValidator = {
         feedback: result.feedback,
       };
     } catch (error) {
-      console.error('[TaskValidator] AI validation failed:', error instanceof Error ? error.message : 'Unknown error');
+      logger.error({ err: error }, 'Task validation failed');
       return {
         isCorrect: false,
         feedback: 'Unable to validate your response. Please try again.',

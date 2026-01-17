@@ -28,9 +28,9 @@ export default async function mustConnectDb(connectionURI: string) {
       transform: baseTransform,
     });
 
-    console.log('Connected to MongoDB');
+    logger.info('Connected to MongoDB');
   } catch (err) {
-    console.error('MongoDB connection error:', err);
+    logger.error({ err }, 'MongoDB connection failed');
     process.exit(1);
   }
 }

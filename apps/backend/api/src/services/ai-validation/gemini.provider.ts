@@ -11,6 +11,7 @@ import type {
 } from './interfaces';
 import { buildAudioPrompt, buildImagePrompt } from './validation.constants';
 import { sanitizeInstructions, parseJsonResponse, normalizeValidationResponse } from './validation-utils';
+import { logger } from '@/utils/logger';
 
 @injectable()
 export class GeminiProvider implements IAudioValidationProvider, IImageValidationProvider {
@@ -19,7 +20,7 @@ export class GeminiProvider implements IAudioValidationProvider, IImageValidatio
 
   constructor() {
     if (!geminiApiKey) {
-      console.warn('[GeminiProvider] GEMINI_API_KEY not set - audio validation calls will fail');
+      logger.warn('GEMINI_API_KEY not set - audio/image validation calls will fail');
     }
     this.client = new GoogleGenerativeAI(geminiApiKey || '');
   }
