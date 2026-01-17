@@ -135,4 +135,17 @@ export class HuntMapper {
       isPublished: false,
     };
   }
+
+  static toCloneForNewHunt(sourceDoc: HydratedDocument<IHuntVersion>, newHuntId: number): Partial<IHuntVersion> {
+    return {
+      huntId: newHuntId,
+      version: 1,
+      name: `${sourceDoc.name} (Copy)`,
+      description: sourceDoc.description,
+      startLocation: sourceDoc.startLocation,
+      stepOrder: [], // Populated after steps cloned with new IDs
+      coverImage: sourceDoc.coverImage,
+      isPublished: false,
+    };
+  }
 }

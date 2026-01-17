@@ -4,6 +4,7 @@ export { useDashboardHunts } from './useDashboardHunts';
 export { useCreateHunt } from './createHunt';
 export { useUpdateHunt } from './updateHunt';
 export { useDeleteHunt } from './deleteHunt';
+export { useCloneHunt } from './cloneHunt';
 export { useSaveHunt } from './saveHunt';
 export { usePublishHunt } from './publishHunt';
 export { useReleaseHunt } from './releaseHunt';

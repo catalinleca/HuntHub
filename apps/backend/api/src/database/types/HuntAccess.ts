@@ -1,14 +1,15 @@
 import mongoose from 'mongoose';
+import { HuntPermission } from '@hunthub/shared';
 import { IUser } from './User';
 
-// Hierarchy: owner > admin > view
-export type HuntPermission = 'view' | 'admin';
+// Only 'view' and 'admin' are stored - 'owner' is determined by Hunt.creatorId
+export type StoredPermission = Exclude<HuntPermission, HuntPermission.Owner>;
 
 export interface IHuntShare {
   huntId: number;
   ownerId: mongoose.Types.ObjectId;
   sharedWithId: mongoose.Types.ObjectId;
-  permission: HuntPermission;
+  permission: StoredPermission;
   sharedAt: Date;
   sharedBy: mongoose.Types.ObjectId;
 

@@ -115,6 +115,13 @@ export enum HuntAccessType {
   Editor = "editor",
 }
 
+/** Permission level for hunt access. Hierarchy: owner > admin > view */
+export enum HuntPermission {
+  View = "view",
+  Admin = "admin",
+  Owner = "owner",
+}
+
 /** Hunt status: draft (editable) or published (read-only) */
 export enum HuntStatus {
   Draft = "draft",
@@ -762,6 +769,15 @@ export interface TakeOfflineRequest {
    * @example 2
    */
   currentLiveVersion: number | null;
+}
+
+/** Request body for cloning a hunt */
+export interface CloneHuntRequest {
+  /**
+   * Version number to clone (optional - defaults to latest version)
+   * @example 1
+   */
+  version?: number;
 }
 
 /** Request body for sharing a hunt with another user */
