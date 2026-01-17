@@ -34,16 +34,6 @@ export class CloneService implements ICloneService {
 
     const sourceVersion = version ?? huntDoc.latestVersion;
 
-    if (version !== undefined) {
-      const versionExists = await HuntVersionModel.exists({
-        huntId: sourceHuntId,
-        version,
-      });
-      if (!versionExists) {
-        throw new NotFoundError(`Version ${version} not found`);
-      }
-    }
-
     const sourceVersionDoc = await HuntVersionModel.findOne({
       huntId: sourceHuntId,
       version: sourceVersion,

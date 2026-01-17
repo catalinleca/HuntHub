@@ -229,9 +229,6 @@ export class HuntService implements IHuntService {
 
   async reorderSteps(huntId: number, stepOrder: number[], userId: string): Promise<Hunt> {
     const { huntDoc } = await this.authService.requireAccess(huntId, userId, HuntPermission.Admin);
-    if (!huntDoc) {
-      throw new NotFoundError();
-    }
 
     const stepsCount = await StepModel.countDocuments({
       stepId: { $in: stepOrder },
