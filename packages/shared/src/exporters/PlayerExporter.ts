@@ -135,11 +135,14 @@ export class PlayerExporter {
     if (!quiz) {
       throw new Error('Quiz challenge missing quiz data');
     }
+    if (!quiz.type) {
+      throw new Error('Quiz challenge missing type');
+    }
 
     return {
       title: quiz.title ?? '',
       description: quiz.description ?? '',
-      type: quiz.type!,
+      type: quiz.type,
       options: quiz.options,
       randomizeOrder: quiz.randomizeOrder,
       // STRIPPED: targetId, expectedAnswer, validation
@@ -155,11 +158,14 @@ export class PlayerExporter {
     if (!mission) {
       throw new Error('Mission challenge missing mission data');
     }
+    if (!mission.type) {
+      throw new Error('Mission challenge missing type');
+    }
 
     return {
       title: mission.title ?? '',
       description: mission.description ?? '',
-      type: mission.type!,
+      type: mission.type,
       referenceAssetIds: mission.referenceAssetIds,
       // STRIPPED: targetLocation, aiInstructions, aiModel
     };
