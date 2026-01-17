@@ -8,6 +8,7 @@ import {
   signInWithPopup,
   signOut as firebaseSignOut,
 } from 'firebase/auth';
+import * as Sentry from '@sentry/react';
 import { auth } from '@/services/firebase';
 import { FirebaseError } from 'firebase/app';
 
@@ -37,6 +38,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(firebaseUser);
         setLoading(false);
         setError(null);
+
+        if (firebaseUser) {
+          Sentry.setUser({ id: firebaseUser.uid });
+        } else {
+          Sentry.setUser(null);
+        }
       },
       (err) => {
         console.error('Auth error: ', err.message);
