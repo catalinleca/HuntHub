@@ -50,7 +50,6 @@ async function bootstrap() {
   app.use(bodyParser.json());
   app.use(requestLogger);
 
-  // Health check (no auth required)
   app.get('/health', (_req, res) => {
     res.status(200).json({ status: 'ok' });
   });
