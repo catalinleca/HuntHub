@@ -24,15 +24,6 @@ export const MediaCard = styled(Box)`
   overflow: hidden;
   border-radius: ${({ theme }) => theme.shape.md}px;
   border: 2px solid ${({ theme }) => theme.palette.grey[300]};
-  line-height: 0;
-  font-size: 0;
-
-  img,
-  video {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
 `;
 
 export const ContentCard = styled(Box)`
