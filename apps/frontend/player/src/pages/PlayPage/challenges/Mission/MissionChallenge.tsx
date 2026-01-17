@@ -58,15 +58,15 @@ export const MissionChallenge = ({
     [sessionId, uploadAudio, onValidate],
   );
 
-  const isDisabled = isValidating || isUploadingAudio || isUploadingPhoto;
+  const isSubmitting = isValidating || isUploadingAudio || isUploadingPhoto;
 
   const contents: Record<MissionType, React.ReactNode> = {
-    [MissionType.MatchLocation]: <LocationContent onSubmit={handleLocationSubmit} disabled={isDisabled} />,
+    [MissionType.MatchLocation]: <LocationContent onSubmit={handleLocationSubmit} isSubmitting={isSubmitting} />,
     [MissionType.UploadMedia]: (
-      <PhotoContent onSubmit={handlePhotoSubmit} disabled={isDisabled} uploadError={uploadPhotoError} />
+      <PhotoContent onSubmit={handlePhotoSubmit} isSubmitting={isSubmitting} uploadError={uploadPhotoError} />
     ),
     [MissionType.UploadAudio]: (
-      <AudioContent onSubmit={handleAudioSubmit} disabled={isDisabled} uploadError={uploadAudioError} />
+      <AudioContent onSubmit={handleAudioSubmit} isSubmitting={isSubmitting} uploadError={uploadAudioError} />
     ),
   };
 

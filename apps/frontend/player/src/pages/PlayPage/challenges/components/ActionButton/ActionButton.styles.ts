@@ -7,10 +7,6 @@ const pressAnimation = keyframes`
   100% { transform: scale(1); }
 `;
 
-const spinAnimation = keyframes`
-  to { transform: rotate(360deg); }
-`;
-
 interface StyledButtonProps {
   $color?: string;
   $isLoading?: boolean;
@@ -62,14 +58,4 @@ export const ButtonContent = styled.span`
   align-items: center;
   justify-content: center;
   gap: ${({ theme }) => theme.spacing(1)};
-`;
-
-export const LoadingSpinner = styled.span`
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-  border: 2px solid currentColor;
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: ${spinAnimation} 0.8s linear infinite;
 `;

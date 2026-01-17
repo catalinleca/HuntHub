@@ -1,4 +1,5 @@
 import { ArrowRightIcon, TrophyIcon } from '@phosphor-icons/react';
+import { Spinner } from '@/components/core';
 import * as S from './ActionButton.styles';
 
 interface ActionButtonProps {
@@ -24,7 +25,7 @@ export const ActionButton = ({
     if (isValidating) {
       return (
         <S.ButtonContent>
-          <S.LoadingSpinner />
+          <Spinner />
           {loadingLabel}
         </S.ButtonContent>
       );

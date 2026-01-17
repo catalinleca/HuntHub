@@ -6,8 +6,6 @@ import { alpha } from '@mui/material/styles';
 export const Container = styled(Box)`
   position: relative;
   width: 100%;
-  border-radius: ${({ theme }) => theme.shape.md}px;
-  overflow: hidden;
 `;
 
 export const Image = styled.img`

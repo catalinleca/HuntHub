@@ -15,14 +15,14 @@ import type { Media } from '@hunthub/shared';
 import type { BadgeConfig } from '@/constants';
 import { MediaDisplay } from '@/components/media';
 import { usePlaySession } from '@/context';
-import { TypeBadge } from '../TypeBadge';
+import { TypeBadge, BadgeContainer } from '../TypeBadge';
 import { HintSection } from '../HintSection';
 import { TimeLimit } from '../TimeLimit';
 import { AttemptsCounter } from '../AttemptsCounter';
 import { FeedbackDisplay } from '../FeedbackDisplay';
 import * as S from './ChallengeCard.styles';
 
-const VISUAL_MEDIA_TYPES: MediaType[] = [MediaType.Image, MediaType.Video, MediaType.ImageAudio];
+const BORDERED_MEDIA_TYPES: MediaType[] = [MediaType.Image, MediaType.Video, MediaType.ImageAudio];
 
 interface ChallengeCardProps {
   children?: React.ReactNode;
@@ -31,7 +31,6 @@ interface ChallengeCardProps {
   description?: string;
   footer: React.ReactNode;
   showHint?: boolean;
-  // Step-level features
   media?: Media;
   timeLimit?: number | null;
   maxAttempts?: number | null;
@@ -60,10 +59,10 @@ export const ChallengeCard = ({
   const [showAbandonDialog, setShowAbandonDialog] = useState(false);
 
   const hasIndicators = timeLimit || maxAttempts;
-  const hasVisualMedia = media && VISUAL_MEDIA_TYPES.includes(media.type);
-  const hasAudioOnly = media?.type === MediaType.Audio;
+  const hasMedia = !!media;
+  const needsBorderedContainer = media && BORDERED_MEDIA_TYPES.includes(media.type);
+  const hasContent = title || description;
 
-  // TODO: fix Dialog, move it into its own folder and code properly
   return (
     <S.Container>
       <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
@@ -80,17 +79,31 @@ export const ChallengeCard = ({
         )}
       </Stack>
 
-      {hasVisualMedia && <MediaDisplay media={media} />}
+      <BadgeContainer>
+        <TypeBadge {...badge} />
+      </BadgeContainer>
 
-      <TypeBadge {...badge} />
+      {hasMedia &&
+        (needsBorderedContainer ? (
+          <S.MediaCard>
+            <MediaDisplay media={media} />
+          </S.MediaCard>
+        ) : (
+          <MediaDisplay media={media} />
+        ))}
 
-      {title && <Typography variant="h5">{title}</Typography>}
-      {description && <Typography color="text.secondary">{description}</Typography>}
+      {hasContent && (
+        <S.ContentCard>
+          {title && <Typography variant="h5">{title}</Typography>}
+          {description && (
+            <Typography variant="bodyItalic" color="text.secondary">
+              {description}
+            </Typography>
+          )}
+        </S.ContentCard>
+      )}
 
-      <S.Content>
-        {children}
-        {hasAudioOnly && <MediaDisplay media={media} />}
-      </S.Content>
+      <S.Content>{children}</S.Content>
 
       <FeedbackDisplay feedback={feedback ?? null} />
 

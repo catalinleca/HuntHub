@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography } from '@mui/material';
+import { TextField, Button, Typography, InputLabel, Stack } from '@mui/material';
 import * as S from './PlayerIdentification.styles';
 
 interface PlayerIdentificationProps {
@@ -31,25 +31,31 @@ export const PlayerIdentification = ({ onSubmit, isLoading = false }: PlayerIden
         </Typography>
 
         <S.Form onSubmit={handleSubmit}>
-          <TextField
-            label="Your Name"
-            value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
-            required
-            fullWidth
-            autoFocus
-            disabled={isLoading}
-          />
+          <Stack gap={1}>
+            <InputLabel>Your Name</InputLabel>
+            <TextField
+              value={playerName}
+              onChange={(e) => setPlayerName(e.target.value)}
+              placeholder="Enter your name..."
+              required
+              fullWidth
+              autoFocus
+              disabled={isLoading}
+            />
+          </Stack>
 
-          <TextField
-            label="Email (optional)"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            fullWidth
-            disabled={isLoading}
-            helperText="For saving progress across devices"
-          />
+          <Stack gap={1}>
+            <InputLabel>Email (optional)</InputLabel>
+            <TextField
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email..."
+              fullWidth
+              disabled={isLoading}
+              helperText="For saving progress across devices"
+            />
+          </Stack>
 
           <Button type="submit" variant="contained" size="large" fullWidth disabled={!playerName.trim() || isLoading}>
             {isLoading ? 'Starting...' : 'Start Hunt'}

@@ -1,26 +1,19 @@
 import { useEffect } from 'react';
-import { Typography, Button, CircularProgress, Stack } from '@mui/material';
-import { MapPinIcon, NavigationArrowIcon } from '@phosphor-icons/react';
+import { Typography, Button, Stack } from '@mui/material';
+import { MapPinIcon, NavigationArrowIcon, CheckIcon } from '@phosphor-icons/react';
+import { Spinner } from '@/components/core';
+import { LocationStatus, getLocationStatus } from '@/constants';
 import { useGeolocation } from '@/hooks';
 import * as S from './Mission.styles';
 
 interface LocationContentProps {
   onSubmit: (position: { lat: number; lng: number }) => void;
-  disabled?: boolean;
+  isSubmitting?: boolean;
 }
-
-type LocationStatus = 'idle' | 'loading' | 'error' | 'ready';
-
-const getStatus = (isLoading: boolean, error: string | null, hasPosition: boolean): LocationStatus => {
-  if (error) return 'error';
-  if (hasPosition) return 'ready';
-  if (isLoading) return 'loading';
-  return 'idle';
-};
 
 const LoadingPrompt = () => (
   <>
-    <CircularProgress size={24} />
+    <Spinner size="large" />
     <Typography variant="body2" color="text.secondary">
       Getting your location...
     </Typography>
@@ -55,7 +48,7 @@ const ErrorPrompt = ({ message }: { message: string }) => (
   </Typography>
 );
 
-export const LocationContent = ({ onSubmit, disabled = false }: LocationContentProps) => {
+export const LocationContent = ({ onSubmit, isSubmitting = false }: LocationContentProps) => {
   const { position, error, isLoading, watchPosition, clearWatch } = useGeolocation();
 
   useEffect(() => {
@@ -63,14 +56,7 @@ export const LocationContent = ({ onSubmit, disabled = false }: LocationContentP
     return clearWatch;
   }, [watchPosition, clearWatch]);
 
-  const status = getStatus(isLoading, error, !!position);
-
-  const prompts: Record<LocationStatus, React.ReactNode> = {
-    idle: <IdlePrompt />,
-    loading: <LoadingPrompt />,
-    error: <ErrorPrompt message={error || 'Location error'} />,
-    ready: <ReadyPrompt />,
-  };
+  const status = getLocationStatus(isLoading, error, !!position, isSubmitting);
 
   const handleCheckLocation = () => {
     if (position) {
@@ -78,32 +64,67 @@ export const LocationContent = ({ onSubmit, disabled = false }: LocationContentP
     }
   };
 
+  const prompts: Record<LocationStatus, React.ReactNode> = {
+    [LocationStatus.Idle]: <IdlePrompt />,
+    [LocationStatus.Loading]: <LoadingPrompt />,
+    [LocationStatus.Error]: <ErrorPrompt message={error || 'Location error'} />,
+    [LocationStatus.Ready]: <ReadyPrompt />,
+    [LocationStatus.Submitting]: <ReadyPrompt />,
+  };
+
+  const buttons: Record<LocationStatus, React.ReactNode> = {
+    [LocationStatus.Idle]: (
+      <Button variant="contained" fullWidth size="large" disabled startIcon={<MapPinIcon size={20} weight="bold" />}>
+        Waiting for location...
+      </Button>
+    ),
+    [LocationStatus.Loading]: (
+      <Button variant="contained" fullWidth size="large" disabled startIcon={<Spinner />}>
+        Getting location...
+      </Button>
+    ),
+    [LocationStatus.Error]: (
+      <Button variant="contained" fullWidth size="large" disabled startIcon={<MapPinIcon size={20} weight="bold" />}>
+        Check Location
+      </Button>
+    ),
+    [LocationStatus.Ready]: (
+      <Button
+        variant="contained"
+        fullWidth
+        size="large"
+        onClick={handleCheckLocation}
+        startIcon={<CheckIcon size={20} weight="bold" />}
+      >
+        Check Location
+      </Button>
+    ),
+    [LocationStatus.Submitting]: (
+      <Button variant="contained" fullWidth size="large" disabled startIcon={<Spinner />}>
+        Checking...
+      </Button>
+    ),
+  };
+
+  const showGpsIndicator = status === LocationStatus.Ready || status === LocationStatus.Submitting;
+
   return (
     <Stack gap={2}>
-      <S.UploadZone as="div" style={{ cursor: 'default' }}>
+      <S.StatusZone>
         <S.IconWrapper>
           <MapPinIcon size={32} weight="duotone" />
         </S.IconWrapper>
         {prompts[status]}
-      </S.UploadZone>
+      </S.StatusZone>
 
-      {status === 'ready' && (
+      {showGpsIndicator && (
         <S.StatusIndicator>
           <NavigationArrowIcon size={20} weight="fill" />
           <Typography variant="body2">GPS signal active</Typography>
         </S.StatusIndicator>
       )}
 
-      <Button
-        variant="contained"
-        fullWidth
-        size="large"
-        onClick={handleCheckLocation}
-        disabled={disabled || status !== 'ready'}
-        startIcon={<MapPinIcon size={20} weight="bold" />}
-      >
-        {status === 'loading' ? 'Getting location...' : 'Check Location'}
-      </Button>
+      {buttons[status]}
     </Stack>
   );
 };

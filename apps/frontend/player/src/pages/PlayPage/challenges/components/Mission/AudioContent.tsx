@@ -1,12 +1,13 @@
-import React from 'react';
 import { Typography, Button, Alert, Stack } from '@mui/material';
 import { MicrophoneIcon, StopIcon, ArrowCounterClockwiseIcon, CheckIcon } from '@phosphor-icons/react';
-import { useAudioRecorder, type Status } from '@/hooks';
+import { Spinner } from '@/components/core';
+import { SubmissionStatus, getSubmissionStatus } from '@/constants';
+import { useAudioRecorder } from '@/hooks';
 import * as S from './Mission.styles';
 
 interface AudioContentProps {
   onSubmit: (blob: Blob, mimeType: string) => void;
-  disabled?: boolean;
+  isSubmitting?: boolean;
   uploadError?: string | null;
 }
 
@@ -17,21 +18,18 @@ const formatDuration = (seconds: number): string => {
 };
 
 const ReadyPrompt = () => (
-  <S.UploadZone as="div" style={{ cursor: 'default' }}>
+  <S.StatusZone>
     <S.IconWrapper>
       <MicrophoneIcon size={32} weight="duotone" />
     </S.IconWrapper>
     <Typography variant="body1" fontWeight={500}>
-      Ready to Record
+      Record Your Answer
     </Typography>
-    <Typography variant="body2" color="text.secondary">
-      Tap the button below to start
-    </Typography>
-  </S.UploadZone>
+  </S.StatusZone>
 );
 
 const RecordingDisplay = ({ duration }: { duration: number }) => (
-  <S.UploadZone as="div" style={{ cursor: 'default' }}>
+  <S.StatusZone>
     <Stack direction="row" alignItems="center" gap={1}>
       <S.RecordingDot />
       <Typography variant="body2" color="error">
@@ -39,10 +37,17 @@ const RecordingDisplay = ({ duration }: { duration: number }) => (
       </Typography>
     </Stack>
     <S.TimerDisplay variant="h4">{formatDuration(duration)}</S.TimerDisplay>
-  </S.UploadZone>
+  </S.StatusZone>
 );
 
-const AudioPreview = ({ audioUrl, duration, onReset }: { audioUrl: string; duration: number; onReset: () => void }) => (
+interface AudioPreviewProps {
+  audioUrl: string;
+  duration: number;
+  onReset?: () => void;
+  showReset?: boolean;
+}
+
+const AudioPreview = ({ audioUrl, duration, onReset, showReset = true }: AudioPreviewProps) => (
   <Stack gap={2} alignItems="center">
     <S.AudioPlayerContainer>
       <audio src={audioUrl} controls style={{ width: '100%' }} />
@@ -50,20 +55,23 @@ const AudioPreview = ({ audioUrl, duration, onReset }: { audioUrl: string; durat
     <Typography variant="body2" color="text.secondary">
       Duration: {formatDuration(duration)}
     </Typography>
-    <Button variant="outlined" size="small" onClick={onReset} startIcon={<ArrowCounterClockwiseIcon size={18} />}>
-      Re-record
-    </Button>
+    {showReset && onReset && (
+      <Button variant="outlined" size="small" onClick={onReset} startIcon={<ArrowCounterClockwiseIcon size={18} />}>
+        Re-record
+      </Button>
+    )}
   </Stack>
 );
 
-export const AudioContent = ({ onSubmit, disabled = false, uploadError }: AudioContentProps) => {
+export const AudioContent = ({ onSubmit, isSubmitting = false, uploadError }: AudioContentProps) => {
   const { status, audioUrl, audioBlob, mimeType, duration, error, startRecording, stopRecording, discardRecording } =
     useAudioRecorder();
 
+  const displayStatus = getSubmissionStatus(status, isSubmitting);
   const displayError = error || uploadError;
 
-  const views: Record<Status, React.ReactNode> = {
-    idle: (
+  const views: Record<SubmissionStatus, React.ReactNode> = {
+    [SubmissionStatus.Idle]: (
       <>
         <ReadyPrompt />
         <Button
@@ -71,14 +79,14 @@ export const AudioContent = ({ onSubmit, disabled = false, uploadError }: AudioC
           fullWidth
           size="large"
           onClick={startRecording}
-          disabled={disabled}
+          disabled={isSubmitting}
           startIcon={<MicrophoneIcon size={20} weight="bold" />}
         >
           Start Recording
         </Button>
       </>
     ),
-    requesting: (
+    [SubmissionStatus.Requesting]: (
       <>
         <ReadyPrompt />
         <Button
@@ -92,7 +100,7 @@ export const AudioContent = ({ onSubmit, disabled = false, uploadError }: AudioC
         </Button>
       </>
     ),
-    error: (
+    [SubmissionStatus.Error]: (
       <>
         <ReadyPrompt />
         <Button
@@ -100,14 +108,14 @@ export const AudioContent = ({ onSubmit, disabled = false, uploadError }: AudioC
           fullWidth
           size="large"
           onClick={startRecording}
-          disabled={disabled}
+          disabled={isSubmitting}
           startIcon={<MicrophoneIcon size={20} weight="bold" />}
         >
           Try Again
         </Button>
       </>
     ),
-    recording: (
+    [SubmissionStatus.Recording]: (
       <>
         <RecordingDisplay duration={duration} />
         <Button
@@ -122,7 +130,7 @@ export const AudioContent = ({ onSubmit, disabled = false, uploadError }: AudioC
         </Button>
       </>
     ),
-    stopped: (
+    [SubmissionStatus.Stopped]: (
       <>
         <AudioPreview audioUrl={audioUrl!} duration={duration} onReset={discardRecording} />
         <Button
@@ -130,10 +138,18 @@ export const AudioContent = ({ onSubmit, disabled = false, uploadError }: AudioC
           fullWidth
           size="large"
           onClick={() => audioBlob && mimeType && onSubmit(audioBlob, mimeType)}
-          disabled={disabled || !audioBlob || !mimeType}
+          disabled={!audioBlob || !mimeType}
           startIcon={<CheckIcon size={20} weight="bold" />}
         >
           Submit Recording
+        </Button>
+      </>
+    ),
+    [SubmissionStatus.Submitting]: (
+      <>
+        <AudioPreview audioUrl={audioUrl!} duration={duration} showReset={false} />
+        <Button variant="contained" fullWidth size="large" disabled startIcon={<Spinner />}>
+          Checking...
         </Button>
       </>
     ),
@@ -146,7 +162,7 @@ export const AudioContent = ({ onSubmit, disabled = false, uploadError }: AudioC
           {displayError}
         </Alert>
       )}
-      {views[status]}
+      {views[displayStatus]}
     </Stack>
   );
 };
