@@ -1,9 +1,8 @@
 import { useReducer, useCallback, useEffect, useRef } from 'react';
-
-export type Status = 'idle' | 'requesting' | 'recording' | 'stopped' | 'error';
+import { RecorderStatus } from '@/constants';
 
 interface State {
-  status: Status;
+  status: RecorderStatus;
   audioUrl: string | null;
   duration: number;
   error: string | null;
@@ -18,7 +17,7 @@ type Action =
   | { type: 'RESET' };
 
 const initialState: State = {
-  status: 'idle',
+  status: RecorderStatus.Idle,
   audioUrl: null,
   duration: 0,
   error: null,
@@ -27,15 +26,15 @@ const initialState: State = {
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'REQUEST_PERMISSION':
-      return { ...initialState, status: 'requesting' };
+      return { ...initialState, status: RecorderStatus.Requesting };
     case 'START_RECORDING':
-      return { ...state, status: 'recording', duration: 0 };
+      return { ...state, status: RecorderStatus.Recording, duration: 0 };
     case 'TICK':
       return { ...state, duration: state.duration + 1 };
     case 'STOP':
-      return { ...state, status: 'stopped', audioUrl: action.audioUrl };
+      return { ...state, status: RecorderStatus.Stopped, audioUrl: action.audioUrl };
     case 'ERROR':
-      return { ...initialState, status: 'error', error: action.error };
+      return { ...initialState, status: RecorderStatus.Error, error: action.error };
     case 'RESET':
       return initialState;
     default:
@@ -211,8 +210,8 @@ export const useAudioRecorder = () => {
     mimeType: mimeTypeRef.current,
     duration: state.duration,
     error: state.error,
-    isRecording: state.status === 'recording',
-    hasRecording: state.status === 'stopped',
+    isRecording: state.status === RecorderStatus.Recording,
+    hasRecording: state.status === RecorderStatus.Stopped,
     startRecording,
     stopRecording,
     discardRecording,

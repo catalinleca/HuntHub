@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogActions, Button, Typography, Stack } from '@mui/material';
+import { Dialog, DialogContent, DialogActions, Button, Typography, Stack, useTheme } from '@mui/material';
 import { CheckCircleIcon } from '@phosphor-icons/react';
 
 interface SuccessDialogProps {
@@ -9,11 +9,13 @@ interface SuccessDialogProps {
 }
 
 export const SuccessDialog = ({ open, feedback, isHuntComplete, onContinue }: SuccessDialogProps) => {
+  const theme = useTheme();
+
   return (
     <Dialog open={open} maxWidth="xs" fullWidth>
       <DialogContent>
         <Stack alignItems="center" gap={2} sx={{ py: 2 }}>
-          <CheckCircleIcon size={64} weight="fill" color="#4caf50" />
+          <CheckCircleIcon size={64} weight="fill" color={theme.palette.success.main} />
           <Typography variant="h5" textAlign="center">
             {isHuntComplete ? 'Hunt Complete!' : 'Well Done!'}
           </Typography>

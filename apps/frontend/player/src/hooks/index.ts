@@ -8,7 +8,7 @@ export { usePhotoCapture } from './usePhotoCapture';
 export type { UsePhotoCaptureReturn } from './usePhotoCapture';
 
 export { useAudioRecorder } from './useAudioRecorder';
-export type { UseAudioRecorderReturn, Status } from './useAudioRecorder';
+export type { UseAudioRecorderReturn } from './useAudioRecorder';
 
 export { useUploadAudio } from './useUploadAudio';
 

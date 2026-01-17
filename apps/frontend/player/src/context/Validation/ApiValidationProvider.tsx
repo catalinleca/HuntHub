@@ -66,12 +66,15 @@ export const ApiValidationProvider = ({
   }, [advanceToNextStep, sessionId, nextStepId, data?.isComplete]);
 
   const isCorrect = error ? false : (data?.correct ?? null);
-  const feedback = error ? 'Something went wrong. Please try again.' : getFeedback(data);
   const attemptCount = data?.attempts ?? 0;
   const isExpired = data?.expired ?? false;
   const isExhausted = data?.exhausted ?? false;
 
   const dialogOpen = showSuccessDialog && isCorrect === true;
+
+  // When dialog is open, feedback displays in the dialog, not the Alert
+  const dialogFeedback = getFeedback(data);
+  const feedback = error ? 'Something went wrong. Please try again.' : dialogOpen ? null : dialogFeedback;
 
   return (
     <ValidationContext.Provider
@@ -89,7 +92,7 @@ export const ApiValidationProvider = ({
       {children}
       <SuccessDialog
         open={dialogOpen}
-        feedback={feedback}
+        feedback={dialogFeedback}
         isHuntComplete={data?.isComplete ?? false}
         onContinue={handleDialogContinue}
       />

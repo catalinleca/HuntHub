@@ -1,17 +1,22 @@
 import styled from 'styled-components';
 import { Box, Stack, Typography } from '@mui/material';
 
-export const UploadZone = styled(Box)`
-  display: flex;
-  flex-direction: column;
+const ZoneBase = styled(Stack)`
   align-items: center;
   justify-content: center;
   gap: ${({ theme }) => theme.spacing(1)};
   padding: ${({ theme }) => theme.spacing(4)};
   min-height: 160px;
   background-color: ${({ theme }) => theme.palette.grey[50]};
-  border: 2px dashed ${({ theme }) => theme.palette.grey[300]};
   border-radius: ${({ theme }) => theme.shape.borderRadius}px;
+`;
+
+export const StatusZone = styled(ZoneBase)`
+  border: 1px solid ${({ theme }) => theme.palette.grey[300]};
+`;
+
+export const UploadZone = styled(ZoneBase)`
+  border: 2px dashed ${({ theme }) => theme.palette.grey[300]};
   cursor: pointer;
   transition: all 0.2s ease;
 
@@ -25,8 +30,7 @@ export const UploadZone = styled(Box)`
   }
 `;
 
-export const IconWrapper = styled(Box)<{ $color?: string }>`
-  display: flex;
+export const IconWrapper = styled(Stack)<{ $color?: string }>`
   align-items: center;
   justify-content: center;
   width: 64px;
