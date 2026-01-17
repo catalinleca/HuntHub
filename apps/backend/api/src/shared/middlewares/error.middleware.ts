@@ -28,6 +28,7 @@ export const errorHandler: ErrorRequestHandler = (err: Error, _req: Request, res
   }
 
   const internalError = new InternalServerError(undefined, err);
+
   logger.error({ err }, internalError.message);
   Sentry.captureException(err);
 

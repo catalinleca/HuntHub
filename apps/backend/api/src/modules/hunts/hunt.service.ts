@@ -22,6 +22,7 @@ import {
   calculateSkip,
   buildSortObject,
 } from '@/shared/utils/pagination';
+import { logger } from '@/utils/logger';
 
 export interface IHuntService {
   createHunt(hunt: HuntCreate, creatorId: string): Promise<Hunt>;
@@ -53,7 +54,10 @@ export class HuntService implements IHuntService {
       const versionData = HuntMapper.toVersionDocument(hunt, createdHunt.huntId, 1);
       const [createdVersion] = await HuntVersionModel.create([versionData], { session });
 
-      return HuntMapper.fromDocuments(createdHunt, createdVersion);
+      const result = HuntMapper.fromDocuments(createdHunt, createdVersion);
+      logger.info({ huntId: result.huntId, creatorId }, 'Hunt created');
+
+      return result;
     });
   }
 
@@ -194,7 +198,10 @@ export class HuntService implements IHuntService {
         throw new Error('Update failed for unknown reason');
       }
 
-      return HuntMapper.fromDocuments(huntDoc, updatedVersionDoc);
+      const result = HuntMapper.fromDocuments(huntDoc, updatedVersionDoc);
+      logger.info({ huntId, userId }, 'Hunt updated');
+
+      return result;
     });
   }
 
@@ -222,8 +229,9 @@ export class HuntService implements IHuntService {
 
       await HuntVersionModel.deleteMany({ huntId }, { session });
       await StepModel.deleteMany({ huntId }, { session });
-      // Clean up asset usage (fixes cascade delete bug - no orphan records)
       await AssetUsageModel.deleteMany({ huntId }, { session });
+
+      logger.info({ huntId, userId }, 'Hunt deleted');
     });
   }
 
