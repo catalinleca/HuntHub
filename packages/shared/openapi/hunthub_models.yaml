@@ -47,9 +47,19 @@ components:
       type: string
       enum: [upload-media, match-location, upload-audio]
 
+    ValidationMode:
+      type: string
+      enum: [exact, fuzzy, contains, numeric-range]
+      description: |
+        Validation mode for quiz input answers:
+        - exact: Case-insensitive exact match (default)
+        - fuzzy: Levenshtein distance similarity match
+        - contains: Substring match
+        - numeric-range: Numeric value within tolerance
+
     MimeTypes:
       type: string
-      enum: [image/jpeg, image/png, image/webp, image/gif, video/mp4, video/webm, audio/mpeg, audio/wav, audio/ogg]
+      enum: [image/jpeg, image/png, image/webp, image/gif, video/mp4, video/webm, audio/mpeg, audio/wav, audio/ogg, audio/webm, audio/mp4]
 
     # ============================================================
     # Media Schemas (Step-level media attachment)
@@ -463,24 +473,29 @@ components:
 
     QuizValidation:
       type: object
-      description: Validation configuration for quiz answers (future feature)
+      description: Validation configuration for quiz input answers
       properties:
         mode:
-          type: string
-          enum: [exact, fuzzy, contains, numeric-range]
+          $ref: '#/components/schemas/ValidationMode'
         caseSensitive:
           type: boolean
-        range:
-          type: object
-          properties:
-            min:
-              type: number
-            max:
-              type: number
+          default: false
+          description: Whether validation should be case-sensitive (default false)
+        fuzzyThreshold:
+          type: number
+          minimum: 1
+          maximum: 100
+          default: 80
+          description: Similarity threshold percentage for fuzzy mode (1-100%, default 80%)
+        numericTolerance:
+          type: number
+          minimum: 0
+          description: Tolerance for numeric-range mode (expectedAnswer +/- tolerance)
         acceptableAnswers:
           type: array
           items:
             type: string
+          description: Additional acceptable answers (any match is correct)
       additionalProperties: false
 
     Quiz:

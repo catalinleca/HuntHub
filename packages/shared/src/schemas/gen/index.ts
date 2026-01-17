@@ -9,6 +9,7 @@ export const HuntAccessType = z.enum(['creator', 'viewer', 'editor']);
 export const ChallengeType = z.enum(['clue', 'quiz', 'mission', 'task']);
 export const OptionType = z.enum(['choice', 'input']);
 export const MissionType = z.enum(['upload-media', 'match-location', 'upload-audio']);
+export const ValidationMode = z.enum(['exact', 'fuzzy', 'contains', 'numeric-range']);
 export const MimeTypes = z.enum([
   'image/jpeg',
   'image/png',
@@ -19,6 +20,8 @@ export const MimeTypes = z.enum([
   'audio/mpeg',
   'audio/wav',
   'audio/ogg',
+  'audio/webm',
+  'audio/mp4',
 ]);
 export const MediaType = z.enum(['image', 'audio', 'video', 'image-audio']);
 export const AssetSnapshot = z
@@ -45,9 +48,10 @@ export const Clue = z.object({ title: z.string(), description: z.string() }).par
 export const Option = z.object({ id: z.string(), text: z.string() }).strict();
 export const QuizValidation = z
   .object({
-    mode: z.enum(['exact', 'fuzzy', 'contains', 'numeric-range']),
-    caseSensitive: z.boolean(),
-    range: z.object({ min: z.number(), max: z.number() }).partial().strict().passthrough(),
+    mode: ValidationMode,
+    caseSensitive: z.boolean().default(false),
+    fuzzyThreshold: z.number().gte(1).lte(100).default(80),
+    numericTolerance: z.number().gte(0),
     acceptableAnswers: z.array(z.string()),
   })
   .partial()
@@ -462,6 +466,7 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   ChallengeType,
   OptionType,
   MissionType,
+  ValidationMode,
   MimeTypes,
   MediaType,
   AssetSnapshot,

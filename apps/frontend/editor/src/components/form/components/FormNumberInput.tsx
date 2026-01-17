@@ -12,6 +12,16 @@ export interface FormNumberInputProps extends FormFieldProps<TextFieldProps> {
   step?: number;
 }
 
+const numberRegisterOptions = {
+  setValueAs: (value: string | number): number | undefined => {
+    if (value === '' || value == null) {
+      return undefined;
+    }
+    const numValue = Number(value);
+    return isNaN(numValue) ? undefined : numValue;
+  },
+};
+
 export const FormNumberInput = ({
   name,
   label,
@@ -34,7 +44,7 @@ export const FormNumberInput = ({
         {label}
       </InputLabel>
       <TextField
-        {...register(name, { valueAsNumber: true })}
+        {...register(name, numberRegisterOptions)}
         id={id}
         type="number"
         placeholder={placeholder}

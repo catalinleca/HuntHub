@@ -1,4 +1,4 @@
-import { ChallengeType, OptionType, MissionType, Quiz } from '@hunthub/shared';
+import { ChallengeType, OptionType, MissionType, ValidationMode, Quiz } from '@hunthub/shared';
 import { StepFormData } from '@/types/editor';
 
 const createBaseStep = (type: ChallengeType, huntId: number): StepFormData => {
@@ -41,6 +41,13 @@ const createQuiz = (huntId: number): StepFormData => {
       { id: option2Id, text: '' },
     ],
     targetId: option1Id,
+    validation: {
+      mode: ValidationMode.Exact,
+      caseSensitive: false,
+      fuzzyThreshold: 80,
+      numericTolerance: 0,
+      acceptableAnswers: [],
+    },
   };
 
   return {

@@ -15,6 +15,7 @@ export {
   ChallengeType,
   OptionType,
   MissionType,
+  ValidationMode,
   MimeTypes,
   MediaType,
 

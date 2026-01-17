@@ -2,6 +2,8 @@
 
 Enforceable patterns for HuntHub frontend (Editor & Player apps).
 
+**IMPORTANT: Also follow all rules in `common.md` (arrow functions, self-explanatory code, SOLID).**
+
 ---
 
 ## MUI + Styled-Components Pattern

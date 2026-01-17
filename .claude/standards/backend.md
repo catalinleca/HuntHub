@@ -2,6 +2,8 @@
 
 Enforceable patterns for HuntHub backend (Node.js + Express + MongoDB).
 
+**IMPORTANT: Also follow all rules in `common.md` (arrow functions, self-explanatory code, SOLID).**
+
 ---
 
 ## File Naming
