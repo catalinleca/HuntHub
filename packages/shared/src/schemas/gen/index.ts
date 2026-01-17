@@ -2,6 +2,7 @@ import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
 export const HuntStatus = z.enum(['draft', 'published']);
+export const HuntPermission = z.enum(['view', 'admin', 'owner']);
 export const Location = z
   .object({ lat: z.number(), lng: z.number(), radius: z.number(), address: z.string().optional() })
   .strict();
@@ -321,6 +322,7 @@ export const ReleaseHuntRequest = z
   .partial()
   .strict();
 export const TakeOfflineRequest = z.object({ currentLiveVersion: z.number().int().nullable() }).strict();
+export const CloneHuntRequest = z.object({ version: z.number().int() }).partial().strict();
 export const ShareHuntRequest = z.object({ email: z.string().email(), permission: z.enum(['admin', 'view']) }).strict();
 export const UpdatePermissionRequest = z.object({ permission: z.enum(['admin', 'view']) }).strict();
 export const CluePF = z.object({ title: z.string(), description: z.string() }).strict();
@@ -461,6 +463,7 @@ export const PaginatedAssetsResponse = z.object({ data: z.array(Asset), paginati
 
 export const schemas: Record<string, z.ZodTypeAny> = {
   HuntStatus,
+  HuntPermission,
   Location,
   HuntAccessType,
   ChallengeType,
@@ -507,6 +510,7 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   ShareResult,
   ReleaseHuntRequest,
   TakeOfflineRequest,
+  CloneHuntRequest,
   ShareHuntRequest,
   UpdatePermissionRequest,
   CluePF,
