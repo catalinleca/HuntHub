@@ -5,11 +5,10 @@ import { logger } from '@/utils/logger';
 export const requestLogger = pinoHttp({
   logger,
   genReqId: (req) => {
-    const correlationId = req.headers['x-correlation-id'] as string;
-    if (correlationId) {
-      return correlationId;
-    }
-    return randomUUID();
+    const header = req.headers['x-correlation-id'];
+    const correlationId = Array.isArray(header) ? header[0] : header;
+
+    return correlationId || randomUUID();
   },
   customLogLevel: (_req, res, err) => {
     if (res.statusCode >= 500 || err) {
