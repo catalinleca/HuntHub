@@ -4,6 +4,7 @@ import { TYPES } from '@/shared/types';
 import { IAuthorizationService } from '@/services/authorization/authorization.service';
 import { IHuntService } from '@/modules/hunts/hunt.service';
 import { IStepService } from '@/modules/steps/step.service';
+import { IAssetUsageTracker } from '@/services/asset-usage/asset-usage-tracker.service';
 import { NotFoundError } from '@/shared/errors';
 import { withTransaction } from '@/shared/utils/transaction';
 import HuntVersionModel from '@/database/models/HuntVersion';
@@ -25,6 +26,7 @@ export class CloneService implements ICloneService {
     @inject(TYPES.AuthorizationService) private authService: IAuthorizationService,
     @inject(TYPES.HuntService) private huntService: IHuntService,
     @inject(TYPES.StepService) private stepService: IStepService,
+    @inject(TYPES.AssetUsageTracker) private usageTracker: IAssetUsageTracker,
   ) {}
 
   async cloneHunt(sourceHuntId: number, userId: string, version?: number): Promise<CloneResult> {
@@ -71,6 +73,8 @@ export class CloneService implements ICloneService {
           { session },
         );
       }
+
+      await this.usageTracker.rebuildHuntAssetUsage(newHuntDoc.huntId, session);
 
       return {
         huntId: newHuntDoc.huntId,
