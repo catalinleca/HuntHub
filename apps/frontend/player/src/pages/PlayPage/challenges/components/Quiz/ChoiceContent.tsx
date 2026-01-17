@@ -1,6 +1,7 @@
 import React from 'react';
-import { RadioGroup, FormControlLabel, Radio } from '@mui/material';
+import { Stack, Typography, Radio } from '@mui/material';
 import type { QuizPF } from '@hunthub/shared';
+import * as S from './Quiz.styles';
 
 interface ChoiceContentProps {
   quiz: QuizPF;
@@ -10,21 +11,32 @@ interface ChoiceContentProps {
 }
 
 export const ChoiceContent = ({ quiz, selectedOptionId, onSelect, disabled }: ChoiceContentProps) => {
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onSelect(event.target.value);
+  const handleSelect = (optionId: string) => {
+    if (!disabled) {
+      onSelect(optionId);
+    }
   };
 
   return (
-    <RadioGroup value={selectedOptionId} onChange={handleChange}>
-      {quiz.options?.map((option) => (
-        <FormControlLabel
-          key={option.id}
-          value={option.id}
-          control={<Radio />}
-          label={option.text}
-          disabled={disabled}
-        />
-      ))}
-    </RadioGroup>
+    <Stack gap={2}>
+      {quiz.options?.map((option) => {
+        const isSelected = selectedOptionId === option.id;
+
+        return (
+          <S.OptionCard
+            key={option.id}
+            $selected={isSelected}
+            $disabled={disabled}
+            elevation={0}
+            onClick={() => handleSelect(option.id)}
+          >
+            <Stack direction="row" alignItems="center" gap={2}>
+              <Radio checked={isSelected} disabled={disabled} size="small" />
+              <Typography>{option.text}</Typography>
+            </Stack>
+          </S.OptionCard>
+        );
+      })}
+    </Stack>
   );
 };

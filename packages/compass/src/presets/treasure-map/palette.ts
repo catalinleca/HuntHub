@@ -169,6 +169,18 @@ export const treasureMapThemeOptions = {
       lineHeight: 1.43,
       fontFamily: 'Georgia, "Times New Roman", serif',
     },
+    bodyItalic: {
+      fontSize: 16,
+      fontWeight: 400,
+      fontStyle: 'italic' as const,
+      lineHeight: 1.6,
+    },
+    smItalic: {
+      fontSize: 14,
+      fontWeight: 400,
+      fontStyle: 'italic' as const,
+      lineHeight: 1.5,
+    },
   },
   spacing: [0, 4, 8, 12, 16, 24, 32, 48, 64],
   shadows: [

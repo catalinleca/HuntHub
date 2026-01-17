@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Box, Stack, Typography } from '@mui/material';
+import { alpha, Box, Stack, Typography } from '@mui/material';
 
 const ZoneBase = styled(Stack)`
   align-items: center;
@@ -7,8 +7,8 @@ const ZoneBase = styled(Stack)`
   gap: ${({ theme }) => theme.spacing(1)};
   padding: ${({ theme }) => theme.spacing(4)};
   min-height: 160px;
-  background-color: ${({ theme }) => theme.palette.grey[50]};
-  border-radius: ${({ theme }) => theme.shape.borderRadius}px;
+  background-color: ${({ theme }) => theme.palette.background.surface};
+  border-radius: ${({ theme }) => theme.shape.md}px;
 `;
 
 export const StatusZone = styled(ZoneBase)`
@@ -21,8 +21,8 @@ export const UploadZone = styled(ZoneBase)`
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: ${({ theme }) => theme.palette.primary.main};
-    background-color: ${({ theme }) => theme.palette.grey[100]};
+    border-color: ${({ theme }) => theme.palette.accent.main};
+    background-color: ${({ theme }) => alpha(theme.palette.accent.main, 0.05)};
   }
 
   &:active {
@@ -36,8 +36,8 @@ export const IconWrapper = styled(Stack)<{ $color?: string }>`
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background-color: ${({ theme, $color }) => $color || theme.palette.primary.light}20;
-  color: ${({ theme, $color }) => $color || theme.palette.primary.main};
+  background-color: ${({ theme, $color }) => alpha($color || theme.palette.accent.main, 0.1)};
+  color: ${({ theme, $color }) => $color || theme.palette.accent.dark};
 `;
 
 export const StatusIndicator = styled(Stack)<{ $isSuccess?: boolean }>`
@@ -55,7 +55,9 @@ export const PreviewImage = styled.img`
   width: 100%;
   max-height: 300px;
   object-fit: contain;
-  border-radius: ${({ theme }) => theme.shape.borderRadius}px;
+  border-radius: ${({ theme }) => theme.shape.md}px;
+  border: 1px solid ${({ theme }) => theme.palette.grey[300]};
+  background-color: ${({ theme }) => theme.palette.background.surface};
 `;
 
 export const AudioPlayerContainer = styled(Box)`

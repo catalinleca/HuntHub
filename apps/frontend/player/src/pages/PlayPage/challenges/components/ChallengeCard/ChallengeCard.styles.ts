@@ -20,6 +20,28 @@ export const Container = styled(Paper)`
   animation: ${fadeIn} 0.3s ease-out;
 `;
 
+export const MediaCard = styled(Box)`
+  overflow: hidden;
+  border-radius: ${({ theme }) => theme.shape.md}px;
+  border: 1px solid ${({ theme }) => theme.palette.grey[300]};
+  background-color: ${({ theme }) => theme.palette.background.surface};
+
+  img,
+  video {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+`;
+
+export const ContentCard = styled(Paper)`
+  padding: ${({ theme }) => theme.spacing(3)};
+  border-radius: ${({ theme }) => theme.shape.md}px;
+  border: 1px solid ${({ theme }) => theme.palette.grey[300]};
+  text-align: center;
+  background-color: ${({ theme }) => theme.palette.background.surface};
+`;
+
 export const Content = styled(Box)`
   flex: 1;
 `;

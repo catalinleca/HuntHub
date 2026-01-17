@@ -15,7 +15,7 @@ import type { Media } from '@hunthub/shared';
 import type { BadgeConfig } from '@/constants';
 import { MediaDisplay } from '@/components/media';
 import { usePlaySession } from '@/context';
-import { TypeBadge } from '../TypeBadge';
+import { TypeBadge, BadgeContainer } from '../TypeBadge';
 import { HintSection } from '../HintSection';
 import { TimeLimit } from '../TimeLimit';
 import { AttemptsCounter } from '../AttemptsCounter';
@@ -31,7 +31,6 @@ interface ChallengeCardProps {
   description?: string;
   footer: React.ReactNode;
   showHint?: boolean;
-  // Step-level features
   media?: Media;
   timeLimit?: number | null;
   maxAttempts?: number | null;
@@ -62,8 +61,8 @@ export const ChallengeCard = ({
   const hasIndicators = timeLimit || maxAttempts;
   const hasVisualMedia = media && VISUAL_MEDIA_TYPES.includes(media.type);
   const hasAudioOnly = media?.type === MediaType.Audio;
+  const hasContent = title || description;
 
-  // TODO: fix Dialog, move it into its own folder and code properly
   return (
     <S.Container>
       <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
@@ -80,12 +79,26 @@ export const ChallengeCard = ({
         )}
       </Stack>
 
-      {hasVisualMedia && <MediaDisplay media={media} />}
+      {hasVisualMedia && (
+        <S.MediaCard>
+          <MediaDisplay media={media} />
+        </S.MediaCard>
+      )}
 
-      <TypeBadge {...badge} />
+      <BadgeContainer>
+        <TypeBadge {...badge} />
+      </BadgeContainer>
 
-      {title && <Typography variant="h5">{title}</Typography>}
-      {description && <Typography color="text.secondary">{description}</Typography>}
+      {hasContent && (
+        <S.ContentCard elevation={0}>
+          {title && <Typography variant="h5">{title}</Typography>}
+          {description && (
+            <Typography variant="bodyItalic" color="text.secondary">
+              {description}
+            </Typography>
+          )}
+        </S.ContentCard>
+      )}
 
       <S.Content>
         {children}

@@ -63,6 +63,8 @@ declare module '@mui/material/styles' {
     displayH4: React.CSSProperties;
     displayH6: React.CSSProperties;
     displayBody2: React.CSSProperties;
+    bodyItalic: React.CSSProperties;
+    smItalic: React.CSSProperties;
   }
 
   interface TypographyVariantsOptions {
@@ -77,6 +79,8 @@ declare module '@mui/material/styles' {
     displayH4?: React.CSSProperties;
     displayH6?: React.CSSProperties;
     displayBody2?: React.CSSProperties;
+    bodyItalic?: React.CSSProperties;
+    smItalic?: React.CSSProperties;
   }
 
   interface Theme {
@@ -118,6 +122,8 @@ declare module '@mui/material/Typography' {
     displayH4: true;
     displayH6: true;
     displayBody2: true;
+    bodyItalic: true;
+    smItalic: true;
   }
 }
 

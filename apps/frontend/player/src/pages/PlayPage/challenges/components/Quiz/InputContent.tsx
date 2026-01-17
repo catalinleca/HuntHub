@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextField } from '@mui/material';
+import { TextField, InputLabel, Stack } from '@mui/material';
 
 interface InputContentProps {
   value: string;
@@ -12,5 +12,16 @@ export const InputContent = ({ value, onChange, disabled }: InputContentProps) =
     onChange(event.target.value);
   };
 
-  return <TextField fullWidth label="Your answer" value={value} onChange={handleChange} disabled={disabled} />;
+  return (
+    <Stack gap={1}>
+      <InputLabel>Your answer</InputLabel>
+      <TextField
+        fullWidth
+        value={value}
+        onChange={handleChange}
+        placeholder="Type your answer..."
+        disabled={disabled}
+      />
+    </Stack>
+  );
 };
