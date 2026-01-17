@@ -38,6 +38,9 @@ jobs:
       - name: Run type check
         run: npm run type-check --workspace=@hunthub/api
 
+      - name: Build backend
+        run: npm run build --workspace=@hunthub/api
+
       - name: Run tests
         run: npm run test:api
         env:

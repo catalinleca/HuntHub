@@ -13,38 +13,27 @@ import {
 import { logger } from '@/utils/logger';
 
 function initializeFirebaseAdmin() {
-  // Test environment - use dummy credentials
   if (process.env.NODE_ENV === 'test') {
     return initializeAdminApp({
       projectId: process.env.FIREBASE_PROJECT_ID || 'test-project',
     });
   }
 
-  // Try env var first (CI/Production)
-  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    try {
-      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-      return initializeAdminApp({
-        credential: cert(serviceAccount as ServiceAccount),
-      });
-    } catch {
-      throw new Error('Invalid FIREBASE_SERVICE_ACCOUNT JSON');
-    }
+  const base64Credentials = process.env.FIREBASE_SERVICE_ACCOUNT;
+  if (!base64Credentials) {
+    throw new Error('FIREBASE_SERVICE_ACCOUNT env var is required (base64 encoded JSON)');
   }
 
-  // Fallback to local file (Local dev)
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const serviceAccount = require('../firebaseService.json');
+    const decoded = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+    const serviceAccount = JSON.parse(decoded);
+
     return initializeAdminApp({
       credential: cert(serviceAccount as ServiceAccount),
     });
-  } catch {
-    throw new Error(
-      'Firebase not configured. Either:\n' +
-        '1. Add firebaseService.json file (local dev)\n' +
-        '2. Set FIREBASE_SERVICE_ACCOUNT env var (CI/prod)',
-    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Invalid FIREBASE_SERVICE_ACCOUNT - must be base64 encoded JSON: ${message}`);
   }
 }
 
