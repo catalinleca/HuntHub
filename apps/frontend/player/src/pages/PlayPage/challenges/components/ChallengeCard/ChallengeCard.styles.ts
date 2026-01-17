@@ -16,7 +16,7 @@ export const Container = styled(Paper)`
   padding: ${({ theme }) => theme.spacing(3)};
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(2)};
+  gap: ${({ theme }) => theme.spacing(3)};
   animation: ${fadeIn} 0.3s ease-out;
 `;
 
@@ -24,13 +24,14 @@ export const MediaCard = styled(Box)`
   overflow: hidden;
   border-radius: ${({ theme }) => theme.shape.md}px;
   border: 2px solid ${({ theme }) => theme.palette.grey[300]};
+  line-height: 0;
+  font-size: 0;
 
   img,
   video {
     width: 100%;
     height: auto;
     display: block;
-    vertical-align: bottom;
   }
 `;
 

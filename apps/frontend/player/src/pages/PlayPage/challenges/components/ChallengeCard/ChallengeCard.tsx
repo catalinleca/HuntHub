@@ -22,7 +22,7 @@ import { AttemptsCounter } from '../AttemptsCounter';
 import { FeedbackDisplay } from '../FeedbackDisplay';
 import * as S from './ChallengeCard.styles';
 
-const VISUAL_MEDIA_TYPES: MediaType[] = [MediaType.Image, MediaType.Video, MediaType.ImageAudio];
+const BORDERED_MEDIA_TYPES: MediaType[] = [MediaType.Image, MediaType.Video, MediaType.ImageAudio];
 
 interface ChallengeCardProps {
   children?: React.ReactNode;
@@ -59,8 +59,8 @@ export const ChallengeCard = ({
   const [showAbandonDialog, setShowAbandonDialog] = useState(false);
 
   const hasIndicators = timeLimit || maxAttempts;
-  const hasVisualMedia = media && VISUAL_MEDIA_TYPES.includes(media.type);
-  const hasAudioOnly = media?.type === MediaType.Audio;
+  const hasMedia = !!media;
+  const needsBorderedContainer = media && BORDERED_MEDIA_TYPES.includes(media.type);
   const hasContent = title || description;
 
   return (
@@ -83,14 +83,17 @@ export const ChallengeCard = ({
         <TypeBadge {...badge} />
       </BadgeContainer>
 
-      {hasVisualMedia && (
-        <S.MediaCard>
+      {hasMedia &&
+        (needsBorderedContainer ? (
+          <S.MediaCard>
+            <MediaDisplay media={media} />
+          </S.MediaCard>
+        ) : (
           <MediaDisplay media={media} />
-        </S.MediaCard>
-      )}
+        ))}
 
       {hasContent && (
-        <S.ContentCard elevation={0}>
+        <S.ContentCard>
           {title && <Typography variant="h5">{title}</Typography>}
           {description && (
             <Typography variant="bodyItalic" color="text.secondary">
@@ -100,10 +103,7 @@ export const ChallengeCard = ({
         </S.ContentCard>
       )}
 
-      <S.Content>
-        {children}
-        {hasAudioOnly && <MediaDisplay media={media} />}
-      </S.Content>
+      <S.Content>{children}</S.Content>
 
       <FeedbackDisplay feedback={feedback ?? null} />
 
