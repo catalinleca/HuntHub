@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '@/shared/types';
 import { ICloneService } from './clone.service';
-import { ValidationError } from '@/shared/errors';
 import { parseNumericId } from '@/shared/utils/parseId';
 
 export interface ICloneController {
@@ -15,10 +14,6 @@ export class CloneController implements ICloneController {
 
   async cloneHunt(req: Request, res: Response): Promise<Response> {
     const huntId = parseNumericId(req.params.id);
-    if (isNaN(huntId)) {
-      throw new ValidationError('Invalid hunt ID', []);
-    }
-
     const { version } = req.body;
     const result = await this.cloneService.cloneHunt(huntId, req.user.id, version);
 

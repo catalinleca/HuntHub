@@ -199,10 +199,7 @@ export class HuntService implements IHuntService {
   }
 
   async deleteHunt(huntId: number, userId: string): Promise<void> {
-    const { huntDoc: existingHunt } = await this.authService.requireAccess(huntId, userId, HuntPermission.Owner);
-    if (!existingHunt) {
-      throw new NotFoundError();
-    }
+    await this.authService.requireAccess(huntId, userId, HuntPermission.Owner);
 
     await withTransaction(async (session) => {
       const result = await HuntModel.findOneAndUpdate(

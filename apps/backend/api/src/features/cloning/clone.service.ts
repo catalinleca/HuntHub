@@ -49,6 +49,10 @@ export class CloneService implements ICloneService {
       version: sourceVersion,
     });
 
+    if (!sourceVersionDoc) {
+      throw new NotFoundError(`Version ${sourceVersion} not found`);
+    }
+
     return withTransaction(async (session) => {
       const { huntDoc: newHuntDoc } = await this.huntService.cloneHuntAndVersion(
         sourceHuntId,
@@ -62,7 +66,7 @@ export class CloneService implements ICloneService {
         sourceVersion,
         newHuntDoc.huntId,
         1,
-        sourceVersionDoc?.stepOrder ?? [],
+        sourceVersionDoc.stepOrder,
         session,
       );
 
