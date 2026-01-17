@@ -16,7 +16,7 @@ export interface HuntCardImageProps {
   height?: number;
   isPublished?: boolean;
   onEdit?: () => void;
-  onDuplicate?: () => void;
+  onClone?: () => void;
   onDelete?: () => void;
 }
 

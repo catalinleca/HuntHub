@@ -4,10 +4,10 @@ import { Box, Grid2 } from '@mui/material';
 import { StackIcon } from '@phosphor-icons/react';
 import { getColor } from '@hunthub/compass';
 import { HuntActionCard } from '@/pages/Dashboard/components/HuntActionCard';
-import { useDeleteHunt } from '@/api/Hunt';
+import { useDeleteHunt, useCloneHunt } from '@/api/Hunt';
 import { useConfirmationDialog } from '@/hooks';
 import { DialogVariants } from '@/stores/useDialogStore';
-import { useHuntDialogStore } from '@/stores';
+import { useHuntDialogStore, useSnackbarStore } from '@/stores';
 import { MediaHelper } from '@/components/media/data';
 import { useNavigate } from 'react-router-dom';
 
@@ -20,7 +20,9 @@ export const AllHunts = ({ hunts }: AllHuntsProps) => {
 
   const { confirm } = useConfirmationDialog();
   const { open: openHuntDialog } = useHuntDialogStore();
+  const snackbar = useSnackbarStore();
   const deleteMutation = useDeleteHunt();
+  const cloneMutation = useCloneHunt();
 
   const handleEdit = (huntId: number) => {
     openHuntDialog(huntId);
@@ -28,6 +30,31 @@ export const AllHunts = ({ hunts }: AllHuntsProps) => {
 
   const handleNavigateToHunt = (huntId: number) => {
     navigate(`/editor/${huntId}`);
+  };
+
+  const handleClone = (hunt: Hunt) => {
+    confirm({
+      title: 'Clone Hunt',
+      message: `Create a copy of "${hunt.name}"?`,
+      confirmText: 'Clone',
+      variant: DialogVariants.Info,
+      awaitConfirmation: false,
+      onConfirm: () => {
+        cloneMutation.mutate(
+          { huntId: hunt.huntId },
+          {
+            onSuccess: (result) => {
+              snackbar.success(`"${hunt.name}" cloned!`, {
+                label: 'View',
+                onClick: () => {
+                  navigate(`/editor/${result.huntId}`);
+                },
+              });
+            },
+          }
+        );
+      },
+    });
   };
 
   const handleDelete = (huntId: number) => {
@@ -64,6 +91,7 @@ export const AllHunts = ({ hunts }: AllHuntsProps) => {
                 subtitle={hunt.description || 'No description'}
                 isPublished={hunt.isPublished}
                 onEdit={() => handleEdit(hunt.huntId)}
+                onClone={() => handleClone(hunt)}
                 onDelete={() => handleDelete(hunt.huntId)}
                 onClick={() => handleNavigateToHunt(hunt.huntId)}
               />
