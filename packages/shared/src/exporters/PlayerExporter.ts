@@ -9,7 +9,6 @@ import {
   TaskPF,
   HuntMetaPF,
   ChallengeType,
-  Option,
 } from '../types';
 
 /**
@@ -113,6 +112,7 @@ export class PlayerExporter {
 
   /**
    * Clue - No sensitive data to strip
+   * Validation is Editor's responsibility - we just transform
    */
   private static clue(challenge: Challenge): CluePF {
     const clue = challenge.clue;
@@ -120,18 +120,15 @@ export class PlayerExporter {
       throw new Error('Clue challenge missing clue data');
     }
 
-    if (!clue.title || !clue.description) {
-      throw new Error('Clue challenge missing required fields');
-    }
-
     return {
-      title: clue.title,
-      description: clue.description,
+      title: clue.title ?? '',
+      description: clue.description ?? '',
     };
   }
 
   /**
    * Quiz - Strip targetId, expectedAnswer, validation
+   * Validation is Editor's responsibility - we just transform
    */
   private static quiz(challenge: Challenge): QuizPF {
     const quiz = challenge.quiz;
@@ -139,14 +136,10 @@ export class PlayerExporter {
       throw new Error('Quiz challenge missing quiz data');
     }
 
-    if (!quiz.title || !quiz.type) {
-      throw new Error('Quiz challenge missing required fields (title, type)');
-    }
-
     return {
-      title: quiz.title,
+      title: quiz.title ?? '',
       description: quiz.description ?? '',
-      type: quiz.type,
+      type: quiz.type!,
       options: quiz.options,
       randomizeOrder: quiz.randomizeOrder,
       // STRIPPED: targetId, expectedAnswer, validation
@@ -155,6 +148,7 @@ export class PlayerExporter {
 
   /**
    * Mission - Strip targetLocation, aiInstructions, aiModel
+   * Validation is Editor's responsibility - we just transform
    */
   private static mission(challenge: Challenge): MissionPF {
     const mission = challenge.mission;
@@ -162,14 +156,10 @@ export class PlayerExporter {
       throw new Error('Mission challenge missing mission data');
     }
 
-    if (!mission.title || !mission.type) {
-      throw new Error('Mission challenge missing required fields (title, type)');
-    }
-
     return {
-      title: mission.title,
+      title: mission.title ?? '',
       description: mission.description ?? '',
-      type: mission.type,
+      type: mission.type!,
       referenceAssetIds: mission.referenceAssetIds,
       // STRIPPED: targetLocation, aiInstructions, aiModel
     };
@@ -177,20 +167,16 @@ export class PlayerExporter {
 
   /**
    * Task - Strip aiInstructions, aiModel
+   * Validation is Editor's responsibility - we just transform
    */
   private static task(challenge: Challenge): TaskPF {
     const task = challenge.task;
     if (!task) {
       throw new Error('Task challenge missing task data');
     }
-    console.log('===task: ', task);
-
-    if (!task.title) {
-      throw new Error('Task challenge missing required fields');
-    }
 
     return {
-      title: task.title,
+      title: task.title ?? '',
       instructions: task.instructions ?? '',
       // STRIPPED: aiInstructions, aiModel
     };

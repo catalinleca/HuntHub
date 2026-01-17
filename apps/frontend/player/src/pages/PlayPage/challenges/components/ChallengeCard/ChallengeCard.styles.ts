@@ -1,5 +1,5 @@
 import styled, { keyframes } from 'styled-components';
-import { Box, Paper } from '@mui/material';
+import { alpha, Box, Paper } from '@mui/material';
 
 const fadeIn = keyframes`
   from {
@@ -23,23 +23,23 @@ export const Container = styled(Paper)`
 export const MediaCard = styled(Box)`
   overflow: hidden;
   border-radius: ${({ theme }) => theme.shape.md}px;
-  border: 1px solid ${({ theme }) => theme.palette.grey[300]};
-  background-color: ${({ theme }) => theme.palette.background.surface};
+  border: 2px solid ${({ theme }) => theme.palette.grey[300]};
 
   img,
   video {
     width: 100%;
     height: auto;
     display: block;
+    vertical-align: bottom;
   }
 `;
 
-export const ContentCard = styled(Paper)`
-  padding: ${({ theme }) => theme.spacing(3)};
+export const ContentCard = styled(Box)`
+  padding: ${({ theme }) => theme.spacing(2, 3)};
   border-radius: ${({ theme }) => theme.shape.md}px;
-  border: 1px solid ${({ theme }) => theme.palette.grey[300]};
   text-align: center;
-  background-color: ${({ theme }) => theme.palette.background.surface};
+  background-color: ${({ theme }) => alpha(theme.palette.accent.main, 0.08)};
+  border: 1px solid ${({ theme }) => alpha(theme.palette.accent.main, 0.15)};
 `;
 
 export const Content = styled(Box)`

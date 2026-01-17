@@ -12,18 +12,15 @@ interface PhotoContentProps {
   uploadError?: string | null;
 }
 
-const CapturePrompt = ({ onClick }: { onClick: () => void }) => (
-  <S.UploadZone onClick={onClick}>
+const CapturePrompt = () => (
+  <S.StatusZone>
     <S.IconWrapper>
       <CameraIcon size={32} weight="duotone" />
     </S.IconWrapper>
     <Typography variant="body1" fontWeight={500}>
-      Tap to open camera
+      Capture Your Photo
     </Typography>
-    <Typography variant="body2" color="text.secondary">
-      Capture your photo
-    </Typography>
-  </S.UploadZone>
+  </S.StatusZone>
 );
 
 interface PhotoPreviewProps {
@@ -59,7 +56,7 @@ export const PhotoContent = ({ onSubmit, isSubmitting = false, uploadError }: Ph
   const views: Record<PhotoStatus, React.ReactNode> = {
     [PhotoStatus.Empty]: (
       <>
-        <CapturePrompt onClick={openCamera} />
+        <CapturePrompt />
         <Button
           variant="contained"
           fullWidth

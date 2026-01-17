@@ -23,10 +23,7 @@ const ReadyPrompt = () => (
       <MicrophoneIcon size={32} weight="duotone" />
     </S.IconWrapper>
     <Typography variant="body1" fontWeight={500}>
-      Ready to Record
-    </Typography>
-    <Typography variant="body2" color="text.secondary">
-      Tap the button below to start
+      Record Your Answer
     </Typography>
   </S.StatusZone>
 );

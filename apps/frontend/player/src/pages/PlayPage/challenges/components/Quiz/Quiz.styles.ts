@@ -1,18 +1,22 @@
 import styled from 'styled-components';
-import { Paper } from '@mui/material';
+import { alpha, Box } from '@mui/material';
 
-export const OptionCard = styled(Paper)<{ $selected?: boolean; $disabled?: boolean }>`
-  padding: ${({ theme }) => theme.spacing(2)};
-  border: 1px solid ${({ theme, $selected }) => ($selected ? theme.palette.primary.main : theme.palette.grey[300])};
-  border-radius: ${({ theme }) => theme.shape.md}px;
+export const OptionCard = styled(Box)<{ $selected?: boolean; $disabled?: boolean }>`
+  padding: ${({ theme }) => theme.spacing(1.5, 2)};
+  border: 1px solid ${({ theme, $selected }) => ($selected ? theme.palette.accent.main : theme.palette.grey[300])};
+  border-radius: ${({ theme }) => theme.shape.sm}px;
   cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
   opacity: ${({ $disabled }) => ($disabled ? 0.6 : 1)};
-  transition: all 0.2s ease;
-  background-color: ${({ theme, $selected }) =>
-    $selected ? theme.palette.primary.light : theme.palette.background.surface};
+  transition: all 0.15s ease;
+  background-color: ${({ theme, $selected }) => ($selected ? alpha(theme.palette.accent.main, 0.08) : 'transparent')};
 
   &:hover {
-    border-color: ${({ theme, $disabled }) => ($disabled ? undefined : theme.palette.primary.main)};
-    background-color: ${({ theme, $disabled }) => ($disabled ? undefined : theme.palette.grey[100])};
+    border-color: ${({ theme, $disabled }) => ($disabled ? undefined : theme.palette.accent.main)};
+    background-color: ${({ theme, $disabled, $selected }) =>
+      $disabled
+        ? undefined
+        : $selected
+          ? alpha(theme.palette.accent.main, 0.12)
+          : alpha(theme.palette.grey[500], 0.08)};
   }
 `;
