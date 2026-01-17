@@ -1,6 +1,5 @@
 import * as S from './Spinner.styles';
-
-type SpinnerSize = 'small' | 'medium' | 'large';
+import type { SpinnerSize } from './Spinner.styles';
 
 interface SpinnerProps {
   size?: SpinnerSize;

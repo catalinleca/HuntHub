@@ -4,7 +4,7 @@ const spinAnimation = keyframes`
   to { transform: rotate(360deg); }
 `;
 
-type SpinnerSize = 'small' | 'medium' | 'large';
+export type SpinnerSize = 'small' | 'medium' | 'large';
 
 const sizeMap: Record<SpinnerSize, number> = {
   small: 14,
