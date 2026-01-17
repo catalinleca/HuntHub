@@ -52,6 +52,9 @@ jobs:
       - name: Build shared package
         run: npm run build:shared
 
+      - name: Format check
+        run: npm run format:check
+
       - name: Lint
         run: npm run lint --workspace=@hunthub/api
 
@@ -87,6 +90,9 @@ jobs:
       - name: Build shared package
         run: npm run build:shared
 
+      - name: Format check
+        run: npm run format:check
+
       - name: Lint
         run: npm run lint --workspace=@hunthub/editor
 
@@ -116,6 +122,9 @@ jobs:
 
       - name: Build shared package
         run: npm run build:shared
+
+      - name: Format check
+        run: npm run format:check
 
       - name: Lint
         run: npm run lint --workspace=@hunthub/player
