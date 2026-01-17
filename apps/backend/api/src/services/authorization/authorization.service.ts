@@ -1,31 +1,33 @@
 import { injectable } from 'inversify';
 import { HydratedDocument } from 'mongoose';
+import { HuntPermission } from '@hunthub/shared';
 import { HuntModel, HuntAccessModel } from '@/database/models';
 import { IHunt } from '@/database/types/Hunt';
-import { HuntPermission } from '@/database/types/HuntAccess';
 import { NotFoundError, ForbiddenError } from '@/shared/errors';
 
 export interface AccessContext {
   huntDoc: HydratedDocument<IHunt>;
   userId: string;
-  permission: HuntPermission | 'owner';
+  permission: HuntPermission;
   isOwner: boolean;
   canEdit: boolean;
   canPublish: boolean;
   canRelease: boolean;
   canDelete: boolean;
   canShare: boolean;
+  canClone: boolean;
 }
 
 const PERMISSION_HIERARCHY: Record<HuntPermission, number> = {
-  view: 1,
-  admin: 3,
+  [HuntPermission.View]: 1,
+  [HuntPermission.Admin]: 3,
+  [HuntPermission.Owner]: 5,
 };
 
 export interface IAuthorizationService {
   getAccess(huntId: number, userId: string): Promise<AccessContext | null>;
-  requireAccess(huntId: number, userId: string, permission: HuntPermission | 'owner'): Promise<AccessContext>;
-  canAccess(huntId: number, userId: string, requiredPermission: HuntPermission | 'owner'): Promise<boolean>;
+  requireAccess(huntId: number, userId: string, permission: HuntPermission): Promise<AccessContext>;
+  canAccess(huntId: number, userId: string, requiredPermission: HuntPermission): Promise<boolean>;
 }
 
 @injectable()
@@ -49,11 +51,7 @@ export class AuthorizationService implements IAuthorizationService {
     return this.createSharedContext(huntDoc, userId, permission);
   }
 
-  async requireAccess(
-    huntId: number,
-    userId: string,
-    requiredPermission: HuntPermission | 'owner',
-  ): Promise<AccessContext> {
+  async requireAccess(huntId: number, userId: string, requiredPermission: HuntPermission): Promise<AccessContext> {
     const access = await this.getAccess(huntId, userId);
     if (!access) {
       throw new NotFoundError('Hunt not found or access denied');
@@ -66,41 +64,28 @@ export class AuthorizationService implements IAuthorizationService {
     return access;
   }
 
-  async canAccess(huntId: number, userId: string, requiredPermission: HuntPermission | 'owner'): Promise<boolean> {
+  async canAccess(huntId: number, userId: string, requiredPermission: HuntPermission): Promise<boolean> {
     const access = await this.getAccess(huntId, userId);
 
     return access ? this.hasPermission(access.permission, requiredPermission) : false;
   }
 
-  private hasPermission(
-    userPermission: HuntPermission | 'owner',
-    requiredPermission: HuntPermission | 'owner',
-  ): boolean {
-    if (userPermission === 'owner') {
-      return true;
-    }
-
-    if (requiredPermission === 'owner') {
-      return false;
-    }
-
-    const userPermissionLevel = PERMISSION_HIERARCHY[userPermission];
-    const requiredPermissionLevel = PERMISSION_HIERARCHY[requiredPermission];
-
-    return userPermissionLevel >= requiredPermissionLevel;
+  private hasPermission(userPermission: HuntPermission, requiredPermission: HuntPermission): boolean {
+    return PERMISSION_HIERARCHY[userPermission] >= PERMISSION_HIERARCHY[requiredPermission];
   }
 
   private createOwnerContext(huntDoc: HydratedDocument<IHunt>, userId: string): AccessContext {
     return {
       huntDoc,
       userId,
-      permission: 'owner',
+      permission: HuntPermission.Owner,
       isOwner: true,
       canEdit: true,
       canPublish: true,
       canRelease: true,
       canDelete: true,
       canShare: true,
+      canClone: true,
     };
   }
 
@@ -109,16 +94,18 @@ export class AuthorizationService implements IAuthorizationService {
     userId: string,
     permission: HuntPermission,
   ): AccessContext {
+    const isAdmin = permission === HuntPermission.Admin;
     return {
       huntDoc,
       userId,
       permission,
       isOwner: false,
-      canEdit: permission === 'admin',
-      canPublish: permission === 'admin',
-      canRelease: permission === 'admin',
+      canEdit: isAdmin,
+      canPublish: isAdmin,
+      canRelease: isAdmin,
       canDelete: false,
-      canShare: permission === 'admin',
+      canShare: isAdmin,
+      canClone: true,
     };
   }
 }

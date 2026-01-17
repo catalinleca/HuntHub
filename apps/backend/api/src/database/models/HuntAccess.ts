@@ -1,5 +1,6 @@
 import { Schema, model, Model, HydratedDocument } from 'mongoose';
-import { HuntPermission, IHuntShare, IHuntSharePopulated } from '@/database/types';
+import { HuntPermission } from '@hunthub/shared';
+import { StoredPermission, IHuntShare, IHuntSharePopulated } from '@/database/types';
 
 const huntShareSchema: Schema<IHuntShare> = new Schema<IHuntShare>(
   {
@@ -21,8 +22,8 @@ const huntShareSchema: Schema<IHuntShare> = new Schema<IHuntShare>(
     },
     permission: {
       type: String,
-      enum: ['view', 'admin'],
-      default: 'view',
+      enum: [HuntPermission.View, HuntPermission.Admin],
+      default: HuntPermission.View,
       required: true,
     },
     sharedAt: {
@@ -54,11 +55,11 @@ huntShareSchema.index({ huntId: 1, permission: 1 });
 huntShareSchema.index({ ownerId: 1 });
 
 huntShareSchema.methods.canEdit = function (): boolean {
-  return this.permission === 'admin';
+  return this.permission === HuntPermission.Admin;
 };
 
 huntShareSchema.methods.canShare = function (): boolean {
-  return this.permission === 'admin';
+  return this.permission === HuntPermission.Admin;
 };
 
 huntShareSchema.methods.canView = function (): boolean {
@@ -69,18 +70,18 @@ interface IHuntShareModel extends Model<IHuntShare> {
   findSharedWithUser(userId: string): Promise<HydratedDocument<IHuntShare>[]>;
   findHuntCollaborators(huntId: number): Promise<HydratedDocument<IHuntSharePopulated>[]>;
   hasAccess(huntId: number, userId: string): Promise<boolean>;
-  getPermission(huntId: number, userId: string): Promise<HuntPermission | null>;
+  getPermission(huntId: number, userId: string): Promise<StoredPermission | null>;
   shareHunt(
     huntId: number,
     ownerId: string,
     sharedWithId: string,
     sharedBy: string,
-    permission: HuntPermission,
+    permission: StoredPermission,
   ): Promise<HydratedDocument<IHuntShare>>;
   updatePermission(
     huntId: number,
     sharedWithId: string,
-    permission: HuntPermission,
+    permission: StoredPermission,
   ): Promise<HydratedDocument<IHuntShare> | null>;
   revokeAccess(huntId: number, userId: string): Promise<boolean>;
 }
@@ -108,7 +109,7 @@ huntShareSchema.statics.hasAccess = async function (huntId: number, userId: stri
 huntShareSchema.statics.getPermission = async function (
   huntId: number,
   userId: string,
-): Promise<HuntPermission | null> {
+): Promise<StoredPermission | null> {
   const share = await this.findOne({ huntId, sharedWithId: userId }).select('permission').lean().exec();
   return share ? share.permission : null;
 };
@@ -118,7 +119,7 @@ huntShareSchema.statics.shareHunt = function (
   ownerId: string,
   sharedWithId: string,
   sharedBy: string,
-  permission: HuntPermission = 'view',
+  permission: StoredPermission = HuntPermission.View,
 ) {
   return this.findOneAndUpdate(
     { huntId, sharedWithId },
@@ -134,7 +135,11 @@ huntShareSchema.statics.shareHunt = function (
   ).exec();
 };
 
-huntShareSchema.statics.updatePermission = function (huntId: number, sharedWithId: string, permission: HuntPermission) {
+huntShareSchema.statics.updatePermission = function (
+  huntId: number,
+  sharedWithId: string,
+  permission: StoredPermission,
+) {
   return this.findOneAndUpdate({ huntId, sharedWithId }, { permission }, { new: true, runValidators: true }).exec();
 };
 

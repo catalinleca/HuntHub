@@ -68,6 +68,9 @@ export {
   ReleaseHuntRequest,
   TakeOfflineRequest,
 
+  // Cloning
+  CloneHuntRequest,
+
   // Sharing
   Collaborator,
   ShareResult,

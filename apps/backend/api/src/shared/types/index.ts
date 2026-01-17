@@ -6,6 +6,7 @@ export const TYPES = {
   PublishingController: Symbol.for('PublishingController'),
   HuntShareController: Symbol.for('HuntShareController'),
   PlayController: Symbol.for('PlayController'),
+  CloneController: Symbol.for('CloneController'),
 
   AuthService: Symbol.for('AuthService'),
   UserService: Symbol.for('UserService'),
@@ -17,6 +18,7 @@ export const TYPES = {
   PublishingService: Symbol.for('PublishingService'),
   AuthorizationService: Symbol.for('AuthorizationService'),
   HuntShareService: Symbol.for('HuntShareService'),
+  CloneService: Symbol.for('CloneService'),
   AssetUsageTracker: Symbol.for('AssetUsageTracker'),
   AssetValidator: Symbol.for('AssetValidator'),
   PlayService: Symbol.for('PlayService'),

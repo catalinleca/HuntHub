@@ -13,7 +13,7 @@ interface HuntActionCardProps {
   isPublished?: boolean;
   onClick?: () => void;
   onEdit?: () => void;
-  onDuplicate?: () => void;
+  onClone?: () => void;
   onDelete?: () => void;
 }
 
@@ -25,7 +25,7 @@ export const HuntActionCard = ({
   isPublished,
   onClick,
   onEdit,
-  onDuplicate,
+  onClone,
   onDelete,
 }: HuntActionCardProps) => {
   return (
@@ -35,7 +35,7 @@ export const HuntActionCard = ({
         alt={imageAlt}
         isPublished={isPublished}
         onEdit={onEdit}
-        onDuplicate={onDuplicate}
+        onClone={onClone}
         onDelete={onDelete}
       />
 

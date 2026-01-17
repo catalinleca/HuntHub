@@ -1,6 +1,6 @@
 import { injectable, inject } from 'inversify';
 import { ClientSession, HydratedDocument } from 'mongoose';
-import { PublishResult, ReleaseResult, TakeOfflineResult } from '@hunthub/shared';
+import { PublishResult, ReleaseResult, TakeOfflineResult, HuntPermission } from '@hunthub/shared';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import { IHuntVersion } from '@/database/types/HuntVersion';
 import { HuntMapper } from '@/shared/mappers';
@@ -48,7 +48,7 @@ export class PublishingService implements IPublishingService {
   ) {}
 
   async publishHunt(huntId: number, userId: string): Promise<PublishResult> {
-    const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
+    const { huntDoc } = await this.authService.requireAccess(huntId, userId, HuntPermission.Admin);
 
     return withTransaction(async (session) => {
       const currentVersion = huntDoc.latestVersion;
@@ -94,7 +94,7 @@ export class PublishingService implements IPublishingService {
     userId: string,
     currentLiveVersion: number | null | undefined,
   ): Promise<ReleaseResult> {
-    const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
+    const { huntDoc } = await this.authService.requireAccess(huntId, userId, HuntPermission.Admin);
     const previousLiveVersion = huntDoc.liveVersion;
 
     return withTransaction(async (session) => {
@@ -132,7 +132,7 @@ export class PublishingService implements IPublishingService {
   }
 
   async takeOffline(huntId: number, userId: string, currentLiveVersion: number): Promise<TakeOfflineResult> {
-    const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
+    const { huntDoc } = await this.authService.requireAccess(huntId, userId, HuntPermission.Admin);
 
     if (huntDoc.liveVersion === null) {
       throw new ValidationError('Hunt is not currently live', []);

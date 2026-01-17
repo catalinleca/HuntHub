@@ -13,6 +13,11 @@ components:
       enum: [draft, published]
       description: "Hunt status: draft (editable) or published (read-only)"
 
+    HuntPermission:
+      type: string
+      enum: [view, admin, owner]
+      description: "Permission level for hunt access. Hierarchy: owner > admin > view"
+
     Location:
       type: object
       properties:
@@ -1053,6 +1058,16 @@ components:
           example: 2
       required:
         - currentLiveVersion
+      additionalProperties: false
+
+    CloneHuntRequest:
+      type: object
+      description: Request body for cloning a hunt
+      properties:
+        version:
+          type: integer
+          description: Version number to clone (optional - defaults to latest version)
+          example: 1
       additionalProperties: false
 
     ShareHuntRequest:

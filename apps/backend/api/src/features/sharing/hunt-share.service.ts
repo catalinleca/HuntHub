@@ -1,18 +1,23 @@
 import { inject, injectable } from 'inversify';
-import { ShareResult, Collaborator } from '@hunthub/shared';
+import { ShareResult, Collaborator, HuntPermission } from '@hunthub/shared';
 import { TYPES } from '@/shared/types';
 import { IAuthorizationService } from '@/services/authorization/authorization.service';
 import { HuntAccessModel, UserModel } from '@/database/models';
-import { HuntPermission } from '@/database/types/HuntAccess';
+import { StoredPermission } from '@/database/types';
 import { NotFoundError, ForbiddenError, ValidationError } from '@/shared/errors';
 import { HuntShareMapper } from '@/shared/mappers';
 
 export interface IHuntShareService {
-  shareHunt(huntId: number, sharedWithEmail: string, permission: HuntPermission, userId: string): Promise<ShareResult>;
+  shareHunt(
+    huntId: number,
+    sharedWithEmail: string,
+    permission: StoredPermission,
+    userId: string,
+  ): Promise<ShareResult>;
   updatePermission(
     huntId: number,
     sharedWithId: string,
-    permission: HuntPermission,
+    permission: StoredPermission,
     userId: string,
   ): Promise<ShareResult>;
   revokeAccess(huntId: number, sharedWithId: string, userId: string): Promise<void>;
@@ -48,10 +53,10 @@ export class HuntShareService implements IHuntShareService {
   async shareHunt(
     huntId: number,
     sharedWithEmail: string,
-    permission: HuntPermission,
+    permission: StoredPermission,
     userId: string,
   ): Promise<ShareResult> {
-    const access = await this.authService.requireAccess(huntId, userId, 'admin');
+    const access = await this.authService.requireAccess(huntId, userId, HuntPermission.Admin);
     if (!access.canShare) {
       throw new ForbiddenError('You do not have permission to share this hunt');
     }
@@ -75,10 +80,10 @@ export class HuntShareService implements IHuntShareService {
   async updatePermission(
     huntId: number,
     sharedWithId: string,
-    permission: HuntPermission,
+    permission: StoredPermission,
     userId: string,
   ): Promise<ShareResult> {
-    const access = await this.authService.requireAccess(huntId, userId, 'admin');
+    const access = await this.authService.requireAccess(huntId, userId, HuntPermission.Admin);
 
     if (!access.canShare) {
       throw new ForbiddenError('Insufficient permission to update permissions');
@@ -98,7 +103,7 @@ export class HuntShareService implements IHuntShareService {
   }
 
   async revokeAccess(huntId: number, sharedWithId: string, userId: string): Promise<void> {
-    const access = await this.authService.requireAccess(huntId, userId, 'admin');
+    const access = await this.authService.requireAccess(huntId, userId, HuntPermission.Admin);
     if (!access.canShare) {
       throw new ForbiddenError('Insufficient permission to revoke access');
     }
@@ -112,7 +117,7 @@ export class HuntShareService implements IHuntShareService {
   }
 
   async listCollaborators(huntId: number, userId: string): Promise<Collaborator[]> {
-    await this.authService.requireAccess(huntId, userId, 'view');
+    await this.authService.requireAccess(huntId, userId, HuntPermission.View);
 
     const shares = await HuntAccessModel.findHuntCollaborators(huntId);
 

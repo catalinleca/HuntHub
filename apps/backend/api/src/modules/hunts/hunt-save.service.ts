@@ -1,4 +1,4 @@
-import { Hunt, Step, StepCreate } from '@hunthub/shared';
+import { Hunt, Step, StepCreate, HuntPermission } from '@hunthub/shared';
 import { inject, injectable } from 'inversify';
 import { ClientSession } from 'mongoose';
 import StepModel from '@/database/models/Step';
@@ -35,7 +35,7 @@ export class HuntSaveService implements IHuntSaveService {
   ) {}
 
   async saveHunt(huntId: number, huntData: Hunt, userId: string): Promise<Hunt> {
-    const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
+    const { huntDoc } = await this.authService.requireAccess(huntId, userId, HuntPermission.Admin);
     const huntVersion = huntDoc.latestVersion;
 
     await this.validateAllAssets(huntData, userId);

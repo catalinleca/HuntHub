@@ -1,5 +1,6 @@
-import { Step, StepCreate } from '@hunthub/shared';
+import { Step, StepCreate, HuntPermission } from '@hunthub/shared';
 import { inject, injectable } from 'inversify';
+import { ClientSession } from 'mongoose';
 import StepModel from '@/database/models/Step';
 import { StepMapper } from '@/shared/mappers';
 import { IHuntService } from '@/modules/hunts/hunt.service';
@@ -16,6 +17,14 @@ export interface IStepService {
   createStep(stepData: StepCreate, huntId: number, userId: string): Promise<Step>;
   updateStep(stepId: number, huntId: number, stepData: Step, userId: string): Promise<Step>;
   deleteStep(stepId: number, huntId: number, userId: string): Promise<void>;
+  cloneSteps(
+    sourceHuntId: number,
+    sourceVersion: number,
+    targetHuntId: number,
+    targetVersion: number,
+    stepOrder: number[],
+    session: ClientSession,
+  ): Promise<number[]>;
 }
 
 @injectable()
@@ -28,7 +37,7 @@ export class StepService implements IStepService {
   ) {}
 
   async createStep(stepData: StepCreate, huntId: number, userId: string): Promise<Step> {
-    const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
+    const { huntDoc } = await this.authService.requireAccess(huntId, userId, HuntPermission.Admin);
     const huntVersion = huntDoc.latestVersion;
 
     const extracted = AssetExtractor.fromDTO(stepData);
@@ -47,7 +56,7 @@ export class StepService implements IStepService {
   }
 
   async updateStep(stepId: number, huntId: number, stepData: Step, userId: string): Promise<Step> {
-    const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
+    const { huntDoc } = await this.authService.requireAccess(huntId, userId, HuntPermission.Admin);
     const huntVersion = huntDoc.latestVersion;
     const stepUpdateData = StepMapper.toDocumentUpdate(stepData);
 
@@ -91,7 +100,7 @@ export class StepService implements IStepService {
   }
 
   async deleteStep(stepId: number, huntId: number, userId: string): Promise<void> {
-    const { huntDoc } = await this.authService.requireAccess(huntId, userId, 'admin');
+    const { huntDoc } = await this.authService.requireAccess(huntId, userId, HuntPermission.Admin);
     const huntVersion = huntDoc.latestVersion;
 
     await withTransaction(async (session) => {
@@ -106,5 +115,31 @@ export class StepService implements IStepService {
 
       await this.usageTracker.rebuildHuntAssetUsage(huntId, session);
     });
+  }
+
+  async cloneSteps(
+    sourceHuntId: number,
+    sourceVersion: number,
+    targetHuntId: number,
+    targetVersion: number,
+    stepOrder: number[],
+    session: ClientSession,
+  ): Promise<number[]> {
+    if (stepOrder.length === 0) {
+      return [];
+    }
+
+    const sourceSteps = await StepModel.findOrdered(sourceHuntId, sourceVersion, stepOrder, session);
+
+    const newStepIds: number[] = [];
+
+    // Create one-by-one to trigger pre-save hooks for new stepIds
+    for (const sourceStep of sourceSteps) {
+      const cloneData = StepMapper.toCloneForNewHunt(sourceStep, targetHuntId, targetVersion);
+      const [newStep] = await StepModel.create([cloneData], { session });
+      newStepIds.push(newStep.stepId);
+    }
+
+    return newStepIds;
   }
 }

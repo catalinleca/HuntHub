@@ -12,7 +12,7 @@ export const HuntCardImage = ({
   height,
   isPublished,
   onEdit,
-  onDuplicate,
+  onClone,
   onDelete,
 }: HuntCardImageProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -32,9 +32,9 @@ export const HuntCardImage = ({
     onEdit?.();
   };
 
-  const handleDuplicate = () => {
+  const handleClone = () => {
     handleClose();
-    onDuplicate?.();
+    onClone?.();
   };
 
   const handleDelete = () => {
@@ -43,7 +43,7 @@ export const HuntCardImage = ({
   };
 
   const imageSrc = src || pirateMapFallback;
-  const hasMenuActions = onEdit || onDuplicate || onDelete;
+  const hasMenuActions = onEdit || onClone || onDelete;
 
   return (
     <S.ImageContainer>
@@ -65,12 +65,12 @@ export const HuntCardImage = ({
                 <ListItemText>Edit</ListItemText>
               </MenuItem>
             )}
-            {onDuplicate && (
-              <MenuItem onClick={handleDuplicate}>
+            {onClone && (
+              <MenuItem onClick={handleClone}>
                 <ListItemIcon>
                   <CopyIcon size={18} />
                 </ListItemIcon>
-                <ListItemText>Duplicate</ListItemText>
+                <ListItemText>Clone</ListItemText>
               </MenuItem>
             )}
             {onDelete && (
