@@ -31,8 +31,9 @@ function initializeFirebaseAdmin() {
     return initializeAdminApp({
       credential: cert(serviceAccount as ServiceAccount),
     });
-  } catch {
-    throw new Error('Invalid FIREBASE_SERVICE_ACCOUNT - must be base64 encoded JSON');
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Invalid FIREBASE_SERVICE_ACCOUNT - must be base64 encoded JSON: ${message}`);
   }
 }
 
