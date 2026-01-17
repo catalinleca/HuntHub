@@ -1,11 +1,12 @@
-import 'tsconfig-paths/register';
 import 'reflect-metadata';
 import express from 'express';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 
-dotenv.config({ path: '.env.local' });
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: '.env.local' });
+}
 
 import { logger } from '@/utils/logger';
 import { initSentry } from '@/config/sentry';
@@ -48,6 +49,11 @@ async function bootstrap() {
 
   app.use(bodyParser.json());
   app.use(requestLogger);
+
+  // Health check (no auth required)
+  app.get('/health', (_req, res) => {
+    res.status(200).json({ status: 'ok' });
+  });
 
   app.use('/auth', authRouter);
 

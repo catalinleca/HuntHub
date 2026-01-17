@@ -1,0 +1,11 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/backend/api/Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - apps/backend/api/.env.local
+    environment:
+      - NODE_ENV=production

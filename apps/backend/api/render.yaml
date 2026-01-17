@@ -1,0 +1,45 @@
+# Render.com configuration for HuntHub API
+# Docs: https://render.com/docs/blueprint-spec
+# To use: Connect repo to Render, it auto-detects this file
+
+services:
+  - type: web
+    name: hunthub-api
+    runtime: docker
+    dockerfilePath: ./apps/backend/api/Dockerfile
+    dockerContext: .
+    region: frankfurt  # fra (EU), oregon (US), singapore (Asia)
+    plan: free  # free tier has cold starts (~30s)
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: LOG_LEVEL
+        value: info
+      # Secrets - set these in Render dashboard
+      - key: MONGODB_URI
+        sync: false
+      - key: FIREBASE_API_KEY
+        sync: false
+      - key: FIREBASE_AUTH_DOMAIN
+        sync: false
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_STORAGE_BUCKET
+        sync: false
+      - key: FIREBASE_MESSAGING_SENDER_ID
+        sync: false
+      - key: FIREBASE_APP_ID
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
+      - key: AWS_REGION
+        sync: false
+      - key: AWS_S3_BUCKET
+        sync: false
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false

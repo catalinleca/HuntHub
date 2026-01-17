@@ -1,0 +1,50 @@
+# Build stage
+FROM node:22-alpine AS builder
+
+WORKDIR /app
+
+# Copy root package files for workspaces
+COPY package*.json ./
+COPY packages/shared/package*.json ./packages/shared/
+COPY apps/backend/api/package*.json ./apps/backend/api/
+
+# Install all dependencies (workspaces)
+RUN npm ci
+
+# Copy source code
+COPY packages/shared ./packages/shared
+COPY apps/backend/api ./apps/backend/api
+COPY tsconfig.json ./
+
+# Build shared package first, then API
+RUN npm run build --workspace=@hunthub/shared
+RUN npm run build --workspace=@hunthub/api
+
+# Production stage
+FROM node:22-alpine AS production
+
+WORKDIR /app
+
+# Copy root package files
+COPY package*.json ./
+COPY packages/shared/package*.json ./packages/shared/
+COPY apps/backend/api/package*.json ./apps/backend/api/
+
+# Install production dependencies only
+RUN npm ci --omit=dev
+
+# Copy built files from builder
+COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
+COPY --from=builder /app/packages/shared/package.json ./packages/shared/
+COPY --from=builder /app/apps/backend/api/dist ./apps/backend/api/dist
+
+# Set working directory to API
+WORKDIR /app/apps/backend/api
+
+# Environment
+ENV NODE_ENV=production
+ENV PORT=3000
+
+EXPOSE 3000
+
+CMD ["node", "dist/server.js"]

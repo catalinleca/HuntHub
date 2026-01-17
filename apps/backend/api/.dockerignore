@@ -1,0 +1,45 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build output (we build in Docker)
+dist
+**/dist
+
+# Development
+.env*
+!.env.example
+*.log
+
+# Tests
+tests
+**/*.test.ts
+**/*.spec.ts
+coverage
+.jest
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Fly.io / Render configs (not needed in image)
+fly.toml
+render.yaml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Frontend (not needed for API)
+apps/frontend
