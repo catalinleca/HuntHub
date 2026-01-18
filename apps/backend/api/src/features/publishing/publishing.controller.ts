@@ -9,6 +9,7 @@ export interface IPublishingController {
   publishHunt(req: Request, res: Response): Promise<Response>;
   releaseHunt(req: Request, res: Response): Promise<Response>;
   takeOffline(req: Request, res: Response): Promise<Response>;
+  getVersionHistory(req: Request, res: Response): Promise<Response>;
 }
 
 /**
@@ -72,5 +73,17 @@ export class PublishingController implements IPublishingController {
       message: `Hunt taken offline (was version ${result.previousLiveVersion})`,
       ...result,
     });
+  }
+
+  async getVersionHistory(req: Request, res: Response): Promise<Response> {
+    const huntId = parseNumericId(req.params.id);
+
+    if (isNaN(huntId)) {
+      throw new ValidationError('Invalid hunt ID', []);
+    }
+
+    const result = await this.publishingService.getVersionHistory(huntId, req.user.id);
+
+    return res.status(200).json(result);
   }
 }

@@ -3,6 +3,7 @@
 Enforceable patterns for HuntHub frontend (Editor & Player apps).
 
 **IMPORTANT: Also follow all rules in `common.md` (arrow functions, self-explanatory code, SOLID).**
+**IMPORTANT: Do not miss any requirements in this file!.**
 
 ---
 
@@ -271,6 +272,40 @@ export const useGetHunt = (huntId?: number | null) => {
 **When to use:**
 - `initialData` - list item structure matches detail structure
 - `placeholderData` - structures differ
+
+### Disabling Queries: `skipToken` vs `enabled`
+
+**Use `skipToken`** for type-safe conditional queries (preferred):
+
+```tsx
+import { useQuery, skipToken } from '@tanstack/react-query';
+
+export const useGetVersionHistory = (huntId: number | undefined) => {
+  return useQuery({
+    queryKey: huntKeys.versions(huntId!),
+    queryFn: huntId ? () => fetchVersionHistory(huntId) : skipToken,
+  });
+};
+```
+
+**Use `enabled: false`** when you need manual `refetch()`:
+
+```tsx
+export const useGetHunt = (huntId?: number | null) => {
+  return useQuery({
+    queryKey: huntKeys.detail(huntId!),
+    queryFn: () => fetchHunt(huntId!),
+    enabled: !!huntId,  // allows refetch() to work
+  });
+};
+```
+
+| Pattern | Type-safe | `refetch()` works | Use when |
+|---------|-----------|-------------------|----------|
+| `skipToken` | ✅ Yes | ❌ No | Default choice, conditional fetching |
+| `enabled: false` | ❌ No (needs `!`) | ✅ Yes | Need manual trigger capability |
+
+**Never combine** `skipToken` with `enabled: true` - throws "Missing queryFn" error.
 
 ---
 

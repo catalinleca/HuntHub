@@ -326,7 +326,7 @@ export interface Step {
   type: ChallengeType;
   challenge: Challenge;
   /** Optional media attachment for this step */
-  media?: Media;
+  media?: Media | null;
   requiredLocation?: Location | null;
   hint?: string | null;
   timeLimit?: number | null;
@@ -350,7 +350,7 @@ export interface StepCreate {
   type: ChallengeType;
   challenge: Challenge;
   /** Optional media attachment for this step */
-  media?: Media;
+  media?: Media | null;
   requiredLocation?: Location | null;
   hint?: string | null;
   timeLimit?: number | null;
@@ -362,7 +362,7 @@ export interface StepUpdate {
   type: ChallengeType;
   challenge: Challenge;
   /** Optional media attachment for this step */
-  media?: Media;
+  media?: Media | null;
   requiredLocation?: Location | null;
   hint?: string | null;
   timeLimit?: number | null;
@@ -700,6 +700,30 @@ export interface TakeOfflineResult {
    * @format date-time
    */
   takenOfflineAt: string;
+}
+
+/** A published version in the version history */
+export interface VersionHistoryItem {
+  /**
+   * Version number
+   * @example 3
+   */
+  version: number;
+  /**
+   * When this version was published
+   * @format date-time
+   */
+  publishedAt: string;
+  /**
+   * Number of steps in this version
+   * @example 6
+   */
+  stepCount: number;
+}
+
+/** Response containing the version history for a hunt */
+export interface VersionHistoryResponse {
+  versions: VersionHistoryItem[];
 }
 
 /** Represents a user who has access to a hunt (for GET /hunts/:huntId/access endpoint) */

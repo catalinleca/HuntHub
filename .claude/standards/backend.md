@@ -3,6 +3,7 @@
 Enforceable patterns for HuntHub backend (Node.js + Express + MongoDB).
 
 **IMPORTANT: Also follow all rules in `common.md` (arrow functions, self-explanatory code, SOLID).**
+**IMPORTANT: Do not miss any requirements in this file!.**
 
 ---
 
@@ -257,6 +258,69 @@ export interface Hunt {
 - Services return API types (Hunt)
 - Models use DB types (IHunt)
 - Convert via `.toJSON()` method
+
+---
+
+## Null vs Undefined
+
+**Rule: Use `undefined` internally, accept `null` at boundaries.**
+
+### Why `undefined`:
+
+- JavaScript default - uninitialized values are `undefined`
+- TypeScript's design - `property?` means `T | undefined`
+- TypeScript team doesn't use `null` in their codebase
+- Simpler types - one absence value, not two
+
+### Where `null` appears:
+
+- JSON/API responses (JSON has no `undefined`)
+- MongoDB results (DB returns `null` for missing)
+- OpenAPI schemas (`nullable: true`)
+
+### The Pattern:
+
+```typescript
+// INTERNAL TYPES - use undefined
+interface StepPF {
+  media?: Media;      // means: Media | undefined
+  timeLimit?: number; // means: number | undefined
+}
+
+// API/DB BOUNDARY - convert null → undefined
+const step: StepPF = {
+  ...dbResult,
+  media: dbResult.media ?? undefined,
+};
+```
+
+### Layer Rules:
+
+| Layer | Pattern |
+|-------|---------|
+| OpenAPI schemas | `nullable: true` (produces `T \| null`) |
+| Mongoose/DB | Returns `null` for missing values |
+| Service layer | Convert `null` → `undefined` at boundary |
+| Internal types | Use `property?: T` (undefined only) |
+| API responses | JSON sends `null` (undefined omitted) |
+
+### Conversion Examples:
+
+```typescript
+// DB → Internal (in service/mapper)
+const result = {
+  media: dbDoc.media ?? undefined,
+  hint: dbDoc.hint ?? undefined,
+};
+
+// Check for absence (handles both)
+if (value == null) { /* null OR undefined */ }
+
+// Nullish coalescing (handles both)
+const safe = value ?? defaultValue;
+```
+
+**Don't mix** - If internal type says `undefined`, don't pass `null`. Convert at boundaries.
 
 ---
 

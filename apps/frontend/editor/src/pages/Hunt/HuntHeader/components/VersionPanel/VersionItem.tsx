@@ -1,99 +1,76 @@
-import { ReactNode } from 'react';
 import { ListItem, ListItemText, Typography, Stack, Chip, Button, CircularProgress } from '@mui/material';
 import { RocketLaunchIcon, EyeSlashIcon } from '@phosphor-icons/react';
 
-export type VersionStatus = 'draft' | 'published' | 'live';
-
 interface VersionItemProps {
   version: number;
-  status: VersionStatus;
-  onRelease: (version: number) => void;
+  publishedAt: string;
+  stepCount: number;
+  isLive: boolean;
+  onSetAsLive: (version: number) => void;
   onTakeOffline: () => void;
-  isReleasing: boolean;
+  isSettingLive: boolean;
   isTakingOffline: boolean;
-  releasingVersion: number | null;
 }
 
-const StatusChip = ({ status }: { status: VersionStatus }) => {
-  switch (status) {
-    case 'live':
-      return <Chip label="Live" size="small" color="success" />;
-    case 'published':
-      return <Chip label="Published" size="small" color="primary" variant="outlined" />;
-    case 'draft':
-      return <Chip label="Draft" size="small" color="default" variant="outlined" />;
-  }
-};
-
-const getSecondaryText = (status: VersionStatus): string => {
-  switch (status) {
-    case 'draft':
-      return 'Currently editing';
-    case 'live':
-      return 'Players can see this version';
-    case 'published':
-      return 'Ready to release';
-  }
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
 
 export const VersionItem = ({
   version,
-  status,
-  onRelease,
+  publishedAt,
+  stepCount,
+  isLive,
+  onSetAsLive,
   onTakeOffline,
-  isReleasing,
+  isSettingLive,
   isTakingOffline,
-  releasingVersion,
 }: VersionItemProps) => {
-  const isLoading = isReleasing || isTakingOffline;
-  const isThisVersionReleasing = isReleasing && releasingVersion === version;
-
-  const secondaryActionByStatus: Record<VersionStatus, ReactNode> = {
-    published: (
-      <Button
-        size="small"
-        variant="outlined"
-        color="success"
-        startIcon={isThisVersionReleasing ? <CircularProgress size={14} /> : <RocketLaunchIcon size={14} />}
-        onClick={() => onRelease(version)}
-        disabled={isLoading}
-      >
-        Release
-      </Button>
-    ),
-    live: (
-      <Button
-        size="small"
-        variant="outlined"
-        color="warning"
-        startIcon={isTakingOffline ? <CircularProgress size={14} /> : <EyeSlashIcon size={14} />}
-        onClick={onTakeOffline}
-        disabled={isLoading}
-      >
-        Take Offline
-      </Button>
-    ),
-    draft: undefined,
-  };
+  const isLoading = isSettingLive || isTakingOffline;
 
   return (
     <ListItem
-      secondaryAction={secondaryActionByStatus[status]}
+      secondaryAction={
+        isLive ? (
+          <Button
+            size="small"
+            variant="outlined"
+            color="warning"
+            startIcon={isTakingOffline ? <CircularProgress size={14} /> : <EyeSlashIcon size={14} />}
+            onClick={onTakeOffline}
+            disabled={isLoading}
+          >
+            Take Offline
+          </Button>
+        ) : (
+          <Button
+            size="small"
+            variant="outlined"
+            color="success"
+            startIcon={isSettingLive ? <CircularProgress size={14} /> : <RocketLaunchIcon size={14} />}
+            onClick={() => onSetAsLive(version)}
+            disabled={isLoading}
+          >
+            Set as Live
+          </Button>
+        )
+      }
       sx={{
         py: 1,
-        bgcolor: status === 'live' ? 'success.50' : 'transparent',
+        bgcolor: isLive ? 'success.50' : 'transparent',
       }}
     >
       <ListItemText
         primary={
           <Stack direction="row" alignItems="center" gap={1}>
             <Typography variant="body2" fontWeight={500}>
-              Version {version}
+              v{version} ({formatDate(publishedAt)})
             </Typography>
-            <StatusChip status={status} />
+            {isLive && <Chip label="Live" size="small" color="success" />}
           </Stack>
         }
-        secondary={getSecondaryText(status)}
+        secondary={`${stepCount} step${stepCount !== 1 ? 's' : ''}`}
       />
     </ListItem>
   );

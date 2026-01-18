@@ -1,5 +1,7 @@
 # Common Standards
 
+**IMPORTANT: Do not miss any requirements in this file!.**
+
 **Applies to ALL code - frontend and backend.**
 
 These standards are referenced by both `frontend.md` and `backend.md`.

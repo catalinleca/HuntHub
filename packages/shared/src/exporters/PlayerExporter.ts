@@ -40,7 +40,7 @@ export class PlayerExporter {
       stepId: step.stepId,
       type: step.type,
       challenge: this.challenge(step.type, step.challenge),
-      media: step.media,
+      media: step.media ?? undefined,
       timeLimit: step.timeLimit ?? null,
       maxAttempts: step.maxAttempts ?? null,
       hasHint: !!step.hint,

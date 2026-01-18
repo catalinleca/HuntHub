@@ -18,4 +18,5 @@ export const huntKeys = {
   list: (filters?: GetHuntsParams) => [...huntKeys.lists(), filters] as const,
   details: () => [...huntKeys.all(), 'detail'] as const,
   detail: (id: number) => [...huntKeys.details(), id] as const,
+  versions: (id: number) => [...huntKeys.detail(id), 'versions'] as const,
 };

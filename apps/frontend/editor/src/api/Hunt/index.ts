@@ -1,5 +1,6 @@
 export { useHuntsQuery } from './getHunts';
 export { useGetHunt } from './getHunt';
+export { useGetVersionHistory } from './getVersionHistory';
 export { useDashboardHunts } from './useDashboardHunts';
 export { useCreateHunt } from './createHunt';
 export { useUpdateHunt } from './updateHunt';
