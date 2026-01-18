@@ -45,10 +45,7 @@ export const createTestStep = async (options: CreateStepOptions = {}): Promise<I
   return step.toJSON() as IStep;
 };
 
-export const createTestSteps = async (
-  count: number,
-  options: CreateStepOptions = {},
-): Promise<IStep[]> => {
+export const createTestSteps = async (count: number, options: CreateStepOptions = {}): Promise<IStep[]> => {
   const steps: IStep[] = [];
 
   for (let i = 0; i < count; i++) {

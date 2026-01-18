@@ -15,9 +15,9 @@
  * @example "createdAt"
  */
 export enum AssetSortField {
-  CreatedAt = "createdAt",
-  OriginalFilename = "originalFilename",
-  Size = "size",
+  CreatedAt = 'createdAt',
+  OriginalFilename = 'originalFilename',
+  Size = 'size',
 }
 
 /**
@@ -25,8 +25,8 @@ export enum AssetSortField {
  * @example "updatedAt"
  */
 export enum HuntSortField {
-  CreatedAt = "createdAt",
-  UpdatedAt = "updatedAt",
+  CreatedAt = 'createdAt',
+  UpdatedAt = 'updatedAt',
 }
 
 /**
@@ -34,47 +34,47 @@ export enum HuntSortField {
  * @example "desc"
  */
 export enum SortOrder {
-  Asc = "asc",
-  Desc = "desc",
+  Asc = 'asc',
+  Desc = 'desc',
 }
 
 /** Type of answer being submitted */
 export enum AnswerType {
-  Clue = "clue",
-  QuizChoice = "quiz-choice",
-  QuizInput = "quiz-input",
-  MissionLocation = "mission-location",
-  MissionMedia = "mission-media",
-  Task = "task",
+  Clue = 'clue',
+  QuizChoice = 'quiz-choice',
+  QuizInput = 'quiz-input',
+  MissionLocation = 'mission-location',
+  MissionMedia = 'mission-media',
+  Task = 'task',
 }
 
 /** Player's progress status through a hunt */
 export enum HuntProgressStatus {
-  InProgress = "in_progress",
-  Completed = "completed",
-  Abandoned = "abandoned",
+  InProgress = 'in_progress',
+  Completed = 'completed',
+  Abandoned = 'abandoned',
 }
 
 /** Type of media attached to a step */
 export enum MediaType {
-  Image = "image",
-  Audio = "audio",
-  Video = "video",
-  ImageAudio = "image-audio",
+  Image = 'image',
+  Audio = 'audio',
+  Video = 'video',
+  ImageAudio = 'image-audio',
 }
 
 export enum MimeTypes {
-  ImageJpeg = "image/jpeg",
-  ImagePng = "image/png",
-  ImageWebp = "image/webp",
-  ImageGif = "image/gif",
-  VideoMp4 = "video/mp4",
-  VideoWebm = "video/webm",
-  AudioMpeg = "audio/mpeg",
-  AudioWav = "audio/wav",
-  AudioOgg = "audio/ogg",
-  AudioWebm = "audio/webm",
-  AudioMp4 = "audio/mp4",
+  ImageJpeg = 'image/jpeg',
+  ImagePng = 'image/png',
+  ImageWebp = 'image/webp',
+  ImageGif = 'image/gif',
+  VideoMp4 = 'video/mp4',
+  VideoWebm = 'video/webm',
+  AudioMpeg = 'audio/mpeg',
+  AudioWav = 'audio/wav',
+  AudioOgg = 'audio/ogg',
+  AudioWebm = 'audio/webm',
+  AudioMp4 = 'audio/mp4',
 }
 
 /**
@@ -85,47 +85,47 @@ export enum MimeTypes {
  * - numeric-range: Numeric value within tolerance
  */
 export enum ValidationMode {
-  Exact = "exact",
-  Fuzzy = "fuzzy",
-  Contains = "contains",
-  NumericRange = "numeric-range",
+  Exact = 'exact',
+  Fuzzy = 'fuzzy',
+  Contains = 'contains',
+  NumericRange = 'numeric-range',
 }
 
 export enum MissionType {
-  UploadMedia = "upload-media",
-  MatchLocation = "match-location",
-  UploadAudio = "upload-audio",
+  UploadMedia = 'upload-media',
+  MatchLocation = 'match-location',
+  UploadAudio = 'upload-audio',
 }
 
 export enum OptionType {
-  Choice = "choice",
-  Input = "input",
+  Choice = 'choice',
+  Input = 'input',
 }
 
 export enum ChallengeType {
-  Clue = "clue",
-  Quiz = "quiz",
-  Mission = "mission",
-  Task = "task",
+  Clue = 'clue',
+  Quiz = 'quiz',
+  Mission = 'mission',
+  Task = 'task',
 }
 
 export enum HuntAccessType {
-  Creator = "creator",
-  Viewer = "viewer",
-  Editor = "editor",
+  Creator = 'creator',
+  Viewer = 'viewer',
+  Editor = 'editor',
 }
 
 /** Permission level for hunt access. Hierarchy: owner > admin > view */
 export enum HuntPermission {
-  View = "view",
-  Admin = "admin",
-  Owner = "owner",
+  View = 'view',
+  Admin = 'admin',
+  Owner = 'owner',
 }
 
 /** Hunt status: draft (editable) or published (read-only) */
 export enum HuntStatus {
-  Draft = "draft",
-  Published = "published",
+  Draft = 'draft',
+  Published = 'published',
 }
 
 export interface Location {
@@ -270,7 +270,7 @@ export interface Hunt {
    * Authenticated user's permission level for this hunt (included in user-specific contexts like dashboard)
    * @example "owner"
    */
-  permission?: "owner" | "admin" | "view";
+  permission?: 'owner' | 'admin' | 'view';
   /**
    * @format date-time
    * @example "2024-02-01T10:12:45Z"
@@ -443,7 +443,7 @@ export interface Mission {
   /** Instructions for AI to validate player's upload (future feature) */
   aiInstructions?: string;
   /** Which AI model to use for validation (future feature) */
-  aiModel?: "gpt-4-vision" | "claude-vision" | "gemini-vision";
+  aiModel?: 'gpt-4-vision' | 'claude-vision' | 'gemini-vision';
 }
 
 export interface Task {
@@ -453,7 +453,7 @@ export interface Task {
   /** Optional. Specific criteria for AI validation. If not provided, AI validates against the instructions field. */
   aiInstructions?: string;
   /** Which AI model to use for validation (future feature) */
-  aiModel?: "gpt-4" | "claude" | "gemini";
+  aiModel?: 'gpt-4' | 'claude' | 'gemini';
 }
 
 export interface User {
@@ -716,7 +716,7 @@ export interface Collaborator {
   /** User's profile picture URL */
   profilePicture?: string;
   /** User's permission level (owner is not listed as collaborator) */
-  permission: "admin" | "view";
+  permission: 'admin' | 'view';
   /**
    * When access was granted
    * @format date-time
@@ -737,7 +737,7 @@ export interface ShareResult {
   /** User ID of the person the hunt was shared with */
   sharedWithId: string;
   /** Permission level granted */
-  permission: "admin" | "view";
+  permission: 'admin' | 'view';
   /**
    * When the hunt was shared
    * @format date-time
@@ -788,13 +788,13 @@ export interface ShareHuntRequest {
    */
   email: string;
   /** Permission level to grant */
-  permission: "admin" | "view";
+  permission: 'admin' | 'view';
 }
 
 /** Request body for updating a collaborator's permission level */
 export interface UpdatePermissionRequest {
   /** New permission level */
-  permission: "admin" | "view";
+  permission: 'admin' | 'view';
 }
 
 /** Player Format - Clue (same as Clue, no answers to strip) */

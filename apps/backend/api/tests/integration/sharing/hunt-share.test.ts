@@ -325,10 +325,7 @@ describe('Hunt Sharing Integration Tests', () => {
     });
 
     it('should return 404 when hunt does not exist', async () => {
-      await request(app)
-        .get('/api/hunts/99999/access')
-        .set('Authorization', `Bearer ${ownerToken}`)
-        .expect(404);
+      await request(app).get('/api/hunts/99999/access').set('Authorization', `Bearer ${ownerToken}`).expect(404);
     });
   });
 

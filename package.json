@@ -32,7 +32,11 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\"",
     "type-check": "tsc --noEmit --workspaces",
     "type-check:editor": "npm run type-check --workspace=@hunthub/editor",
-    "type-check:player": "npm run type-check --workspace=@hunthub/player"
+    "type-check:player": "npm run type-check --workspace=@hunthub/player",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,json,md}": "prettier --write"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.0.0",
@@ -40,6 +44,8 @@
     "eslint": "^8.45.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.0.0",
     "typescript": "^5.3.3"
   }

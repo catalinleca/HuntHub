@@ -2,16 +2,8 @@ import request from 'supertest';
 import { Express } from 'express';
 import { createTestApp } from '../../setup/testServer';
 import { createTestUser } from '../../setup/factories/user.factory';
-import {
-  createTestAsset,
-  createTestAssets,
-  generateAssetCreateData,
-} from '../../setup/factories/asset.factory';
-import {
-  mockFirebaseAuth,
-  createTestAuthToken,
-  clearFirebaseAuthMocks,
-} from '../../helpers/authHelper';
+import { createTestAsset, createTestAssets, generateAssetCreateData } from '../../setup/factories/asset.factory';
+import { mockFirebaseAuth, createTestAuthToken, clearFirebaseAuthMocks } from '../../helpers/authHelper';
 import { IUser } from '@/database/types/User';
 import { MimeTypes } from '@hunthub/shared';
 
@@ -124,10 +116,7 @@ describe('Asset CRUD Integration Tests', () => {
     });
 
     it('should return 401 when no auth token provided', async () => {
-      await request(app)
-        .post('/api/assets/request-upload')
-        .query({ extension: 'jpg' })
-        .expect(401);
+      await request(app).post('/api/assets/request-upload').query({ extension: 'jpg' }).expect(401);
     });
   });
 
@@ -219,10 +208,7 @@ describe('Asset CRUD Integration Tests', () => {
     it('should return all user assets', async () => {
       await createTestAssets(3, { ownerId: testUser.id });
 
-      const response = await request(app)
-        .get('/api/assets')
-        .set('Authorization', `Bearer ${authToken}`)
-        .expect(200);
+      const response = await request(app).get('/api/assets').set('Authorization', `Bearer ${authToken}`).expect(200);
 
       expect(response.body.data).toHaveLength(3);
       expect(response.body.pagination).toMatchObject({
@@ -241,10 +227,7 @@ describe('Asset CRUD Integration Tests', () => {
     });
 
     it('should return empty array when user has no assets', async () => {
-      const response = await request(app)
-        .get('/api/assets')
-        .set('Authorization', `Bearer ${authToken}`)
-        .expect(200);
+      const response = await request(app).get('/api/assets').set('Authorization', `Bearer ${authToken}`).expect(200);
 
       expect(response.body.data).toHaveLength(0);
       expect(response.body.pagination.total).toBe(0);
@@ -281,10 +264,7 @@ describe('Asset CRUD Integration Tests', () => {
 
       await createTestAsset({ ownerId: testUser.id });
 
-      const response = await request(app)
-        .get('/api/assets')
-        .set('Authorization', `Bearer ${authToken}`)
-        .expect(200);
+      const response = await request(app).get('/api/assets').set('Authorization', `Bearer ${authToken}`).expect(200);
 
       expect(response.body.data).toHaveLength(1);
       expect(response.body.data[0].ownerId).toBe(testUser.id);
@@ -349,15 +329,9 @@ describe('Asset CRUD Integration Tests', () => {
     it('should delete asset and return 204', async () => {
       const asset = await createTestAsset({ ownerId: testUser.id });
 
-      await request(app)
-        .delete(`/api/assets/${asset.assetId}`)
-        .set('Authorization', `Bearer ${authToken}`)
-        .expect(204);
+      await request(app).delete(`/api/assets/${asset.assetId}`).set('Authorization', `Bearer ${authToken}`).expect(204);
 
-      await request(app)
-        .get(`/api/assets/${asset.assetId}`)
-        .set('Authorization', `Bearer ${authToken}`)
-        .expect(404);
+      await request(app).get(`/api/assets/${asset.assetId}`).set('Authorization', `Bearer ${authToken}`).expect(404);
     });
 
     it('should return 404 for non-existent asset', async () => {

@@ -67,10 +67,7 @@ describe('Hunt CRUD Integration Tests', () => {
     it('should return 401 when no auth token provided', async () => {
       const huntData = generateHuntData();
 
-      await request(app)
-        .post('/api/hunts')
-        .send(huntData)
-        .expect(401);
+      await request(app).post('/api/hunts').send(huntData).expect(401);
     });
 
     it('should validate required fields', async () => {
@@ -113,23 +110,15 @@ describe('Hunt CRUD Integration Tests', () => {
     it('should return 404 when hunt does not exist', async () => {
       const fakeId = 99999; // Non-existent numeric hunt ID
 
-      await request(app)
-        .get(`/api/hunts/${fakeId}`)
-        .set('Authorization', `Bearer ${authToken}`)
-        .expect(404);
+      await request(app).get(`/api/hunts/${fakeId}`).set('Authorization', `Bearer ${authToken}`).expect(404);
     });
 
     it('should return 400 for invalid hunt ID format', async () => {
-      await request(app)
-        .get('/api/hunts/invalid')
-        .set('Authorization', `Bearer ${authToken}`)
-        .expect(400);
+      await request(app).get('/api/hunts/invalid').set('Authorization', `Bearer ${authToken}`).expect(400);
     });
 
     it('should return 401 when accessing without auth', async () => {
-      await request(app)
-        .get(`/api/hunts/${createdHunt.huntId}`)
-        .expect(401);
+      await request(app).get(`/api/hunts/${createdHunt.huntId}`).expect(401);
     });
 
     it('should populate steps array with full step details', async () => {
@@ -185,10 +174,7 @@ describe('Hunt CRUD Integration Tests', () => {
     });
 
     it('should get all hunts for authenticated user', async () => {
-      const response = await request(app)
-        .get('/api/hunts')
-        .set('Authorization', `Bearer ${authToken}`)
-        .expect(200);
+      const response = await request(app).get('/api/hunts').set('Authorization', `Bearer ${authToken}`).expect(200);
 
       expect(response.body.data).toHaveLength(3);
       expect(response.body.data.every((hunt: Hunt) => hunt.creatorId === testUser.id)).toBe(true);
@@ -207,10 +193,7 @@ describe('Hunt CRUD Integration Tests', () => {
       mockFirebaseAuth(newUser);
       const newUserToken = createTestAuthToken(newUser);
 
-      const response = await request(app)
-        .get('/api/hunts')
-        .set('Authorization', `Bearer ${newUserToken}`)
-        .expect(200);
+      const response = await request(app).get('/api/hunts').set('Authorization', `Bearer ${newUserToken}`).expect(200);
 
       expect(response.body.data).toHaveLength(0);
       expect(response.body.pagination.total).toBe(0);
@@ -266,7 +249,7 @@ describe('Hunt CRUD Integration Tests', () => {
         .expect(400);
     });
 
-    it('should return 403 when trying to update another user\'s hunt', async () => {
+    it("should return 403 when trying to update another user's hunt", async () => {
       const otherUser = await createTestUser({ email: 'other@example.com' });
       const otherHunt = await createTestHunt({ creatorId: otherUser.id });
 
@@ -301,20 +284,14 @@ describe('Hunt CRUD Integration Tests', () => {
     });
 
     it('should return 404 when hunt does not exist', async () => {
-      await request(app)
-        .delete('/api/hunts/99999')
-        .set('Authorization', `Bearer ${authToken}`)
-        .expect(404);
+      await request(app).delete('/api/hunts/99999').set('Authorization', `Bearer ${authToken}`).expect(404);
     });
 
     it('should return 400 for invalid hunt ID format', async () => {
-      await request(app)
-        .delete('/api/hunts/invalid')
-        .set('Authorization', `Bearer ${authToken}`)
-        .expect(400);
+      await request(app).delete('/api/hunts/invalid').set('Authorization', `Bearer ${authToken}`).expect(400);
     });
 
-    it('should return 404 when trying to delete another user\'s hunt', async () => {
+    it("should return 404 when trying to delete another user's hunt", async () => {
       const otherUser = await createTestUser({ email: 'other@example.com' });
       const otherHunt = await createTestHunt({ creatorId: otherUser.id });
 
@@ -343,10 +320,7 @@ describe('Hunt CRUD Integration Tests', () => {
         challenge: { clue: { title: 'Step 2' } },
       });
 
-      await request(app)
-        .delete(`/api/hunts/${hunt.huntId}`)
-        .set('Authorization', `Bearer ${authToken}`)
-        .expect(204);
+      await request(app).delete(`/api/hunts/${hunt.huntId}`).set('Authorization', `Bearer ${authToken}`).expect(204);
 
       const remainingSteps = await StepModel.find({ huntId: hunt.huntId });
       expect(remainingSteps).toHaveLength(0);
@@ -365,26 +339,32 @@ describe('Hunt CRUD Integration Tests', () => {
         name: 'Hunt for Reordering',
       });
 
-      step1 = (await StepModel.create({
-        huntId: createdHunt.huntId,
-        huntVersion: 1,
-        type: 'clue',
-        challenge: { clue: { title: 'Step 1' } },
-      })).toJSON() as IStep;
+      step1 = (
+        await StepModel.create({
+          huntId: createdHunt.huntId,
+          huntVersion: 1,
+          type: 'clue',
+          challenge: { clue: { title: 'Step 1' } },
+        })
+      ).toJSON() as IStep;
 
-      step2 = (await StepModel.create({
-        huntId: createdHunt.huntId,
-        huntVersion: 1,
-        type: 'clue',
-        challenge: { clue: { title: 'Step 2' } },
-      })).toJSON() as IStep;
+      step2 = (
+        await StepModel.create({
+          huntId: createdHunt.huntId,
+          huntVersion: 1,
+          type: 'clue',
+          challenge: { clue: { title: 'Step 2' } },
+        })
+      ).toJSON() as IStep;
 
-      step3 = (await StepModel.create({
-        huntId: createdHunt.huntId,
-        huntVersion: 1,
-        type: 'clue',
-        challenge: { clue: { title: 'Step 3' } },
-      })).toJSON() as IStep;
+      step3 = (
+        await StepModel.create({
+          huntId: createdHunt.huntId,
+          huntVersion: 1,
+          type: 'clue',
+          challenge: { clue: { title: 'Step 3' } },
+        })
+      ).toJSON() as IStep;
     });
 
     it('should reorder steps successfully', async () => {
@@ -427,7 +407,7 @@ describe('Hunt CRUD Integration Tests', () => {
         .expect(400);
     });
 
-    it('should return 404 when trying to reorder another user\'s hunt', async () => {
+    it("should return 404 when trying to reorder another user's hunt", async () => {
       const otherUser = await createTestUser({ email: 'other@example.com' });
       const otherHunt = await createTestHunt({ creatorId: otherUser.id });
 
@@ -549,10 +529,7 @@ describe('Hunt CRUD Integration Tests', () => {
       mockFirebaseAuth(adminUser);
       adminToken = createTestAuthToken(adminUser);
 
-      const response = await request(app)
-        .get('/api/hunts')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
+      const response = await request(app).get('/api/hunts').set('Authorization', `Bearer ${adminToken}`).expect(200);
 
       expect(response.body.data.length).toBeGreaterThan(0);
       const foundSharedHunt = response.body.data.find((h: Hunt) => h.huntId === sharedHunt.huntId);
@@ -575,10 +552,7 @@ describe('Hunt CRUD Integration Tests', () => {
       });
       expect(versionBefore).toBeDefined();
 
-      await request(app)
-        .delete(`/api/hunts/${hunt.huntId}`)
-        .set('Authorization', `Bearer ${authToken}`)
-        .expect(204);
+      await request(app).delete(`/api/hunts/${hunt.huntId}`).set('Authorization', `Bearer ${authToken}`).expect(204);
 
       const versionsAfter = await HuntVersionModel.find({ huntId: hunt.huntId });
       expect(versionsAfter).toHaveLength(0);
