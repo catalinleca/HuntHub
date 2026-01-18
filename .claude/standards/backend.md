@@ -263,64 +263,63 @@ export interface Hunt {
 
 ## Null vs Undefined
 
-**Rule: Use `undefined` internally, accept `null` at boundaries.**
+**Rule: Use `null` for absent values. Don't convert.**
 
-### Why `undefined`:
+### Why `null`:
 
-- JavaScript default - uninitialized values are `undefined`
-- TypeScript's design - `property?` means `T | undefined`
-- TypeScript team doesn't use `null` in their codebase
-- Simpler types - one absence value, not two
-
-### Where `null` appears:
-
-- JSON/API responses (JSON has no `undefined`)
-- MongoDB results (DB returns `null` for missing)
-- OpenAPI schemas (`nullable: true`)
+- JSON uses `null` (no `undefined` in JSON)
+- MongoDB returns `null` for missing values
+- OpenAPI schemas use `nullable: true`
+- No conversion overhead - data flows naturally
 
 ### The Pattern:
 
 ```typescript
-// INTERNAL TYPES - use undefined
-interface StepPF {
-  media?: Media;      // means: Media | undefined
-  timeLimit?: number; // means: number | undefined
+// Types use null for optional values
+interface Hunt {
+  liveVersion: number | null;
 }
 
-// API/DB BOUNDARY - convert null → undefined
-const step: StepPF = {
-  ...dbResult,
-  media: dbResult.media ?? undefined,
-};
+// Just pass the value, no conversion needed
+await this.pruneOldVersions(huntId, huntDoc.liveVersion, session);
+
+// Method accepts null
+private async pruneOldVersions(
+  huntId: number,
+  liveVersion: number | null,
+  session: ClientSession,
+): Promise<void>
 ```
 
-### Layer Rules:
+### When `undefined` appears:
 
-| Layer | Pattern |
-|-------|---------|
-| OpenAPI schemas | `nullable: true` (produces `T \| null`) |
-| Mongoose/DB | Returns `null` for missing values |
-| Service layer | Convert `null` → `undefined` at boundary |
-| Internal types | Use `property?: T` (undefined only) |
-| API responses | JSON sends `null` (undefined omitted) |
+- Optional function parameters (`param?: T`)
+- Object properties that may not exist
+- TypeScript's `?:` syntax produces `undefined`
 
-### Conversion Examples:
+### Checking for absence:
 
 ```typescript
-// DB → Internal (in service/mapper)
-const result = {
-  media: dbDoc.media ?? undefined,
-  hint: dbDoc.hint ?? undefined,
-};
+// Explicit null check
+if (value === null) { /* explicitly absent */ }
 
-// Check for absence (handles both)
+// Handles both null and undefined (use when unsure)
 if (value == null) { /* null OR undefined */ }
 
-// Nullish coalescing (handles both)
+// Nullish coalescing works with both
 const safe = value ?? defaultValue;
 ```
 
-**Don't mix** - If internal type says `undefined`, don't pass `null`. Convert at boundaries.
+### Guidelines:
+
+| Situation | Use |
+|-----------|-----|
+| "No value" in data | `null` |
+| Optional parameter | `param?: T` (undefined) |
+| Checking absence | `value == null` (catches both) |
+| Default values | `value ?? default` |
+
+**Don't convert** - If data has `null`, pass `null`. No `?? undefined` noise.
 
 ---
 

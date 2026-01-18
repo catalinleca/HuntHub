@@ -90,8 +90,8 @@ export class PublishingService implements IPublishingService {
 
       await VersionPublisher.updateHuntPointers(huntId, currentVersion, newVersion, session);
 
-      // Prune old versions if exceeding cap
-      await this.pruneOldVersions(huntId, session);
+      // Prune old versions if exceeding cap (never prune the live version)
+      await this.pruneOldVersions(huntId, huntDoc.liveVersion, session);
 
       return {
         publishedVersion: currentVersion,
@@ -213,7 +213,7 @@ export class PublishingService implements IPublishingService {
     return createdVersion;
   }
 
-  private async pruneOldVersions(huntId: number, session: ClientSession): Promise<void> {
+  private async pruneOldVersions(huntId: number, liveVersion: number | null, session: ClientSession): Promise<void> {
     const versionsToDelete = await HuntVersionModel.find({ huntId, isPublished: true })
       .sort({ version: -1 })
       .skip(MAX_PUBLISHED_VERSIONS)
@@ -225,7 +225,12 @@ export class PublishingService implements IPublishingService {
       return;
     }
 
-    const versionNumbers = versionsToDelete.map((v) => v.version);
+    // Never delete the currently live version
+    const versionNumbers = versionsToDelete.map((v) => v.version).filter((v) => v !== liveVersion);
+
+    if (versionNumbers.length === 0) {
+      return;
+    }
 
     await HuntVersionModel.deleteMany({ huntId, version: { $in: versionNumbers } }).session(session);
     await StepModel.deleteMany({ huntId, huntVersion: { $in: versionNumbers } }).session(session);
