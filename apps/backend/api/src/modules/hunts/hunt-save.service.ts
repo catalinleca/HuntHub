@@ -14,7 +14,6 @@ import { IAssetUsageTracker, AssetSource } from '@/services/asset-usage';
 import { IAssetValidator } from '@/services/asset-validation';
 import { AssetExtractor } from '@/utils';
 import { withTransaction } from '@/shared/utils/transaction';
-import { isDev } from '@/config/env.config';
 
 export interface IHuntSaveService {
   saveHunt(huntId: number, huntData: Hunt, userId: string): Promise<Hunt>;
@@ -49,10 +48,6 @@ export class HuntSaveService implements IHuntSaveService {
       await this.updateStepOrder(huntId, huntVersion, huntData.steps || [], createdStepIds, session);
 
       await this.usageTracker.rebuildHuntAssetUsage(huntId, session);
-
-      if (isDev) {
-        await HuntModel.findOneAndUpdate({ huntId }, { liveVersion: huntVersion }, { session });
-      }
 
       return this.fetchHuntWithSteps(huntId, huntVersion, session);
     });
