@@ -1,20 +1,16 @@
-import {
-  Popover,
-  Typography,
-  Stack,
-  Divider,
-  TextField,
-  ToggleButtonGroup,
-  ToggleButton,
-  IconButton,
-  InputAdornment,
-} from '@mui/material';
+import { Popover, Typography, Stack, Divider, TextField, IconButton, InputAdornment, Collapse } from '@mui/material';
 import { CopyIcon } from '@phosphor-icons/react';
 import { useParams } from 'react-router-dom';
 import { HuntAccessMode } from '@hunthub/shared';
 import { useGetHunt, useUpdateAccessMode } from '@/api/Hunt';
 import { useSnackbarStore } from '@/stores';
+import { ToggleButtonGroup } from '@/components/common';
 import { InviteSection } from './InviteSection';
+
+const ACCESS_MODE_OPTIONS = [
+  { value: HuntAccessMode.Open, label: 'Anyone with link' },
+  { value: HuntAccessMode.InviteOnly, label: 'Invite only' },
+];
 
 const PLAYER_URL = import.meta.env.VITE_PLAYER_URL || 'http://localhost:5175';
 
@@ -32,7 +28,8 @@ export const SharePanel = ({ anchorEl, open, onClose }: SharePanelProps) => {
   const { mutate: updateAccessMode, isPending: isUpdatingAccessMode } = useUpdateAccessMode();
   const { success } = useSnackbarStore();
 
-  const playUrl = hunt?.playSlug ? `${PLAYER_URL}/${hunt.playSlug}` : '';
+  const hasPlayUrl = Boolean(hunt?.playSlug);
+  const playUrl = hasPlayUrl ? `${PLAYER_URL}/${hunt!.playSlug}` : '';
   const accessMode = hunt?.accessMode ?? HuntAccessMode.Open;
   const isInviteOnly = accessMode === HuntAccessMode.InviteOnly;
 
@@ -44,9 +41,9 @@ export const SharePanel = ({ anchorEl, open, onClose }: SharePanelProps) => {
     success('Link copied!');
   };
 
-  const handleAccessModeChange = (_event: React.MouseEvent<HTMLElement>, newMode: HuntAccessMode | null) => {
+  const handleAccessModeChange = (_event: React.MouseEvent<HTMLElement>, newMode: string | null) => {
     if (newMode && newMode !== accessMode) {
-      updateAccessMode({ huntId, accessMode: newMode });
+      updateAccessMode({ huntId, accessMode: newMode as HuntAccessMode });
     }
   };
 
@@ -65,23 +62,29 @@ export const SharePanel = ({ anchorEl, open, onClose }: SharePanelProps) => {
         <Typography variant="subtitle1" fontWeight={600}>
           Share Hunt
         </Typography>
-        <TextField
-          value={playUrl}
-          size="small"
-          fullWidth
-          slotProps={{
-            input: {
-              readOnly: true,
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton size="small" onClick={handleCopy} disabled={!playUrl}>
-                    <CopyIcon size={18} />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
+        {hasPlayUrl ? (
+          <TextField
+            value={playUrl}
+            size="small"
+            fullWidth
+            slotProps={{
+              input: {
+                readOnly: true,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton size="small" onClick={handleCopy}>
+                      <CopyIcon size={18} />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            Release your hunt to get a shareable link
+          </Typography>
+        )}
       </Stack>
 
       <Divider />
@@ -94,24 +97,19 @@ export const SharePanel = ({ anchorEl, open, onClose }: SharePanelProps) => {
           value={accessMode}
           exclusive
           onChange={handleAccessModeChange}
-          size="small"
           fullWidth
           disabled={isUpdatingAccessMode}
-        >
-          <ToggleButton value={HuntAccessMode.Open}>Anyone with link</ToggleButton>
-          <ToggleButton value={HuntAccessMode.InviteOnly}>Invite only</ToggleButton>
-        </ToggleButtonGroup>
+          options={ACCESS_MODE_OPTIONS}
+        />
         <Typography variant="caption" color="text.secondary">
           {isInviteOnly ? 'Only invited players can access this hunt' : 'Anyone with the link can play'}
         </Typography>
       </Stack>
 
-      {isInviteOnly && (
-        <>
-          <Divider />
-          <InviteSection huntId={huntId} />
-        </>
-      )}
+      <Collapse in={isInviteOnly}>
+        <Divider />
+        <InviteSection huntId={huntId} />
+      </Collapse>
     </Popover>
   );
 };
