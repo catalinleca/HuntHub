@@ -6,14 +6,13 @@ import { HuntAccessMode } from '@hunthub/shared';
 import { useGetHunt, useUpdateAccessMode } from '@/api/Hunt';
 import { useSnackbarStore } from '@/stores';
 import { ToggleButtonGroup } from '@/components/common';
+import { getPlayUrl } from '@/utils';
 import { InviteSection } from './InviteSection';
 
 const ACCESS_MODE_OPTIONS = [
   { value: HuntAccessMode.Open, label: 'Link access' },
   { value: HuntAccessMode.InviteOnly, label: 'Invite only' },
 ];
-
-const PLAYER_URL = import.meta.env.VITE_PLAYER_URL || 'http://localhost:5175';
 
 interface SharePanelProps {
   anchorEl: HTMLElement | null;
@@ -31,7 +30,7 @@ export const SharePanel = ({ anchorEl, open, onClose }: SharePanelProps) => {
   const { success } = useSnackbarStore();
 
   const hasPlayUrl = Boolean(hunt?.playSlug);
-  const playUrl = hasPlayUrl ? `${PLAYER_URL}/${hunt!.playSlug}` : '';
+  const playUrl = hasPlayUrl ? getPlayUrl(hunt!.playSlug!) : '';
   const accessMode = hunt?.accessMode ?? HuntAccessMode.Open;
   const isInviteOnly = accessMode === HuntAccessMode.InviteOnly;
 

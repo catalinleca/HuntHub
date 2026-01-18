@@ -1,25 +1,25 @@
-const SESSION_KEY = (huntId: number) => `hunthub_session_${huntId}`;
+const SESSION_KEY = (playSlug: string) => `hunthub_session_${playSlug}`;
 
 export const sessionStorage = {
-  get: (huntId: number): string | null => {
+  get: (playSlug: string): string | null => {
     try {
-      return localStorage.getItem(SESSION_KEY(huntId));
+      return localStorage.getItem(SESSION_KEY(playSlug));
     } catch {
       return null;
     }
   },
 
-  set: (huntId: number, sessionId: string): void => {
+  set: (playSlug: string, sessionId: string): void => {
     try {
-      localStorage.setItem(SESSION_KEY(huntId), sessionId);
+      localStorage.setItem(SESSION_KEY(playSlug), sessionId);
     } catch {
       console.warn('Failed to save session to localStorage');
     }
   },
 
-  clear: (huntId: number): void => {
+  clear: (playSlug: string): void => {
     try {
-      localStorage.removeItem(SESSION_KEY(huntId));
+      localStorage.removeItem(SESSION_KEY(playSlug));
     } catch {
       console.warn('Failed to clear session from localStorage');
     }

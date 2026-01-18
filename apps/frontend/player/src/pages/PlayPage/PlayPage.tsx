@@ -78,20 +78,18 @@ const PlayPageContent = () => {
 };
 
 export const PlayPage = () => {
-  const { huntId } = useParams<{ huntId?: string }>();
-  const huntIdNum = Number(huntId);
-  const isValidHuntId = Number.isInteger(huntIdNum) && huntIdNum > 0;
+  const { playSlug } = useParams<{ playSlug?: string }>();
 
-  if (!isValidHuntId) {
+  if (!playSlug) {
     return (
       <S.Container>
-        <Typography color="error">Invalid hunt ID</Typography>
+        <Typography color="error">Invalid hunt link</Typography>
       </S.Container>
     );
   }
 
   return (
-    <PlaySessionProvider huntId={huntIdNum}>
+    <PlaySessionProvider playSlug={playSlug}>
       <PlayPageContent />
     </PlaySessionProvider>
   );

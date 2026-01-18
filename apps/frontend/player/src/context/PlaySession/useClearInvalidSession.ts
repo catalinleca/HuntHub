@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { sessionStorage } from './sessionStorage';
 
 interface UseClearInvalidSessionParams {
-  huntId: number;
+  playSlug: string;
   savedSessionId: string | null;
   isLoading: boolean;
   hasData: boolean;
@@ -10,7 +10,7 @@ interface UseClearInvalidSessionParams {
 }
 
 export const useClearInvalidSession = ({
-  huntId,
+  playSlug,
   savedSessionId,
   isLoading,
   hasData,
@@ -21,7 +21,7 @@ export const useClearInvalidSession = ({
     const sessionNotFound = !hasData;
 
     if (savedSessionId && querySucceeded && sessionNotFound) {
-      sessionStorage.clear(huntId);
+      sessionStorage.clear(playSlug);
     }
-  }, [savedSessionId, isLoading, hasData, error, huntId]);
+  }, [savedSessionId, isLoading, hasData, error, playSlug]);
 };
