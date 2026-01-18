@@ -1,9 +1,10 @@
-import { Popover, Typography, Stack, Divider, List, CircularProgress } from '@mui/material';
+import { Popover, Typography, Stack, Divider, CircularProgress } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { usePublishingContext } from '@/pages/Hunt/context';
 import { useGetVersionHistory } from '@/api/Hunt';
 import { VersionItem } from './VersionItem';
 import { EmptyVersionState } from './EmptyVersionState';
+import * as S from './VersionPanel.styles';
 
 interface VersionPanelProps {
   anchorEl: HTMLElement | null;
@@ -52,7 +53,7 @@ export const VersionPanel = ({ anchorEl, open, onClose }: VersionPanelProps) => 
       ) : !hasPublishedVersions ? (
         <EmptyVersionState />
       ) : (
-        <List dense sx={{ py: 0 }}>
+        <S.VersionList dense>
           {versions.map((version) => (
             <VersionItem
               key={version.version}
@@ -66,7 +67,7 @@ export const VersionPanel = ({ anchorEl, open, onClose }: VersionPanelProps) => 
               isTakingOffline={isTakingOffline && version.version === liveVersion}
             />
           ))}
-        </List>
+        </S.VersionList>
       )}
 
       <Divider />

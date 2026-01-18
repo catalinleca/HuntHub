@@ -1,5 +1,6 @@
-import { ListItem, ListItemText, Typography, Stack, Chip, Button, CircularProgress } from '@mui/material';
-import { RocketLaunchIcon, EyeSlashIcon } from '@phosphor-icons/react';
+import { Stack, Typography, CircularProgress } from '@mui/material';
+import { CheckIcon } from '@phosphor-icons/react';
+import * as S from './VersionItem.styles';
 
 interface VersionItemProps {
   version: number;
@@ -29,49 +30,41 @@ export const VersionItem = ({
 }: VersionItemProps) => {
   const isLoading = isSettingLive || isTakingOffline;
 
+  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>, action: () => void) => {
+    e.stopPropagation();
+    action();
+  };
+
   return (
-    <ListItem
-      secondaryAction={
-        isLive ? (
-          <Button
+    <S.VersionRow $isLive={isLive} disableRipple>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" flex={1}>
+        <Stack direction="row" alignItems="center" gap={1}>
+          {isLive && <CheckIcon size={14} weight="bold" />}
+          <Typography variant="body2" fontWeight={isLive ? 600 : 400}>
+            v{version} ({formatDate(publishedAt)}) · {stepCount} steps
+          </Typography>
+        </Stack>
+
+        {isLive ? (
+          <S.ActionButton
             size="small"
-            variant="outlined"
             color="warning"
-            startIcon={isTakingOffline ? <CircularProgress size={14} /> : <EyeSlashIcon size={14} />}
-            onClick={onTakeOffline}
+            onClick={(e) => handleButtonClick(e, onTakeOffline)}
             disabled={isLoading}
           >
-            Take Offline
-          </Button>
+            {isTakingOffline ? <CircularProgress size={14} /> : 'Take Offline'}
+          </S.ActionButton>
         ) : (
-          <Button
+          <S.ActionButton
             size="small"
-            variant="outlined"
             color="success"
-            startIcon={isSettingLive ? <CircularProgress size={14} /> : <RocketLaunchIcon size={14} />}
-            onClick={() => onSetAsLive(version)}
+            onClick={(e) => handleButtonClick(e, () => onSetAsLive(version))}
             disabled={isLoading}
           >
-            Set as Live
-          </Button>
-        )
-      }
-      sx={{
-        py: 1,
-        bgcolor: isLive ? 'success.50' : 'transparent',
-      }}
-    >
-      <ListItemText
-        primary={
-          <Stack direction="row" alignItems="center" gap={1}>
-            <Typography variant="body2" fontWeight={500}>
-              v{version} ({formatDate(publishedAt)})
-            </Typography>
-            {isLive && <Chip label="Live" size="small" color="success" />}
-          </Stack>
-        }
-        secondary={`${stepCount} step${stepCount !== 1 ? 's' : ''}`}
-      />
-    </ListItem>
+            {isSettingLive ? <CircularProgress size={14} /> : 'Set as Live'}
+          </S.ActionButton>
+        )}
+      </Stack>
+    </S.VersionRow>
   );
 };
