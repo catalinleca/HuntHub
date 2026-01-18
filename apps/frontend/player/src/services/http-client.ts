@@ -11,14 +11,16 @@ export const httpClient = axios.create({
 httpClient.interceptors.response.use(
   (response) => response,
   (error) => {
+    const message = error.response?.data?.message || error.message;
+
     if (import.meta.env.DEV) {
       console.error('[API Error]', {
         url: error.config?.url,
         status: error.response?.status,
-        message: error.response?.data?.message || error.message,
+        message,
       });
     }
 
-    return Promise.reject(error);
+    return Promise.reject(new Error(message));
   },
 );

@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, InputLabel, Stack } from '@mui/material';
+import { TextField, Button, Typography, InputLabel, Stack, Alert } from '@mui/material';
 import * as S from './PlayerIdentification.styles';
 
 interface PlayerIdentificationProps {
   onSubmit: (playerName: string, email?: string) => void;
   isLoading?: boolean;
+  requireEmail?: boolean;
+  error?: string | null;
 }
 
-export const PlayerIdentification = ({ onSubmit, isLoading = false }: PlayerIdentificationProps) => {
+export const PlayerIdentification = ({
+  onSubmit,
+  isLoading = false,
+  requireEmail = false,
+  error = null,
+}: PlayerIdentificationProps) => {
   const [playerName, setPlayerName] = useState('');
   const [email, setEmail] = useState('');
 
@@ -16,9 +23,14 @@ export const PlayerIdentification = ({ onSubmit, isLoading = false }: PlayerIden
     if (!playerName.trim()) {
       return;
     }
+    if (requireEmail && !email.trim()) {
+      return;
+    }
 
     onSubmit(playerName.trim(), email.trim() || undefined);
   };
+
+  const isSubmitDisabled = !playerName.trim() || (requireEmail && !email.trim()) || isLoading;
 
   return (
     <S.Container>
@@ -27,8 +39,16 @@ export const PlayerIdentification = ({ onSubmit, isLoading = false }: PlayerIden
           Ready to Play?
         </Typography>
         <Typography variant="body2" color="text.secondary" gutterBottom>
-          Enter your name to start the adventure
+          {requireEmail
+            ? 'This hunt is invite-only. Enter your details to continue.'
+            : 'Enter your name to start the adventure'}
         </Typography>
+
+        {error && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {error}
+          </Alert>
+        )}
 
         <S.Form onSubmit={handleSubmit}>
           <Stack gap={1}>
@@ -45,19 +65,20 @@ export const PlayerIdentification = ({ onSubmit, isLoading = false }: PlayerIden
           </Stack>
 
           <Stack gap={1}>
-            <InputLabel>Email (optional)</InputLabel>
+            <InputLabel>{requireEmail ? 'Email' : 'Email (optional)'}</InputLabel>
             <TextField
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email..."
               fullWidth
+              required={requireEmail}
               disabled={isLoading}
-              helperText="For saving progress across devices"
+              helperText={requireEmail ? 'Required to verify your invitation' : 'For saving progress across devices'}
             />
           </Stack>
 
-          <Button type="submit" variant="contained" size="large" fullWidth disabled={!playerName.trim() || isLoading}>
+          <Button type="submit" variant="contained" size="large" fullWidth disabled={isSubmitDisabled}>
             {isLoading ? 'Starting...' : 'Start Hunt'}
           </Button>
         </S.Form>

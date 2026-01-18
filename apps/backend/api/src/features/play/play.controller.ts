@@ -6,6 +6,7 @@ import { parseNumericId } from '@/shared/utils/parseId';
 import { ValidationError } from '@/shared/errors';
 
 export interface IPlayController {
+  getHuntInfo(req: Request, res: Response): Promise<Response>;
   discoverHunts(req: Request, res: Response): Promise<Response>;
   startSession(req: Request, res: Response): Promise<Response>;
   getSession(req: Request, res: Response): Promise<Response>;
@@ -27,6 +28,18 @@ export class PlayController implements IPlayController {
     @inject(TYPES.PlayService)
     private playService: IPlayService,
   ) {}
+
+  async getHuntInfo(req: Request, res: Response): Promise<Response> {
+    const { playSlug } = req.params;
+
+    if (!playSlug || typeof playSlug !== 'string') {
+      throw new ValidationError('Invalid play slug', []);
+    }
+
+    const result = await this.playService.getHuntInfo(playSlug);
+
+    return res.status(200).json(result);
+  }
 
   async discoverHunts(req: Request, res: Response): Promise<Response> {
     const { page, limit } = req.query as unknown as { page: number; limit: number };

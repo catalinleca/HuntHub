@@ -23,6 +23,10 @@ router.get(
   },
 );
 
+router.get('/:playSlug', (req, res, next) => {
+  controller.getHuntInfo(req, res).catch(next);
+});
+
 router.post('/:playSlug/start', optionalAuthMiddleware, validateRequest(startSessionSchema), (req, res, next) => {
   controller.startSession(req, res).catch(next);
 });

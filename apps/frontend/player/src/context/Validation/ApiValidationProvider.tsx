@@ -7,6 +7,7 @@ import { SuccessDialog } from './SuccessDialog';
 interface ApiValidationProviderProps {
   sessionId: string;
   nextStepId: number | null;
+  stepId?: number;
   showSuccessDialog?: boolean;
   children: ReactNode;
 }
@@ -35,6 +36,7 @@ const getFeedback = (data: ValidateAnswerResponse | undefined): string | null =>
 export const ApiValidationProvider = ({
   sessionId,
   nextStepId,
+  stepId,
   showSuccessDialog = false,
   children,
 }: ApiValidationProviderProps) => {
@@ -52,13 +54,13 @@ export const ApiValidationProvider = ({
 
   const validate = useCallback(
     async (answerType: AnswerType, payload: AnswerPayload) => {
-      const responseData = await validateAnswer({ sessionId, answerType, payload, nextStepId });
+      const responseData = await validateAnswer({ sessionId, answerType, payload, nextStepId, stepId });
 
       if (responseData.correct) {
         handleValidationSuccess(responseData);
       }
     },
-    [sessionId, nextStepId, validateAnswer, handleValidationSuccess],
+    [sessionId, nextStepId, stepId, validateAnswer, handleValidationSuccess],
   );
 
   const handleDialogContinue = useCallback(() => {

@@ -1004,6 +1004,8 @@ export interface StartSessionRequest {
   playerName: string;
   /** @format email */
   email?: string;
+  /** JWT token for preview mode (bypasses access restrictions) */
+  previewToken?: string;
 }
 
 /** Request to validate a player's answer (session tracks current step) */
@@ -1012,6 +1014,8 @@ export interface ValidateAnswerRequest {
   answerType: AnswerType;
   /** Container for answer data (only one field populated based on answerType) */
   payload: AnswerPayload;
+  /** Step ID to validate (only used in preview mode to validate non-current steps) */
+  stepId?: number;
 }
 
 /** Lightweight response from validating an answer (client uses prefetched cache for next step) */
@@ -1091,6 +1095,16 @@ export interface StepResponse {
   _links: StepLinks;
 }
 
+/** Basic hunt info returned before starting a session (used to show hunt name, check access mode, etc.) */
+export interface HuntInfoResponse {
+  name: string;
+  description?: string;
+  /** Access mode for players: open (anyone with link) or invite_only (only invited emails) */
+  accessMode: HuntAccessMode;
+  /** Whether the hunt has a live version available for play */
+  isReleased: boolean;
+}
+
 /** Unified session response - used for both starting and resuming a session */
 export interface SessionResponse {
   /** @format uuid */
@@ -1117,6 +1131,8 @@ export interface SessionResponse {
   completedAt?: string;
   /** True if this is a preview session (enables skip functionality) */
   isPreview?: boolean;
+  /** List of step IDs in order (only present for preview sessions) */
+  stepOrder?: number[];
 }
 
 /** Standard pagination query parameters */

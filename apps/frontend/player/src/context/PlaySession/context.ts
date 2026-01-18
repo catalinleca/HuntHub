@@ -13,11 +13,14 @@ export interface SessionData {
   currentStepIndex: number;
   totalSteps: number;
   previewHint?: string;
+  isPreview: boolean;
+  stepOrder: number[];
 }
 
 export interface SessionActions {
   startSession: (playerName: string, email?: string) => void;
   abandonSession: () => void;
+  goToStep: (stepIndex: number) => void;
 }
 
 export interface SessionDerived {

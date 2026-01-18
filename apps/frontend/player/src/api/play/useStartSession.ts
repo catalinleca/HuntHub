@@ -1,12 +1,24 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { StartSessionRequest, SessionResponse } from '@hunthub/shared';
+import type { SessionResponse } from '@hunthub/shared';
 import { httpClient } from '@/services/http-client';
 import { playKeys } from './keys';
 
-const startSession = async (playSlug: string, playerName: string, email?: string): Promise<SessionResponse> => {
+interface StartSessionParams {
+  playerName: string;
+  email?: string;
+  previewToken?: string;
+}
+
+const startSession = async (
+  playSlug: string,
+  playerName: string,
+  email?: string,
+  previewToken?: string,
+): Promise<SessionResponse> => {
   const { data } = await httpClient.post<SessionResponse>(`/play/${playSlug}/start`, {
     playerName,
     ...(email && { email }),
+    ...(previewToken && { previewToken }),
   });
   return data;
 };
@@ -14,10 +26,17 @@ const startSession = async (playSlug: string, playerName: string, email?: string
 export const useStartSession = (playSlug: string) => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: (request: StartSessionRequest) => startSession(playSlug, request.playerName, request.email),
+  const mutation = useMutation({
+    mutationFn: (params: StartSessionParams) =>
+      startSession(playSlug, params.playerName, params.email, params.previewToken),
     onSuccess: (data: SessionResponse) => {
       queryClient.setQueryData(playKeys.session(data.sessionId), data);
     },
   });
+
+  return {
+    startSession: mutation.mutate,
+    isStartingSession: mutation.isPending,
+    startSessionError: mutation.error,
+  };
 };

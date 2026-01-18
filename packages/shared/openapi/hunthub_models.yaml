@@ -1457,6 +1457,9 @@ components:
         email:
           type: string
           format: email
+        previewToken:
+          type: string
+          description: JWT token for preview mode (bypasses access restrictions)
       required:
         - playerName
       additionalProperties: false
@@ -1469,6 +1472,9 @@ components:
           $ref: '#/components/schemas/AnswerType'
         payload:
           $ref: '#/components/schemas/AnswerPayload'
+        stepId:
+          type: integer
+          description: Step ID to validate (only used in preview mode to validate non-current steps)
       required:
         - answerType
         - payload
@@ -1617,6 +1623,25 @@ components:
         - _links
       additionalProperties: false
 
+    HuntInfoResponse:
+      type: object
+      description: Basic hunt info returned before starting a session (used to show hunt name, check access mode, etc.)
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        accessMode:
+          $ref: '#/components/schemas/HuntAccessMode'
+        isReleased:
+          type: boolean
+          description: Whether the hunt has a live version available for play
+      required:
+        - name
+        - accessMode
+        - isReleased
+      additionalProperties: false
+
     SessionResponse:
       type: object
       description: Unified session response - used for both starting and resuming a session
@@ -1651,6 +1676,11 @@ components:
         isPreview:
           type: boolean
           description: True if this is a preview session (enables skip functionality)
+        stepOrder:
+          type: array
+          items:
+            type: integer
+          description: List of step IDs in order (only present for preview sessions)
       required:
         - sessionId
         - hunt

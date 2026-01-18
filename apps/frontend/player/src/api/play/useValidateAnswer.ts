@@ -13,10 +13,12 @@ const validateAnswer = async (
   sessionId: string,
   answerType: AnswerType,
   payload: AnswerPayload,
+  stepId?: number,
 ): Promise<ValidateAnswerResponse> => {
   const { data } = await httpClient.post<ValidateAnswerResponse>(`/play/sessions/${sessionId}/validate`, {
     answerType,
     payload,
+    ...(stepId !== undefined && { stepId }),
   });
   return data;
 };
@@ -26,6 +28,7 @@ interface ValidateParams {
   answerType: AnswerType;
   payload: AnswerPayload;
   nextStepId: number | null;
+  stepId?: number;
 }
 
 export const useValidateAnswer = () => {
@@ -33,7 +36,7 @@ export const useValidateAnswer = () => {
 
   const mutation = useMutation({
     mutationFn: (params: ValidateParams): Promise<ValidateAnswerResponse> =>
-      validateAnswer(params.sessionId, params.answerType, params.payload),
+      validateAnswer(params.sessionId, params.answerType, params.payload, params.stepId),
   });
 
   const advanceToNextStep = (sessionId: string, nextStepId: number | null, isComplete: boolean) => {

@@ -15,6 +15,7 @@ export const SKIP_KEY = '__skip__';
 
 export const playKeys = {
   all: ['play'] as const,
+  huntInfo: (playSlug: string) => [...playKeys.all, 'huntInfo', playSlug] as const,
   session: (sessionId: string) => [...playKeys.all, 'session', sessionId] as const,
   step: (sessionId: string, stepId: number) => [...playKeys.all, 'step', sessionId, stepId] as const,
   // Skip placeholders - used with skipToken to identify disabled queries in devtools

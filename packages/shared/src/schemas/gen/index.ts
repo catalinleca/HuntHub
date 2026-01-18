@@ -411,9 +411,15 @@ export const AnswerPayload = z
   .partial()
   .strict();
 export const StartSessionRequest = z
-  .object({ playerName: z.string().min(1).max(50), email: z.string().email().optional() })
+  .object({
+    playerName: z.string().min(1).max(50),
+    email: z.string().email().optional(),
+    previewToken: z.string().optional(),
+  })
   .strict();
-export const ValidateAnswerRequest = z.object({ answerType: AnswerType, payload: AnswerPayload }).strict();
+export const ValidateAnswerRequest = z
+  .object({ answerType: AnswerType, payload: AnswerPayload, stepId: z.number().int().optional() })
+  .strict();
 export const ValidateAnswerResponse = z
   .object({
     correct: z.boolean(),
@@ -446,6 +452,9 @@ export const StepResponse = z
     _links: StepLinks,
   })
   .strict();
+export const HuntInfoResponse = z
+  .object({ name: z.string(), description: z.string().optional(), accessMode: HuntAccessMode, isReleased: z.boolean() })
+  .strict();
 export const SessionResponse = z
   .object({
     sessionId: z.string().uuid(),
@@ -457,6 +466,7 @@ export const SessionResponse = z
     startedAt: z.string().datetime({ offset: true }),
     completedAt: z.string().datetime({ offset: true }).optional(),
     isPreview: z.boolean().optional(),
+    stepOrder: z.array(z.number().int()).optional(),
   })
   .strict();
 export const SortOrder = z.enum(['asc', 'desc']);
@@ -570,6 +580,7 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   StepLinks,
   ValidateAnswerLinks,
   StepResponse,
+  HuntInfoResponse,
   SessionResponse,
   SortOrder,
   HuntSortField,

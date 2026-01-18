@@ -74,7 +74,7 @@ export class PlayerInvitationService implements IPlayerInvitationService {
 
     const { token, expiresIn } = PreviewTokenHelper.generate(huntId);
 
-    const url = new URL(access.huntDoc.playSlug, playerBaseUrl);
+    const url = new URL(`/play/${access.huntDoc.playSlug}`, playerBaseUrl);
     url.searchParams.set('preview', token);
 
     return { previewUrl: url.toString(), expiresIn };

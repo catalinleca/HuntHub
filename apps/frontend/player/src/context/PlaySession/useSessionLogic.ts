@@ -19,9 +19,12 @@ export const useSessionLogic = (playSlug: string): PlaySessionContextValue => {
     currentStep: stepLayer.currentStep,
     currentStepIndex: sessionLayer.currentStepIndex,
     totalSteps: sessionLayer.totalSteps,
+    isPreview: sessionLayer.isPreview,
+    stepOrder: sessionLayer.stepOrder,
 
     startSession: sessionLayer.startSession,
     abandonSession: sessionLayer.abandonSession,
+    goToStep: sessionLayer.goToStep,
 
     hasSession,
     isLastStep,

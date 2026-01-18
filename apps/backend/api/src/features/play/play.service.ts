@@ -55,7 +55,15 @@ export interface UploadUrlResponse {
   s3Key: string;
 }
 
+export interface HuntInfoResponse {
+  name: string;
+  description?: string;
+  accessMode: HuntAccessMode;
+  isReleased: boolean;
+}
+
 export interface IPlayService {
+  getHuntInfo(playSlug: string): Promise<HuntInfoResponse>;
   discoverHunts(page: number, limit: number): Promise<DiscoverHuntsResponse>;
   startSession(
     playSlug: string,
@@ -79,6 +87,35 @@ export class PlayService implements IPlayService {
     @inject(TYPES.StorageService)
     private storageService: IStorageService,
   ) {}
+
+  async getHuntInfo(playSlug: string): Promise<HuntInfoResponse> {
+    const hunt = await HuntModel.findOne({ playSlug, isDeleted: false });
+
+    if (!hunt) {
+      logger.debug({ playSlug }, 'Hunt not found by playSlug');
+      throw new NotFoundError('Hunt not found');
+    }
+
+    const isReleased = hunt.liveVersion !== null;
+    const versionToFetch = isReleased ? hunt.liveVersion : hunt.latestVersion;
+    const huntVersion = await HuntVersionModel.findOne({
+      huntId: hunt.huntId,
+      version: versionToFetch,
+    });
+
+    if (!huntVersion) {
+      logger.warn({ huntId: hunt.huntId, version: versionToFetch }, 'Hunt version not found');
+    }
+
+    logger.debug({ huntId: hunt.huntId, playSlug, isReleased }, 'Hunt info retrieved');
+
+    return {
+      name: huntVersion?.name ?? 'Untitled Hunt',
+      description: huntVersion?.description,
+      accessMode: hunt.accessMode,
+      isReleased,
+    };
+  }
 
   async discoverHunts(page: number, limit: number): Promise<DiscoverHuntsResponse> {
     const skip = (page - 1) * limit;
@@ -126,6 +163,20 @@ export class PlayService implements IPlayService {
 
     const isPreview = previewToken ? PreviewTokenHelper.validate(previewToken, hunt.huntId) : false;
 
+    logger.debug(
+      {
+        huntId: hunt.huntId,
+        playSlug,
+        hasPreviewToken: !!previewToken,
+        isPreview,
+      },
+      'Session start - preview token check',
+    );
+
+    if (isPreview) {
+      logger.info({ huntId: hunt.huntId, playSlug }, 'Preview session requested');
+    }
+
     if (!isPreview) {
       await this.checkAccessMode(hunt.huntId, hunt.accessMode, email);
     }
@@ -149,6 +200,16 @@ export class PlayService implements IPlayService {
       isPreview,
     );
 
+    logger.info(
+      {
+        sessionId: progress.sessionId,
+        huntId: hunt.huntId,
+        isPreview,
+        totalSteps: huntVersion.stepOrder.length,
+      },
+      'Session created',
+    );
+
     return {
       sessionId: progress.sessionId,
       hunt: PlayerExporter.hunt(hunt.huntId, huntVersion),
@@ -158,6 +219,7 @@ export class PlayService implements IPlayService {
       totalSteps: huntVersion.stepOrder.length,
       startedAt: progress.startedAt.toISOString(),
       isPreview,
+      ...(isPreview && { stepOrder: huntVersion.stepOrder }),
     };
   }
 
@@ -178,6 +240,7 @@ export class PlayService implements IPlayService {
       startedAt: progress.startedAt.toISOString(),
       completedAt: progress.completedAt?.toISOString(),
       isPreview: progress.isPreview,
+      ...(progress.isPreview && { stepOrder: huntVersion.stepOrder }),
     };
   }
 
@@ -187,14 +250,21 @@ export class PlayService implements IPlayService {
 
     const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version);
 
-    // SERVER STATE is source of truth
-    const currentIndex = huntVersion.stepOrder.indexOf(progress.currentStepId);
-    const currentStepId = progress.currentStepId;
-    const nextStepId = huntVersion.stepOrder[currentIndex + 1]; // may be undefined
+    // Preview mode: allow any step in the hunt
+    if (progress.isPreview) {
+      if (!huntVersion.stepOrder.includes(requestedStepId)) {
+        throw new ForbiddenError('Step not in hunt');
+      }
+    } else {
+      // Regular mode: only allow current step and next step (for prefetching)
+      const currentIndex = huntVersion.stepOrder.indexOf(progress.currentStepId);
+      const currentStepId = progress.currentStepId;
+      const nextStepId = huntVersion.stepOrder[currentIndex + 1];
 
-    const allowedStepIds = [currentStepId, nextStepId].filter((id): id is number => id !== undefined);
-    if (!allowedStepIds.includes(requestedStepId)) {
-      throw new ForbiddenError('Step not accessible from current position');
+      const allowedStepIds = [currentStepId, nextStepId].filter((id): id is number => id !== undefined);
+      if (!allowedStepIds.includes(requestedStepId)) {
+        throw new ForbiddenError('Step not accessible from current position');
+      }
     }
 
     const step = await StepNavigator.getStepById(progress.huntId, progress.version, requestedStepId);
@@ -203,7 +273,7 @@ export class PlayService implements IPlayService {
     }
 
     const stepProgress =
-      requestedStepId === currentStepId ? SessionManager.getCurrentStepProgress(progress) : undefined;
+      requestedStepId === progress.currentStepId ? SessionManager.getCurrentStepProgress(progress) : undefined;
 
     return this.buildStepResponse(sessionId, step, huntVersion, stepProgress ?? undefined);
   }
@@ -224,6 +294,35 @@ export class PlayService implements IPlayService {
     SessionManager.validateSessionActive(progress);
 
     const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version);
+
+    // Preview mode: run real validation but don't persist any state
+    if (progress.isPreview) {
+      const stepId = request.stepId ?? progress.currentStepId;
+
+      if (!huntVersion.stepOrder.includes(stepId)) {
+        throw new ForbiddenError('Step not in hunt');
+      }
+
+      const step = await StepNavigator.getStepById(progress.huntId, progress.version, stepId);
+      if (!step) {
+        throw new NotFoundError('Step not found');
+      }
+
+      const validationResult = await AnswerValidator.validate(request.answerType, request.payload, step);
+
+      logger.debug(
+        { sessionId, stepId, answerType: request.answerType, isCorrect: validationResult.isCorrect, isPreview: true },
+        'Preview validation result',
+      );
+
+      return {
+        correct: validationResult.isCorrect,
+        feedback: validationResult.feedback,
+        attempts: 0,
+      };
+    }
+
+    // Regular mode: validate and persist state
     const step = await StepNavigator.getCurrentStepForSession(progress);
 
     if (!step) {
@@ -376,7 +475,7 @@ export class PlayService implements IPlayService {
     }
 
     if (!email) {
-      throw new NotFoundError('Hunt not found');
+      throw new ForbiddenError('This hunt is invite-only. Please provide your email.');
     }
 
     const normalizedEmail = email.toLowerCase().trim();
@@ -386,7 +485,7 @@ export class PlayService implements IPlayService {
       return;
     }
 
-    throw new NotFoundError('Hunt not found');
+    throw new ForbiddenError('You are not invited to this hunt. Please check with the hunt creator.');
   }
 
   private async requireHuntVersion(huntId: number, version: number): Promise<HydratedDocument<IHuntVersion>> {

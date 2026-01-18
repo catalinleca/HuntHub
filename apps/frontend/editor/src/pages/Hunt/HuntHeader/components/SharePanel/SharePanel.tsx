@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Popover, Typography, Stack, Divider, IconButton, Collapse, Paper, Box } from '@mui/material';
-import { CopyIcon, CheckIcon, LinkIcon } from '@phosphor-icons/react';
+import { CopyIcon, CheckIcon, LinkIcon, EyeIcon } from '@phosphor-icons/react';
 import { useParams } from 'react-router-dom';
 import { HuntAccessMode } from '@hunthub/shared';
-import { useGetHunt, useUpdateAccessMode } from '@/api/Hunt';
+import { useGetHunt, useUpdateAccessMode, useGetPreviewLink } from '@/api/Hunt';
 import { useSnackbarStore } from '@/stores';
 import { ToggleButtonGroup } from '@/components/common';
 import { getPlayUrl } from '@/utils';
@@ -24,8 +24,10 @@ export const SharePanel = ({ anchorEl, open, onClose }: SharePanelProps) => {
   const { id } = useParams<{ id: string }>();
   const huntId = Number(id);
   const [copied, setCopied] = useState(false);
+  const [previewCopied, setPreviewCopied] = useState(false);
 
   const { data: hunt } = useGetHunt(huntId);
+  const { data: previewLink } = useGetPreviewLink(huntId);
   const { mutate: updateAccessMode, isPending: isUpdatingAccessMode } = useUpdateAccessMode();
   const { success } = useSnackbarStore();
 
@@ -43,6 +45,15 @@ export const SharePanel = ({ anchorEl, open, onClose }: SharePanelProps) => {
     success('Link copied!');
   };
 
+  const handlePreviewCopy = () => {
+    if (!previewLink?.previewUrl) {
+      return;
+    }
+    navigator.clipboard.writeText(previewLink.previewUrl);
+    setPreviewCopied(true);
+    success('Preview link copied!');
+  };
+
   const handleAccessModeChange = (_event: React.MouseEvent<HTMLElement>, newMode: string | null) => {
     if (newMode && newMode !== accessMode) {
       updateAccessMode({ huntId, accessMode: newMode as HuntAccessMode });
@@ -51,6 +62,7 @@ export const SharePanel = ({ anchorEl, open, onClose }: SharePanelProps) => {
 
   const handleClose = () => {
     setCopied(false);
+    setPreviewCopied(false);
     onClose();
   };
 
@@ -63,6 +75,36 @@ export const SharePanel = ({ anchorEl, open, onClose }: SharePanelProps) => {
       transformOrigin={{ vertical: 'top', horizontal: 'right' }}
     >
       <Box sx={{ width: 300 }}>
+        <Stack p={2} gap={1}>
+          <Stack direction="row" alignItems="center" gap={1}>
+            <EyeIcon size={18} />
+            <Typography variant="subtitle1" fontWeight={600}>
+              Preview Link
+            </Typography>
+          </Stack>
+          {previewLink?.previewUrl ? (
+            <Paper variant="outlined" sx={{ p: 1 }}>
+              <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
+                <Typography variant="body2" noWrap sx={{ minWidth: 0, flex: 1 }}>
+                  {previewLink.previewUrl}
+                </Typography>
+                <IconButton size="small" onClick={handlePreviewCopy}>
+                  {previewCopied ? <CheckIcon size={18} /> : <CopyIcon size={18} />}
+                </IconButton>
+              </Stack>
+            </Paper>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              Add steps to enable preview
+            </Typography>
+          )}
+          <Typography variant="caption" color="text.secondary">
+            Expires in ~1 hour. For testing only.
+          </Typography>
+        </Stack>
+
+        <Divider />
+
         <Stack p={2} gap={1}>
           <Typography variant="subtitle1" fontWeight={600}>
             Share Hunt
