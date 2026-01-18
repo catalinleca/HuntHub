@@ -1,4 +1,4 @@
-import { styled } from '@mui/material/styles';
+import { styled, alpha } from '@mui/material/styles';
 import { ListItemButton, Button } from '@mui/material';
 
 interface StyledListItemProps {
@@ -10,10 +10,12 @@ export const ActionButton = styled(Button)`
   transition: opacity 0.15s ease-in-out;
 `;
 
-export const VersionRow = styled(ListItemButton)<StyledListItemProps>(({ theme, $isLive }) => ({
+export const VersionRow = styled(ListItemButton, {
+  shouldForwardProp: (prop) => prop !== '$isLive',
+})<StyledListItemProps>(({ theme, $isLive }) => ({
   padding: theme.spacing(1, 2),
   borderLeft: $isLive ? `3px solid ${theme.palette.success.main}` : '3px solid transparent',
-  backgroundColor: $isLive ? theme.palette.success.light + '20' : 'transparent',
+  backgroundColor: $isLive ? alpha(theme.palette.success.light, 0.12) : 'transparent',
 
   [`&:hover ${ActionButton}`]: {
     opacity: 1,
