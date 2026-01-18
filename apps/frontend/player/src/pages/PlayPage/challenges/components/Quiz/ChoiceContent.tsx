@@ -27,7 +27,6 @@ export const ChoiceContent = ({ quiz, selectedOptionId, onSelect, disabled }: Ch
             key={option.id}
             $selected={isSelected}
             $disabled={disabled}
-            elevation={0}
             onClick={() => handleSelect(option.id)}
           >
             <Stack direction="row" alignItems="center" gap={2}>

@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Box, Button } from '@mui/material';
+import { Box } from '@mui/material';
 
 export const SectionCard = styled(Box)`
   border: 2px solid ${({ theme }) => theme.palette.primary.main};

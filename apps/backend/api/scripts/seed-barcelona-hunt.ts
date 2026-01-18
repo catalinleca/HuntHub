@@ -6,12 +6,7 @@ config({ path: path.resolve(__dirname, '../.env.local') });
 
 import mongoose from 'mongoose';
 import { databaseUrl } from '../src/config/env.config';
-import {
-  HuntModel,
-  HuntVersionModel,
-  StepModel,
-  UserModel,
-} from '../src/database/models';
+import { HuntModel, HuntVersionModel, StepModel, UserModel } from '../src/database/models';
 
 // Get user email from command line argument
 const userEmail = process.argv[2];
@@ -234,7 +229,7 @@ const BARCELONA_STEPS = [
       mission: {
         title: 'The Stone Quarry',
         description:
-          "Walk up Passeig de Gràcia to find La Pedrera (Casa Milà), Gaudí's last civil work before dedicating himself entirely to the Sagrada Familia. Built 1906-1912, its undulating stone facade earned it the nickname \"The Stone Quarry\" from skeptical locals. The rooftop with its warrior-like chimneys is legendary. Check in at this UNESCO World Heritage site!",
+          'Walk up Passeig de Gràcia to find La Pedrera (Casa Milà), Gaudí\'s last civil work before dedicating himself entirely to the Sagrada Familia. Built 1906-1912, its undulating stone facade earned it the nickname "The Stone Quarry" from skeptical locals. The rooftop with its warrior-like chimneys is legendary. Check in at this UNESCO World Heritage site!',
         type: 'match-location',
         targetLocation: {
           lat: 41.3954,
@@ -260,7 +255,7 @@ const BARCELONA_STEPS = [
       task: {
         title: 'The Battle of the Architects',
         instructions:
-          "You're standing on the \"Manzana de la Discordia\" (Block of Discord), where three rival modernist architects competed side by side. On this block you'll find: Casa Lleó Morera by Domènech i Montaner, Casa Amatller by Puig i Cadafalch, and Casa Batlló by Gaudí. Each tried to outdo the others! Walk the block and observe the three different facades. Notice how each architect had their own vision of Modernisme.",
+          'You\'re standing on the "Manzana de la Discordia" (Block of Discord), where three rival modernist architects competed side by side. On this block you\'ll find: Casa Lleó Morera by Domènech i Montaner, Casa Amatller by Puig i Cadafalch, and Casa Batlló by Gaudí. Each tried to outdo the others! Walk the block and observe the three different facades. Notice how each architect had their own vision of Modernisme.',
         aiInstructions:
           'Accept if player mentions observing the three buildings or describes differences between Casa Batlló, Casa Amatller, and Casa Lleó Morera. Look for architectural observations or comparisons.',
       },
@@ -304,7 +299,7 @@ const BARCELONA_STEPS = [
       clue: {
         title: 'The Eternal Masterpiece',
         description:
-          'Congratulations! You\'ve reached the Sagrada Familia, Gaudí\'s unfinished masterpiece and Barcelona\'s most iconic landmark. Construction began in 1882 and continues today, making it the world\'s longest-running construction project. Gaudí devoted 43 years of his life to this church, living in his workshop for the final years. He said, "My client is not in a hurry." Stand before the Nativity Facade (the only one Gaudí completed) and marvel at what one man\'s vision created. You\'ve completed the Barcelona Treasures hunt!',
+          "Congratulations! You've reached the Sagrada Familia, Gaudí's unfinished masterpiece and Barcelona's most iconic landmark. Construction began in 1882 and continues today, making it the world's longest-running construction project. Gaudí devoted 43 years of his life to this church, living in his workshop for the final years. He said, \"My client is not in a hurry.\" Stand before the Nativity Facade (the only one Gaudí completed) and marvel at what one man's vision created. You've completed the Barcelona Treasures hunt!",
       },
     },
     hint: 'The Nativity Facade faces northeast, toward the rising sun',
@@ -331,7 +326,7 @@ async function seedBarcelonaHunt() {
       await mongoose.disconnect();
       process.exit(1);
     }
-    console.log(`Found user: ${user.email} (${user.firstName})`)
+    console.log(`Found user: ${user.email} (${user.firstName})`);
 
     // 2. Check if Barcelona hunt already exists for this user
     const userHunts = await HuntModel.find({ creatorId: user._id, isDeleted: false });
@@ -341,9 +336,7 @@ async function seedBarcelonaHunt() {
       name: BARCELONA_HUNT.name,
     });
     if (existingHunt) {
-      console.log(
-        `Hunt "${BARCELONA_HUNT.name}" already exists for this user (huntId: ${existingHunt.huntId})`,
-      );
+      console.log(`Hunt "${BARCELONA_HUNT.name}" already exists for this user (huntId: ${existingHunt.huntId})`);
       console.log('Skipping seed to avoid duplicates.');
       await mongoose.disconnect();
       process.exit(0);
@@ -401,10 +394,7 @@ async function seedBarcelonaHunt() {
     }
 
     // 6. Update stepOrder
-    await HuntVersionModel.updateOne(
-      { huntId: hunt.huntId, version: 1 },
-      { stepOrder: stepIds },
-    );
+    await HuntVersionModel.updateOne({ huntId: hunt.huntId, version: 1 }, { stepOrder: stepIds });
     console.log(`\nUpdated stepOrder with ${stepIds.length} steps`);
 
     // 7. Success summary

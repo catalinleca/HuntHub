@@ -163,7 +163,9 @@ describe('Publishing Workflow Integration Tests', () => {
       ]);
 
       // One should succeed, one should fail
-      const succeeded = [response1, response2].filter((r) => r.status === 'fulfilled' && (r.value as any).status === 200);
+      const succeeded = [response1, response2].filter(
+        (r) => r.status === 'fulfilled' && (r.value as any).status === 200,
+      );
       const failed = [response1, response2].filter((r) => r.status === 'fulfilled' && (r.value as any).status !== 200);
 
       expect(succeeded.length).toBe(1);
@@ -175,10 +177,7 @@ describe('Publishing Workflow Integration Tests', () => {
     });
 
     it('should return 404 when hunt does not exist', async () => {
-      await request(app)
-        .post('/api/hunts/99999/publish')
-        .set('Authorization', `Bearer ${authToken}`)
-        .expect(404);
+      await request(app).post('/api/hunts/99999/publish').set('Authorization', `Bearer ${authToken}`).expect(404);
     });
 
     it('should allow admin user (non-owner) to publish shared hunt', async () => {
@@ -194,7 +193,7 @@ describe('Publishing Workflow Integration Tests', () => {
         permission: 'admin',
       });
 
-       await request(app)
+      await request(app)
         .post(`/api/hunts/${testHunt.huntId}/publish`)
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
@@ -345,7 +344,9 @@ describe('Publishing Workflow Integration Tests', () => {
       ]);
 
       // One should succeed, one should fail
-      const succeeded = [response1, response2].filter((r) => r.status === 'fulfilled' && (r.value as any).status === 200);
+      const succeeded = [response1, response2].filter(
+        (r) => r.status === 'fulfilled' && (r.value as any).status === 200,
+      );
       const failed = [response1, response2].filter((r) => r.status === 'fulfilled' && (r.value as any).status !== 200);
 
       expect(succeeded.length).toBe(1);

@@ -133,11 +133,7 @@ describe('Pagination Integration Tests', () => {
     });
 
     it('should reject negative limit', async () => {
-      await request(app)
-        .get('/api/hunts')
-        .query({ limit: -1 })
-        .set('Authorization', `Bearer ${authToken}`)
-        .expect(400);
+      await request(app).get('/api/hunts').query({ limit: -1 }).set('Authorization', `Bearer ${authToken}`).expect(400);
     });
   });
 

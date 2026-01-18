@@ -81,7 +81,7 @@ const initializeCounters = async (): Promise<void> => {
   for (const counter of counters) {
     await CounterModel.findOneAndUpdate(
       { name: counter.name },
-      { $set: { seq: counter.seq } },  // Reset to starting value each time
+      { $set: { seq: counter.seq } }, // Reset to starting value each time
       { upsert: true, new: true },
     );
   }

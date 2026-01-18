@@ -39,4 +39,3 @@ export const getMuiToggleButtonOverrides = (): Components<Theme>['MuiToggleButto
     }),
   },
 });
-

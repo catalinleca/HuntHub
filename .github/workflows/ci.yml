@@ -7,67 +7,66 @@ on:
     branches: [main, develop]
 
 jobs:
-  test:
-    name: Test Backend
+  # Format check - always runs, checks entire codebase once
+  format:
+    name: Format Check
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    strategy:
-      matrix:
-        node-version: [22.13.1]
-
+    timeout-minutes: 5
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22.13.1
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build shared package
-        run: npm run build:shared
+      - name: Check formatting
+        run: npm run format:check
 
-      - name: Run linter
-        run: npm run lint --workspace=@hunthub/api
-
-      - name: Run type check
-        run: npm run type-check --workspace=@hunthub/api
-
-      - name: Build backend
-        run: npm run build --workspace=@hunthub/api
-
-      - name: Run tests
-        run: npm run test:api
-        env:
-          NODE_ENV: test
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
+  # Detect what changed
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      editor: ${{ steps.filter.outputs.editor }}
+      player: ${{ steps.filter.outputs.player }}
+      common: ${{ steps.filter.outputs.common }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
         with:
-          name: test-results
-          path: apps/backend/api/coverage/
-          retention-days: 7
-          if-no-files-found: ignore
+          filters: |
+            common:
+              - 'package.json'
+              - 'package-lock.json'
+              - 'tsconfig.json'
+              - '.github/workflows/**'
+            backend:
+              - 'apps/backend/api/**'
+              - 'packages/shared/**'
+            editor:
+              - 'apps/frontend/editor/**'
+              - 'packages/shared/**'
+            player:
+              - 'apps/frontend/player/**'
+              - 'packages/shared/**'
 
-  # Optional: Add a job for test coverage reporting
-  coverage:
-    name: Test Coverage
+  # Backend CI
+  backend:
+    name: Backend CI
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.common == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    if: github.event_name == 'pull_request'
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22.13.1
           cache: 'npm'
@@ -78,14 +77,76 @@ jobs:
       - name: Build shared package
         run: npm run build:shared
 
-      - name: Run tests with coverage
-        run: npm run test:api:coverage
+      - name: Lint
+        run: npm run lint --workspace=@hunthub/api
+
+      - name: Type check
+        run: npm run type-check --workspace=@hunthub/api
+
+      - name: Build
+        run: npm run build --workspace=@hunthub/api
+
+      - name: Test
+        run: npm run test:api
         env:
           NODE_ENV: test
 
-      - name: Upload coverage to artifact
-        uses: actions/upload-artifact@v4
+  # Editor CI
+  editor:
+    name: Editor CI
+    needs: changes
+    if: needs.changes.outputs.editor == 'true' || needs.changes.outputs.common == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
-          name: coverage-report
-          path: apps/backend/api/coverage/
-          retention-days: 30
+          node-version: 22.13.1
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build shared package
+        run: npm run build:shared
+
+      - name: Lint
+        run: npm run lint --workspace=@hunthub/editor
+
+      - name: Type check
+        run: npm run type-check --workspace=@hunthub/editor
+
+      - name: Build
+        run: npm run build --workspace=@hunthub/editor
+
+  # Player CI
+  player:
+    name: Player CI
+    needs: changes
+    if: needs.changes.outputs.player == 'true' || needs.changes.outputs.common == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.1
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build shared package
+        run: npm run build:shared
+
+      - name: Lint
+        run: npm run lint --workspace=@hunthub/player
+
+      - name: Type check
+        run: npm run type-check --workspace=@hunthub/player
+
+      - name: Build
+        run: npm run build --workspace=@hunthub/player

@@ -24,18 +24,10 @@ export const ErrorFallback: FallbackRender = ({ resetError }) => {
         </Typography>
 
         <Stack direction="row" gap={2}>
-          <Button
-            variant="outlined"
-            startIcon={<HouseIcon size={20} />}
-            onClick={handleGoHome}
-          >
+          <Button variant="outlined" startIcon={<HouseIcon size={20} />} onClick={handleGoHome}>
             Go Home
           </Button>
-          <Button
-            variant="contained"
-            startIcon={<ArrowCounterClockwiseIcon size={20} />}
-            onClick={resetError}
-          >
+          <Button variant="contained" startIcon={<ArrowCounterClockwiseIcon size={20} />} onClick={resetError}>
             Try Again
           </Button>
         </Stack>

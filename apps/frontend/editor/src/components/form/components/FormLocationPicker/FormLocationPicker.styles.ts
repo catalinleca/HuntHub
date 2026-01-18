@@ -1,6 +1,5 @@
 import styled from 'styled-components';
-import { Card, Box, Stack, Typography } from '@mui/material';
-import { alpha } from '@mui/material/styles';
+import { Box, Stack, Typography } from '@mui/material';
 
 export const AddLocationButton = styled(Stack).attrs({
   direction: 'row',

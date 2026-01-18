@@ -3,7 +3,10 @@ import { injectable } from 'inversify';
 
 @injectable()
 export class MockStorageService implements IStorageService {
-  async generateUploadUrls(userId: string, extension: string): Promise<{
+  async generateUploadUrls(
+    userId: string,
+    extension: string,
+  ): Promise<{
     signedUrl: string;
     publicUrl: string;
     s3Key: string;

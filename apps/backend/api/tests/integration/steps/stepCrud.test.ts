@@ -96,13 +96,10 @@ describe('Step CRUD Integration Tests', () => {
     it('should return 401 when no auth token provided', async () => {
       const stepData = generateStepData();
 
-      await request(app)
-        .post(`/api/hunts/${testHunt.huntId}/steps`)
-        .send(stepData)
-        .expect(401);
+      await request(app).post(`/api/hunts/${testHunt.huntId}/steps`).send(stepData).expect(401);
     });
 
-    it('should return 404 when trying to create step in another user\'s hunt (access denied)', async () => {
+    it("should return 404 when trying to create step in another user's hunt (access denied)", async () => {
       const otherUser = await createTestUser({ email: 'other@example.com' });
       const otherHunt = await createTestHunt({ creatorId: otherUser.id });
 
@@ -182,7 +179,7 @@ describe('Step CRUD Integration Tests', () => {
       expect(response.body.challenge.clue.title).toBe('Updated Title');
     });
 
-    it('should return 404 when trying to update step in another user\'s hunt (access denied)', async () => {
+    it("should return 404 when trying to update step in another user's hunt (access denied)", async () => {
       const otherUser = await createTestUser({ email: 'other@example.com' });
       const otherHunt = await createTestHunt({ creatorId: otherUser.id });
       const otherStep = await createTestStep({ huntId: otherHunt.huntId });
@@ -272,7 +269,7 @@ describe('Step CRUD Integration Tests', () => {
       expect(huntVersion?.stepOrder).not.toContain(testStep.stepId);
     });
 
-    it('should return 404 when trying to delete step from another user\'s hunt (access denied)', async () => {
+    it("should return 404 when trying to delete step from another user's hunt (access denied)", async () => {
       const otherUser = await createTestUser({ email: 'other@example.com' });
       const otherHunt = await createTestHunt({ creatorId: otherUser.id });
       const otherStep = await createTestStep({ huntId: otherHunt.huntId });

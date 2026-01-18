@@ -17,6 +17,9 @@ export const initSentry = () => {
     tracesSampleRate: IS_PRODUCTION ? 0.1 : 1.0,
     replaysSessionSampleRate: 0,
     replaysOnErrorSampleRate: IS_PRODUCTION ? 1.0 : 0,
+    initialScope: {
+      tags: { app: 'editor' },
+    },
   });
 };
 
