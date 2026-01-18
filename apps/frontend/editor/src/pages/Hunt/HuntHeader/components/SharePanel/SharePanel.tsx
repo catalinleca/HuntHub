@@ -1,5 +1,6 @@
-import { Popover, Typography, Stack, Divider, TextField, IconButton, InputAdornment, Collapse } from '@mui/material';
-import { CopyIcon } from '@phosphor-icons/react';
+import { useState } from 'react';
+import { Popover, Typography, Stack, Divider, IconButton, Collapse, Paper, Box } from '@mui/material';
+import { CopyIcon, CheckIcon, LinkIcon } from '@phosphor-icons/react';
 import { useParams } from 'react-router-dom';
 import { HuntAccessMode } from '@hunthub/shared';
 import { useGetHunt, useUpdateAccessMode } from '@/api/Hunt';
@@ -8,7 +9,7 @@ import { ToggleButtonGroup } from '@/components/common';
 import { InviteSection } from './InviteSection';
 
 const ACCESS_MODE_OPTIONS = [
-  { value: HuntAccessMode.Open, label: 'Anyone with link' },
+  { value: HuntAccessMode.Open, label: 'Link access' },
   { value: HuntAccessMode.InviteOnly, label: 'Invite only' },
 ];
 
@@ -23,6 +24,7 @@ interface SharePanelProps {
 export const SharePanel = ({ anchorEl, open, onClose }: SharePanelProps) => {
   const { id } = useParams<{ id: string }>();
   const huntId = Number(id);
+  const [copied, setCopied] = useState(false);
 
   const { data: hunt } = useGetHunt(huntId);
   const { mutate: updateAccessMode, isPending: isUpdatingAccessMode } = useUpdateAccessMode();
@@ -38,6 +40,7 @@ export const SharePanel = ({ anchorEl, open, onClose }: SharePanelProps) => {
       return;
     }
     navigator.clipboard.writeText(playUrl);
+    setCopied(true);
     success('Link copied!');
   };
 
@@ -47,69 +50,69 @@ export const SharePanel = ({ anchorEl, open, onClose }: SharePanelProps) => {
     }
   };
 
+  const handleClose = () => {
+    setCopied(false);
+    onClose();
+  };
+
   return (
     <Popover
       open={open}
       anchorEl={anchorEl}
-      onClose={onClose}
+      onClose={handleClose}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      slotProps={{
-        paper: { sx: { width: 360, mt: 1 } },
-      }}
     >
-      <Stack p={2} gap={1}>
-        <Typography variant="subtitle1" fontWeight={600}>
-          Share Hunt
-        </Typography>
-        {hasPlayUrl ? (
-          <TextField
-            value={playUrl}
-            size="small"
-            fullWidth
-            slotProps={{
-              input: {
-                readOnly: true,
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton size="small" onClick={handleCopy}>
-                      <CopyIcon size={18} />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-        ) : (
-          <Typography variant="body2" color="text.secondary">
-            Release your hunt to get a shareable link
+      <Box sx={{ width: 300 }}>
+        <Stack p={2} gap={1}>
+          <Typography variant="subtitle1" fontWeight={600}>
+            Share Hunt
           </Typography>
-        )}
-      </Stack>
+          {hasPlayUrl ? (
+            <Paper variant="outlined" sx={{ p: 1 }}>
+              <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
+                <Stack direction="row" alignItems="center" gap={1} sx={{ minWidth: 0 }}>
+                  <LinkIcon size={18} />
+                  <Typography variant="body2" noWrap>
+                    {playUrl}
+                  </Typography>
+                </Stack>
+                <IconButton size="small" onClick={handleCopy}>
+                  {copied ? <CheckIcon size={18} /> : <CopyIcon size={18} />}
+                </IconButton>
+              </Stack>
+            </Paper>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              Release your hunt to get a shareable link
+            </Typography>
+          )}
+        </Stack>
 
-      <Divider />
-
-      <Stack p={2} gap={1}>
-        <Typography variant="body2" fontWeight={500}>
-          Who can play
-        </Typography>
-        <ToggleButtonGroup
-          value={accessMode}
-          exclusive
-          onChange={handleAccessModeChange}
-          fullWidth
-          disabled={isUpdatingAccessMode}
-          options={ACCESS_MODE_OPTIONS}
-        />
-        <Typography variant="caption" color="text.secondary">
-          {isInviteOnly ? 'Only invited players can access this hunt' : 'Anyone with the link can play'}
-        </Typography>
-      </Stack>
-
-      <Collapse in={isInviteOnly}>
         <Divider />
-        <InviteSection huntId={huntId} />
-      </Collapse>
+
+        <Stack p={2} gap={1}>
+          <Typography variant="body2" fontWeight={500}>
+            Who can play
+          </Typography>
+          <ToggleButtonGroup
+            value={accessMode}
+            exclusive
+            onChange={handleAccessModeChange}
+            fullWidth
+            disabled={isUpdatingAccessMode}
+            options={ACCESS_MODE_OPTIONS}
+          />
+          <Typography variant="caption" color="text.secondary">
+            {isInviteOnly ? 'Only invited players can access this hunt' : 'Anyone with the link can play'}
+          </Typography>
+        </Stack>
+
+        <Collapse in={isInviteOnly}>
+          <Divider />
+          <InviteSection huntId={huntId} />
+        </Collapse>
+      </Box>
     </Popover>
   );
 };

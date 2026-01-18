@@ -29,8 +29,6 @@ export const useUpdateAccessMode = () => {
       if (context?.previous) {
         queryClient.setQueryData(huntKeys.detail(huntId), context.previous);
       }
-    },
-    onSettled: (_data, _err, { huntId }) => {
       void queryClient.invalidateQueries({ queryKey: huntKeys.detail(huntId) });
     },
   });

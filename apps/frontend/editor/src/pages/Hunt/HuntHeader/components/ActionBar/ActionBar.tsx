@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button, CircularProgress } from '@mui/material';
-import { ShareNetworkIcon, RocketLaunchIcon } from '@phosphor-icons/react';
+import { ShareNetworkIcon, RocketLaunchIcon, CaretDownIcon } from '@phosphor-icons/react';
 import { usePublishingContext } from '@/pages/Hunt/context';
 import { SharePanel } from '../SharePanel';
 import * as S from './ActionBar.styles';
@@ -33,6 +33,7 @@ export const ActionBar = ({ hasUnsavedChanges, isSaving, onSave }: ActionBarProp
         variant="outlined"
         size="small"
         startIcon={<ShareNetworkIcon size={18} />}
+        endIcon={<CaretDownIcon size={14} />}
         disabled={isBusy}
         onClick={(e) => setShareAnchor(e.currentTarget)}
       >
