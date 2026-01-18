@@ -36,13 +36,13 @@ export class PlayController implements IPlayController {
   }
 
   async startSession(req: Request, res: Response): Promise<Response> {
-    const huntId = parseNumericId(req.params.huntId);
+    const { playSlug } = req.params;
 
-    if (isNaN(huntId)) {
-      throw new ValidationError('Invalid hunt ID', []);
+    if (!playSlug || typeof playSlug !== 'string') {
+      throw new ValidationError('Invalid play slug', []);
     }
 
-    const { playerName } = req.body;
+    const { playerName, email } = req.body;
 
     if (!playerName || typeof playerName !== 'string' || !playerName.trim()) {
       throw new ValidationError('Player name is required', [
@@ -52,7 +52,7 @@ export class PlayController implements IPlayController {
 
     const userId = req.user?.id;
 
-    const result = await this.playService.startSession(huntId, playerName.trim(), userId);
+    const result = await this.playService.startSession(playSlug, playerName.trim(), email, userId);
 
     return res.status(201).json(result);
   }
