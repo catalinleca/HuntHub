@@ -7,6 +7,25 @@ on:
     branches: [main, develop]
 
 jobs:
+  # Format check - always runs, checks entire codebase once
+  format:
+    name: Format Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.1
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check formatting
+        run: npm run format:check
+
   # Detect what changed
   changes:
     name: Detect Changes
@@ -58,9 +77,6 @@ jobs:
       - name: Build shared package
         run: npm run build:shared
 
-      - name: Format check
-        run: npm run format:check
-
       - name: Lint
         run: npm run lint --workspace=@hunthub/api
 
@@ -96,9 +112,6 @@ jobs:
       - name: Build shared package
         run: npm run build:shared
 
-      - name: Format check
-        run: npm run format:check
-
       - name: Lint
         run: npm run lint --workspace=@hunthub/editor
 
@@ -128,9 +141,6 @@ jobs:
 
       - name: Build shared package
         run: npm run build:shared
-
-      - name: Format check
-        run: npm run format:check
 
       - name: Lint
         run: npm run lint --workspace=@hunthub/player
