@@ -1519,6 +1519,24 @@ components:
         - maxHints
       additionalProperties: false
 
+    SkipStepResponse:
+      type: object
+      description: Response after skipping a step in preview mode
+      properties:
+        skipped:
+          type: boolean
+        nextStepId:
+          type: integer
+          nullable: true
+          description: Next step ID or null if hunt is complete
+        isComplete:
+          type: boolean
+          description: True if this was the last step and hunt is now complete
+      required:
+        - skipped
+        - isComplete
+      additionalProperties: false
+
     # ============================================================
     # HATEOAS Link Schemas (REST Best Practice for Navigation)
     # ============================================================
@@ -1630,6 +1648,9 @@ components:
           type: string
           format: date-time
           description: When the session was completed (if finished)
+        isPreview:
+          type: boolean
+          description: True if this is a preview session (enables skip functionality)
       required:
         - sessionId
         - hunt

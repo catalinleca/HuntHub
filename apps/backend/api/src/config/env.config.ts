@@ -39,3 +39,6 @@ export const isProduction = process.env.NODE_ENV === 'production';
 
 export const logLevel = process.env.LOG_LEVEL || 'info';
 export const sentryDsn = process.env.SENTRY_DSN;
+
+export const playerBaseUrl = process.env.PLAYER_BASE_URL || 'http://localhost:5175';
+export const previewTokenSecret = process.env.PREVIEW_TOKEN_SECRET || 'preview-secret-dev';

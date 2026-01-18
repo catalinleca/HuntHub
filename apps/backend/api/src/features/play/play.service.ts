@@ -6,6 +6,7 @@ import {
   ValidateAnswerRequest,
   ValidateAnswerResponse,
   HintResponse,
+  SkipStepResponse,
   PlayerExporter,
   HuntProgressStatus,
   Step,
@@ -34,6 +35,7 @@ import { AssetMapper, AssetDTO } from '@/shared/mappers/asset.mapper';
 import { SessionManager } from './helpers/session-manager.helper';
 import { StepNavigator } from './helpers/step-navigator.helper';
 import { AnswerValidator } from './helpers/answer-validator.helper';
+import { PreviewTokenHelper } from './helpers/preview-token.helper';
 
 const MAX_SIZE_BYTES = 10 * 1024 * 1024;
 
@@ -55,11 +57,18 @@ export interface UploadUrlResponse {
 
 export interface IPlayService {
   discoverHunts(page: number, limit: number): Promise<DiscoverHuntsResponse>;
-  startSession(playSlug: string, playerName: string, email?: string, userId?: string): Promise<SessionResponse>;
+  startSession(
+    playSlug: string,
+    playerName: string,
+    email?: string,
+    previewToken?: string,
+    userId?: string,
+  ): Promise<SessionResponse>;
   getSession(sessionId: string): Promise<SessionResponse>;
   getStep(sessionId: string, stepId: number): Promise<StepResponse>;
   validateAnswer(sessionId: string, request: ValidateAnswerRequest): Promise<ValidateAnswerResponse>;
   requestHint(sessionId: string): Promise<HintResponse>;
+  skipStep(sessionId: string): Promise<SkipStepResponse>;
   requestUpload(sessionId: string, extension: string): Promise<UploadUrlResponse>;
   createAsset(sessionId: string, assetData: AssetCreate): Promise<AssetDTO>;
 }
@@ -105,11 +114,21 @@ export class PlayService implements IPlayService {
     return { hunts: sanitizedHunts, total };
   }
 
-  async startSession(playSlug: string, playerName: string, email?: string, userId?: string): Promise<SessionResponse> {
+  async startSession(
+    playSlug: string,
+    playerName: string,
+    email?: string,
+    previewToken?: string,
+    userId?: string,
+  ): Promise<SessionResponse> {
     const hunt = await this.requireLiveHuntBySlug(playSlug);
     const liveVersion = hunt.liveVersion!;
 
-    await this.checkAccessMode(hunt.huntId, hunt.accessMode, email);
+    const isPreview = previewToken ? PreviewTokenHelper.validate(previewToken, hunt.huntId) : false;
+
+    if (!isPreview) {
+      await this.checkAccessMode(hunt.huntId, hunt.accessMode, email);
+    }
 
     const huntVersion = await this.requireHuntVersion(hunt.huntId, liveVersion);
     if (!huntVersion) {
@@ -121,7 +140,14 @@ export class PlayService implements IPlayService {
     }
 
     const firstStepId = huntVersion.stepOrder[0];
-    const progress = await SessionManager.createSession(hunt.huntId, liveVersion, playerName, firstStepId, userId);
+    const progress = await SessionManager.createSession(
+      hunt.huntId,
+      liveVersion,
+      playerName,
+      firstStepId,
+      userId,
+      isPreview,
+    );
 
     return {
       sessionId: progress.sessionId,
@@ -131,6 +157,7 @@ export class PlayService implements IPlayService {
       currentStepId: firstStepId,
       totalSteps: huntVersion.stepOrder.length,
       startedAt: progress.startedAt.toISOString(),
+      isPreview,
     };
   }
 
@@ -150,6 +177,7 @@ export class PlayService implements IPlayService {
       totalSteps: huntVersion.stepOrder.length,
       startedAt: progress.startedAt.toISOString(),
       completedAt: progress.completedAt?.toISOString(),
+      isPreview: progress.isPreview,
     };
   }
 
@@ -300,6 +328,32 @@ export class PlayService implements IPlayService {
       hintsUsed,
       maxHints,
     };
+  }
+
+  async skipStep(sessionId: string): Promise<SkipStepResponse> {
+    const progress = await SessionManager.requireSession(sessionId);
+    SessionManager.validateSessionActive(progress);
+
+    if (!progress.isPreview) {
+      throw new ForbiddenError('Skip is only available in preview mode');
+    }
+
+    const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version);
+    const isLastStep = StepNavigator.isLastStep(huntVersion.stepOrder, progress.currentStepId);
+
+    if (isLastStep) {
+      await SessionManager.completeSession(sessionId, progress.currentStepId);
+      return { skipped: true, nextStepId: null, isComplete: true };
+    }
+
+    const nextStepId = StepNavigator.getNextStepId(huntVersion.stepOrder, progress.currentStepId);
+    if (nextStepId !== null) {
+      await withTransaction(async (session) => {
+        await SessionManager.advanceToNextStep(sessionId, progress.currentStepId, nextStepId, session);
+      });
+    }
+
+    return { skipped: true, nextStepId, isComplete: false };
   }
 
   private async requireLiveHuntBySlug(playSlug: string): Promise<HydratedDocument<IHunt>> {

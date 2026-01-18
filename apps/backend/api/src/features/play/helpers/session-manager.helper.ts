@@ -16,6 +16,7 @@ export class SessionManager {
     playerName: string,
     firstStepId: number,
     userId?: string,
+    isPreview: boolean = false,
     session?: ClientSession,
   ): Promise<HydratedDocument<IProgress>> {
     const sessionId = this.generateSessionId();
@@ -36,6 +37,7 @@ export class SessionManager {
       playerName,
       userId: userId ? new mongoose.Types.ObjectId(userId) : undefined,
       isAnonymous: !userId,
+      isPreview,
       status: HuntProgressStatus.InProgress,
       startedAt: new Date(),
       currentStepId: firstStepId,

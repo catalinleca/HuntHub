@@ -428,6 +428,9 @@ export const ValidateAnswerResponse = z
 export const HintResponse = z
   .object({ hint: z.string(), hintsUsed: z.number().int(), maxHints: z.number().int() })
   .strict();
+export const SkipStepResponse = z
+  .object({ skipped: z.boolean(), nextStepId: z.number().int().nullish(), isComplete: z.boolean() })
+  .strict();
 export const HateoasLink = z.object({ href: z.string() }).strict();
 export const StepLinks = z.object({ self: HateoasLink, next: HateoasLink.optional(), validate: HateoasLink }).strict();
 export const ValidateAnswerLinks = z.object({ currentStep: HateoasLink, nextStep: HateoasLink.optional() }).strict();
@@ -453,6 +456,7 @@ export const SessionResponse = z
     totalSteps: z.number().int(),
     startedAt: z.string().datetime({ offset: true }),
     completedAt: z.string().datetime({ offset: true }).optional(),
+    isPreview: z.boolean().optional(),
   })
   .strict();
 export const SortOrder = z.enum(['asc', 'desc']);
@@ -561,6 +565,7 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   ValidateAnswerRequest,
   ValidateAnswerResponse,
   HintResponse,
+  SkipStepResponse,
   HateoasLink,
   StepLinks,
   ValidateAnswerLinks,

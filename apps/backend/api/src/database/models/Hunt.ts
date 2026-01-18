@@ -29,7 +29,6 @@ const huntSchema: Schema<IHunt> = new Schema<IHunt>(
     playSlug: {
       type: String,
       required: true,
-      unique: true,
       default: () => nanoid(6),
     },
     accessMode: {
@@ -60,7 +59,7 @@ huntSchema.index({ creatorId: 1 });
 huntSchema.index({ liveVersion: 1 });
 huntSchema.index({ creatorId: 1, isDeleted: 1 }); // For user's active hunts
 huntSchema.index({ liveVersion: 1, isDeleted: 1, createdAt: -1 }); // For discover hunts query
-huntSchema.index({ playSlug: 1 }, { unique: true }); // For player access by slug
+huntSchema.index({ playSlug: 1 }, { unique: true });
 
 interface IHuntModel extends Model<IHunt> {
   findUserHunts(userId: string): Promise<HydratedDocument<IHunt>[]>;

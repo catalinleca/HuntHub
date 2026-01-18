@@ -12,6 +12,7 @@ export interface IPlayController {
   getStep(req: Request, res: Response): Promise<Response>;
   validateAnswer(req: Request, res: Response): Promise<Response>;
   requestHint(req: Request, res: Response): Promise<Response>;
+  skipStep(req: Request, res: Response): Promise<Response>;
   requestUpload(req: Request, res: Response): Promise<Response>;
   createAsset(req: Request, res: Response): Promise<Response>;
 }
@@ -42,7 +43,7 @@ export class PlayController implements IPlayController {
       throw new ValidationError('Invalid play slug', []);
     }
 
-    const { playerName, email } = req.body;
+    const { playerName, email, previewToken } = req.body;
 
     if (!playerName || typeof playerName !== 'string' || !playerName.trim()) {
       throw new ValidationError('Player name is required', [
@@ -52,7 +53,7 @@ export class PlayController implements IPlayController {
 
     const userId = req.user?.id;
 
-    const result = await this.playService.startSession(playSlug, playerName.trim(), email, userId);
+    const result = await this.playService.startSession(playSlug, playerName.trim(), email, previewToken, userId);
 
     return res.status(201).json(result);
   }
@@ -118,6 +119,18 @@ export class PlayController implements IPlayController {
     }
 
     const result = await this.playService.requestHint(sessionId);
+
+    return res.status(200).json(result);
+  }
+
+  async skipStep(req: Request, res: Response): Promise<Response> {
+    const { sessionId } = req.params;
+
+    if (!sessionId || !this.isValidUUID(sessionId)) {
+      throw new ValidationError('Invalid session ID', []);
+    }
+
+    const result = await this.playService.skipStep(sessionId);
 
     return res.status(200).json(result);
   }

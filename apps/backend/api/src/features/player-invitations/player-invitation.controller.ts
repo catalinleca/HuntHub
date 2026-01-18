@@ -9,6 +9,7 @@ export interface IPlayerInvitationController {
   listInvitations(req: Request, res: Response): Promise<Response>;
   revokeInvitation(req: Request, res: Response): Promise<Response>;
   updateAccessMode(req: Request, res: Response): Promise<Response>;
+  getPreviewLink(req: Request, res: Response): Promise<Response>;
 }
 
 @injectable()
@@ -48,5 +49,13 @@ export class PlayerInvitationController implements IPlayerInvitationController {
     await this.service.updateAccessMode(huntId, accessMode, req.user.id);
 
     return res.status(204).send();
+  }
+
+  async getPreviewLink(req: Request, res: Response) {
+    const huntId = parseNumericId(req.params.id);
+
+    const result = await this.service.getPreviewLink(huntId, req.user.id);
+
+    return res.status(200).json(result);
   }
 }

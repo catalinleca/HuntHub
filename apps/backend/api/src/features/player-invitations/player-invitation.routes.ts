@@ -24,4 +24,8 @@ router.patch('/:id/access-mode', validateRequest(updateAccessModeSchema), (req, 
   controller.updateAccessMode(req, res).catch(next);
 });
 
+router.get('/:id/preview-link', (req, res, next) => {
+  controller.getPreviewLink(req, res).catch(next);
+});
+
 export default router;

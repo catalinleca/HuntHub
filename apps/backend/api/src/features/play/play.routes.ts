@@ -43,6 +43,10 @@ router.post('/sessions/:sessionId/hint', (req, res, next) => {
   controller.requestHint(req, res).catch(next);
 });
 
+router.post('/sessions/:sessionId/skip', (req, res, next) => {
+  controller.skipStep(req, res).catch(next);
+});
+
 router.post('/sessions/:sessionId/upload', (req, res, next) => {
   controller.requestUpload(req, res).catch(next);
 });

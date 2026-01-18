@@ -36,6 +36,7 @@ const progressSchema: Schema<IProgress> = new Schema<IProgress>(
     },
     sessionId: { type: String, required: true },
     isAnonymous: { type: Boolean, required: true, default: true },
+    isPreview: { type: Boolean, required: true, default: false },
 
     huntId: { type: Number, required: true },
     version: { type: Number, default: 1 },

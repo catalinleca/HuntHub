@@ -39,6 +39,7 @@ export interface IProgress {
   userId?: mongoose.Types.ObjectId; // Optional for anonymous players
   sessionId: string; // UUID for localStorage-based sessions
   isAnonymous: boolean;
+  isPreview: boolean;
 
   huntId: number;
   version: number; // Which published version they're playing

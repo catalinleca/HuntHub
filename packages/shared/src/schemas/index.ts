@@ -102,6 +102,7 @@ export {
   StartSessionRequest,
   SessionResponse,
   HintResponse,
+  SkipStepResponse,
 
   // Pagination
   SortOrder,

@@ -1038,6 +1038,15 @@ export interface HintResponse {
   maxHints: number;
 }
 
+/** Response after skipping a step in preview mode */
+export interface SkipStepResponse {
+  skipped: boolean;
+  /** Next step ID or null if hunt is complete */
+  nextStepId?: number | null;
+  /** True if this was the last step and hunt is now complete */
+  isComplete: boolean;
+}
+
 /** Hypermedia link for REST navigation */
 export interface HateoasLink {
   /** URL to the linked resource */
@@ -1106,6 +1115,8 @@ export interface SessionResponse {
    * @format date-time
    */
   completedAt?: string;
+  /** True if this is a preview session (enables skip functionality) */
+  isPreview?: boolean;
 }
 
 /** Standard pagination query parameters */
