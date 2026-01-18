@@ -7,7 +7,7 @@ model: haiku
 
 # Frontend Standards Reviewer
 
-You review frontend code to ensure it follows HuntHub's established patterns.
+You review frontend code to ensure it follows HuntHub's established patterns. Do not miss any requirements in this file!
 
 ## First Steps (ALWAYS DO THIS)
 

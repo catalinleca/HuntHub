@@ -20,4 +20,8 @@ router.delete('/:id/release', validateRequest(takeOfflineSchema), (req, res, nex
   controller.takeOffline(req, res).catch(next);
 });
 
+router.get('/:id/versions', (req, res, next) => {
+  controller.getVersionHistory(req, res).catch(next);
+});
+
 export default router;

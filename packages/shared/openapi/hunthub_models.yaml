@@ -965,6 +965,40 @@ components:
         - takenOfflineAt
       additionalProperties: false
 
+    VersionHistoryItem:
+      type: object
+      description: A published version in the version history
+      properties:
+        version:
+          type: integer
+          description: Version number
+          example: 3
+        publishedAt:
+          type: string
+          format: date-time
+          description: When this version was published
+        stepCount:
+          type: integer
+          description: Number of steps in this version
+          example: 6
+      required:
+        - version
+        - publishedAt
+        - stepCount
+      additionalProperties: false
+
+    VersionHistoryResponse:
+      type: object
+      description: Response containing the version history for a hunt
+      properties:
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/VersionHistoryItem'
+      required:
+        - versions
+      additionalProperties: false
+
     Collaborator:
       type: object
       description: Represents a user who has access to a hunt (for GET /hunts/:huntId/access endpoint)

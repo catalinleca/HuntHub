@@ -297,6 +297,14 @@ export const TakeOfflineResult = z
     takenOfflineAt: z.string().datetime({ offset: true }),
   })
   .strict();
+export const VersionHistoryItem = z
+  .object({
+    version: z.number().int(),
+    publishedAt: z.string().datetime({ offset: true }),
+    stepCount: z.number().int(),
+  })
+  .strict();
+export const VersionHistoryResponse = z.object({ versions: z.array(VersionHistoryItem) }).strict();
 export const Collaborator = z
   .object({
     userId: z.string(),
@@ -506,6 +514,8 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   LiveHunt,
   ReleaseResult,
   TakeOfflineResult,
+  VersionHistoryItem,
+  VersionHistoryResponse,
   Collaborator,
   ShareResult,
   ReleaseHuntRequest,

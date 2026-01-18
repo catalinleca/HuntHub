@@ -1,18 +1,27 @@
 import { injectable, inject } from 'inversify';
 import { ClientSession, HydratedDocument } from 'mongoose';
-import { PublishResult, ReleaseResult, TakeOfflineResult, HuntPermission } from '@hunthub/shared';
+import {
+  PublishResult,
+  ReleaseResult,
+  TakeOfflineResult,
+  HuntPermission,
+  VersionHistoryResponse,
+} from '@hunthub/shared';
 import HuntVersionModel from '@/database/models/HuntVersion';
+import StepModel from '@/database/models/Step';
 import { IHuntVersion } from '@/database/types/HuntVersion';
 import { HuntMapper } from '@/shared/mappers';
 import { IHuntService } from '@/modules/hunts/hunt.service';
 import { TYPES } from '@/shared/types';
-import { ValidationError } from '@/shared/errors';
+import { ValidationError, DataIntegrityError } from '@/shared/errors';
 import { VersionValidator } from '@/features/publishing/helpers/version-validator.helper';
 import { StepCloner } from '@/features/publishing/helpers/step-cloner.helper';
 import { VersionPublisher } from '@/features/publishing/helpers/version-publisher.helper';
 import { ReleaseManager } from '@/features/publishing/helpers/release-manager.helper';
 import { IAuthorizationService } from '@/services/authorization/authorization.service';
 import { withTransaction } from '@/shared/utils/transaction';
+
+const MAX_PUBLISHED_VERSIONS = 10;
 
 export interface IPublishingService {
   publishHunt(huntId: number, userId: string): Promise<PublishResult>;
@@ -23,6 +32,7 @@ export interface IPublishingService {
     currentLiveVersion: number | null | undefined,
   ): Promise<ReleaseResult>;
   takeOffline(huntId: number, userId: string, currentLiveVersion: number): Promise<TakeOfflineResult>;
+  getVersionHistory(huntId: number, userId: string): Promise<VersionHistoryResponse>;
 }
 
 /**
@@ -79,6 +89,9 @@ export class PublishingService implements IPublishingService {
       );
 
       await VersionPublisher.updateHuntPointers(huntId, currentVersion, newVersion, session);
+
+      // Prune old versions if exceeding cap (never prune the live version)
+      await this.pruneOldVersions(huntId, huntDoc.liveVersion, session);
 
       return {
         publishedVersion: currentVersion,
@@ -151,6 +164,42 @@ export class PublishingService implements IPublishingService {
     });
   }
 
+  async getVersionHistory(huntId: number, userId: string): Promise<VersionHistoryResponse> {
+    await this.authService.requireAccess(huntId, userId, HuntPermission.View);
+
+    const versions = await HuntVersionModel.find({ huntId, isPublished: true })
+      .sort({ version: -1 })
+      .select('version publishedAt')
+      .lean();
+
+    if (versions.length === 0) {
+      return { versions: [] };
+    }
+
+    const versionNumbers = versions.map((v) => v.version);
+
+    const stepCounts = await StepModel.aggregate<{ _id: number; count: number }>([
+      { $match: { huntId, huntVersion: { $in: versionNumbers } } },
+      { $group: { _id: '$huntVersion', count: { $sum: 1 } } },
+    ]);
+
+    const countMap = new Map(stepCounts.map((s) => [s._id, s.count]));
+
+    return {
+      versions: versions.map((v) => {
+        if (!v.publishedAt) {
+          throw new DataIntegrityError(`huntId=${huntId} version=${v.version} is published but has no publishedAt`);
+        }
+
+        return {
+          version: v.version,
+          publishedAt: v.publishedAt.toISOString(),
+          stepCount: countMap.get(v.version) ?? 0,
+        };
+      }),
+    };
+  }
+
   private async createNewDraftVersion(
     currentVersionDoc: HydratedDocument<IHuntVersion>,
     huntId: number,
@@ -162,5 +211,28 @@ export class PublishingService implements IPublishingService {
     const [createdVersion] = await HuntVersionModel.create([newVersionData], { session });
 
     return createdVersion;
+  }
+
+  private async pruneOldVersions(huntId: number, liveVersion: number | null, session: ClientSession): Promise<void> {
+    const versionsToDelete = await HuntVersionModel.find({ huntId, isPublished: true })
+      .sort({ version: -1 })
+      .skip(MAX_PUBLISHED_VERSIONS)
+      .select('version')
+      .session(session)
+      .lean();
+
+    if (versionsToDelete.length === 0) {
+      return;
+    }
+
+    // Never delete the currently live version
+    const versionNumbers = versionsToDelete.map((v) => v.version).filter((v) => v !== liveVersion);
+
+    if (versionNumbers.length === 0) {
+      return;
+    }
+
+    await HuntVersionModel.deleteMany({ huntId, version: { $in: versionNumbers } }).session(session);
+    await StepModel.deleteMany({ huntId, huntVersion: { $in: versionNumbers } }).session(session);
   }
 }

@@ -3,9 +3,24 @@ import { AppError, ValidationError, InternalServerError } from '@/shared/errors'
 import { logger } from '@/utils/logger';
 import { Sentry } from '@/config/sentry';
 
-export const errorHandler: ErrorRequestHandler = (err: Error, _req: Request, res: Response, _next: NextFunction) => {
+const logAppError = (err: AppError, req: Request): void => {
+  const logData = {
+    errorCode: err.code,
+    statusCode: err.statusCode,
+    path: req.path,
+    method: req.method,
+  };
+
+  if (err.statusCode >= 500) {
+    logger.error(logData, err.message);
+  } else {
+    logger.warn(logData, err.message);
+  }
+};
+
+export const errorHandler: ErrorRequestHandler = (err: Error, req: Request, res: Response, _next: NextFunction) => {
   if (err instanceof ValidationError) {
-    logger.warn({ err }, err.message);
+    logAppError(err, req);
 
     res.status(err.statusCode).json({
       code: err.code,
@@ -17,7 +32,7 @@ export const errorHandler: ErrorRequestHandler = (err: Error, _req: Request, res
   }
 
   if (err instanceof AppError) {
-    logger.warn({ err }, err.message);
+    logAppError(err, req);
 
     res.status(err.statusCode).json({
       code: err.code,
@@ -29,7 +44,7 @@ export const errorHandler: ErrorRequestHandler = (err: Error, _req: Request, res
 
   const internalError = new InternalServerError(undefined, err);
 
-  logger.error({ err }, internalError.message);
+  logger.error({ err, path: req.path, method: req.method }, internalError.message);
   Sentry.captureException(err);
 
   res.status(internalError.statusCode).json({

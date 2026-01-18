@@ -3,6 +3,7 @@
 Enforceable patterns for HuntHub backend (Node.js + Express + MongoDB).
 
 **IMPORTANT: Also follow all rules in `common.md` (arrow functions, self-explanatory code, SOLID).**
+**IMPORTANT: Do not miss any requirements in this file!.**
 
 ---
 
@@ -257,6 +258,68 @@ export interface Hunt {
 - Services return API types (Hunt)
 - Models use DB types (IHunt)
 - Convert via `.toJSON()` method
+
+---
+
+## Null vs Undefined
+
+**Rule: Use `null` for absent values. Don't convert.**
+
+### Why `null`:
+
+- JSON uses `null` (no `undefined` in JSON)
+- MongoDB returns `null` for missing values
+- OpenAPI schemas use `nullable: true`
+- No conversion overhead - data flows naturally
+
+### The Pattern:
+
+```typescript
+// Types use null for optional values
+interface Hunt {
+  liveVersion: number | null;
+}
+
+// Just pass the value, no conversion needed
+await this.pruneOldVersions(huntId, huntDoc.liveVersion, session);
+
+// Method accepts null
+private async pruneOldVersions(
+  huntId: number,
+  liveVersion: number | null,
+  session: ClientSession,
+): Promise<void>
+```
+
+### When `undefined` appears:
+
+- Optional function parameters (`param?: T`)
+- Object properties that may not exist
+- TypeScript's `?:` syntax produces `undefined`
+
+### Checking for absence:
+
+```typescript
+// Explicit null check
+if (value === null) { /* explicitly absent */ }
+
+// Handles both null and undefined (use when unsure)
+if (value == null) { /* null OR undefined */ }
+
+// Nullish coalescing works with both
+const safe = value ?? defaultValue;
+```
+
+### Guidelines:
+
+| Situation | Use |
+|-----------|-----|
+| "No value" in data | `null` |
+| Optional parameter | `param?: T` (undefined) |
+| Checking absence | `value == null` (catches both) |
+| Default values | `value ?? default` |
+
+**Don't convert** - If data has `null`, pass `null`. No `?? undefined` noise.
 
 ---
 

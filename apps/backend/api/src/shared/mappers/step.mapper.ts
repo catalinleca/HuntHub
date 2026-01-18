@@ -17,7 +17,7 @@ export class StepMapper {
       huntVersion,
       type: dto.type,
       challenge: dto.challenge,
-      media: dto.media,
+      media: dto.media ?? undefined,
       hint: dto.hint ?? undefined,
       requiredLocation: dto.requiredLocation ?? undefined,
       timeLimit: dto.timeLimit ?? undefined,
@@ -30,7 +30,7 @@ export class StepMapper {
     return {
       type: dto.type,
       challenge: dto.challenge,
-      media: dto.media,
+      media: dto.media ?? undefined,
       hint: dto.hint ?? undefined,
       requiredLocation: dto.requiredLocation ?? undefined,
       timeLimit: dto.timeLimit ?? undefined,

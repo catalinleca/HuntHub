@@ -7,7 +7,7 @@ model: haiku
 
 # Backend Standards Reviewer
 
-You review backend code to ensure it follows HuntHub's established patterns.
+You review backend code to ensure it follows HuntHub's established patterns. Do not miss any requirements in this file!
 
 ## First Steps (ALWAYS DO THIS)
 
@@ -87,6 +87,11 @@ Ensure backend code follows service/controller patterns, MongoDB best practices,
 - [ ] Controllers → Services → Repositories (not backwards)
 - [ ] No circular dependencies
 - [ ] Shared package used correctly (types, schemas, constants)
+
+### Logging 
+- [ ] Logs should tell a journey, what the user did, and what happened, but not polluting
+- [ ] Make sure proper logs are used
+
 
 ## Key Files to Reference
 

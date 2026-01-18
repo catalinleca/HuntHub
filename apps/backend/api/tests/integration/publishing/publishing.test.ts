@@ -637,4 +637,262 @@ describe('Publishing Workflow Integration Tests', () => {
       expect(bothSucceeded).toBe(false);
     });
   });
+
+  describe('Version Pruning', () => {
+    let testHunt: IHunt;
+
+    beforeEach(async () => {
+      testHunt = await createTestHunt({
+        creatorId: owner.id,
+        name: 'Pruning Test Hunt',
+      });
+    });
+
+    it('should keep only 10 published versions after publishing many', async () => {
+      for (let i = 1; i <= 12; i++) {
+        await createTestStep({
+          huntId: testHunt.huntId,
+          huntVersion: i,
+          type: ChallengeType.Clue,
+        });
+
+        await request(app)
+          .post(`/api/hunts/${testHunt.huntId}/publish`)
+          .set('Authorization', `Bearer ${authToken}`)
+          .expect(200);
+      }
+
+      const publishedVersions = await HuntVersionModel.find({
+        huntId: testHunt.huntId,
+        isPublished: true,
+      });
+
+      expect(publishedVersions.length).toBe(10);
+    });
+
+    it('should delete oldest versions first', async () => {
+      for (let i = 1; i <= 12; i++) {
+        await createTestStep({
+          huntId: testHunt.huntId,
+          huntVersion: i,
+          type: ChallengeType.Clue,
+        });
+
+        await request(app)
+          .post(`/api/hunts/${testHunt.huntId}/publish`)
+          .set('Authorization', `Bearer ${authToken}`)
+          .expect(200);
+      }
+
+      const publishedVersions = await HuntVersionModel.find({
+        huntId: testHunt.huntId,
+        isPublished: true,
+      }).sort({ version: 1 });
+
+      const versionNumbers = publishedVersions.map((v) => v.version);
+
+      expect(versionNumbers).toEqual([3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+      expect(versionNumbers).not.toContain(1);
+      expect(versionNumbers).not.toContain(2);
+    });
+
+    it('should delete steps of pruned versions', async () => {
+      for (let i = 1; i <= 12; i++) {
+        await createTestStep({
+          huntId: testHunt.huntId,
+          huntVersion: i,
+          type: ChallengeType.Clue,
+        });
+
+        await request(app)
+          .post(`/api/hunts/${testHunt.huntId}/publish`)
+          .set('Authorization', `Bearer ${authToken}`)
+          .expect(200);
+      }
+
+      const stepsForVersion1 = await StepModel.find({
+        huntId: testHunt.huntId,
+        huntVersion: 1,
+      });
+
+      const stepsForVersion2 = await StepModel.find({
+        huntId: testHunt.huntId,
+        huntVersion: 2,
+      });
+
+      expect(stepsForVersion1.length).toBe(0);
+      expect(stepsForVersion2.length).toBe(0);
+    });
+
+    it('should not prune when under 10 versions', async () => {
+      for (let i = 1; i <= 5; i++) {
+        await createTestStep({
+          huntId: testHunt.huntId,
+          huntVersion: i,
+          type: ChallengeType.Clue,
+        });
+
+        await request(app)
+          .post(`/api/hunts/${testHunt.huntId}/publish`)
+          .set('Authorization', `Bearer ${authToken}`)
+          .expect(200);
+      }
+
+      const publishedVersions = await HuntVersionModel.find({
+        huntId: testHunt.huntId,
+        isPublished: true,
+      });
+
+      expect(publishedVersions.length).toBe(5);
+    });
+  });
+
+  describe('GET /api/hunts/:id/versions - Version History', () => {
+    let testHunt: IHunt;
+
+    beforeEach(async () => {
+      testHunt = await createTestHunt({
+        creatorId: owner.id,
+        name: 'Version History Hunt',
+      });
+    });
+
+    it('should return empty array when no published versions', async () => {
+      const response = await request(app)
+        .get(`/api/hunts/${testHunt.huntId}/versions`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200);
+
+      expect(response.body.versions).toEqual([]);
+    });
+
+    it('should return published versions with step counts', async () => {
+      await createTestStep({
+        huntId: testHunt.huntId,
+        huntVersion: 1,
+        type: ChallengeType.Clue,
+      });
+      await createTestStep({
+        huntId: testHunt.huntId,
+        huntVersion: 1,
+        type: ChallengeType.Quiz,
+      });
+
+      await request(app)
+        .post(`/api/hunts/${testHunt.huntId}/publish`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200);
+
+      const response = await request(app)
+        .get(`/api/hunts/${testHunt.huntId}/versions`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200);
+
+      expect(response.body.versions).toHaveLength(1);
+      expect(response.body.versions[0]).toMatchObject({
+        version: 1,
+        stepCount: 2,
+      });
+      expect(response.body.versions[0]).toHaveProperty('publishedAt');
+    });
+
+    it('should return versions sorted by version descending (newest first)', async () => {
+      await createTestStep({
+        huntId: testHunt.huntId,
+        huntVersion: 1,
+        type: ChallengeType.Clue,
+      });
+
+      await request(app)
+        .post(`/api/hunts/${testHunt.huntId}/publish`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200);
+
+      await createTestStep({
+        huntId: testHunt.huntId,
+        huntVersion: 2,
+        type: ChallengeType.Quiz,
+      });
+
+      await request(app)
+        .post(`/api/hunts/${testHunt.huntId}/publish`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200);
+
+      const response = await request(app)
+        .get(`/api/hunts/${testHunt.huntId}/versions`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200);
+
+      expect(response.body.versions).toHaveLength(2);
+      expect(response.body.versions[0].version).toBe(2);
+      expect(response.body.versions[1].version).toBe(1);
+    });
+
+    it('should not include draft versions', async () => {
+      await createTestStep({
+        huntId: testHunt.huntId,
+        huntVersion: 1,
+        type: ChallengeType.Clue,
+      });
+
+      const response = await request(app)
+        .get(`/api/hunts/${testHunt.huntId}/versions`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200);
+
+      expect(response.body.versions).toEqual([]);
+    });
+
+    it('should allow view user to get version history', async () => {
+      const viewUser = await createTestUser({ email: 'viewer@example.com' });
+      const viewToken = createTestAuthToken(viewUser);
+      mockFirebaseAuth(viewUser);
+
+      await HuntAccessModel.create({
+        huntId: testHunt.huntId,
+        ownerId: owner.id,
+        sharedWithId: viewUser.id,
+        sharedBy: owner.id,
+        permission: 'view',
+      });
+
+      await createTestStep({
+        huntId: testHunt.huntId,
+        huntVersion: 1,
+        type: ChallengeType.Clue,
+      });
+
+      await request(app)
+        .post(`/api/hunts/${testHunt.huntId}/publish`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200);
+
+      const response = await request(app)
+        .get(`/api/hunts/${testHunt.huntId}/versions`)
+        .set('Authorization', `Bearer ${viewToken}`)
+        .expect(200);
+
+      expect(response.body.versions).toHaveLength(1);
+    });
+
+    it('should return 401 when no auth token provided', async () => {
+      await request(app).get(`/api/hunts/${testHunt.huntId}/versions`).expect(401);
+    });
+
+    it('should return 404 when hunt does not exist', async () => {
+      await request(app).get('/api/hunts/99999/versions').set('Authorization', `Bearer ${authToken}`).expect(404);
+    });
+
+    it('should return 404 for unauthorized user (hides hunt existence)', async () => {
+      const otherUser = await createTestUser({ email: 'other@example.com' });
+      const otherToken = createTestAuthToken(otherUser);
+      mockFirebaseAuth(otherUser);
+
+      await request(app)
+        .get(`/api/hunts/${testHunt.huntId}/versions`)
+        .set('Authorization', `Bearer ${otherToken}`)
+        .expect(404);
+    });
+  });
 });

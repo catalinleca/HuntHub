@@ -3,6 +3,7 @@
 Enforceable patterns for HuntHub frontend (Editor & Player apps).
 
 **IMPORTANT: Also follow all rules in `common.md` (arrow functions, self-explanatory code, SOLID).**
+**IMPORTANT: Do not miss any requirements in this file!.**
 
 ---
 
@@ -271,6 +272,45 @@ export const useGetHunt = (huntId?: number | null) => {
 **When to use:**
 - `initialData` - list item structure matches detail structure
 - `placeholderData` - structures differ
+
+### Disabling Queries: `queryFnOrSkip` Helper
+
+**Always use `queryFnOrSkip`** for conditional queries - it handles skipToken with proper validation:
+
+```tsx
+import { useQuery } from '@tanstack/react-query';
+import { queryFnOrSkip } from '@/utils/queryFnOrSkip';
+
+export const useGetVersionHistory = (huntId: number | undefined) => {
+  return useQuery<VersionHistoryResponse>({
+    queryKey: huntKeys.versions(huntId ?? 0),
+    queryFn: queryFnOrSkip(fetchVersionHistory, huntId),
+  });
+};
+```
+
+**Why use it:**
+- Type-safe (no `!` assertions needed in queryFn)
+- Validates numbers with `Number.isFinite()` (catches NaN, Infinity)
+- Validates other types with `!= null` (catches null, undefined)
+- Cleaner than manual ternary with skipToken
+
+**Use `enabled: false`** only when you need manual `refetch()`:
+
+```tsx
+export const useGetHunt = (huntId?: number | null) => {
+  return useQuery({
+    queryKey: huntKeys.detail(huntId!),
+    queryFn: () => fetchHunt(huntId!),
+    enabled: !!huntId,  // allows refetch() to work
+  });
+};
+```
+
+| Pattern | Type-safe | `refetch()` works | Use when |
+|---------|-----------|-------------------|----------|
+| `queryFnOrSkip` | ✅ Yes | ❌ No | Default choice, conditional fetching |
+| `enabled: false` | ❌ No (needs `!`) | ✅ Yes | Need manual trigger capability |
 
 ---
 

@@ -1,7 +1,10 @@
-import { Popover, Typography, Stack, Divider, List } from '@mui/material';
+import { Popover, Typography, Stack, Divider, CircularProgress } from '@mui/material';
+import { useParams } from 'react-router-dom';
 import { usePublishingContext } from '@/pages/Hunt/context';
-import { VersionItem, VersionStatus } from './VersionItem';
+import { useGetVersionHistory } from '@/api/Hunt';
+import { VersionItem } from './VersionItem';
 import { EmptyVersionState } from './EmptyVersionState';
+import * as S from './VersionPanel.styles';
 
 interface VersionPanelProps {
   anchorEl: HTMLElement | null;
@@ -9,42 +12,17 @@ interface VersionPanelProps {
   onClose: () => void;
 }
 
-interface Version {
-  number: number;
-  status: VersionStatus;
-}
-
-const buildVersionList = (latestVersion: number, liveVersion: number | null): Version[] => {
-  const versions: Version[] = [];
-
-  versions.push({
-    number: latestVersion,
-    status: 'draft',
-  });
-
-  for (let v = latestVersion - 1; v >= 1; v--) {
-    versions.push({
-      number: v,
-      status: v === liveVersion ? 'live' : 'published',
-    });
-  }
-
-  return versions;
-};
-
 export const VersionPanel = ({ anchorEl, open, onClose }: VersionPanelProps) => {
-  const {
-    latestVersion,
-    liveVersion,
-    handleRelease,
-    handleTakeOffline,
-    isReleasing,
-    isTakingOffline,
-    releasingVersion,
-  } = usePublishingContext();
+  const { id } = useParams<{ id: string }>();
+  const huntId = Number(id);
 
-  const versions = buildVersionList(latestVersion, liveVersion);
-  const hasPublishedVersions = latestVersion > 1;
+  const { liveVersion, handleSetAsLive, handleTakeOffline, isReleasing, isTakingOffline, settingLiveVersion } =
+    usePublishingContext();
+
+  const { data: versionHistory, isLoading } = useGetVersionHistory(huntId);
+
+  const versions = versionHistory?.versions ?? [];
+  const hasPublishedVersions = versions.length > 0;
 
   return (
     <Popover
@@ -62,36 +40,41 @@ export const VersionPanel = ({ anchorEl, open, onClose }: VersionPanelProps) => 
           Version History
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {liveVersion ? `Version ${liveVersion} is currently live for players` : 'No version is live yet'}
+          {liveVersion ? `Version ${liveVersion} is currently live` : 'No version is live yet'}
         </Typography>
       </Stack>
 
       <Divider />
 
-      {!hasPublishedVersions ? (
+      {isLoading ? (
+        <Stack alignItems="center" p={3}>
+          <CircularProgress size={24} />
+        </Stack>
+      ) : !hasPublishedVersions ? (
         <EmptyVersionState />
       ) : (
-        <List dense sx={{ py: 0 }}>
+        <S.VersionList dense>
           {versions.map((version) => (
             <VersionItem
-              key={version.number}
-              version={version.number}
-              status={version.status}
-              onRelease={handleRelease}
+              key={version.version}
+              version={version.version}
+              publishedAt={version.publishedAt}
+              stepCount={version.stepCount}
+              isLive={version.version === liveVersion}
+              onSetAsLive={handleSetAsLive}
               onTakeOffline={handleTakeOffline}
-              isReleasing={isReleasing}
-              isTakingOffline={isTakingOffline}
-              releasingVersion={releasingVersion}
+              isSettingLive={isReleasing && settingLiveVersion === version.version}
+              isTakingOffline={isTakingOffline && version.version === liveVersion}
             />
           ))}
-        </List>
+        </S.VersionList>
       )}
 
       <Divider />
 
       <Stack p={2}>
         <Typography variant="caption" color="text.secondary">
-          Publish creates an immutable snapshot. Release makes a version visible to players.
+          Switch which version players see, or take the hunt offline.
         </Typography>
       </Stack>
     </Popover>

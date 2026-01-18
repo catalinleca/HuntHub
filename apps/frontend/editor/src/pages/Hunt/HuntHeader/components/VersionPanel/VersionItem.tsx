@@ -1,100 +1,70 @@
-import { ReactNode } from 'react';
-import { ListItem, ListItemText, Typography, Stack, Chip, Button, CircularProgress } from '@mui/material';
-import { RocketLaunchIcon, EyeSlashIcon } from '@phosphor-icons/react';
-
-export type VersionStatus = 'draft' | 'published' | 'live';
+import { Stack, Typography, CircularProgress } from '@mui/material';
+import { CheckIcon } from '@phosphor-icons/react';
+import * as S from './VersionItem.styles';
 
 interface VersionItemProps {
   version: number;
-  status: VersionStatus;
-  onRelease: (version: number) => void;
+  publishedAt: string;
+  stepCount: number;
+  isLive: boolean;
+  onSetAsLive: (version: number) => void;
   onTakeOffline: () => void;
-  isReleasing: boolean;
+  isSettingLive: boolean;
   isTakingOffline: boolean;
-  releasingVersion: number | null;
 }
 
-const StatusChip = ({ status }: { status: VersionStatus }) => {
-  switch (status) {
-    case 'live':
-      return <Chip label="Live" size="small" color="success" />;
-    case 'published':
-      return <Chip label="Published" size="small" color="primary" variant="outlined" />;
-    case 'draft':
-      return <Chip label="Draft" size="small" color="default" variant="outlined" />;
-  }
-};
-
-const getSecondaryText = (status: VersionStatus): string => {
-  switch (status) {
-    case 'draft':
-      return 'Currently editing';
-    case 'live':
-      return 'Players can see this version';
-    case 'published':
-      return 'Ready to release';
-  }
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
 
 export const VersionItem = ({
   version,
-  status,
-  onRelease,
+  publishedAt,
+  stepCount,
+  isLive,
+  onSetAsLive,
   onTakeOffline,
-  isReleasing,
+  isSettingLive,
   isTakingOffline,
-  releasingVersion,
 }: VersionItemProps) => {
-  const isLoading = isReleasing || isTakingOffline;
-  const isThisVersionReleasing = isReleasing && releasingVersion === version;
+  const isLoading = isSettingLive || isTakingOffline;
 
-  const secondaryActionByStatus: Record<VersionStatus, ReactNode> = {
-    published: (
-      <Button
-        size="small"
-        variant="outlined"
-        color="success"
-        startIcon={isThisVersionReleasing ? <CircularProgress size={14} /> : <RocketLaunchIcon size={14} />}
-        onClick={() => onRelease(version)}
-        disabled={isLoading}
-      >
-        Release
-      </Button>
-    ),
-    live: (
-      <Button
-        size="small"
-        variant="outlined"
-        color="warning"
-        startIcon={isTakingOffline ? <CircularProgress size={14} /> : <EyeSlashIcon size={14} />}
-        onClick={onTakeOffline}
-        disabled={isLoading}
-      >
-        Take Offline
-      </Button>
-    ),
-    draft: undefined,
+  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>, action: () => void) => {
+    e.stopPropagation();
+    action();
   };
 
   return (
-    <ListItem
-      secondaryAction={secondaryActionByStatus[status]}
-      sx={{
-        py: 1,
-        bgcolor: status === 'live' ? 'success.50' : 'transparent',
-      }}
-    >
-      <ListItemText
-        primary={
-          <Stack direction="row" alignItems="center" gap={1}>
-            <Typography variant="body2" fontWeight={500}>
-              Version {version}
-            </Typography>
-            <StatusChip status={status} />
-          </Stack>
-        }
-        secondary={getSecondaryText(status)}
-      />
-    </ListItem>
+    <S.VersionRow $isLive={isLive} disableRipple>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" flex={1}>
+        <Stack direction="row" alignItems="center" gap={1}>
+          {isLive && <CheckIcon size={14} weight="bold" />}
+          <Typography variant="body2" fontWeight={isLive ? 600 : 400}>
+            v{version} ({formatDate(publishedAt)}) · {stepCount} steps
+          </Typography>
+        </Stack>
+
+        {isLive ? (
+          <S.ActionButton
+            size="small"
+            color="warning"
+            onClick={(e) => handleButtonClick(e, onTakeOffline)}
+            disabled={isLoading}
+          >
+            {isTakingOffline ? <CircularProgress size={14} /> : 'Take Offline'}
+          </S.ActionButton>
+        ) : (
+          <S.ActionButton
+            size="small"
+            color="success"
+            onClick={(e) => handleButtonClick(e, () => onSetAsLive(version))}
+            disabled={isLoading}
+          >
+            {isSettingLive ? <CircularProgress size={14} /> : 'Set as Live'}
+          </S.ActionButton>
+        )}
+      </Stack>
+    </S.VersionRow>
   );
 };
