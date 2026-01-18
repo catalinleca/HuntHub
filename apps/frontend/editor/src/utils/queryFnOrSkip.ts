@@ -4,5 +4,7 @@ export function queryFnOrSkip<TParam, TResult>(
   fn: (p: TParam) => Promise<TResult>,
   param?: TParam | null,
 ): (() => Promise<TResult>) | typeof skipToken {
-  return param != null ? () => fn(param) : skipToken;
+  const isValid = typeof param === 'number' ? Number.isFinite(param) : param != null;
+
+  return isValid ? () => fn(param as TParam) : skipToken;
 }

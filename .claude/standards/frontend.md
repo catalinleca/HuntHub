@@ -273,22 +273,29 @@ export const useGetHunt = (huntId?: number | null) => {
 - `initialData` - list item structure matches detail structure
 - `placeholderData` - structures differ
 
-### Disabling Queries: `skipToken` vs `enabled`
+### Disabling Queries: `queryFnOrSkip` Helper
 
-**Use `skipToken`** for type-safe conditional queries (preferred):
+**Always use `queryFnOrSkip`** for conditional queries - it handles skipToken with proper validation:
 
 ```tsx
-import { useQuery, skipToken } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
+import { queryFnOrSkip } from '@/utils/queryFnOrSkip';
 
 export const useGetVersionHistory = (huntId: number | undefined) => {
-  return useQuery({
-    queryKey: huntKeys.versions(huntId!),
-    queryFn: huntId ? () => fetchVersionHistory(huntId) : skipToken,
+  return useQuery<VersionHistoryResponse>({
+    queryKey: huntKeys.versions(huntId ?? 0),
+    queryFn: queryFnOrSkip(fetchVersionHistory, huntId),
   });
 };
 ```
 
-**Use `enabled: false`** when you need manual `refetch()`:
+**Why use it:**
+- Type-safe (no `!` assertions needed in queryFn)
+- Validates numbers with `Number.isFinite()` (catches NaN, Infinity)
+- Validates other types with `!= null` (catches null, undefined)
+- Cleaner than manual ternary with skipToken
+
+**Use `enabled: false`** only when you need manual `refetch()`:
 
 ```tsx
 export const useGetHunt = (huntId?: number | null) => {
@@ -302,10 +309,8 @@ export const useGetHunt = (huntId?: number | null) => {
 
 | Pattern | Type-safe | `refetch()` works | Use when |
 |---------|-----------|-------------------|----------|
-| `skipToken` | ✅ Yes | ❌ No | Default choice, conditional fetching |
+| `queryFnOrSkip` | ✅ Yes | ❌ No | Default choice, conditional fetching |
 | `enabled: false` | ❌ No (needs `!`) | ✅ Yes | Need manual trigger capability |
-
-**Never combine** `skipToken` with `enabled: true` - throws "Missing queryFn" error.
 
 ---
 

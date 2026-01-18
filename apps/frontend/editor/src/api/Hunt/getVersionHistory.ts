@@ -1,6 +1,7 @@
-import { useQuery, skipToken } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import type { VersionHistoryResponse } from '@hunthub/shared';
 import { apiClient } from '@/services/http-client';
+import { queryFnOrSkip } from '@/utils/queryFnOrSkip';
 import { huntKeys } from './keys';
 
 const fetchVersionHistory = async (huntId: number): Promise<VersionHistoryResponse> => {
@@ -9,8 +10,8 @@ const fetchVersionHistory = async (huntId: number): Promise<VersionHistoryRespon
 };
 
 export const useGetVersionHistory = (huntId: number | undefined) => {
-  return useQuery({
-    queryKey: huntKeys.versions(huntId!),
-    queryFn: huntId ? () => fetchVersionHistory(huntId) : skipToken,
+  return useQuery<VersionHistoryResponse>({
+    queryKey: huntKeys.versions(huntId ?? 0),
+    queryFn: queryFnOrSkip(fetchVersionHistory, huntId),
   });
 };

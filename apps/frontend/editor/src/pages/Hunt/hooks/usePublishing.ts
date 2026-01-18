@@ -68,6 +68,8 @@ export const usePublishing = ({ hunt }: UsePublishingParams) => {
             },
           });
           snackbar.success(`v${versionToRelease} is now live!`);
+        } catch {
+          snackbar.error('Failed to set version as live');
         } finally {
           setSettingLiveVersion(null);
         }
@@ -83,13 +85,17 @@ export const usePublishing = ({ hunt }: UsePublishingParams) => {
       cancelText: 'Cancel',
       variant: DialogVariants.Warning,
       onConfirm: async () => {
-        await takeOfflineMutation.mutateAsync({
-          huntId: hunt.huntId,
-          request: {
-            currentLiveVersion: hunt.liveVersion ?? null,
-          },
-        });
-        snackbar.success('Hunt is now offline');
+        try {
+          await takeOfflineMutation.mutateAsync({
+            huntId: hunt.huntId,
+            request: {
+              currentLiveVersion: hunt.liveVersion ?? null,
+            },
+          });
+          snackbar.success('Hunt is now offline');
+        } catch {
+          snackbar.error('Failed to take hunt offline');
+        }
       },
     });
   };
