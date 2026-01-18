@@ -15,12 +15,18 @@ jobs:
       backend: ${{ steps.filter.outputs.backend }}
       editor: ${{ steps.filter.outputs.editor }}
       player: ${{ steps.filter.outputs.player }}
+      common: ${{ steps.filter.outputs.common }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
+            common:
+              - 'package.json'
+              - 'package-lock.json'
+              - 'tsconfig.json'
+              - '.github/workflows/**'
             backend:
               - 'apps/backend/api/**'
               - 'packages/shared/**'
@@ -35,7 +41,7 @@ jobs:
   backend:
     name: Backend CI
     needs: changes
-    if: needs.changes.outputs.backend == 'true'
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.common == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -73,7 +79,7 @@ jobs:
   editor:
     name: Editor CI
     needs: changes
-    if: needs.changes.outputs.editor == 'true'
+    if: needs.changes.outputs.editor == 'true' || needs.changes.outputs.common == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -106,7 +112,7 @@ jobs:
   player:
     name: Player CI
     needs: changes
-    if: needs.changes.outputs.player == 'true'
+    if: needs.changes.outputs.player == 'true' || needs.changes.outputs.common == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

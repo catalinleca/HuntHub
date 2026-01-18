@@ -17,10 +17,7 @@ module.exports = {
     project: './tsconfig.json',
   },
   rules: {
-    '@typescript-eslint/no-unused-vars': [
-      'warn',
-      { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
-    ],
+    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
 
     // React 17+ doesn't need React in scope
     'react/react-in-jsx-scope': 'off',
