@@ -1,5 +1,6 @@
 # CodeRabbit Configuration - Balanced Mode
 # Focus on bugs, security, and meaningful patterns - not nitpicking
+# Make sure we reuse patterns if existing, BE + FE, doesn't matter
 
 # CRITICAL: Before suggesting ANY code changes or library usage, you MUST verify
 # the exact version we have installed and check current documentation.

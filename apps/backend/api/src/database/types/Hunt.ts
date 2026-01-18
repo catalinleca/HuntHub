@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { HuntAccessMode } from '@hunthub/shared';
 
 export interface IHunt {
   huntId: number;
@@ -11,6 +12,10 @@ export interface IHunt {
   // Release metadata
   releasedAt?: Date;
   releasedBy?: string;
+
+  // Player access
+  playSlug: string; // Short URL slug for player access (e.g., "xK9mR3")
+  accessMode: HuntAccessMode; // open or invite_only
 
   isDeleted: boolean;
   deletedAt?: Date;

@@ -115,6 +115,12 @@ export enum HuntAccessType {
   Editor = 'editor',
 }
 
+/** Access mode for players: open (anyone with link) or invite_only (only invited emails) */
+export enum HuntAccessMode {
+  Open = 'open',
+  InviteOnly = 'invite_only',
+}
+
 /** Permission level for hunt access. Hierarchy: owner > admin > view */
 export enum HuntPermission {
   View = 'view',
@@ -266,6 +272,13 @@ export interface Hunt {
   releasedAt?: string | null;
   /** User ID who released/made the hunt live (null if never released) */
   releasedBy?: string | null;
+  /**
+   * Short URL slug for player access (e.g., 'xK9mR3pQ7w')
+   * @example "xK9mR3pQ7w"
+   */
+  playSlug?: string;
+  /** Access mode for players: open (anyone with link) or invite_only (only invited emails) */
+  accessMode?: HuntAccessMode;
   /**
    * Authenticated user's permission level for this hunt (included in user-specific contexts like dashboard)
    * @example "owner"
@@ -819,6 +832,32 @@ export interface ShareHuntRequest {
 export interface UpdatePermissionRequest {
   /** New permission level */
   permission: 'admin' | 'view';
+}
+
+export interface PlayerInvitation {
+  /** @example 1332 */
+  huntId: number;
+  /** @format email */
+  email: string;
+  invitedBy: string;
+  /** @format date-time */
+  invitedAt: string;
+}
+
+export interface CreatePlayerInvitationRequest {
+  /** @format email */
+  email: string;
+}
+
+export interface UpdateAccessModeRequest {
+  /** Access mode for players: open (anyone with link) or invite_only (only invited emails) */
+  accessMode: HuntAccessMode;
+}
+
+export interface PreviewLinkResponse {
+  previewUrl: string;
+  /** Seconds until expiry */
+  expiresIn: number;
 }
 
 /** Player Format - Clue (same as Clue, no answers to strip) */

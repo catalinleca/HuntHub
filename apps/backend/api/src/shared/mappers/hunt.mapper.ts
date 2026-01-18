@@ -1,5 +1,5 @@
 import { HydratedDocument, Types } from 'mongoose';
-import { Hunt, HuntCreate, HuntStatus } from '@hunthub/shared';
+import { Hunt, HuntCreate, HuntStatus, HuntAccessMode } from '@hunthub/shared';
 import { IHunt } from '@/database/types/Hunt';
 import { IHuntVersion } from '@/database/types/HuntVersion';
 
@@ -24,6 +24,7 @@ export class HuntMapper {
       latestVersion: 1,
       liveVersion: null,
       isDeleted: false,
+      // playSlug and accessMode use schema defaults (nanoid(6) and HuntAccessMode.Open)
     };
   }
 
@@ -85,6 +86,9 @@ export class HuntMapper {
       isLive: versionDoc.version === huntDoc.liveVersion,
       releasedAt: huntDoc.releasedAt?.toISOString(),
       releasedBy: huntDoc.releasedBy,
+
+      playSlug: huntDoc.playSlug,
+      accessMode: huntDoc.accessMode,
 
       // Computed status
       status: versionDoc.isPublished ? HuntStatus.Published : HuntStatus.Draft,

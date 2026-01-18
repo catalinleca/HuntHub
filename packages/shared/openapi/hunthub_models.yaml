@@ -18,6 +18,11 @@ components:
       enum: [view, admin, owner]
       description: "Permission level for hunt access. Hierarchy: owner > admin > view"
 
+    HuntAccessMode:
+      type: string
+      enum: [open, invite_only]
+      description: "Access mode for players: open (anyone with link) or invite_only (only invited emails)"
+
     Location:
       type: object
       properties:
@@ -258,6 +263,12 @@ components:
           type: string
           nullable: true
           description: "User ID who released/made the hunt live (null if never released)"
+        playSlug:
+          type: string
+          description: "Short URL slug for player access (e.g., 'xK9mR3pQ7w')"
+          example: "xK9mR3pQ7w"
+        accessMode:
+          $ref: '#/components/schemas/HuntAccessMode'
         permission:
           type: string
           enum: [owner, admin, view]
@@ -1131,6 +1142,59 @@ components:
           description: New permission level
       required:
         - permission
+      additionalProperties: false
+
+    PlayerInvitation:
+      type: object
+      properties:
+        huntId:
+          type: integer
+          example: 1332
+        email:
+          type: string
+          format: email
+        invitedBy:
+          type: string
+        invitedAt:
+          type: string
+          format: date-time
+      required:
+        - huntId
+        - email
+        - invitedBy
+        - invitedAt
+      additionalProperties: false
+
+    CreatePlayerInvitationRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+        - email
+      additionalProperties: false
+
+    UpdateAccessModeRequest:
+      type: object
+      properties:
+        accessMode:
+          $ref: '#/components/schemas/HuntAccessMode'
+      required:
+        - accessMode
+      additionalProperties: false
+
+    PreviewLinkResponse:
+      type: object
+      properties:
+        previewUrl:
+          type: string
+        expiresIn:
+          type: integer
+          description: Seconds until expiry
+      required:
+        - previewUrl
+        - expiresIn
       additionalProperties: false
 
     # ============================================================

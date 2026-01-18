@@ -5,3 +5,4 @@ export { AssetMapper } from './asset.mapper';
 export { ProgressMapper } from './progress.mapper';
 export { LiveHuntMapper } from './liveHunt.mapper';
 export { HuntShareMapper } from './hunt-share.mapper';
+export { PlayerInvitationMapper } from './player-invitation.mapper';

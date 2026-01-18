@@ -1,4 +1,6 @@
 import { Schema, model, Model, HydratedDocument } from 'mongoose';
+import { nanoid } from 'nanoid';
+import { HuntAccessMode } from '@hunthub/shared';
 import { IHunt } from '../types/Hunt';
 import { getNextSequence } from './Counter';
 
@@ -24,6 +26,17 @@ const huntSchema: Schema<IHunt> = new Schema<IHunt>(
     },
     releasedAt: Date,
     releasedBy: String,
+    playSlug: {
+      type: String,
+      required: true,
+      unique: true,
+      default: () => nanoid(6),
+    },
+    accessMode: {
+      type: String,
+      enum: Object.values(HuntAccessMode),
+      default: HuntAccessMode.Open,
+    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -47,6 +60,7 @@ huntSchema.index({ creatorId: 1 });
 huntSchema.index({ liveVersion: 1 });
 huntSchema.index({ creatorId: 1, isDeleted: 1 }); // For user's active hunts
 huntSchema.index({ liveVersion: 1, isDeleted: 1, createdAt: -1 }); // For discover hunts query
+huntSchema.index({ playSlug: 1 }, { unique: true }); // For player access by slug
 
 interface IHuntModel extends Model<IHunt> {
   findUserHunts(userId: string): Promise<HydratedDocument<IHunt>[]>;
