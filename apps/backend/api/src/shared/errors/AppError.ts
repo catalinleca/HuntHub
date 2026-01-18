@@ -1,4 +1,3 @@
-import { logger } from '@/utils/logger';
 import { ErrorCode } from './error-codes';
 
 export class AppError extends Error {
@@ -16,12 +15,5 @@ export class AppError extends Error {
     if (Error?.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor);
     }
-
-    this.logError();
-  }
-
-  private logError(): void {
-    const logMethod = this.statusCode >= 500 ? 'error' : 'warn';
-    logger[logMethod]({ errorCode: this.code, statusCode: this.statusCode }, this.message);
   }
 }
