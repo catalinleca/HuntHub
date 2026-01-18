@@ -273,6 +273,16 @@ export const useGetHunt = (huntId?: number | null) => {
 - `initialData` - list item structure matches detail structure
 - `placeholderData` - structures differ
 
+### Optional Parameters: Use `?:` Not `| undefined`
+
+```tsx
+// GOOD
+const useGetHunt = (huntId?: number) => { ... }
+
+// BAD
+const useGetHunt = (huntId: number | undefined) => { ... }
+```
+
 ### Disabling Queries: `queryFnOrSkip` Helper
 
 **Always use `queryFnOrSkip`** for conditional queries - it handles skipToken with proper validation:

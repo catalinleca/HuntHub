@@ -10,5 +10,8 @@ export { useSaveHunt } from './saveHunt';
 export { usePublishHunt } from './publishHunt';
 export { useReleaseHunt } from './releaseHunt';
 export { useTakeOfflineHunt } from './takeOfflineHunt';
+export { useGetPlayerInvitations, useInvitePlayer, useRevokeInvitation } from './playerInvitations';
+export { useUpdateAccessMode } from './updateAccessMode';
+export { useGetPreviewLink } from './getPreviewLink';
 export { huntKeys } from './keys';
 export type { GetHuntsParams } from './getHunts';

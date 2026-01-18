@@ -19,4 +19,6 @@ export const huntKeys = {
   details: () => [...huntKeys.all(), 'detail'] as const,
   detail: (id: number) => [...huntKeys.details(), id] as const,
   versions: (id: number) => [...huntKeys.detail(id), 'versions'] as const,
+  invitations: (id: number) => [...huntKeys.detail(id), 'invitations'] as const,
+  previewLink: (id: number) => [...huntKeys.detail(id), 'previewLink'] as const,
 };
