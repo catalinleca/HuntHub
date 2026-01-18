@@ -33,7 +33,7 @@
     "type-check": "tsc --noEmit --workspaces",
     "type-check:editor": "npm run type-check --workspace=@hunthub/editor",
     "type-check:player": "npm run type-check --workspace=@hunthub/player",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "lint-staged": {
     "*.{ts,tsx,json,md}": "prettier --write"
