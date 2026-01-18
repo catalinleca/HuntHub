@@ -2,6 +2,10 @@ import { useSessionLayer } from './useSessionLayer';
 import { useStepLayer } from './useStepLayer';
 import type { PlaySessionContextValue } from './context';
 
+/**
+ * Session logic for REGULAR mode only.
+ * Preview mode is handled separately by PreviewFlow/usePreviewSession.
+ */
 export const useSessionLogic = (playSlug: string): PlaySessionContextValue => {
   const sessionLayer = useSessionLayer(playSlug);
   const stepLayer = useStepLayer(sessionLayer.sessionId, sessionLayer.currentStepId);
@@ -19,12 +23,12 @@ export const useSessionLogic = (playSlug: string): PlaySessionContextValue => {
     currentStep: stepLayer.currentStep,
     currentStepIndex: sessionLayer.currentStepIndex,
     totalSteps: sessionLayer.totalSteps,
-    isPreview: sessionLayer.isPreview,
+    isPreview: false, // Regular mode is never preview
     stepOrder: sessionLayer.stepOrder,
 
     startSession: sessionLayer.startSession,
     abandonSession: sessionLayer.abandonSession,
-    goToStep: sessionLayer.goToStep,
+    goToStep: () => {}, // No-op in regular mode (server-driven navigation)
 
     hasSession,
     isLastStep,
