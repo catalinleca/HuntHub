@@ -47,8 +47,8 @@ describe('Hunt Save Integration Tests', () => {
     hint: s.hint,
     timeLimit: s.timeLimit,
     maxAttempts: s.maxAttempts,
-    createdAt: s.createdAt?.toISOString(),
-    updatedAt: s.updatedAt?.toISOString(),
+    createdAt: s.createdAt,
+    updatedAt: s.updatedAt,
   });
 
   const buildSavePayload = async (hunt: IHunt, steps: IStep[] = []): Promise<Hunt> => {
