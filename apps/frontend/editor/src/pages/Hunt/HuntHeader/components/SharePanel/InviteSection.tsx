@@ -14,8 +14,8 @@ export const InviteSection = ({ huntId }: InviteSectionProps) => {
   const { error } = useSnackbarStore();
 
   const { data: invitations = [] } = useGetPlayerInvitations(huntId);
-  const { mutate: invitePlayer, isPending: isInviting } = useInvitePlayer();
-  const { mutate: revokeInvitation } = useRevokeInvitation();
+  const { invitePlayer, isInviting } = useInvitePlayer();
+  const { revokeInvitation, isRevoking } = useRevokeInvitation();
 
   const trimmedEmail = email.trim().toLowerCase();
   const isAlreadyInvited = invitations.some((inv) => inv.email === trimmedEmail);
@@ -83,7 +83,11 @@ export const InviteSection = ({ huntId }: InviteSectionProps) => {
               key={invitation.email}
               disablePadding
               secondaryAction={
-                <IconButton size="small" onClick={() => revokeInvitation({ huntId, email: invitation.email })}>
+                <IconButton
+                  size="small"
+                  onClick={() => revokeInvitation({ huntId, email: invitation.email })}
+                  disabled={isRevoking}
+                >
                   <TrashIcon size={16} />
                 </IconButton>
               }

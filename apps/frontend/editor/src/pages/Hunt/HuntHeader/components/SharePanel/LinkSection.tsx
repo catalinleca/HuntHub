@@ -13,7 +13,7 @@ export const LinkSection = ({ playUrl, huntId }: LinkSectionProps) => {
   const { copied, copy } = useCopyToClipboard();
   const { success } = useSnackbarStore();
   const { confirm } = useDialogStore();
-  const { mutateAsync: resetPlayLink } = useResetPlayLink();
+  const { resetPlayLink } = useResetPlayLink();
 
   const handleCopy = () => {
     if (!playUrl) {

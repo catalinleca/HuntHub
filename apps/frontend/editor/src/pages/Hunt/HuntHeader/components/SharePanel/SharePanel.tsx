@@ -20,7 +20,7 @@ export const SharePanel = ({ anchorEl, open, onClose }: SharePanelProps) => {
   const huntId = Number(id);
 
   const { data: hunt } = useGetHunt(huntId);
-  const { mutate: updateAccessMode, isPending: isUpdatingAccessMode } = useUpdateAccessMode();
+  const { updateAccessMode, isUpdatingAccessMode } = useUpdateAccessMode();
 
   const playUrl = hunt?.playSlug ? `${PLAYER_URL}/${hunt.playSlug}` : '';
   const accessMode = hunt?.accessMode ?? HuntAccessMode.Open;

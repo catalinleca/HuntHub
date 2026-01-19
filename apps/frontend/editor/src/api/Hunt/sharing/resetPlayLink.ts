@@ -14,10 +14,12 @@ const resetPlayLink = async (huntId: number): Promise<ResetPlayLinkResponse> => 
 export const useResetPlayLink = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  const { mutateAsync, isPending, ...rest } = useMutation({
     mutationFn: resetPlayLink,
     onSuccess: (_data, huntId) => {
       void queryClient.invalidateQueries({ queryKey: huntKeys.detail(huntId) });
     },
   });
+
+  return { resetPlayLink: mutateAsync, isResettingPlayLink: isPending, ...rest };
 };

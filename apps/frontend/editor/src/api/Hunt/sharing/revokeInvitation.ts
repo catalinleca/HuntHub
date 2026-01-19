@@ -14,10 +14,12 @@ const revokeInvitation = async ({ huntId, email }: RevokeInvitationParams): Prom
 export const useRevokeInvitation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  const { mutate, isPending, ...rest } = useMutation({
     mutationFn: revokeInvitation,
     onSuccess: (_data, { huntId }) => {
       void queryClient.invalidateQueries({ queryKey: sharingKeys.invitations(huntId) });
     },
   });
+
+  return { revokeInvitation: mutate, isRevoking: isPending, ...rest };
 };

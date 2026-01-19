@@ -16,10 +16,12 @@ const invitePlayer = async ({ huntId, email }: InvitePlayerParams): Promise<Play
 export const useInvitePlayer = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  const { mutate, isPending, ...rest } = useMutation({
     mutationFn: invitePlayer,
     onSuccess: (_data, { huntId }) => {
       void queryClient.invalidateQueries({ queryKey: sharingKeys.invitations(huntId) });
     },
   });
+
+  return { invitePlayer: mutate, isInviting: isPending, ...rest };
 };

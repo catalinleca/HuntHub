@@ -15,7 +15,7 @@ const updateAccessMode = async ({ huntId, accessMode }: UpdateAccessModeParams):
 export const useUpdateAccessMode = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  const { mutate, isPending, ...rest } = useMutation({
     mutationFn: updateAccessMode,
     onMutate: async ({ huntId, accessMode }) => {
       await queryClient.cancelQueries({ queryKey: huntKeys.detail(huntId) });
@@ -37,4 +37,6 @@ export const useUpdateAccessMode = () => {
       }
     },
   });
+
+  return { updateAccessMode: mutate, isUpdatingAccessMode: isPending, ...rest };
 };

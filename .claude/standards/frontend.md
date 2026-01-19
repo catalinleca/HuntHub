@@ -312,6 +312,29 @@ export const useGetHunt = (huntId?: number | null) => {
 | `queryFnOrSkip` | ✅ Yes | ❌ No | Default choice, conditional fetching |
 | `enabled: false` | ❌ No (needs `!`) | ✅ Yes | Need manual trigger capability |
 
+### Mutation Hooks: Return Semantic Names
+
+**Hooks return semantic names, consumers use them directly - no renaming at call site.**
+
+```tsx
+// GOOD - hook returns semantic names
+export const useInvitePlayer = () => {
+  const { mutate, isPending, ...rest } = useMutation({ ... });
+  return { invitePlayer: mutate, isInviting: isPending, ...rest };
+};
+
+// Consumer uses directly
+const { invitePlayer, isInviting } = useInvitePlayer();
+
+// BAD - renaming at consumer
+const { mutate: invitePlayer, isPending: isInviting } = useInvitePlayer();
+```
+
+**Why:**
+- Cleaner JSX - less destructuring noise
+- Consistent naming across all consumers
+- Hook name implies return shape (`useInvitePlayer` → `invitePlayer`)
+
 ---
 
 ## React Patterns
