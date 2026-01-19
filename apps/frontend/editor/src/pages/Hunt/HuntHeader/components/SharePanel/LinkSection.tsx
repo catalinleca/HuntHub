@@ -19,6 +19,7 @@ export const LinkSection = ({ playUrl, huntId }: LinkSectionProps) => {
     if (!playUrl) {
       return;
     }
+
     copy(playUrl);
     success('Link copied!');
   };

@@ -32,13 +32,7 @@ export const InviteSection = ({ huntId }: InviteSectionProps) => {
       return;
     }
 
-    invitePlayer(
-      { huntId, email: trimmedEmail },
-      {
-        onSuccess: () => setEmail(''),
-        onError: () => error('Failed to invite player'),
-      },
-    );
+    invitePlayer({ huntId, email: trimmedEmail }, { onSuccess: () => setEmail('') });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
