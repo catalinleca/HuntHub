@@ -2,7 +2,7 @@ import { useCallback, type ReactNode } from 'react';
 import type { AnswerType, AnswerPayload, ValidateAnswerResponse } from '@hunthub/shared';
 import { useValidateAnswer } from '@/api';
 import { useSessionId } from '@/context';
-import { ValidationContext } from './context';
+import { ValidationContext } from './ValidationContext';
 import { SuccessDialog } from './SuccessDialog';
 
 interface ApiValidationProviderProps {

@@ -1,7 +1,7 @@
 import type { UseQueryResult } from '@tanstack/react-query';
 import type { SessionResponse, StepResponse } from '@hunthub/shared';
 import { HuntProgressStatus } from '@hunthub/shared';
-import { SessionStatus } from './types';
+import { SessionStatus } from '../SessionContexts';
 
 export const deriveStatus = (
   sessionQuery: UseQueryResult<SessionResponse>,

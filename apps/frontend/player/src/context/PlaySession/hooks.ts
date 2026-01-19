@@ -1,6 +1,6 @@
 import { useContext } from 'react';
-import { SessionStateContext, SessionActionsContext } from './contexts';
-import type { SessionState, SessionActions } from './types';
+import { SessionStateContext, SessionActionsContext } from './SessionContexts';
+import type { SessionState, SessionActions } from './SessionContexts';
 
 const useSessionState = (): SessionState => {
   const context = useContext(SessionStateContext);

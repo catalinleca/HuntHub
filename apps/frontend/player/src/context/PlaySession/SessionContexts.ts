@@ -1,3 +1,4 @@
+import { createContext } from 'react';
 import type { StepPF, HuntMetaPF } from '@hunthub/shared';
 
 export const SessionStatus = {
@@ -27,3 +28,6 @@ export interface SessionActions {
   abandonSession: () => void;
   advanceToNextStep: () => void;
 }
+
+export const SessionStateContext = createContext<SessionState | null>(null);
+export const SessionActionsContext = createContext<SessionActions | null>(null);

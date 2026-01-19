@@ -1,7 +1,6 @@
 import { useMemo, type ReactNode } from 'react';
-import { SessionStateContext, SessionActionsContext } from './contexts';
-import { SessionStatus } from './types';
-import type { SessionState, SessionActions } from './types';
+import { SessionStatus, SessionStateContext, SessionActionsContext } from './SessionContexts';
+import type { SessionState, SessionActions } from './SessionContexts';
 
 const NOOP = () => {};
 

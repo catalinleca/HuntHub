@@ -1,7 +1,7 @@
 import { useState, useCallback, type ReactNode } from 'react';
 import type { AnswerType, AnswerPayload } from '@hunthub/shared';
 import type { ValidationMode } from '@hunthub/player-sdk';
-import { ValidationContext } from './context';
+import { ValidationContext } from './ValidationContext';
 
 const PREVIEW_FEEDBACK = {
   success: 'Correct! (Preview)',

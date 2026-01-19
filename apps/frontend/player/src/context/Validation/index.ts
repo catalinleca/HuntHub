@@ -1,4 +1,4 @@
-export { ValidationContext, useValidation } from './context';
+export { ValidationContext, useValidation } from './ValidationContext';
 export { ApiValidationProvider } from './ApiValidationProvider';
 export { EditorPreviewProvider } from './EditorPreviewProvider';
-export type { ValidationContextValue, ValidationResult } from './types';
+export type { ValidationContextValue, ValidationResult } from './ValidationContext';

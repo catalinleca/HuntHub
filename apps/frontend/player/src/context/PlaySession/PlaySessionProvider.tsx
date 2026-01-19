@@ -2,12 +2,11 @@ import { useMemo, useRef, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { HuntProgressStatus, type SessionResponse } from '@hunthub/shared';
 import { useGetSession, useStartSession, useStep, usePrefetchStep, playKeys } from '@/api';
-import { SessionStateContext, SessionActionsContext } from './contexts';
-import { deriveStatus } from './deriveStatus';
-import { sessionStorage } from './sessionStorage';
-import { useClearInvalidSession } from './useClearInvalidSession';
-import { SessionStatus } from './types';
-import type { SessionState, SessionActions } from './types';
+import { SessionStatus, SessionStateContext, SessionActionsContext } from './SessionContexts';
+import { deriveStatus } from './internal/deriveStatus';
+import { sessionStorage } from './internal/sessionStorage';
+import { useClearInvalidSession } from './internal/useClearInvalidSession';
+import type { SessionState, SessionActions } from './SessionContexts';
 
 interface PlaySessionProviderProps {
   playSlug: string;
