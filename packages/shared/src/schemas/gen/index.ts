@@ -347,6 +347,7 @@ export const PlayerInvitation = z
 export const CreatePlayerInvitationRequest = z.object({ email: z.string().email() }).strict();
 export const UpdateAccessModeRequest = z.object({ accessMode: HuntAccessMode }).strict();
 export const PreviewLinkResponse = z.object({ previewUrl: z.string(), expiresIn: z.number().int() }).strict();
+export const ResetPlayLinkResponse = z.object({ playSlug: z.string() }).strict();
 export const CluePF = z.object({ title: z.string(), description: z.string() }).strict();
 export const QuizPF = z
   .object({
@@ -542,6 +543,7 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   CreatePlayerInvitationRequest,
   UpdateAccessModeRequest,
   PreviewLinkResponse,
+  ResetPlayLinkResponse,
   CluePF,
   QuizPF,
   MissionPF,

@@ -860,6 +860,11 @@ export interface PreviewLinkResponse {
   expiresIn: number;
 }
 
+export interface ResetPlayLinkResponse {
+  /** New play link slug */
+  playSlug: string;
+}
+
 /** Player Format - Clue (same as Clue, no answers to strip) */
 export interface CluePF {
   title: string;

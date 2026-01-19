@@ -109,7 +109,7 @@ export class PlayService implements IPlayService {
     const hunt = await this.requireLiveHuntBySlug(playSlug);
     const liveVersion = hunt.liveVersion!;
 
-    await this.checkAccessMode(hunt.huntId, hunt.accessMode, email);
+    await this.checkAccessMode(hunt, hunt.accessMode, email, userId);
 
     const huntVersion = await this.requireHuntVersion(hunt.huntId, liveVersion);
     if (!huntVersion) {
@@ -316,20 +316,33 @@ export class PlayService implements IPlayService {
     return hunt;
   }
 
-  private async checkAccessMode(huntId: number, accessMode: HuntAccessMode, email?: string): Promise<void> {
+  private async checkAccessMode(
+    hunt: HydratedDocument<IHunt>,
+    accessMode: HuntAccessMode,
+    email?: string,
+    userId?: string,
+  ): Promise<void> {
     if (accessMode === HuntAccessMode.Open) {
       return;
     }
 
-    if (!email) {
-      throw new NotFoundError('Hunt not found');
+    const isCreator = userId != null && hunt.creatorId.toString() === userId;
+    if (isCreator) {
+      return;
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
+    if (userId != null) {
+      const hasCollaboratorAccess = await HuntAccessModel.hasAccess(hunt.huntId, userId);
+      if (hasCollaboratorAccess) {
+        return;
+      }
+    }
 
-    const isInvited = await PlayerInvitationModel.isInvited(huntId, normalizedEmail);
-    if (isInvited) {
-      return;
+    if (email != null) {
+      const isInvitedPlayer = await PlayerInvitationModel.isInvited(hunt.huntId, email.toLowerCase().trim());
+      if (isInvitedPlayer) {
+        return;
+      }
     }
 
     throw new NotFoundError('Hunt not found');

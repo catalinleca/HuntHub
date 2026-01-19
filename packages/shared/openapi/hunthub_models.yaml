@@ -1197,6 +1197,16 @@ components:
         - expiresIn
       additionalProperties: false
 
+    ResetPlayLinkResponse:
+      type: object
+      properties:
+        playSlug:
+          type: string
+          description: New play link slug
+      required:
+        - playSlug
+      additionalProperties: false
+
     # ============================================================
     # PLAYER FORMAT SCHEMAS (Stripped for Player - no answers)
     # See: .claude/player/PLAYER-FORMAT.md

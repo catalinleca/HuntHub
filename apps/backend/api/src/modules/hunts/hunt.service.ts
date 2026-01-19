@@ -1,4 +1,5 @@
 import { Hunt, HuntCreate, HuntPermission } from '@hunthub/shared';
+import { nanoid } from 'nanoid';
 import { inject, injectable } from 'inversify';
 import { ClientSession, HydratedDocument, Types } from 'mongoose';
 import { IHunt } from '@/database/types/Hunt';
@@ -40,6 +41,7 @@ export interface IHuntService {
     newCreatorId: string,
     session: ClientSession,
   ): Promise<{ huntDoc: HydratedDocument<IHunt>; versionDoc: HydratedDocument<IHuntVersion> }>;
+  resetPlayLink(huntId: number, userId: string): Promise<{ playSlug: string }>;
 }
 
 @injectable()
@@ -313,5 +315,21 @@ export class HuntService implements IHuntService {
     const [versionDoc] = await HuntVersionModel.create([newVersionData], { session });
 
     return { huntDoc, versionDoc };
+  }
+
+  async resetPlayLink(huntId: number, userId: string): Promise<{ playSlug: string }> {
+    await this.authService.requireAccess(huntId, userId, HuntPermission.Admin);
+
+    const newSlug = nanoid(6);
+
+    const result = await HuntModel.findOneAndUpdate({ huntId, isDeleted: false }, { playSlug: newSlug }, { new: true });
+
+    if (!result) {
+      throw new NotFoundError('Hunt not found');
+    }
+
+    logger.info({ huntId, userId }, 'Play link reset');
+
+    return { playSlug: newSlug };
   }
 }

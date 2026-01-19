@@ -29,7 +29,6 @@ const huntSchema: Schema<IHunt> = new Schema<IHunt>(
     playSlug: {
       type: String,
       required: true,
-      unique: true,
       default: () => nanoid(6),
     },
     accessMode: {

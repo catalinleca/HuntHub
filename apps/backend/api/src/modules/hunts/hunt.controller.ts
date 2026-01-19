@@ -14,6 +14,7 @@ export interface IHuntController {
   saveHunt(req: Request, res: Response): Promise<Response>;
   deleteHunt(req: Request, res: Response): Promise<Response>;
   reorderSteps(req: Request, res: Response): Promise<Response>;
+  resetPlayLink(req: Request, res: Response): Promise<Response>;
 }
 
 @injectable()
@@ -72,5 +73,11 @@ export class HuntController implements IHuntController {
     const { stepOrder } = req.body;
     const updatedHunt = await this.huntService.reorderSteps(huntId, stepOrder, req.user.id);
     return res.status(200).json(updatedHunt);
+  }
+
+  async resetPlayLink(req: Request, res: Response) {
+    const huntId = parseNumericId(req.params.id);
+    const result = await this.huntService.resetPlayLink(huntId, req.user.id);
+    return res.status(200).json(result);
   }
 }
