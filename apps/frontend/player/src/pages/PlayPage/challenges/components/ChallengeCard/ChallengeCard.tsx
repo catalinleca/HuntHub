@@ -120,9 +120,11 @@ export const ChallengeCard = ({
           <Typography>Are you sure you want to abandon this hunt? Your progress will be lost.</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowAbandonDialog(false)}>No, Continue</Button>
+          <Button variant="outlined" onClick={() => setShowAbandonDialog(false)}>
+            Cancel
+          </Button>
           <Button variant="contained" color="error" onClick={abandonSession}>
-            Yes, Abandon
+            Abandon
           </Button>
         </DialogActions>
       </Dialog>

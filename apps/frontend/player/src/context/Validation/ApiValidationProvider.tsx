@@ -16,14 +16,8 @@ const getFeedback = (data: ValidateAnswerResponse | undefined): string | null =>
     return null;
   }
 
-  if (data.expired) {
-    return 'Time expired for this step.';
-  }
-
-  if (data.exhausted) {
-    return 'No attempts remaining.';
-  }
-
+  // expired/exhausted have their own UI (TimeLimit, AttemptsCounter dialogs)
+  // Feedback area is only for answer correctness
   return data.feedback ?? null;
 };
 
