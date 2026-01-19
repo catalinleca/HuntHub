@@ -1,60 +1,45 @@
 # Play Flow Architecture
 
+## Quick Reference
+
+| Flow | Entry | Code Path |
+|------|-------|-----------|
+| **Share** | `/play/{slug}` | `PlayPage` → `useGetHuntInfo` (gate) → `PlaySessionProvider` → `usePreviewMode` (no token) → `RegularFlow` → `useSessionLogic` → `useSessionLayer`. Shows PlayerIdentification, saves to localStorage, server-driven nav. |
+| **Preview** | `/play/{slug}?preview={token}` | `PlayPage` → `useGetHuntInfo` (bypass if token) → `PlaySessionProvider` → `usePreviewMode` (has token) → `PreviewFlow` → `usePreviewSession` (auto-POST). Free nav via local `currentStepIndex`, `isStepSynced` guard prevents stale data. |
+
+---
+
 ## 1. Share Link Flow
 
 ```
-[EDITOR] User clicks Share button
+[EDITOR] SharePanel reads hunt.playSlug → builds URL: /play/{slug} → user copies
     │
     ▼
-[EDITOR] Read hunt.playSlug from hunt data
+[PLAYER] PlayPage.tsx extracts playSlug from URL params
     │
     ▼
-[EDITOR] Build URL: http://localhost:5175/play/YQ7r9B
+[PLAYER] PlayPageWithSlug calls useGetHuntInfo(slug) → if !isReleased → "Not available yet"
     │
     ▼
-[EDITOR] User copies link
+[PLAYER] PlaySessionProvider → usePreviewMode() reads ?preview param → null → RegularFlow
     │
     ▼
-[PLAYER] User opens /play/YQ7r9B in browser
+[PLAYER] RegularFlow → useSessionLogic → useSessionLayer checks localStorage(playSlug) → no session
     │
     ▼
-[PLAYER] Router extracts playSlug="YQ7r9B" from URL
+[PLAYER] PlayPageContent: !hasSession → renders PlayerIdentification form
     │
     ▼
-[PLAYER] Call GET /api/play/YQ7r9B
+[PLAYER] User submits → startSession() → POST /api/play/{slug}/start { playerName }
     │
     ▼
-[BACKEND] Find hunt where playSlug="YQ7r9B"
+[BACKEND] PlayService.startSession() → creates HuntProgress → returns { sessionId, hunt, currentStepId }
     │
     ▼
-[BACKEND] Return { name, accessMode, isReleased }
+[PLAYER] handleSessionStarted() saves sessionId to localStorage → useStepLayer(sessionId, stepId) fetches step
     │
     ▼
-[PLAYER] If not released → show "Not available yet"
-    │
-    ▼
-[PLAYER] If released → show "Enter your name" form
-    │
-    ▼
-[PLAYER] User submits name
-    │
-    ▼
-[PLAYER] Call POST /api/play/YQ7r9B/start { playerName }
-    │
-    ▼
-[BACKEND] Find hunt by playSlug
-    │
-    ▼
-[BACKEND] Create HuntProgress session
-    │
-    ▼
-[BACKEND] Return { sessionId, hunt, currentStepId }
-    │
-    ▼
-[PLAYER] Save sessionId to localStorage[playSlug]
-    │
-    ▼
-[PLAYER] Show first step, user plays hunt
+[PLAYER] ApiValidationProvider wraps StepRenderer → validation saves progress, advances via cache invalidation
 ```
 
 ---
@@ -62,76 +47,31 @@
 ## 2. Preview Link Flow
 
 ```
-[EDITOR] User clicks Share button
+[EDITOR] SharePanel → usePreviewLink() → GET /api/hunts/{id}/preview-link
     │
     ▼
-[EDITOR] Call GET /api/hunts/1037/preview-link
+[BACKEND] PreviewLinkService.generatePreviewLink() → JWT { huntId, exp: 1h } → { previewUrl, expiresIn }
     │
     ▼
-[BACKEND] Generate JWT { huntId: 1037, isPreview: true, exp: 1hour }
+[PLAYER] PlayPage.tsx extracts playSlug, detects ?preview param via useSearchParams
     │
     ▼
-[BACKEND] Build URL: /play/YQ7r9B?preview=JWT
+[PLAYER] PlayPageWithSlug: hasPreviewToken=true → bypasses isReleased check → renders PlaySessionProvider
     │
     ▼
-[BACKEND] Return { previewUrl, expiresIn }
+[PLAYER] PlaySessionProvider → usePreviewMode() → { isPreviewMode: true, previewToken: JWT } → PreviewFlow
     │
     ▼
-[EDITOR] Show preview URL in SharePanel
+[PLAYER] PreviewFlow → usePreviewSession(slug, token) → useQuery auto-POSTs /start { playerName: "Preview", previewToken }
     │
     ▼
-[EDITOR] User copies preview link
+[BACKEND] PlayService.startSession() → PreviewTokenHelper.validate(JWT) → creates session(isPreview=true) → returns { stepOrder }
     │
     ▼
-[PLAYER] User opens /play/YQ7r9B?preview=JWT
+[PLAYER] PreviewFlow: local currentStepIndex + isStepSynced guard → PreviewToolbar (◀ ▶) + StepRenderer
     │
     ▼
-[PLAYER] Detect ?preview= query param exists
-    │
-    ▼
-[PLAYER] Skip "not released" check (allow unreleased hunts)
-    │
-    ▼
-[PLAYER] Show "Enter your name" form
-    │
-    ▼
-[PLAYER] User submits name
-    │
-    ▼
-[PLAYER] Call POST /api/play/YQ7r9B/start { playerName, previewToken: JWT }
-    │
-    ▼
-[BACKEND] Validate JWT token
-    │
-    ▼
-[BACKEND] Create session with isPreview=true
-    │
-    ▼
-[BACKEND] Return { sessionId, hunt, stepOrder: [...], isPreview: true }
-    │
-    ▼
-[PLAYER] Show PreviewToolbar with ◀ ▶ arrows
-    │
-    ▼
-[PLAYER] User can navigate steps freely with arrows
-    │
-    ▼
-[PLAYER] User submits answer
-    │
-    ▼
-[PLAYER] Call POST /api/validate { answer, stepId }
-    │
-    ▼
-[BACKEND] Run real validation logic
-    │
-    ▼
-[BACKEND] DON'T save attempts, DON'T advance step
-    │
-    ▼
-[BACKEND] Return { correct, feedback }
-    │
-    ▼
-[PLAYER] Show result (can test same step again)
+[PLAYER] Validation: ApiValidationProvider passes stepId → POST /validate { stepId } → backend validates but saves NOTHING
 ```
 
 ---

@@ -43,6 +43,12 @@ const PreviewSessionReady = ({ session, playSlug, children }: PreviewSessionRead
 
   const stepLayer = useStepLayer(session.sessionId, currentStepId);
 
+  // Guard against stale step data during navigation
+  // When navigating, currentStepId updates immediately but stepLayer.currentStep may lag
+  // This ensures we never render with mismatched step data (which causes wrong answer types)
+  const isStepSynced = stepLayer.currentStep?.stepId === currentStepId;
+  const effectiveIsLoading = stepLayer.isLoading || (currentStepId !== null && !isStepSynced);
+
   const goToStep = useCallback(
     (stepIndex: number) => {
       if (stepIndex >= 0 && stepIndex < stepOrder.length) {
@@ -60,12 +66,12 @@ const PreviewSessionReady = ({ session, playSlug, children }: PreviewSessionRead
   const startSession = useCallback(() => {}, []);
 
   const value = {
-    isLoading: stepLayer.isLoading,
+    isLoading: effectiveIsLoading,
     error: stepLayer.error,
 
     sessionId: session.sessionId,
     huntMeta: session.hunt,
-    currentStep: stepLayer.currentStep,
+    currentStep: isStepSynced ? stepLayer.currentStep : null,
     currentStepIndex,
     totalSteps: stepOrder.length,
     isPreview: true,
