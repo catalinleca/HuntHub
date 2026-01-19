@@ -14,7 +14,7 @@ import { MediaType } from '@hunthub/shared';
 import type { Media } from '@hunthub/shared';
 import type { BadgeConfig } from '@/constants';
 import { MediaDisplay } from '@/components/media';
-import { usePlaySession } from '@/context';
+import { useSessionActions } from '@/context';
 import { TypeBadge, BadgeContainer } from '../TypeBadge';
 import { HintSection } from '../HintSection';
 import { TimeLimit } from '../TimeLimit';
@@ -55,7 +55,7 @@ export const ChallengeCard = ({
   onTimeExpire,
   onMaxAttempts,
 }: ChallengeCardProps) => {
-  const { abandonSession } = usePlaySession();
+  const { abandonSession } = useSessionActions();
   const [showAbandonDialog, setShowAbandonDialog] = useState(false);
 
   const hasIndicators = timeLimit || maxAttempts;

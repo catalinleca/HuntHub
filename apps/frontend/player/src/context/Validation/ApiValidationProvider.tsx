@@ -1,12 +1,12 @@
 import { useCallback, type ReactNode } from 'react';
 import type { AnswerType, AnswerPayload, ValidateAnswerResponse } from '@hunthub/shared';
 import { useValidateAnswer } from '@/api';
-import { ValidationContext } from './context';
+import { useSessionId } from '@/context';
+import { ValidationContext } from './ValidationContext';
 import { SuccessDialog } from './SuccessDialog';
 
 interface ApiValidationProviderProps {
-  sessionId: string;
-  nextStepId: number | null;
+  onAdvance: () => void;
   showSuccessDialog?: boolean;
   children: ReactNode;
 }
@@ -27,43 +27,40 @@ const getFeedback = (data: ValidateAnswerResponse | undefined): string | null =>
   return data.feedback ?? null;
 };
 
-/**
- * Provides API-based validation for /play route.
- *
- * IMPORTANT: Use key={stepId} on this component to reset state when step changes.
- */
 export const ApiValidationProvider = ({
-  sessionId,
-  nextStepId,
+  onAdvance,
   showSuccessDialog = false,
   children,
 }: ApiValidationProviderProps) => {
-  const { validate: validateAnswer, isValidating, data, error, reset, advanceToNextStep } = useValidateAnswer();
+  const sessionId = useSessionId();
+  const { validate: validateAnswer, isValidating, data, error, reset } = useValidateAnswer();
 
-  const handleValidationSuccess = useCallback(
-    (responseData: ValidateAnswerResponse) => {
-      if (showSuccessDialog) {
-        return;
-      }
-      advanceToNextStep(sessionId, nextStepId, responseData.isComplete ?? false);
-    },
-    [showSuccessDialog, advanceToNextStep, sessionId, nextStepId],
-  );
+  const handleValidationSuccess = useCallback(() => {
+    if (showSuccessDialog) {
+      return;
+    }
+
+    onAdvance();
+  }, [showSuccessDialog, onAdvance]);
 
   const validate = useCallback(
     async (answerType: AnswerType, payload: AnswerPayload) => {
-      const responseData = await validateAnswer({ sessionId, answerType, payload, nextStepId });
+      if (!sessionId) {
+        return;
+      }
+
+      const responseData = await validateAnswer({ sessionId, answerType, payload });
 
       if (responseData.correct) {
-        handleValidationSuccess(responseData);
+        handleValidationSuccess();
       }
     },
-    [sessionId, nextStepId, validateAnswer, handleValidationSuccess],
+    [sessionId, validateAnswer, handleValidationSuccess],
   );
 
   const handleDialogContinue = useCallback(() => {
-    advanceToNextStep(sessionId, nextStepId, data?.isComplete ?? false);
-  }, [advanceToNextStep, sessionId, nextStepId, data?.isComplete]);
+    onAdvance();
+  }, [onAdvance]);
 
   const isCorrect = error ? false : (data?.correct ?? null);
   const attemptCount = data?.attempts ?? 0;
@@ -71,8 +68,6 @@ export const ApiValidationProvider = ({
   const isExhausted = data?.exhausted ?? false;
 
   const dialogOpen = showSuccessDialog && isCorrect === true;
-
-  // When dialog is open, feedback displays in the dialog, not the Alert
   const dialogFeedback = getFeedback(data);
   const feedback = error ? 'Something went wrong. Please try again.' : dialogOpen ? null : dialogFeedback;
 

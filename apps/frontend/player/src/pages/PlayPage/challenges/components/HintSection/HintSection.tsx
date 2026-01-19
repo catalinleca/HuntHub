@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Typography, CircularProgress } from '@mui/material';
 import { LightbulbIcon } from '@phosphor-icons/react';
-import { usePlaySession } from '@/context';
+import { useSessionId, usePreviewHint } from '@/context';
 import { useHint } from '@/api/play';
 import * as S from './HintSection.styles';
 
@@ -20,7 +20,8 @@ const HintDisplay = ({ hint }: { hint: string }) => (
 );
 
 export const HintSection = () => {
-  const { sessionId, previewHint } = usePlaySession();
+  const sessionId = useSessionId();
+  const previewHint = usePreviewHint();
   const { requestHint, hint, isLoading, isError } = useHint();
   const [revealedHint, setRevealedHint] = useState<string | undefined>(undefined);
 

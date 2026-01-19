@@ -32,8 +32,12 @@ export const CharacterCount = styled(Typography)<{ $isWarning?: boolean; $isErro
   text-align: right;
   font-variant-numeric: tabular-nums;
   color: ${({ theme, $isWarning, $isError }) => {
-    if ($isError) return theme.palette.error.main;
-    if ($isWarning) return theme.palette.warning.main;
+    if ($isError) {
+      return theme.palette.error.main;
+    }
+    if ($isWarning) {
+      return theme.palette.warning.main;
+    }
     return theme.palette.text.secondary;
   }};
 `;

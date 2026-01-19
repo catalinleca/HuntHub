@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react';
-import { useMemo } from 'react';
-import { PlaySessionContext, type PlaySessionContextValue } from './context';
+import { useMemo, type ReactNode } from 'react';
+import { SessionStatus, SessionStateContext, SessionActionsContext } from './SessionContexts';
+import type { SessionState, SessionActions } from './SessionContexts';
 
 const NOOP = () => {};
 
@@ -10,25 +10,33 @@ interface EditorPreviewSessionProviderProps {
 }
 
 export const EditorPreviewSessionProvider = ({ children, previewHint }: EditorPreviewSessionProviderProps) => {
-  const value = useMemo<PlaySessionContextValue>(
+  const stateValue: SessionState = useMemo(
     () => ({
-      isLoading: false,
+      status: SessionStatus.Playing,
       error: null,
       sessionId: null,
       huntMeta: null,
       currentStep: null,
       currentStepIndex: 0,
       totalSteps: 0,
-      startSession: NOOP,
-      abandonSession: NOOP,
-      hasSession: false,
       isLastStep: false,
-      isComplete: false,
-      nextStepId: null,
       previewHint,
     }),
     [previewHint],
   );
 
-  return <PlaySessionContext.Provider value={value}>{children}</PlaySessionContext.Provider>;
+  const actionsValue: SessionActions = useMemo(
+    () => ({
+      startSession: NOOP,
+      abandonSession: NOOP,
+      advanceToNextStep: NOOP,
+    }),
+    [],
+  );
+
+  return (
+    <SessionActionsContext.Provider value={actionsValue}>
+      <SessionStateContext.Provider value={stateValue}>{children}</SessionStateContext.Provider>
+    </SessionActionsContext.Provider>
+  );
 };

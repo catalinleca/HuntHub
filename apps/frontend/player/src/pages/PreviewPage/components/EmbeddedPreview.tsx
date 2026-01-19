@@ -21,7 +21,9 @@ export const EmbeddedPreview = () => {
   useEffect(() => {
     const handleEditorMessage = (event: MessageEvent) => {
       const message = event.data as EditorToPlayerMessage;
-      if (!message?.type) return;
+      if (!message?.type) {
+        return;
+      }
 
       switch (message.type) {
         case EDITOR_MESSAGES.RENDER_HUNT:
