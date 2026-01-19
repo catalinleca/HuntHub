@@ -6,6 +6,7 @@ import { SessionStateContext, SessionActionsContext } from './contexts';
 import { deriveStatus } from './deriveStatus';
 import { sessionStorage } from './sessionStorage';
 import { useClearInvalidSession } from './useClearInvalidSession';
+import { SessionStatus } from './types';
 import type { SessionState, SessionActions } from './types';
 
 interface PlaySessionProviderProps {
@@ -47,7 +48,7 @@ export const PlaySessionProvider = ({ playSlug, children }: PlaySessionProviderP
   nextStepIdRef.current = nextStepId;
 
   const derivedStatus = deriveStatus(sessionQuery, stepQuery);
-  const status = startMutation.error ? 'error' : derivedStatus;
+  const status = startMutation.error ? SessionStatus.Error : derivedStatus;
   const error = sessionQuery.error ?? stepQuery.error ?? startMutation.error ?? null;
 
   const stateValue: SessionState = useMemo(

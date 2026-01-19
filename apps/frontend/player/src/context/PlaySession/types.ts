@@ -1,6 +1,14 @@
 import type { StepPF, HuntMetaPF } from '@hunthub/shared';
 
-export type SessionStatus = 'loading' | 'error' | 'identifying' | 'playing' | 'completed';
+export const SessionStatus = {
+  Loading: 'loading',
+  Error: 'error',
+  Identifying: 'identifying',
+  Playing: 'playing',
+  Completed: 'completed',
+} as const;
+
+export type SessionStatus = (typeof SessionStatus)[keyof typeof SessionStatus];
 
 export interface SessionState {
   status: SessionStatus;

@@ -3,6 +3,7 @@ import { Typography, CircularProgress } from '@mui/material';
 import { ChallengeType } from '@hunthub/shared';
 import {
   PlaySessionProvider,
+  SessionStatus,
   useSessionStatus,
   useSessionError,
   useSessionActions,
@@ -121,15 +122,15 @@ const PlayPageContent = () => {
   const status = useSessionStatus();
 
   switch (status) {
-    case 'loading':
+    case SessionStatus.Loading:
       return <LoadingView />;
-    case 'error':
+    case SessionStatus.Error:
       return <ErrorView />;
-    case 'identifying':
+    case SessionStatus.Identifying:
       return <IdentifyingView />;
-    case 'completed':
+    case SessionStatus.Completed:
       return <CompletedView />;
-    case 'playing':
+    case SessionStatus.Playing:
       return <PlayingView />;
   }
 };

@@ -15,4 +15,5 @@ export {
   usePlaySession,
 } from './hooks';
 
-export type { SessionStatus, SessionState, SessionActions } from './types';
+export { SessionStatus } from './types';
+export type { SessionState, SessionActions } from './types';

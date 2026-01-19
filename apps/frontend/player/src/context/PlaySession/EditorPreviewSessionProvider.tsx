@@ -1,5 +1,6 @@
 import { useMemo, type ReactNode } from 'react';
 import { SessionStateContext, SessionActionsContext } from './contexts';
+import { SessionStatus } from './types';
 import type { SessionState, SessionActions } from './types';
 
 const NOOP = () => {};
@@ -12,7 +13,7 @@ interface EditorPreviewSessionProviderProps {
 export const EditorPreviewSessionProvider = ({ children, previewHint }: EditorPreviewSessionProviderProps) => {
   const stateValue: SessionState = useMemo(
     () => ({
-      status: 'playing',
+      status: SessionStatus.Playing,
       error: null,
       sessionId: null,
       huntMeta: null,

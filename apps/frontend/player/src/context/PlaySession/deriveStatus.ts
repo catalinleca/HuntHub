@@ -1,33 +1,33 @@
 import type { UseQueryResult } from '@tanstack/react-query';
 import type { SessionResponse, StepResponse } from '@hunthub/shared';
 import { HuntProgressStatus } from '@hunthub/shared';
-import type { SessionStatus } from './types';
+import { SessionStatus } from './types';
 
 export const deriveStatus = (
   sessionQuery: UseQueryResult<SessionResponse>,
   stepQuery: UseQueryResult<StepResponse>,
 ): SessionStatus => {
   if (sessionQuery.error || stepQuery.error) {
-    return 'error';
+    return SessionStatus.Error;
   }
 
   if (sessionQuery.isLoading) {
-    return 'loading';
+    return SessionStatus.Loading;
   }
 
   const session = sessionQuery.data;
 
   if (!session) {
-    return 'identifying';
+    return SessionStatus.Identifying;
   }
 
   if (session.status === HuntProgressStatus.Completed) {
-    return 'completed';
+    return SessionStatus.Completed;
   }
 
   if (stepQuery.isLoading) {
-    return 'loading';
+    return SessionStatus.Loading;
   }
 
-  return 'playing';
+  return SessionStatus.Playing;
 };
