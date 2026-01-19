@@ -1,4 +1,4 @@
-import { useCallback, type ReactNode } from 'react';
+import { useCallback, useRef, type ReactNode } from 'react';
 import type { AnswerType, AnswerPayload, ValidateAnswerResponse } from '@hunthub/shared';
 import { useValidateAnswer } from '@/api';
 import { useSessionId } from '@/context';
@@ -34,6 +34,7 @@ export const ApiValidationProvider = ({
 }: ApiValidationProviderProps) => {
   const sessionId = useSessionId();
   const { validate: validateAnswer, isValidating, data, error, reset } = useValidateAnswer();
+  const lastFeedbackRef = useRef<string | null>(null);
 
   const validate = useCallback(
     async (answerType: AnswerType, payload: AnswerPayload) => {
@@ -57,7 +58,13 @@ export const ApiValidationProvider = ({
 
   const dialogOpen = showSuccessDialog && isCorrect === true;
   const dialogFeedback = getFeedback(data);
-  const feedback = error ? 'Something went wrong. Please try again.' : dialogOpen ? null : dialogFeedback;
+  const currentFeedback = error ? 'Something went wrong. Please try again.' : dialogOpen ? null : dialogFeedback;
+
+  // Persist feedback during loading so it doesn't flicker
+  if (!isValidating && currentFeedback !== null) {
+    lastFeedbackRef.current = currentFeedback;
+  }
+  const feedback = isValidating ? lastFeedbackRef.current : currentFeedback;
 
   return (
     <ValidationContext.Provider

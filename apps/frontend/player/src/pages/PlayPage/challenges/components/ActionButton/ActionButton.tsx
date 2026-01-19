@@ -1,5 +1,4 @@
 import { ArrowRightIcon, TrophyIcon } from '@phosphor-icons/react';
-import { useTheme } from '@mui/material';
 import { Spinner } from '@/components/core';
 import * as S from './ActionButton.styles';
 
@@ -24,19 +23,7 @@ export const ActionButton = ({
   loadingLabel = 'Checking...',
   color,
 }: ActionButtonProps) => {
-  const theme = useTheme();
-  const buttonColor = isCorrect ? theme.palette.success.main : color;
-
   const getButtonContent = () => {
-    if (isCorrect) {
-      return (
-        <S.ButtonContent>
-          Continue
-          <ArrowRightIcon size={20} weight="bold" />
-        </S.ButtonContent>
-      );
-    }
-
     if (isValidating) {
       return (
         <S.ButtonContent>
@@ -55,12 +42,16 @@ export const ActionButton = ({
       );
     }
 
-    return (
-      <S.ButtonContent>
-        {label}
-        <ArrowRightIcon size={20} weight="bold" />
-      </S.ButtonContent>
-    );
+    if (isCorrect) {
+      return (
+        <S.ButtonContent>
+          Continue
+          <ArrowRightIcon size={20} weight="bold" />
+        </S.ButtonContent>
+      );
+    }
+
+    return <S.ButtonContent>{label}</S.ButtonContent>;
   };
 
   return (
@@ -70,7 +61,7 @@ export const ActionButton = ({
       onClick={onClick}
       disabled={isValidating || disabled}
       fullWidth
-      $color={buttonColor}
+      $color={color}
       $isLoading={isValidating}
     >
       {getButtonContent()}

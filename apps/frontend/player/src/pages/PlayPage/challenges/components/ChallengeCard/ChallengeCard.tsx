@@ -15,6 +15,7 @@ import type { Media } from '@hunthub/shared';
 import type { BadgeConfig } from '@/constants';
 import { MediaDisplay } from '@/components/media';
 import { useSessionActions } from '@/context';
+import { useIsCorrect } from '@/context/Validation';
 import { TypeBadge, BadgeContainer } from '../TypeBadge';
 import { HintSection } from '../HintSection';
 import { TimeLimit } from '../TimeLimit';
@@ -57,11 +58,13 @@ export const ChallengeCard = ({
 }: ChallengeCardProps) => {
   const { abandonSession } = useSessionActions();
   const [showAbandonDialog, setShowAbandonDialog] = useState(false);
+  const isCorrect = useIsCorrect();
 
   const hasIndicators = timeLimit || maxAttempts;
   const hasMedia = !!media;
   const needsBorderedContainer = media && BORDERED_MEDIA_TYPES.includes(media.type);
   const hasContent = title || description;
+  const feedbackVariant = isCorrect === true ? 'success' : 'info';
 
   return (
     <S.Container>
@@ -105,7 +108,7 @@ export const ChallengeCard = ({
 
       <S.Content>{children}</S.Content>
 
-      <FeedbackDisplay feedback={feedback ?? null} />
+      <FeedbackDisplay feedback={feedback ?? null} variant={feedbackVariant} />
 
       {showHint && <HintSection />}
 
