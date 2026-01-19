@@ -1,7 +1,7 @@
 import type { AnswerType, AnswerPayload, Media } from '@hunthub/shared';
 
 export interface BaseChallengeProps {
-  onValidate: (answerType: AnswerType, payload: AnswerPayload) => void;
+  onValidate: (answerType: AnswerType, payload: AnswerPayload) => Promise<void> | void;
   isValidating: boolean;
   isLastStep: boolean;
   feedback: string | null;

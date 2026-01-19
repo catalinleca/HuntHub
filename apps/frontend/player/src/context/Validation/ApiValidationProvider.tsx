@@ -2,6 +2,7 @@ import { useCallback, type ReactNode } from 'react';
 import type { AnswerType, AnswerPayload, ValidateAnswerResponse } from '@hunthub/shared';
 import { useValidateAnswer } from '@/api';
 import { useSessionId } from '@/context';
+import { useStableWhileLoading } from '@/hooks';
 import { ValidationContext } from './ValidationContext';
 import { SuccessDialog } from './SuccessDialog';
 
@@ -16,14 +17,8 @@ const getFeedback = (data: ValidateAnswerResponse | undefined): string | null =>
     return null;
   }
 
-  if (data.expired) {
-    return 'Time expired for this step.';
-  }
-
-  if (data.exhausted) {
-    return 'No attempts remaining.';
-  }
-
+  // expired/exhausted have their own UI (TimeLimit, AttemptsCounter dialogs)
+  // Feedback area is only for answer correctness
   return data.feedback ?? null;
 };
 
@@ -35,27 +30,15 @@ export const ApiValidationProvider = ({
   const sessionId = useSessionId();
   const { validate: validateAnswer, isValidating, data, error, reset } = useValidateAnswer();
 
-  const handleValidationSuccess = useCallback(() => {
-    if (showSuccessDialog) {
-      return;
-    }
-
-    onAdvance();
-  }, [showSuccessDialog, onAdvance]);
-
   const validate = useCallback(
     async (answerType: AnswerType, payload: AnswerPayload) => {
       if (!sessionId) {
         return;
       }
 
-      const responseData = await validateAnswer({ sessionId, answerType, payload });
-
-      if (responseData.correct) {
-        handleValidationSuccess();
-      }
+      await validateAnswer({ sessionId, answerType, payload });
     },
-    [sessionId, validateAnswer, handleValidationSuccess],
+    [sessionId, validateAnswer],
   );
 
   const handleDialogContinue = useCallback(() => {
@@ -63,13 +46,16 @@ export const ApiValidationProvider = ({
   }, [onAdvance]);
 
   const isCorrect = error ? false : (data?.correct ?? null);
-  const attemptCount = data?.attempts ?? 0;
+  const currentAttemptCount = data?.attempts ?? 0;
   const isExpired = data?.expired ?? false;
   const isExhausted = data?.exhausted ?? false;
 
   const dialogOpen = showSuccessDialog && isCorrect === true;
   const dialogFeedback = getFeedback(data);
-  const feedback = error ? 'Something went wrong. Please try again.' : dialogOpen ? null : dialogFeedback;
+  const currentFeedback = error ? 'Something went wrong. Please try again.' : dialogOpen ? null : dialogFeedback;
+
+  const attemptCount = useStableWhileLoading(currentAttemptCount, isValidating, (v) => v > 0);
+  const feedback = useStableWhileLoading(currentFeedback, isValidating, (v) => v !== null);
 
   return (
     <ValidationContext.Provider

@@ -4,8 +4,8 @@ import type { ValidationMode } from '@hunthub/player-sdk';
 import { ValidationContext } from './ValidationContext';
 
 const PREVIEW_FEEDBACK = {
-  success: 'Correct! (Preview)',
-  fail: 'Incorrect. Try again! (Preview)',
+  success: 'Correct!',
+  fail: 'Incorrect. Try again!',
 } as const;
 
 interface EditorPreviewProviderProps {

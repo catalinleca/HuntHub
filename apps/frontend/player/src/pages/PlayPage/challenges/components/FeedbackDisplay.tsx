@@ -15,6 +15,14 @@ const StyledAlert = styled(Alert)(({ theme, severity }) => ({
       color: theme.palette.accent.dark,
     },
   }),
+  ...(severity === 'success' && {
+    backgroundColor: alpha(theme.palette.success.main, 0.15),
+    border: `1px solid ${alpha(theme.palette.success.main, 0.3)}`,
+    color: theme.palette.success.dark,
+    '& .MuiAlert-icon': {
+      color: theme.palette.success.main,
+    },
+  }),
 }));
 
 export const FeedbackDisplay = ({ feedback, variant = 'info' }: FeedbackDisplayProps) => {

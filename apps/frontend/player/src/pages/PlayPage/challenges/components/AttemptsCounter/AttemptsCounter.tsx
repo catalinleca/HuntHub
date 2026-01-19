@@ -40,7 +40,7 @@ export const AttemptsCounter = ({ current, max, onMaxAttempts }: AttemptsCounter
           </S.DialogHeader>
         </DialogTitle>
         <DialogContent>
-          <Typography>You've used all available attempts for this step.</Typography>
+          <Typography>You've used all your attempts, but you can still continue!</Typography>
         </DialogContent>
         <DialogActions>
           <Button variant="contained" onClick={handleAcknowledge}>

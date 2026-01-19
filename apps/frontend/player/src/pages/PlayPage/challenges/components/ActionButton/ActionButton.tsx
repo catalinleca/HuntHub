@@ -6,6 +6,7 @@ interface ActionButtonProps {
   onClick: () => void;
   isValidating: boolean;
   isLastStep: boolean;
+  isCorrect?: boolean;
   disabled?: boolean;
   label: string;
   loadingLabel?: string;
@@ -16,6 +17,7 @@ export const ActionButton = ({
   onClick,
   isValidating,
   isLastStep,
+  isCorrect = false,
   disabled = false,
   label,
   loadingLabel = 'Checking...',
@@ -40,12 +42,16 @@ export const ActionButton = ({
       );
     }
 
-    return (
-      <S.ButtonContent>
-        {label}
-        <ArrowRightIcon size={20} weight="bold" />
-      </S.ButtonContent>
-    );
+    if (isCorrect) {
+      return (
+        <S.ButtonContent>
+          Continue
+          <ArrowRightIcon size={20} weight="bold" />
+        </S.ButtonContent>
+      );
+    }
+
+    return <S.ButtonContent>{label}</S.ButtonContent>;
   };
 
   return (

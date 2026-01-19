@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { alpha, Box } from '@mui/material';
 
 export const OptionCard = styled(Box)<{ $selected?: boolean; $disabled?: boolean }>`
-  padding: ${({ theme }) => theme.spacing(1.5, 2)};
+  padding: ${({ theme }) => theme.spacing(1, 2)};
   border: 1px solid ${({ theme, $selected }) => ($selected ? theme.palette.accent.main : theme.palette.grey[300])};
   border-radius: ${({ theme }) => theme.shape.sm}px;
   cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};

@@ -11,6 +11,7 @@ export {
   usePreviewHint,
   useStepProgress,
   useSessionActions,
+  useAdvanceToNextStep,
   usePlaySession,
 } from './hooks';
 

@@ -60,7 +60,7 @@ export const TimeLimit = ({ seconds, onExpire }: TimeLimitProps) => {
           </S.DialogHeader>
         </DialogTitle>
         <DialogContent>
-          <Typography>The time limit for this step has expired.</Typography>
+          <Typography>The time for this step has passed, but you can still continue!</Typography>
         </DialogContent>
         <DialogActions>
           <Button variant="contained" onClick={handleAcknowledge}>

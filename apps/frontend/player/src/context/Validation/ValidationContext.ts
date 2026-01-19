@@ -28,3 +28,9 @@ export const useValidation = (): ValidationContextValue => {
 
   return context;
 };
+
+export const useIsCorrect = () => useValidation().isCorrect;
+export const useIsValidating = () => useValidation().isValidating;
+export const useFeedback = () => useValidation().feedback;
+export const useAttemptCount = () => useValidation().attemptCount;
+export const useValidate = () => useValidation().validate;

@@ -2,6 +2,8 @@ import { useState, useCallback } from 'react';
 import { AnswerType, OptionType } from '@hunthub/shared';
 import type { QuizPF } from '@hunthub/shared';
 import { QUIZ_BADGES } from '@/constants';
+import { useIsCorrect } from '@/context/Validation';
+import { useAdvanceToNextStep } from '@/context/PlaySession';
 import { ChallengeCard, ActionButton } from '../components';
 import { ChoiceContent, InputContent } from '../components/Quiz';
 import type { ChallengeProps } from '@/types';
@@ -21,6 +23,9 @@ export const QuizChallenge = ({
   const [selectedOptionId, setSelectedOptionId] = useState('');
   const [inputAnswer, setInputAnswer] = useState('');
 
+  const isCorrect = useIsCorrect();
+  const advanceToNextStep = useAdvanceToNextStep();
+
   const isChoiceMode = challenge.type === OptionType.Choice;
   const hasAnswer = isChoiceMode ? selectedOptionId !== '' : inputAnswer.trim() !== '';
 
@@ -36,6 +41,14 @@ export const QuizChallenge = ({
     }
   }, [hasAnswer, isChoiceMode, selectedOptionId, inputAnswer, onValidate]);
 
+  const handleClick = () => {
+    if (isCorrect) {
+      advanceToNextStep();
+    } else {
+      handleSubmit();
+    }
+  };
+
   return (
     <ChallengeCard
       badge={QUIZ_BADGES[challenge.type]}
@@ -46,15 +59,14 @@ export const QuizChallenge = ({
       maxAttempts={maxAttempts}
       currentAttempts={currentAttempts}
       feedback={feedback}
-      onTimeExpire={handleSubmit}
-      onMaxAttempts={handleSubmit}
       showHint={hasHint}
       footer={
         <ActionButton
-          onClick={handleSubmit}
+          onClick={handleClick}
           isValidating={isValidating}
           isLastStep={isLastStep}
-          disabled={!hasAnswer}
+          isCorrect={isCorrect === true}
+          disabled={!isCorrect && !hasAnswer}
           label="Submit Answer"
         />
       }
