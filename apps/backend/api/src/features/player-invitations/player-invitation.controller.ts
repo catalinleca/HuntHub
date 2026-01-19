@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/shared/types';
 import { parseNumericId } from '@/shared/utils/parseId';
+import { safeDecodeURIComponent } from '@/shared/utils/parsing';
+import { ValidationError } from '@/shared/errors';
 import { IPlayerInvitationService } from './player-invitation.service';
 
 export interface IPlayerInvitationController {
@@ -34,7 +36,11 @@ export class PlayerInvitationController implements IPlayerInvitationController {
 
   async revokeInvitation(req: Request, res: Response) {
     const huntId = parseNumericId(req.params.id);
-    const email = decodeURIComponent(req.params.email);
+    const email = safeDecodeURIComponent(req.params.email);
+
+    if (!email) {
+      throw new ValidationError('Invalid email parameter', []);
+    }
 
     await this.service.revokeInvitation(huntId, email, req.user.id);
 

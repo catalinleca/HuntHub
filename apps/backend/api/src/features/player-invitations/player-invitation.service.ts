@@ -6,7 +6,7 @@ import { IAuthorizationService } from '@/services/authorization/authorization.se
 import PlayerInvitationModel from '@/database/models/PlayerInvitation';
 import HuntModel from '@/database/models/Hunt';
 import { PlayerInvitationMapper } from '@/shared/mappers';
-import { ConflictError, ValidationError } from '@/shared/errors';
+import { ConflictError, NotFoundError } from '@/shared/errors';
 import { isDuplicateKeyError } from '@/shared/utils/mongodb';
 
 export interface IPlayerInvitationService {
@@ -56,7 +56,7 @@ export class PlayerInvitationService implements IPlayerInvitationService {
 
     const result = await PlayerInvitationModel.deleteOne({ huntId, email: normalizedEmail });
     if (result.deletedCount === 0) {
-      throw new ValidationError('Invitation not found', []);
+      throw new NotFoundError('Invitation not found');
     }
   }
 
@@ -65,7 +65,7 @@ export class PlayerInvitationService implements IPlayerInvitationService {
 
     const result = await HuntModel.updateOne({ huntId, isDeleted: false }, { accessMode });
     if (result.matchedCount === 0) {
-      throw new ValidationError('Hunt not found', []);
+      throw new NotFoundError('Hunt not found');
     }
   }
 }

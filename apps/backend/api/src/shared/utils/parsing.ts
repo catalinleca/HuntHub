@@ -10,3 +10,11 @@ export const parseBoolean = (value: unknown): boolean | null => {
   }
   return null;
 };
+
+export const safeDecodeURIComponent = (value: string): string | null => {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return null;
+  }
+};
