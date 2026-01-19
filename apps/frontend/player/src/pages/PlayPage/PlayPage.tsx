@@ -69,7 +69,7 @@ const IdentifyingView = () => {
 
   return (
     <S.Container>
-      <PlayerIdentification onSubmit={startSession} isLoading={false} />
+      <PlayerIdentification onSubmit={startSession} />
     </S.Container>
   );
 };

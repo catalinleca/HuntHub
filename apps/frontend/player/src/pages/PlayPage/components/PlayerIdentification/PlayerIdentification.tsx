@@ -7,7 +7,7 @@ interface PlayerIdentificationProps {
   isLoading?: boolean;
 }
 
-export const PlayerIdentification = ({ onSubmit, isLoading = false }: PlayerIdentificationProps) => {
+export const PlayerIdentification = ({ onSubmit }: PlayerIdentificationProps) => {
   const [playerName, setPlayerName] = useState('');
   const [email, setEmail] = useState('');
 
@@ -40,7 +40,6 @@ export const PlayerIdentification = ({ onSubmit, isLoading = false }: PlayerIden
               required
               fullWidth
               autoFocus
-              disabled={isLoading}
             />
           </Stack>
 
@@ -52,13 +51,12 @@ export const PlayerIdentification = ({ onSubmit, isLoading = false }: PlayerIden
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email..."
               fullWidth
-              disabled={isLoading}
               helperText="For saving progress across devices"
             />
           </Stack>
 
-          <Button type="submit" variant="contained" size="large" fullWidth disabled={!playerName.trim() || isLoading}>
-            {isLoading ? 'Starting...' : 'Start Hunt'}
+          <Button type="submit" variant="contained" size="large" fullWidth disabled={!playerName.trim()}>
+            Start Hunt
           </Button>
         </S.Form>
       </S.Card>
