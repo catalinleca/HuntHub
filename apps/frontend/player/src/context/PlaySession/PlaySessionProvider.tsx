@@ -39,16 +39,16 @@ export const PlaySessionProvider = ({ playSlug, children }: PlaySessionProviderP
 
   usePrefetchStep(session?.sessionId ?? null, nextStepId);
 
-  const status = deriveStatus(sessionQuery, stepQuery);
-
-  const { mutate: startSessionMutate } = useStartSession(playSlug);
+  const startMutation = useStartSession(playSlug);
 
   const sessionIdRef = useRef<string | null>(null);
   const nextStepIdRef = useRef<number | null>(null);
   sessionIdRef.current = session?.sessionId ?? null;
   nextStepIdRef.current = nextStepId;
 
-  const error = sessionQuery.error ?? stepQuery.error ?? null;
+  const derivedStatus = deriveStatus(sessionQuery, stepQuery);
+  const status = startMutation.error ? 'error' : derivedStatus;
+  const error = sessionQuery.error ?? stepQuery.error ?? startMutation.error ?? null;
 
   const stateValue: SessionState = useMemo(
     () => ({
@@ -67,7 +67,7 @@ export const PlaySessionProvider = ({ playSlug, children }: PlaySessionProviderP
   const actionsValue: SessionActions = useMemo(
     () => ({
       startSession: (playerName: string, email?: string) => {
-        startSessionMutate(
+        startMutation.mutate(
           { playerName, email },
           { onSuccess: (data) => sessionStorage.set(playSlug, data.sessionId) },
         );
@@ -99,7 +99,7 @@ export const PlaySessionProvider = ({ playSlug, children }: PlaySessionProviderP
         });
       },
     }),
-    [playSlug, queryClient, startSessionMutate],
+    [playSlug, queryClient, startMutation],
   );
 
   return (

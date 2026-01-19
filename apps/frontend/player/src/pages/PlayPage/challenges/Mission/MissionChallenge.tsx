@@ -3,7 +3,7 @@ import { MissionType, AnswerType } from '@hunthub/shared';
 import type { MissionPF } from '@hunthub/shared';
 import { MISSION_BADGES } from '@/constants';
 import { useUploadAudio, useUploadPhoto } from '@/hooks';
-import { usePlaySession } from '@/context';
+import { useSessionId } from '@/context';
 import { ChallengeCard } from '../components';
 import { LocationContent, PhotoContent, AudioContent } from '../components/Mission';
 import type { ChallengeProps } from '@/types';
@@ -19,7 +19,7 @@ export const MissionChallenge = ({
   maxAttempts,
   hasHint,
 }: ChallengeProps<MissionPF>) => {
-  const { sessionId } = usePlaySession();
+  const sessionId = useSessionId();
   const { upload: uploadAudio, isUploading: isUploadingAudio, error: uploadAudioError } = useUploadAudio();
   const { upload: uploadPhoto, isUploading: isUploadingPhoto, error: uploadPhotoError } = useUploadPhoto();
 
