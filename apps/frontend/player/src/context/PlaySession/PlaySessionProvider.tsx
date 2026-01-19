@@ -14,8 +14,12 @@ interface PlaySessionProviderProps {
 }
 
 const extractStepIdFromLink = (link?: { href: string }): number | null => {
-  if (!link) return null;
+  if (!link) {
+    return null;
+  }
+
   const match = link.href.match(/\/step\/(\d+)$/);
+
   return match ? parseInt(match[1], 10) : null;
 };
 
@@ -80,12 +84,16 @@ export const PlaySessionProvider = ({ playSlug, children }: PlaySessionProviderP
       advanceToNextStep: () => {
         const currentSessionId = sessionIdRef.current;
         const currentNextStepId = nextStepIdRef.current;
-        if (!currentSessionId) return;
+        if (!currentSessionId) {
+          return;
+        }
 
         const isComplete = currentNextStepId === null;
 
         queryClient.setQueryData<SessionResponse>(playKeys.session(currentSessionId), (old) => {
-          if (!old) return old;
+          if (!old) {
+            return old;
+          }
 
           if (isComplete) {
             return { ...old, status: HuntProgressStatus.Completed, currentStepId: null };

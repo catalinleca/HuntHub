@@ -25,7 +25,9 @@ export const QuizChallenge = ({
   const hasAnswer = isChoiceMode ? selectedOptionId !== '' : inputAnswer.trim() !== '';
 
   const handleSubmit = useCallback(() => {
-    if (!hasAnswer) return;
+    if (!hasAnswer) {
+      return;
+    }
 
     if (isChoiceMode) {
       onValidate(AnswerType.QuizChoice, { quizChoice: { optionId: selectedOptionId } });
