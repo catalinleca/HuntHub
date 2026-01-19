@@ -7,6 +7,7 @@ import PlayerInvitationModel from '@/database/models/PlayerInvitation';
 import HuntModel from '@/database/models/Hunt';
 import { PlayerInvitationMapper } from '@/shared/mappers';
 import { ConflictError, ValidationError } from '@/shared/errors';
+import { isDuplicateKeyError } from '@/shared/utils/mongodb';
 
 export interface IPlayerInvitationService {
   invitePlayer(huntId: number, email: string, userId: string): Promise<PlayerInvitation>;
@@ -24,18 +25,20 @@ export class PlayerInvitationService implements IPlayerInvitationService {
 
     const normalizedEmail = email.toLowerCase().trim();
 
-    const existing = await PlayerInvitationModel.findOne({ huntId, email: normalizedEmail });
-    if (existing) {
-      throw new ConflictError('Player is already invited');
+    try {
+      const invitation = await PlayerInvitationModel.create({
+        huntId,
+        email: normalizedEmail,
+        invitedBy: new Types.ObjectId(userId),
+      });
+
+      return PlayerInvitationMapper.toDTO(invitation);
+    } catch (error) {
+      if (isDuplicateKeyError(error)) {
+        throw new ConflictError('Player is already invited');
+      }
+      throw error;
     }
-
-    const invitation = await PlayerInvitationModel.create({
-      huntId,
-      email: normalizedEmail,
-      invitedBy: new Types.ObjectId(userId),
-    });
-
-    return PlayerInvitationMapper.toDTO(invitation);
   }
 
   async listInvitations(huntId: number, userId: string): Promise<PlayerInvitation[]> {

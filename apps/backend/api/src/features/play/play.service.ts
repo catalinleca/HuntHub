@@ -322,7 +322,7 @@ export class PlayService implements IPlayService {
     email?: string,
     userId?: string,
   ): Promise<void> {
-    if (accessMode === HuntAccessMode.Open) {
+    if (!accessMode || accessMode === HuntAccessMode.Open) {
       return;
     }
 

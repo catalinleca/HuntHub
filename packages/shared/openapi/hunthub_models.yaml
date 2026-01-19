@@ -296,6 +296,8 @@ components:
         - status
         - isPublished
         - stepOrder
+        - playSlug
+        - accessMode
       additionalProperties: false
 
     HuntCreate:
