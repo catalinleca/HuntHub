@@ -21,8 +21,7 @@ const queryClient = new QueryClient({
   },
   mutationCache: new MutationCache({
     onError: (error) => {
-      const message = error instanceof Error ? error.message : 'Something went wrong';
-      useSnackbarStore.getState().error(message);
+      useSnackbarStore.getState().error(error.message);
     },
   }),
 });
