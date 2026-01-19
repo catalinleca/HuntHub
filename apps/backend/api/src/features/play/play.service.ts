@@ -21,7 +21,7 @@ import { IHunt } from '@/database/types/Hunt';
 import { IHuntVersion } from '@/database/types/HuntVersion';
 import { IStep } from '@/database/types/Step';
 import { IStepProgress } from '@/database/types/Progress';
-import { NotFoundError, ForbiddenError, ConflictError, ValidationError } from '@/shared/errors';
+import { NotFoundError, NotInvitedError, ForbiddenError, ConflictError, ValidationError } from '@/shared/errors';
 import { logger } from '@/utils/logger';
 import { withTransaction } from '@/shared/utils/transaction';
 import { isDev } from '@/config/env.config';
@@ -345,7 +345,7 @@ export class PlayService implements IPlayService {
       }
     }
 
-    throw new NotFoundError('Hunt not found');
+    throw new NotInvitedError();
   }
 
   private async requireHuntVersion(huntId: number, version: number): Promise<HydratedDocument<IHuntVersion>> {

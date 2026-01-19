@@ -2,13 +2,40 @@ import { useParams } from 'react-router-dom';
 import { Typography, CircularProgress } from '@mui/material';
 import { ChallengeType } from '@hunthub/shared';
 import { PlaySessionProvider, usePlaySession, ApiValidationProvider } from '@/context';
+import { parseApiError, ErrorCode } from '@/utils';
 import { PlayerIdentification } from './components/PlayerIdentification';
 import { StepRenderer } from './components/StepRenderer';
+import { ErrorState } from './components/ErrorState';
 import * as S from './PlayPage.styles';
+
+const playErrorContent: Record<string, { title: string; description: string }> = {
+  [ErrorCode.NOT_FOUND]: {
+    title: 'Hunt Not Found',
+    description: 'This hunt link may be invalid or the hunt no longer exists.',
+  },
+  [ErrorCode.NOT_INVITED]: {
+    title: 'Not Invited',
+    description: 'You have not been invited to this hunt. Please check with the hunt creator.',
+  },
+  [ErrorCode.FORBIDDEN]: {
+    title: 'Hunt Not Available',
+    description: 'This hunt has been taken offline by its creator.',
+  },
+  [ErrorCode.NETWORK_ERROR]: {
+    title: 'Connection Error',
+    description: 'Unable to connect to the server. Please check your internet connection.',
+  },
+};
+
+const defaultErrorContent = {
+  title: 'Something Went Wrong',
+  description: 'Please try again.',
+};
 
 const PlayPageContent = () => {
   const {
     isLoading,
+    error,
     isComplete,
     hasSession,
     sessionId,
@@ -20,6 +47,20 @@ const PlayPageContent = () => {
     startSession,
     nextStepId,
   } = usePlaySession();
+
+  if (error) {
+    const { code } = parseApiError(error);
+    const content = playErrorContent[code] || defaultErrorContent;
+    const isRecoverable = code === ErrorCode.NETWORK_ERROR;
+
+    return (
+      <ErrorState
+        title={content.title}
+        description={content.description}
+        onRetry={isRecoverable ? () => window.location.reload() : undefined}
+      />
+    );
+  }
 
   if (isLoading) {
     return (
@@ -78,20 +119,14 @@ const PlayPageContent = () => {
 };
 
 export const PlayPage = () => {
-  const { huntId } = useParams<{ huntId?: string }>();
-  const huntIdNum = Number(huntId);
-  const isValidHuntId = Number.isInteger(huntIdNum) && huntIdNum > 0;
+  const { playSlug } = useParams<{ playSlug?: string }>();
 
-  if (!isValidHuntId) {
-    return (
-      <S.Container>
-        <Typography color="error">Invalid hunt ID</Typography>
-      </S.Container>
-    );
+  if (!playSlug) {
+    return <ErrorState title="Invalid Link" description="This hunt link appears to be invalid." />;
   }
 
   return (
-    <PlaySessionProvider huntId={huntIdNum}>
+    <PlaySessionProvider playSlug={playSlug}>
       <PlayPageContent />
     </PlaySessionProvider>
   );
