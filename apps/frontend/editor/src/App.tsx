@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, MutationCache } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
@@ -9,6 +9,7 @@ import { AppWithAuth } from './AppWithAuth';
 import { treasureMapTheme as theme } from '@hunthub/compass';
 import { ConfirmationDialog, ErrorFallback, Snackbar } from '@/components';
 import { GOOGLE_MAPS_API_KEY } from '@/config/google-maps';
+import { useSnackbarStore } from '@/stores';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,6 +19,11 @@ const queryClient = new QueryClient({
       retry: 1,
     },
   },
+  mutationCache: new MutationCache({
+    onError: (error) => {
+      useSnackbarStore.getState().error(error.message);
+    },
+  }),
 });
 
 function App() {

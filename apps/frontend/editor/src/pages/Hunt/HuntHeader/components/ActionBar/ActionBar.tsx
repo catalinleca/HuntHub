@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Button, CircularProgress } from '@mui/material';
 import { ShareNetworkIcon, RocketLaunchIcon } from '@phosphor-icons/react';
 import { usePublishingContext } from '@/pages/Hunt/context';
+import { SharePanel } from '../SharePanel';
 import * as S from './ActionBar.styles';
 
 interface ActionBarProps {
@@ -10,6 +12,7 @@ interface ActionBarProps {
 }
 
 export const ActionBar = ({ hasUnsavedChanges, isSaving, onSave }: ActionBarProps) => {
+  const [shareAnchor, setShareAnchor] = useState<HTMLElement | null>(null);
   const { handleRelease, isPublishing, isReleasing } = usePublishingContext();
 
   const isBusy = isPublishing || isReleasing;
@@ -26,9 +29,16 @@ export const ActionBar = ({ hasUnsavedChanges, isSaving, onSave }: ActionBarProp
         Save
       </Button>
 
-      <Button variant="outlined" size="small" startIcon={<ShareNetworkIcon size={18} />} disabled={isBusy}>
+      <Button
+        variant="outlined"
+        size="small"
+        startIcon={<ShareNetworkIcon size={18} />}
+        disabled={isBusy}
+        onClick={(e) => setShareAnchor(e.currentTarget)}
+      >
         Share
       </Button>
+      <SharePanel anchorEl={shareAnchor} open={Boolean(shareAnchor)} onClose={() => setShareAnchor(null)} />
 
       <Button
         variant="contained"

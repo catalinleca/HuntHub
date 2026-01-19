@@ -11,10 +11,20 @@ Share hunts with players via link. Control access with open/invite-only modes.
 | Layer | Status |
 |-------|--------|
 | Backend | ✓ Complete |
-| Frontend (Editor) | ○ Planned |
+| Frontend (Editor) | ✓ Complete |
 | Frontend (Player) | ○ Planned |
 
-**Last Updated:** 2025-01-19 — Backend complete, frontend placeholders
+**Last Updated:** 2025-01-19 — Editor complete (SharePanel, access mode, invitations, reset link). QR code optional.
+
+### Editor Implementation Status
+- [x] SharePanel with link display
+- [x] Copy link to clipboard
+- [x] Access mode toggle (open ↔ invite_only)
+- [x] Invite player by email
+- [x] List invited players
+- [x] Revoke invitation
+- [x] Reset link with confirmation dialog
+- [ ] QR code (optional, not implemented)
 
 ---
 
@@ -29,15 +39,15 @@ sequenceDiagram
 
     rect rgb(40, 70, 40)
     Note right of U: EDITOR: SHARE LINK
-    U->>FE: [FE ○] SharePanel opens
-    FE->>FE: [FE ○] Read hunt.playSlug, accessMode
-    FE->>FE: [FE ○] Build URL /play/{slug}
-    FE-->>U: [FE ○] Copy link / show QR
+    U->>FE: [FE ✓] SharePanel opens
+    FE->>FE: [FE ✓] Read hunt.playSlug, accessMode
+    FE->>FE: [FE ✓] Build URL /play/{slug}
+    FE-->>U: [FE ✓] Copy link
     end
 
     rect rgb(40, 70, 40)
     Note right of U: EDITOR: SET ACCESS MODE
-    U->>FE: [FE ○] Toggle "Invite Only"
+    U->>FE: [FE ✓] Toggle "Invite Only"
     FE->>API: [BE ✓] PATCH /hunts/:id/access-mode { accessMode }
     Note right of API: PlayerInvitationService.updateAccessMode()
     API->>DB: [BE ✓] HuntModel.updateOne({ accessMode })
@@ -46,7 +56,7 @@ sequenceDiagram
 
     rect rgb(40, 70, 40)
     Note right of U: EDITOR: INVITE PLAYER
-    U->>FE: [FE ○] Enter player email
+    U->>FE: [FE ✓] Enter player email
     FE->>API: [BE ✓] POST /hunts/:id/player-invitations { email }
     Note right of API: PlayerInvitationService.invitePlayer()
     API->>DB: [BE ✓] PlayerInvitationModel.create()
@@ -55,7 +65,8 @@ sequenceDiagram
 
     rect rgb(40, 70, 40)
     Note right of U: EDITOR: RESET LINK
-    U->>FE: [FE ○] Click "Reset Link"
+    U->>FE: [FE ✓] Click "Reset Link"
+    FE->>FE: [FE ✓] Confirmation dialog
     FE->>API: [BE ✓] POST /hunts/:id/reset-play-link
     Note right of API: HuntService.resetPlayLink()
     API->>DB: [BE ✓] HuntModel.findOneAndUpdate()
@@ -259,11 +270,17 @@ New:     POST /play/{slug}/start { playerName, email? }
 - [x] Reset generates new slug
 - [x] Old slug stops working after reset
 
-### Frontend (○ TODO)
-- [ ] SharePanel displays correct link
-- [ ] Access mode toggle updates hunt
-- [ ] Invitation CRUD works
-- [ ] Reset link with confirmation
+### Frontend Editor (✓ Complete)
+- [x] SharePanel displays correct link
+- [x] Copy link to clipboard
+- [x] Access mode toggle updates hunt (optimistic)
+- [x] Invite player by email
+- [x] List invited players
+- [x] Revoke invitation
+- [x] Reset link with confirmation dialog
+- [ ] QR code (optional, not blocking)
+
+### Frontend Player (○ TODO)
 - [ ] Player form shows email when needed
 - [ ] Error handling for 404 on invite-only
 
@@ -274,5 +291,6 @@ New:     POST /play/{slug}/start { playerName, email? }
 ```
 [BE ✓] - Backend implemented
 [FE ○] - Frontend planned
+[FE ◐] - Frontend partial
 [FE ✓] - Frontend implemented
 ```

@@ -312,6 +312,29 @@ export const useGetHunt = (huntId?: number | null) => {
 | `queryFnOrSkip` | ✅ Yes | ❌ No | Default choice, conditional fetching |
 | `enabled: false` | ❌ No (needs `!`) | ✅ Yes | Need manual trigger capability |
 
+### Mutation Hooks: Return Semantic Names
+
+**Hooks return semantic names, consumers use them directly - no renaming at call site.**
+
+```tsx
+// GOOD - hook returns semantic names
+export const useInvitePlayer = () => {
+  const { mutate, isPending, ...rest } = useMutation({ ... });
+  return { invitePlayer: mutate, isInviting: isPending, ...rest };
+};
+
+// Consumer uses directly
+const { invitePlayer, isInviting } = useInvitePlayer();
+
+// BAD - renaming at consumer
+const { mutate: invitePlayer, isPending: isInviting } = useInvitePlayer();
+```
+
+**Why:**
+- Cleaner JSX - less destructuring noise
+- Consistent naming across all consumers
+- Hook name implies return shape (`useInvitePlayer` → `invitePlayer`)
+
 ---
 
 ## React Patterns
@@ -347,9 +370,55 @@ const Component = memo(({ items }) => {
 
 ### Small Components
 
-- Break sections from JSX into separate components
-- Especially if you can collocate state or make it easier to follow
-- No big JSX components
+**Container components** (pages, modals, popovers, panels) should compose smaller section components.
+
+**Extract a section when:**
+- It has its own state or handlers
+- It's visually distinct (separated by Divider, Card, etc.)
+- The parent component exceeds ~50 lines of JSX
+
+**Don't over-extract:**
+- A focused section component is the leaf - don't break it into section-sections
+- Simple conditional rendering (ternary) doesn't need extraction
+- If extraction adds prop-drilling complexity, reconsider
+
+```tsx
+// BAD - monolithic container with JSX soup
+const SharePanel = () => (
+  <Popover>
+    <Stack p={2} gap={1}>
+      <Typography>Share Hunt</Typography>
+      <TextField ... />  {/* 15 lines of slotProps */}
+    </Stack>
+    <Divider />
+    <Stack p={2} gap={1}>
+      <Typography>Who can play</Typography>
+      <ToggleButtonGroup ... />  {/* more inline JSX */}
+    </Stack>
+  </Popover>
+);
+
+// GOOD - container composes focused sections
+const SharePanel = () => (
+  <Popover>
+    <LinkSection playUrl={playUrl} />
+    <Divider />
+    <AccessModeSection accessMode={accessMode} onChange={handleChange} />
+  </Popover>
+);
+
+// LinkSection is a leaf - simple, focused, no further extraction needed
+const LinkSection = ({ playUrl }: LinkSectionProps) => {
+  const [copied, setCopied] = useState(false);
+  // ... handlers
+  return (
+    <Stack p={2} gap={1}>
+      <Typography>Share Hunt</Typography>
+      {/* focused JSX */}
+    </Stack>
+  );
+};
+```
 
 ---
 

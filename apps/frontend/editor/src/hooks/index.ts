@@ -1,4 +1,5 @@
 export { useConfirmationDialog } from './useConfirmationDialog';
+export { useCopyToClipboard } from './useCopyToClipboard';
 export { useFieldError } from './useFieldError';
 export { useThrottledValue } from './useThrottledValue';
 export { useHorizontalScroll } from './useHorizontalScroll';
