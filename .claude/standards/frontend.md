@@ -347,9 +347,55 @@ const Component = memo(({ items }) => {
 
 ### Small Components
 
-- Break sections from JSX into separate components
-- Especially if you can collocate state or make it easier to follow
-- No big JSX components
+**Container components** (pages, modals, popovers, panels) should compose smaller section components.
+
+**Extract a section when:**
+- It has its own state or handlers
+- It's visually distinct (separated by Divider, Card, etc.)
+- The parent component exceeds ~50 lines of JSX
+
+**Don't over-extract:**
+- A focused section component is the leaf - don't break it into section-sections
+- Simple conditional rendering (ternary) doesn't need extraction
+- If extraction adds prop-drilling complexity, reconsider
+
+```tsx
+// BAD - monolithic container with JSX soup
+const SharePanel = () => (
+  <Popover>
+    <Stack p={2} gap={1}>
+      <Typography>Share Hunt</Typography>
+      <TextField ... />  {/* 15 lines of slotProps */}
+    </Stack>
+    <Divider />
+    <Stack p={2} gap={1}>
+      <Typography>Who can play</Typography>
+      <ToggleButtonGroup ... />  {/* more inline JSX */}
+    </Stack>
+  </Popover>
+);
+
+// GOOD - container composes focused sections
+const SharePanel = () => (
+  <Popover>
+    <LinkSection playUrl={playUrl} />
+    <Divider />
+    <AccessModeSection accessMode={accessMode} onChange={handleChange} />
+  </Popover>
+);
+
+// LinkSection is a leaf - simple, focused, no further extraction needed
+const LinkSection = ({ playUrl }: LinkSectionProps) => {
+  const [copied, setCopied] = useState(false);
+  // ... handlers
+  return (
+    <Stack p={2} gap={1}>
+      <Typography>Share Hunt</Typography>
+      {/* focused JSX */}
+    </Stack>
+  );
+};
+```
 
 ---
 
