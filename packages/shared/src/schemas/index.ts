@@ -77,6 +77,15 @@ export {
   ShareHuntRequest,
   UpdatePermissionRequest,
 
+  // Player Invitations
+  PlayerInvitation,
+  CreatePlayerInvitationRequest,
+  UpdateAccessModeRequest,
+  PreviewLinkResponse,
+
+  // Access Mode
+  HuntAccessMode,
+
   // Answer Validation (for edge + server)
   AnswerType,
   ClueAnswerPayload,

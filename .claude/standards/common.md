@@ -43,6 +43,54 @@ const isMatch = submitted.includes(expected) || expected.includes(submitted);
 for (const acceptable of config.acceptableAnswers) {
 ```
 
+### Guard Clauses with Early Returns
+
+Use guard clauses and early returns for sequential checks. Variable names replace comments.
+
+```typescript
+// BAD - nested conditionals, comments explaining logic
+const checkAccessMode = async (hunt, accessMode, email, userId) => {
+  // Check if open mode
+  if (accessMode !== HuntAccessMode.Open) {
+    // Check if user is creator
+    if (userId != null && hunt.creatorId.toString() !== userId) {
+      // Check if collaborator
+      const hasAccess = await HuntAccessModel.hasAccess(hunt.huntId, userId);
+      if (!hasAccess) {
+        throw new NotFoundError();
+      }
+    }
+  }
+};
+
+// GOOD - guard clauses, meaningful names, no comments needed
+const checkAccessMode = async (hunt, accessMode, email, userId) => {
+  if (accessMode === HuntAccessMode.Open) {
+    return;
+  }
+
+  const isCreator = userId != null && hunt.creatorId.toString() === userId;
+  if (isCreator) {
+    return;
+  }
+
+  if (userId != null) {
+    const hasCollaboratorAccess = await HuntAccessModel.hasAccess(hunt.huntId, userId);
+    if (hasCollaboratorAccess) {
+      return;
+    }
+  }
+
+  throw new NotFoundError();
+};
+```
+
+**Key principles:**
+- Guard clauses exit early for each condition
+- Descriptive variable names (`isCreator`, `hasCollaboratorAccess`) replace comments
+- One-liner boolean checks stay inline with meaningful names
+- Extract methods only when logic is reused or complex
+
 ### Section Headers
 
 **NO section headers.** If you need section headers, your file is too big. Split it.

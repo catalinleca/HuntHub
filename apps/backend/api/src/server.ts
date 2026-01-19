@@ -25,6 +25,7 @@ import publishingRouter from '@/features/publishing/publishing.routes';
 import huntShareRouter from '@/features/sharing/hunt-share.routes';
 import playRouter from '@/features/play/play.routes';
 import cloneRouter from '@/features/cloning/clone.routes';
+import playerInvitationRouter from '@/features/player-invitations/player-invitation.routes';
 
 import { errorHandler, authMiddleware, requestLogger } from '@/shared/middlewares';
 
@@ -64,6 +65,7 @@ async function bootstrap() {
   app.use('/api/hunts', publishingRouter);
   app.use('/api/hunts', huntShareRouter);
   app.use('/api/hunts', cloneRouter);
+  app.use('/api/hunts', playerInvitationRouter);
   app.use('/api/assets', assetRouter);
 
   app.use(errorHandler);

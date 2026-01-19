@@ -8,7 +8,7 @@ import { mockFirebaseAuth, createTestAuthToken, clearFirebaseAuthMocks } from '.
 import { IUser } from '@/database/types/User';
 import { IHunt } from '@/database/types/Hunt';
 import { IStep } from '@/database/types/Step';
-import { ChallengeType, HuntStatus, Hunt, Step, Challenge } from '@hunthub/shared';
+import { ChallengeType, HuntStatus, Hunt, Step, Challenge, HuntAccessMode } from '@hunthub/shared';
 import StepModel from '@/database/models/Step';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import HuntAccessModel from '@/database/models/HuntAccess';
@@ -47,8 +47,8 @@ describe('Hunt Save Integration Tests', () => {
     hint: s.hint,
     timeLimit: s.timeLimit,
     maxAttempts: s.maxAttempts,
-    createdAt: s.createdAt,
-    updatedAt: s.updatedAt,
+    createdAt: s.createdAt instanceof Date ? s.createdAt.toISOString() : s.createdAt,
+    updatedAt: s.updatedAt instanceof Date ? s.updatedAt.toISOString() : s.updatedAt,
   });
 
   const buildSavePayload = async (hunt: IHunt, steps: IStep[] = []): Promise<Hunt> => {
@@ -79,6 +79,8 @@ describe('Hunt Save Integration Tests', () => {
       stepOrder: versionDoc?.stepOrder || [],
       steps: steps.map(mapStep),
       isPublished: false,
+      playSlug: hunt.playSlug,
+      accessMode: hunt.accessMode as HuntAccessMode,
       createdAt: versionDoc?.createdAt?.toISOString(),
       updatedAt: versionDoc?.updatedAt?.toISOString(),
     };
@@ -350,6 +352,8 @@ describe('Hunt Save Integration Tests', () => {
         status: HuntStatus.Draft,
         stepOrder: [],
         isPublished: false,
+        playSlug: 'abc123',
+        accessMode: HuntAccessMode.Open,
       };
 
       await request(app)

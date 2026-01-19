@@ -6,4 +6,5 @@ export * from './AssetUsage';
 export * from './Progress';
 export * from './LiveHunt';
 export * from './HuntAccess';
+export * from './PlayerInvitation';
 export type { ILocation } from '../schemas/location.schema';

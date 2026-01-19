@@ -37,4 +37,8 @@ huntRouter.put('/:id/step-order', validateRequest(reorderStepsSchema), (req, res
   controller.reorderSteps(req, res).catch(next);
 });
 
+huntRouter.post('/:id/reset-play-link', (req, res, next) => {
+  controller.resetPlayLink(req, res).catch(next);
+});
+
 export default huntRouter;

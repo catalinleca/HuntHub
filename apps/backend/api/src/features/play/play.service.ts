@@ -14,6 +14,9 @@ import {
 import HuntModel from '@/database/models/Hunt';
 import HuntVersionModel from '@/database/models/HuntVersion';
 import AssetModel from '@/database/models/Asset';
+import PlayerInvitationModel from '@/database/models/PlayerInvitation';
+import HuntAccessModel from '@/database/models/HuntAccess';
+import { HuntAccessMode } from '@hunthub/shared';
 import { IHunt } from '@/database/types/Hunt';
 import { IHuntVersion } from '@/database/types/HuntVersion';
 import { IStep } from '@/database/types/Step';
@@ -52,7 +55,7 @@ export interface UploadUrlResponse {
 
 export interface IPlayService {
   discoverHunts(page: number, limit: number): Promise<DiscoverHuntsResponse>;
-  startSession(huntId: number, playerName: string, userId?: string): Promise<SessionResponse>;
+  startSession(playSlug: string, playerName: string, email?: string, userId?: string): Promise<SessionResponse>;
   getSession(sessionId: string): Promise<SessionResponse>;
   getStep(sessionId: string, stepId: number): Promise<StepResponse>;
   validateAnswer(sessionId: string, request: ValidateAnswerRequest): Promise<ValidateAnswerResponse>;
@@ -102,11 +105,13 @@ export class PlayService implements IPlayService {
     return { hunts: sanitizedHunts, total };
   }
 
-  async startSession(huntId: number, playerName: string, userId?: string): Promise<SessionResponse> {
-    const hunt = await this.requireLiveHunt(huntId);
+  async startSession(playSlug: string, playerName: string, email?: string, userId?: string): Promise<SessionResponse> {
+    const hunt = await this.requireLiveHuntBySlug(playSlug);
     const liveVersion = hunt.liveVersion!;
 
-    const huntVersion = await this.requireHuntVersion(huntId, liveVersion);
+    await this.checkAccessMode(hunt, hunt.accessMode, email, userId);
+
+    const huntVersion = await this.requireHuntVersion(hunt.huntId, liveVersion);
     if (!huntVersion) {
       throw new NotFoundError('Live hunt version not found');
     }
@@ -116,11 +121,11 @@ export class PlayService implements IPlayService {
     }
 
     const firstStepId = huntVersion.stepOrder[0];
-    const progress = await SessionManager.createSession(huntId, liveVersion, playerName, firstStepId, userId);
+    const progress = await SessionManager.createSession(hunt.huntId, liveVersion, playerName, firstStepId, userId);
 
     return {
       sessionId: progress.sessionId,
-      hunt: PlayerExporter.hunt(huntId, huntVersion),
+      hunt: PlayerExporter.hunt(hunt.huntId, huntVersion),
       status: HuntProgressStatus.InProgress,
       currentStepIndex: 0,
       currentStepId: firstStepId,
@@ -297,8 +302,8 @@ export class PlayService implements IPlayService {
     };
   }
 
-  private async requireLiveHunt(huntId: number): Promise<HydratedDocument<IHunt>> {
-    const hunt = await HuntModel.findOne({ huntId, isDeleted: false });
+  private async requireLiveHuntBySlug(playSlug: string): Promise<HydratedDocument<IHunt>> {
+    const hunt = await HuntModel.findOne({ playSlug, isDeleted: false });
 
     if (!hunt) {
       throw new NotFoundError('Hunt not found');
@@ -309,6 +314,38 @@ export class PlayService implements IPlayService {
     }
 
     return hunt;
+  }
+
+  private async checkAccessMode(
+    hunt: HydratedDocument<IHunt>,
+    accessMode: HuntAccessMode,
+    email?: string,
+    userId?: string,
+  ): Promise<void> {
+    if (!accessMode || accessMode === HuntAccessMode.Open) {
+      return;
+    }
+
+    const isCreator = userId != null && hunt.creatorId.toString() === userId;
+    if (isCreator) {
+      return;
+    }
+
+    if (userId != null) {
+      const hasCollaboratorAccess = await HuntAccessModel.hasAccess(hunt.huntId, userId);
+      if (hasCollaboratorAccess) {
+        return;
+      }
+    }
+
+    if (email != null) {
+      const isInvitedPlayer = await PlayerInvitationModel.isInvited(hunt.huntId, email.toLowerCase().trim());
+      if (isInvitedPlayer) {
+        return;
+      }
+    }
+
+    throw new NotFoundError('Hunt not found');
   }
 
   private async requireHuntVersion(huntId: number, version: number): Promise<HydratedDocument<IHuntVersion>> {

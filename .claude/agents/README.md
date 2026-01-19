@@ -13,6 +13,7 @@ Custom subagents for code quality, architecture, and reliability reviews.
 | `security-sentinel` | Haiku | AuthZ, data exposure, anti-cheat | Auth/permission changes |
 | `test-failure-modes` | Opus | Test coverage, reliability | Before PR / milestones |
 | `patterns-researcher` | Opus | Research with source quality | On-demand (foreground) |
+| `feature-doc` | Opus | Create/verify feature documentation | New features, doc audits |
 
 > **Why Opus for complex tasks?** Claude Opus 4.5 uses 50-76% fewer tokens than Sonnet for equivalent tasks, making it actually cheaper despite higher per-token pricing. See [Anthropic's announcement](https://www.anthropic.com/news/claude-opus-4-5).
 
@@ -43,6 +44,8 @@ Model changes    → data-model-steward
 Auth changes     → security-sentinel
 Before PR        → test-failure-modes
 Novel problem    → patterns-researcher (foreground)
+New feature      → feature-doc (create documentation)
+Doc audit        → feature-doc (verify existing docs)
 ```
 
 ## Modifying Agents

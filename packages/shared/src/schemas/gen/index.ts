@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 export const HuntStatus = z.enum(['draft', 'published']);
 export const HuntPermission = z.enum(['view', 'admin', 'owner']);
+export const HuntAccessMode = z.enum(['open', 'invite_only']);
 export const Location = z
   .object({ lat: z.number(), lng: z.number(), radius: z.number(), address: z.string().optional() })
   .strict();
@@ -126,6 +127,8 @@ export const Hunt = z
     isLive: z.boolean().optional(),
     releasedAt: z.string().datetime({ offset: true }).nullish(),
     releasedBy: z.string().nullish(),
+    playSlug: z.string(),
+    accessMode: HuntAccessMode,
     permission: z.enum(['owner', 'admin', 'view']).optional(),
     createdAt: z.string().datetime({ offset: true }).optional(),
     updatedAt: z.string().datetime({ offset: true }).optional(),
@@ -333,6 +336,18 @@ export const TakeOfflineRequest = z.object({ currentLiveVersion: z.number().int(
 export const CloneHuntRequest = z.object({ version: z.number().int() }).partial().strict();
 export const ShareHuntRequest = z.object({ email: z.string().email(), permission: z.enum(['admin', 'view']) }).strict();
 export const UpdatePermissionRequest = z.object({ permission: z.enum(['admin', 'view']) }).strict();
+export const PlayerInvitation = z
+  .object({
+    huntId: z.number().int(),
+    email: z.string().email(),
+    invitedBy: z.string(),
+    invitedAt: z.string().datetime({ offset: true }),
+  })
+  .strict();
+export const CreatePlayerInvitationRequest = z.object({ email: z.string().email() }).strict();
+export const UpdateAccessModeRequest = z.object({ accessMode: HuntAccessMode }).strict();
+export const PreviewLinkResponse = z.object({ previewUrl: z.string(), expiresIn: z.number().int() }).strict();
+export const ResetPlayLinkResponse = z.object({ playSlug: z.string() }).strict();
 export const CluePF = z.object({ title: z.string(), description: z.string() }).strict();
 export const QuizPF = z
   .object({
@@ -472,6 +487,7 @@ export const PaginatedAssetsResponse = z.object({ data: z.array(Asset), paginati
 export const schemas: Record<string, z.ZodTypeAny> = {
   HuntStatus,
   HuntPermission,
+  HuntAccessMode,
   Location,
   HuntAccessType,
   ChallengeType,
@@ -523,6 +539,11 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   CloneHuntRequest,
   ShareHuntRequest,
   UpdatePermissionRequest,
+  PlayerInvitation,
+  CreatePlayerInvitationRequest,
+  UpdateAccessModeRequest,
+  PreviewLinkResponse,
+  ResetPlayLinkResponse,
   CluePF,
   QuizPF,
   MissionPF,

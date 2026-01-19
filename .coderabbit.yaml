@@ -1,5 +1,6 @@
 # CodeRabbit Configuration - Balanced Mode
 # Focus on bugs, security, and meaningful patterns - not nitpicking
+# Make sure we reuse patterns if existing, BE + FE, doesn't matter
 
 # CRITICAL: Before suggesting ANY code changes or library usage, you MUST verify
 # the exact version we have installed and check current documentation.
@@ -11,6 +12,10 @@
 # Check package.json versions FIRST, then verify against current docs.
 # If unsure, ask rather than suggest deprecated code.
 # Ignore TODOs
+
+# When possible, create diagrams to explain data flow, decisions and implementations. Let's make it easy to pass context of the feature and code
+# Make sure they work because sometimes the diagram is not visible. Only the 'code' for it
+# One diagram per comment. In case one does not work it is easier to fix it. Make sure they are easy to follow and understand
 
 reviews:
   # Assertive catches more than chill, but we'll tone down instructions
