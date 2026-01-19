@@ -1,4 +1,4 @@
-import { Popover, Divider, Collapse } from '@mui/material';
+import { Popover, Divider, Collapse, Box } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { HuntAccessMode } from '@hunthub/shared';
 import { useGetHunt, useUpdateAccessMode } from '@/api/Hunt';
@@ -7,6 +7,7 @@ import { AccessModeSection } from './AccessModeSection';
 import { InviteSection } from './InviteSection';
 
 const PLAYER_URL = import.meta.env.VITE_PLAYER_URL || 'http://localhost:5175';
+const PANEL_WIDTH = 300;
 
 interface SharePanelProps {
   anchorEl: HTMLElement | null;
@@ -38,17 +39,16 @@ export const SharePanel = ({ anchorEl, open, onClose }: SharePanelProps) => {
       onClose={onClose}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      slotProps={{
-        paper: { sx: { width: 360, mt: 1 } },
-      }}
     >
-      <LinkSection playUrl={playUrl} />
-      <Divider />
-      <AccessModeSection accessMode={accessMode} onChange={handleAccessModeChange} disabled={isUpdatingAccessMode} />
-      <Collapse in={isInviteOnly}>
+      <Box width={PANEL_WIDTH}>
+        <LinkSection playUrl={playUrl} huntId={huntId} />
         <Divider />
-        <InviteSection huntId={huntId} />
-      </Collapse>
+        <AccessModeSection accessMode={accessMode} onChange={handleAccessModeChange} disabled={isUpdatingAccessMode} />
+        <Collapse in={isInviteOnly}>
+          <Divider />
+          <InviteSection huntId={huntId} />
+        </Collapse>
+      </Box>
     </Popover>
   );
 };
