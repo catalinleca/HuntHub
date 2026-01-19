@@ -3,6 +3,7 @@ import { Stack, Typography, TextField, IconButton, InputAdornment, List, ListIte
 import { PaperPlaneRightIcon, TrashIcon } from '@phosphor-icons/react';
 import { useGetPlayerInvitations, useInvitePlayer, useRevokeInvitation } from '@/api/Hunt';
 import { InputLabel } from '@/components/form/core';
+import { useSnackbarStore } from '@/stores';
 
 interface InviteSectionProps {
   huntId: number;
@@ -10,20 +11,34 @@ interface InviteSectionProps {
 
 export const InviteSection = ({ huntId }: InviteSectionProps) => {
   const [email, setEmail] = useState('');
+  const { error } = useSnackbarStore();
 
   const { data: invitations = [] } = useGetPlayerInvitations(huntId);
   const { mutate: invitePlayer, isPending: isInviting } = useInvitePlayer();
   const { mutate: revokeInvitation } = useRevokeInvitation();
 
-  const trimmedEmail = email.trim();
-  const canInvite = Boolean(trimmedEmail) && !isInviting;
+  const trimmedEmail = email.trim().toLowerCase();
+  const isAlreadyInvited = invitations.some((inv) => inv.email === trimmedEmail);
+  const canInvite = Boolean(trimmedEmail) && !isInviting && !isAlreadyInvited;
 
   const handleInvite = () => {
     if (!trimmedEmail) {
       return;
     }
 
-    invitePlayer({ huntId, email: trimmedEmail }, { onSuccess: () => setEmail('') });
+    if (isAlreadyInvited) {
+      error('This email is already invited');
+
+      return;
+    }
+
+    invitePlayer(
+      { huntId, email: trimmedEmail },
+      {
+        onSuccess: () => setEmail(''),
+        onError: () => error('Failed to invite player'),
+      },
+    );
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
