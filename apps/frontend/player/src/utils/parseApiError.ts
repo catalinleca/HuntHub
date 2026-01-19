@@ -20,6 +20,11 @@ export interface ApiError {
   status: number;
 }
 
+const knownErrorCodes = new Set(Object.values(ErrorCode));
+
+const isKnownErrorCode = (code: unknown): code is ErrorCode =>
+  typeof code === 'string' && knownErrorCodes.has(code as ErrorCode);
+
 export const parseApiError = (error: unknown): ApiError => {
   if (axios.isAxiosError(error)) {
     if (!error.response) {
@@ -31,8 +36,10 @@ export const parseApiError = (error: unknown): ApiError => {
     }
 
     const { status, data } = error.response;
+    const code = isKnownErrorCode(data?.code) ? data.code : ErrorCode.UNKNOWN;
+
     return {
-      code: data?.code || ErrorCode.UNKNOWN,
+      code,
       message: data?.message || 'An unexpected error occurred',
       status,
     };

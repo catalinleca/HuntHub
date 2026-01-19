@@ -12,9 +12,9 @@ Share hunts with players via link. Control access with open/invite-only modes.
 |-------|--------|
 | Backend | ✓ Complete |
 | Frontend (Editor) | ✓ Complete |
-| Frontend (Player) | ○ Planned |
+| Frontend (Player) | ✓ Complete |
 
-**Last Updated:** 2025-01-19 — Editor complete (SharePanel, access mode, invitations, reset link). QR code optional.
+**Last Updated:** 2025-01-19 — Full feature complete. Player uses playSlug routing with proper error handling.
 
 ### Editor Implementation Status
 - [x] SharePanel with link display
@@ -25,6 +25,13 @@ Share hunts with players via link. Control access with open/invite-only modes.
 - [x] Revoke invitation
 - [x] Reset link with confirmation dialog
 - [ ] QR code (optional, not implemented)
+
+### Player Implementation Status
+- [x] Route changed to `/play/:playSlug`
+- [x] Session storage keyed by playSlug
+- [x] Error handling with ErrorState component
+- [x] NOT_INVITED error code for invite-only access denial
+- [x] User-friendly error messages per error code
 
 ---
 
@@ -73,19 +80,19 @@ sequenceDiagram
     API-->>FE: [BE ✓] { playSlug }
     end
 
-    rect rgb(70, 50, 50)
+    rect rgb(40, 70, 40)
     Note right of U: PLAYER: START SESSION
-    U->>FE: [FE ○] Open /play/{slug}
-    FE->>FE: [FE ○] PlayPage extracts slug
-    FE->>FE: [FE ○] PlayerIdentification form
-    U->>FE: [FE ○] Submit name + email
+    U->>FE: [FE ✓] Open /play/{slug}
+    FE->>FE: [FE ✓] PlayPage extracts slug
+    FE->>FE: [FE ✓] PlayerIdentification form
+    U->>FE: [FE ✓] Submit name + email
     FE->>API: [BE ✓] POST /play/{slug}/start
     Note right of API: PlayService.startSession()
     API->>API: [BE ✓] PlayService.checkAccessMode()
     API->>DB: [BE ✓] SessionManager.createSession()
     API-->>FE: [BE ✓] { sessionId, hunt, currentStepId }
-    FE->>FE: [FE ○] localStorage.set(sessionId)
-    FE->>FE: [FE ○] Render StepRenderer
+    FE->>FE: [FE ✓] localStorage.set(sessionId)
+    FE->>FE: [FE ✓] Render StepRenderer
     end
 ```
 
@@ -103,7 +110,7 @@ flowchart TD
     D -->|yes| OK
     D -->|no| E{isInvitedPlayer?}
     E -->|yes| OK
-    E -->|no| Z[404 Not Found]
+    E -->|no| Z[403 NOT_INVITED]
 
     style OK fill:#2d5a2d,color:#fff
     style Z fill:#5a2d2d,color:#fff
