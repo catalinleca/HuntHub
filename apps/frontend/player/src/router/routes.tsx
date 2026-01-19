@@ -8,7 +8,7 @@ export const routes: RouteObject[] = [
     element: <RootLayout />,
     children: [
       {
-        path: '/play/:huntId',
+        path: '/play/:playSlug',
         element: <PlayPage />,
       },
       {

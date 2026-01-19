@@ -2,8 +2,8 @@ import { useSessionLayer } from './useSessionLayer';
 import { useStepLayer } from './useStepLayer';
 import type { PlaySessionContextValue } from './context';
 
-export const useSessionLogic = (huntId: number): PlaySessionContextValue => {
-  const sessionLayer = useSessionLayer(huntId);
+export const useSessionLogic = (playSlug: string): PlaySessionContextValue => {
+  const sessionLayer = useSessionLayer(playSlug);
   const stepLayer = useStepLayer(sessionLayer.sessionId, sessionLayer.currentStepId);
 
   const hasSession = !!sessionLayer.session;

@@ -3,12 +3,12 @@ import { PlaySessionContext } from './context';
 import { useSessionLogic } from './useSessionLogic';
 
 interface PlaySessionProviderProps {
-  huntId: number;
+  playSlug: string;
   children: ReactNode;
 }
 
-export const PlaySessionProvider = ({ huntId, children }: PlaySessionProviderProps) => {
-  const value = useSessionLogic(huntId);
+export const PlaySessionProvider = ({ playSlug, children }: PlaySessionProviderProps) => {
+  const value = useSessionLogic(playSlug);
 
   return <PlaySessionContext.Provider value={value}>{children}</PlaySessionContext.Provider>;
 };
