@@ -276,9 +276,9 @@ export interface Hunt {
    * Short URL slug for player access (e.g., 'xK9mR3pQ7w')
    * @example "xK9mR3pQ7w"
    */
-  playSlug?: string;
+  playSlug: string;
   /** Access mode for players: open (anyone with link) or invite_only (only invited emails) */
-  accessMode?: HuntAccessMode;
+  accessMode: HuntAccessMode;
   /**
    * Authenticated user's permission level for this hunt (included in user-specific contexts like dashboard)
    * @example "owner"
