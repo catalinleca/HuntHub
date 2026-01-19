@@ -13,6 +13,10 @@
 # If unsure, ask rather than suggest deprecated code.
 # Ignore TODOs
 
+# When possible, create diagrams to explain data flow, decisions and implementations. Let's make it easy to pass context of the feature and code
+# Make sure they work because sometimes the diagram is not visible. Only the 'code' for it
+# One diagram per comment. In case one does not work it is easier to fix it
+
 reviews:
   # Assertive catches more than chill, but we'll tone down instructions
   profile: "assertive"
