@@ -34,6 +34,7 @@ export const useStepProgress = () => {
 };
 
 export const useSessionActions = () => useSessionActionsContext();
+export const useAdvanceToNextStep = () => useSessionActionsContext().advanceToNextStep;
 
 export const usePlaySession = () => ({
   ...useSessionState(),

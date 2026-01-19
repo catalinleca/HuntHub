@@ -35,27 +35,15 @@ export const ApiValidationProvider = ({
   const sessionId = useSessionId();
   const { validate: validateAnswer, isValidating, data, error, reset } = useValidateAnswer();
 
-  const handleValidationSuccess = useCallback(() => {
-    if (showSuccessDialog) {
-      return;
-    }
-
-    onAdvance();
-  }, [showSuccessDialog, onAdvance]);
-
   const validate = useCallback(
     async (answerType: AnswerType, payload: AnswerPayload) => {
       if (!sessionId) {
         return;
       }
 
-      const responseData = await validateAnswer({ sessionId, answerType, payload });
-
-      if (responseData.correct) {
-        handleValidationSuccess();
-      }
+      await validateAnswer({ sessionId, answerType, payload });
     },
-    [sessionId, validateAnswer, handleValidationSuccess],
+    [sessionId, validateAnswer],
   );
 
   const handleDialogContinue = useCallback(() => {
