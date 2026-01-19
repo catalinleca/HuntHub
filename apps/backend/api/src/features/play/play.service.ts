@@ -231,7 +231,10 @@ export class PlayService implements IPlayService {
     );
 
     return withTransaction(async (session) => {
-      const newAttempts = await SessionManager.incrementAttempts(sessionId, progress.currentStepId, session);
+      let newAttempts = currentAttempts;
+      if (!validationResult.isCorrect) {
+        newAttempts = await SessionManager.incrementAttempts(sessionId, progress.currentStepId, session);
+      }
 
       const metadata = {
         ...(validationResult.transcript && { transcript: validationResult.transcript }),
