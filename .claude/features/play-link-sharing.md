@@ -144,7 +144,7 @@ POST /play/{slug}/start { playerName, email? }
    │  ├─ if isCreator → allow
    │  ├─ if hasCollaboratorAccess → allow
    │  ├─ if isInvitedPlayer → allow
-   │  └─ else → 404 Not Found
+   │  └─ else → 403 NOT_INVITED
    │
    ├─ requireHuntVersion(huntId, liveVersion)
    │
@@ -253,15 +253,18 @@ SharePanel
 └── Reset link button (with confirmation)
 ```
 
-### Player: Session Start
+### Player: Session Start (✓ Implemented)
 
 ```
-Current: POST /play/{huntId}/start { playerName }
-New:     POST /play/{slug}/start { playerName, email? }
+Route: /play/:playSlug
+API:   POST /play/{slug}/start { playerName, email? }
 
-- Change route param from huntId to slug
-- Add optional email field to PlayerIdentification
-- Email required only if hunt is invite_only (can show error from 404)
+Implementation:
+- PlayPage extracts playSlug from route params
+- Session storage keyed by playSlug (not numeric huntId)
+- ErrorState component displays user-friendly error messages
+- parseApiError utility validates backend error codes
+- NOT_INVITED (403) shown when user lacks invite-only access
 ```
 
 ---
@@ -287,9 +290,12 @@ New:     POST /play/{slug}/start { playerName, email? }
 - [x] Reset link with confirmation dialog
 - [ ] QR code (optional, not blocking)
 
-### Frontend Player (○ TODO)
-- [ ] Player form shows email when needed
-- [ ] Error handling for 404 on invite-only
+### Frontend Player (✓ Complete)
+- [x] Route changed to `/play/:playSlug`
+- [x] Session storage keyed by playSlug
+- [x] ErrorState component with user-friendly messages
+- [x] NOT_INVITED (403) handling for invite-only access denial
+- [x] Error code validation with parseApiError utility
 
 ---
 
