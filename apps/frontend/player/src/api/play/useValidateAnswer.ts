@@ -1,13 +1,12 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  HuntProgressStatus,
-  type ValidateAnswerResponse,
-  type AnswerType,
-  type AnswerPayload,
-  type SessionResponse,
-} from '@hunthub/shared';
+import { useMutation } from '@tanstack/react-query';
+import type { ValidateAnswerResponse, AnswerType, AnswerPayload } from '@hunthub/shared';
 import { httpClient } from '@/services/http-client';
-import { playKeys } from './keys';
+
+interface ValidateParams {
+  sessionId: string;
+  answerType: AnswerType;
+  payload: AnswerPayload;
+}
 
 const validateAnswer = async (
   sessionId: string,
@@ -21,44 +20,11 @@ const validateAnswer = async (
   return data;
 };
 
-interface ValidateParams {
-  sessionId: string;
-  answerType: AnswerType;
-  payload: AnswerPayload;
-  nextStepId: number | null;
-}
-
 export const useValidateAnswer = () => {
-  const queryClient = useQueryClient();
-
   const mutation = useMutation({
     mutationFn: (params: ValidateParams): Promise<ValidateAnswerResponse> =>
       validateAnswer(params.sessionId, params.answerType, params.payload),
   });
-
-  const advanceToNextStep = (sessionId: string, nextStepId: number | null, isComplete: boolean) => {
-    queryClient.setQueryData<SessionResponse>(playKeys.session(sessionId), (old) => {
-      if (!old) return old;
-
-      if (isComplete) {
-        return {
-          ...old,
-          status: HuntProgressStatus.Completed,
-          currentStepId: null,
-        };
-      }
-
-      if (nextStepId === null) {
-        return old;
-      }
-
-      return {
-        ...old,
-        currentStepIndex: old.currentStepIndex + 1,
-        currentStepId: nextStepId,
-      };
-    });
-  };
 
   return {
     validate: mutation.mutateAsync,
@@ -66,6 +32,5 @@ export const useValidateAnswer = () => {
     data: mutation.data,
     error: mutation.error,
     reset: mutation.reset,
-    advanceToNextStep,
   };
 };

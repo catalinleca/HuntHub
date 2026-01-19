@@ -1,7 +1,17 @@
 import { useParams } from 'react-router-dom';
 import { Typography, CircularProgress } from '@mui/material';
 import { ChallengeType } from '@hunthub/shared';
-import { PlaySessionProvider, usePlaySession, ApiValidationProvider } from '@/context';
+import {
+  PlaySessionProvider,
+  useSessionStatus,
+  useSessionError,
+  useSessionActions,
+  useCurrentStep,
+  useHuntMeta,
+  useIsLastStep,
+  useStepProgress,
+  ApiValidationProvider,
+} from '@/context';
 import { parseApiError, ErrorCode } from '@/utils';
 import { PlayerIdentification } from './components/PlayerIdentification';
 import { StepRenderer } from './components/StepRenderer';
@@ -32,67 +42,57 @@ const defaultErrorContent = {
   description: 'Please try again.',
 };
 
-const PlayPageContent = () => {
-  const {
-    isLoading,
-    error,
-    isComplete,
-    hasSession,
-    sessionId,
-    huntMeta,
-    currentStep,
-    currentStepIndex,
-    totalSteps,
-    isLastStep,
-    startSession,
-    nextStepId,
-  } = usePlaySession();
+const LoadingView = () => (
+  <S.Container>
+    <CircularProgress />
+  </S.Container>
+);
 
-  if (error) {
-    const { code } = parseApiError(error);
-    const content = playErrorContent[code] || defaultErrorContent;
-    const isRecoverable = code === ErrorCode.NETWORK_ERROR;
+const ErrorView = () => {
+  const error = useSessionError();
+  const { code } = parseApiError(error);
+  const content = playErrorContent[code] || defaultErrorContent;
+  const isRecoverable = code === ErrorCode.NETWORK_ERROR;
 
-    return (
-      <ErrorState
-        title={content.title}
-        description={content.description}
-        onRetry={isRecoverable ? () => window.location.reload() : undefined}
-      />
-    );
-  }
+  return (
+    <ErrorState
+      title={content.title}
+      description={content.description}
+      onRetry={isRecoverable ? () => window.location.reload() : undefined}
+    />
+  );
+};
 
-  if (isLoading) {
-    return (
-      <S.Container>
-        <CircularProgress />
-      </S.Container>
-    );
-  }
+const IdentifyingView = () => {
+  const { startSession } = useSessionActions();
 
-  if (!hasSession) {
-    return (
-      <S.Container>
-        <PlayerIdentification onSubmit={startSession} isLoading={isLoading} />
-      </S.Container>
-    );
-  }
+  return (
+    <S.Container>
+      <PlayerIdentification onSubmit={startSession} isLoading={false} />
+    </S.Container>
+  );
+};
 
-  if (isComplete) {
-    return (
-      <S.Container>
-        <Typography variant="h4">Hunt Complete!</Typography>
-        <Typography color="text.secondary">Congratulations on finishing {huntMeta?.name}</Typography>
-      </S.Container>
-    );
-  }
+const CompletedView = () => {
+  const huntMeta = useHuntMeta();
+
+  return (
+    <S.Container>
+      <Typography variant="h4">Hunt Complete!</Typography>
+      <Typography color="text.secondary">Congratulations on finishing {huntMeta?.name}</Typography>
+    </S.Container>
+  );
+};
+
+const PlayingView = () => {
+  const currentStep = useCurrentStep();
+  const huntMeta = useHuntMeta();
+  const isLastStep = useIsLastStep();
+  const { currentStepIndex, totalSteps } = useStepProgress();
+  const { advanceToNextStep } = useSessionActions();
 
   if (!currentStep) {
-    return (
-      <S.Container>
-        <Typography>Loading step...</Typography>
-      </S.Container>
-    );
+    return <LoadingView />;
   }
 
   return (
@@ -107,8 +107,7 @@ const PlayPageContent = () => {
       <S.Content>
         <ApiValidationProvider
           key={currentStep.stepId}
-          sessionId={sessionId!}
-          nextStepId={nextStepId}
+          onAdvance={advanceToNextStep}
           showSuccessDialog={currentStep.type === ChallengeType.Task || currentStep.type === ChallengeType.Mission}
         >
           <StepRenderer step={currentStep} isLastStep={isLastStep} />
@@ -116,6 +115,23 @@ const PlayPageContent = () => {
       </S.Content>
     </S.Container>
   );
+};
+
+const PlayPageContent = () => {
+  const status = useSessionStatus();
+
+  switch (status) {
+    case 'loading':
+      return <LoadingView />;
+    case 'error':
+      return <ErrorView />;
+    case 'identifying':
+      return <IdentifyingView />;
+    case 'completed':
+      return <CompletedView />;
+    case 'playing':
+      return <PlayingView />;
+  }
 };
 
 export const PlayPage = () => {
