@@ -21,6 +21,7 @@ export const EditorPreviewSessionProvider = ({ children, previewHint }: EditorPr
       totalSteps: 0,
       isLastStep: false,
       previewHint,
+      stepPlayProgress: null,
     }),
     [previewHint],
   );

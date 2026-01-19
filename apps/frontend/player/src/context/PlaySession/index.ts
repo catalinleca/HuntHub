@@ -10,10 +10,11 @@ export {
   useIsLastStep,
   usePreviewHint,
   useStepProgress,
+  useStepPlayProgress,
   useSessionActions,
   useAdvanceToNextStep,
   usePlaySession,
 } from './hooks';
 
 export { SessionStatus } from './SessionContexts';
-export type { SessionState, SessionActions } from './SessionContexts';
+export type { SessionState, SessionActions, StepPlayProgress } from './SessionContexts';

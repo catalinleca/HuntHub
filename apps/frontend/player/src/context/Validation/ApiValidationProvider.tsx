@@ -1,7 +1,7 @@
 import { useCallback, type ReactNode } from 'react';
 import type { AnswerType, AnswerPayload, ValidateAnswerResponse } from '@hunthub/shared';
 import { useValidateAnswer } from '@/api';
-import { useSessionId } from '@/context';
+import { useSessionId, useStepPlayProgress } from '@/context';
 import { useStableWhileLoading } from '@/hooks';
 import { ValidationContext } from './ValidationContext';
 import { SuccessDialog } from './SuccessDialog';
@@ -28,6 +28,8 @@ export const ApiValidationProvider = ({
   children,
 }: ApiValidationProviderProps) => {
   const sessionId = useSessionId();
+  const stepPlayProgress = useStepPlayProgress();
+  const initialAttempts = stepPlayProgress?.attempts ?? 0;
   const { validate: validateAnswer, isValidating, data, error, reset } = useValidateAnswer();
 
   const validate = useCallback(
@@ -54,7 +56,7 @@ export const ApiValidationProvider = ({
   const dialogFeedback = getFeedback(data);
   const currentFeedback = error ? 'Something went wrong. Please try again.' : dialogOpen ? null : dialogFeedback;
 
-  const attemptCount = useStableWhileLoading(currentAttemptCount, isValidating, (v) => v > 0);
+  const attemptCount = useStableWhileLoading(currentAttemptCount || initialAttempts, isValidating, (v) => v > 0);
   const feedback = useStableWhileLoading(currentFeedback, isValidating, (v) => v !== null);
 
   return (

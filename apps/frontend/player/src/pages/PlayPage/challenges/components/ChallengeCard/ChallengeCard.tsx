@@ -14,7 +14,7 @@ import { MediaType } from '@hunthub/shared';
 import type { Media } from '@hunthub/shared';
 import type { BadgeConfig } from '@/constants';
 import { MediaDisplay } from '@/components/media';
-import { useSessionActions } from '@/context';
+import { useSessionActions, useStepPlayProgress } from '@/context';
 import { useIsCorrect } from '@/context/Validation';
 import { TypeBadge, BadgeContainer } from '../TypeBadge';
 import { HintSection } from '../HintSection';
@@ -24,6 +24,16 @@ import { FeedbackDisplay } from '../FeedbackDisplay';
 import * as S from './ChallengeCard.styles';
 
 const BORDERED_MEDIA_TYPES: MediaType[] = [MediaType.Image, MediaType.Video, MediaType.ImageAudio];
+
+const calculateRemainingSeconds = (timeLimit: number, startedAt: string | null): number => {
+  if (!startedAt) {
+    return timeLimit;
+  }
+
+  const elapsedMs = Date.now() - new Date(startedAt).getTime();
+  const elapsedSeconds = Math.floor(elapsedMs / 1000);
+  return Math.max(0, timeLimit - elapsedSeconds);
+};
 
 interface ChallengeCardProps {
   children?: React.ReactNode;
@@ -59,6 +69,9 @@ export const ChallengeCard = ({
   const { abandonSession } = useSessionActions();
   const [showAbandonDialog, setShowAbandonDialog] = useState(false);
   const isCorrect = useIsCorrect();
+  const stepPlayProgress = useStepPlayProgress();
+
+  const remainingSeconds = timeLimit ? calculateRemainingSeconds(timeLimit, stepPlayProgress?.startedAt ?? null) : null;
 
   const hasIndicators = timeLimit || maxAttempts;
   const hasMedia = !!media;
@@ -74,7 +87,9 @@ export const ChallengeCard = ({
         </IconButton>
         {hasIndicators && (
           <Stack direction="row" gap={1}>
-            {timeLimit && <TimeLimit seconds={timeLimit} onExpire={onTimeExpire} />}
+            {remainingSeconds !== null && remainingSeconds > 0 && (
+              <TimeLimit seconds={remainingSeconds} onExpire={onTimeExpire} />
+            )}
             {maxAttempts && (
               <AttemptsCounter current={currentAttempts} max={maxAttempts} onMaxAttempts={onMaxAttempts} />
             )}

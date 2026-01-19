@@ -1598,6 +1598,11 @@ components:
         maxHints:
           type: integer
           description: Maximum hints available per step
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the player started this step (null if step not started yet)
         _links:
           $ref: '#/components/schemas/StepLinks'
       required:
@@ -1608,6 +1613,7 @@ components:
         - maxAttempts
         - hintsUsed
         - maxHints
+        - startedAt
         - _links
       additionalProperties: false
 
