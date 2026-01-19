@@ -29,7 +29,6 @@ export const useValidation = (): ValidationContextValue => {
   return context;
 };
 
-// Selectors
 export const useIsCorrect = () => useValidation().isCorrect;
 export const useIsValidating = () => useValidation().isValidating;
 export const useFeedback = () => useValidation().feedback;

@@ -60,7 +60,6 @@ export const ApiValidationProvider = ({
   const dialogFeedback = getFeedback(data);
   const currentFeedback = error ? 'Something went wrong. Please try again.' : dialogOpen ? null : dialogFeedback;
 
-  // Persist feedback during loading so it doesn't flicker
   if (!isValidating && currentFeedback !== null) {
     lastFeedbackRef.current = currentFeedback;
   }
