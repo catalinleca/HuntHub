@@ -59,8 +59,6 @@ export const QuizChallenge = ({
       maxAttempts={maxAttempts}
       currentAttempts={currentAttempts}
       feedback={feedback}
-      onTimeExpire={handleSubmit}
-      onMaxAttempts={handleSubmit}
       showHint={hasHint}
       footer={
         <ActionButton

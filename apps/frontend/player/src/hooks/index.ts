@@ -1,6 +1,8 @@
 export { usePreviewCore, playerMessages, sendToEditor, PLAYER_MESSAGES, EDITOR_MESSAGES } from './preview';
 export type { PlayerToEditorMessage, EditorToPlayerMessage } from './preview';
 
+export { useStableWhileLoading } from './useStableWhileLoading';
+
 export { useGeolocation } from './useGeolocation';
 export type { UseGeolocationReturn } from './useGeolocation';
 

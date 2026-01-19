@@ -1,7 +1,8 @@
-import { useCallback, useRef, type ReactNode } from 'react';
+import { useCallback, type ReactNode } from 'react';
 import type { AnswerType, AnswerPayload, ValidateAnswerResponse } from '@hunthub/shared';
 import { useValidateAnswer } from '@/api';
 import { useSessionId } from '@/context';
+import { useStableWhileLoading } from '@/hooks';
 import { ValidationContext } from './ValidationContext';
 import { SuccessDialog } from './SuccessDialog';
 
@@ -28,7 +29,6 @@ export const ApiValidationProvider = ({
 }: ApiValidationProviderProps) => {
   const sessionId = useSessionId();
   const { validate: validateAnswer, isValidating, data, error, reset } = useValidateAnswer();
-  const lastFeedbackRef = useRef<string | null>(null);
 
   const validate = useCallback(
     async (answerType: AnswerType, payload: AnswerPayload) => {
@@ -46,7 +46,7 @@ export const ApiValidationProvider = ({
   }, [onAdvance]);
 
   const isCorrect = error ? false : (data?.correct ?? null);
-  const attemptCount = data?.attempts ?? 0;
+  const currentAttemptCount = data?.attempts ?? 0;
   const isExpired = data?.expired ?? false;
   const isExhausted = data?.exhausted ?? false;
 
@@ -54,10 +54,8 @@ export const ApiValidationProvider = ({
   const dialogFeedback = getFeedback(data);
   const currentFeedback = error ? 'Something went wrong. Please try again.' : dialogOpen ? null : dialogFeedback;
 
-  if (!isValidating && currentFeedback !== null) {
-    lastFeedbackRef.current = currentFeedback;
-  }
-  const feedback = isValidating ? lastFeedbackRef.current : currentFeedback;
+  const attemptCount = useStableWhileLoading(currentAttemptCount, isValidating, (v) => v > 0);
+  const feedback = useStableWhileLoading(currentFeedback, isValidating, (v) => v !== null);
 
   return (
     <ValidationContext.Provider
