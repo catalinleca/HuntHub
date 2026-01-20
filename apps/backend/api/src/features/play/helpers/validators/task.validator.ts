@@ -28,9 +28,11 @@ export const TaskValidator: IAnswerValidator = {
     }
 
     try {
+      console.log('===task: ', task);
       const aiService = container.get<IAIValidationService>(TYPES.AIValidationService);
       const result = await aiService.validateTaskResponse(response, task.instructions, task.aiInstructions);
 
+      console.log('===result: ', result);
       return {
         isCorrect: result.isCorrect,
         feedback: result.feedback,

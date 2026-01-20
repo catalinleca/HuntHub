@@ -8,5 +8,8 @@ export { ConflictError } from './ConflictError';
 export { FirebaseAuthError } from './FirebaseAuthError';
 export { InternalServerError } from './InternalServerError';
 export { DataIntegrityError } from './DataIntegrityError';
+export { RateLimitError } from './RateLimitError';
+export { ServiceUnavailableError } from './ServiceUnavailableError';
+export { GenerationError } from './GenerationError';
 export { ErrorCode } from './error-codes';
 export { handleWithFirebaseError } from './handleFirebaseCall';
