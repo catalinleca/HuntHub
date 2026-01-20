@@ -2,10 +2,6 @@ import { useMutation } from '@tanstack/react-query';
 import type { NavigateRequest, NavigateResponse } from '@hunthub/shared';
 import { httpClient } from '@/services/http-client';
 
-interface NavigateParams extends NavigateRequest {
-  sessionId: string;
-}
-
 const navigateToStep = async (sessionId: string, stepId: number): Promise<NavigateResponse> => {
   const { data } = await httpClient.post<NavigateResponse>(`/play/sessions/${sessionId}/navigate`, {
     stepId,
@@ -15,7 +11,8 @@ const navigateToStep = async (sessionId: string, stepId: number): Promise<Naviga
 
 export const useNavigateToStep = () => {
   const mutation = useMutation({
-    mutationFn: (params: NavigateParams): Promise<NavigateResponse> => navigateToStep(params.sessionId, params.stepId),
+    mutationFn: (params: NavigateRequest & { sessionId: string }): Promise<NavigateResponse> =>
+      navigateToStep(params.sessionId, params.stepId),
   });
 
   return {
