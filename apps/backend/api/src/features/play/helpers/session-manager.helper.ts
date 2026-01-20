@@ -273,6 +273,7 @@ export class SessionManager {
   /**
    * Navigate to any step in the hunt (preview mode only).
    * Initializes step progress if visiting a new step.
+   * Uses aggregation pipeline for atomic conditional push (prevents duplicates on concurrent requests).
    */
   static async navigateToStep(
     sessionId: string,
@@ -284,29 +285,32 @@ export class SessionManager {
       throw new NotFoundError('Step not found in hunt');
     }
 
-    const progress = await this.requireSession(sessionId);
+    const newStepProgress: IStepProgress = {
+      stepId,
+      attempts: 0,
+      completed: false,
+      responses: [],
+      startedAt: new Date(),
+      hintsUsed: 0,
+    };
 
-    const existingStepProgress = progress.steps?.find((sp) => sp.stepId === stepId);
-
-    if (existingStepProgress) {
-      await ProgressModel.updateOne({ sessionId }, { $set: { currentStepId: stepId } });
-    } else {
-      const newStepProgress: IStepProgress = {
-        stepId,
-        attempts: 0,
-        completed: false,
-        responses: [],
-        startedAt: new Date(),
-        hintsUsed: 0,
-      };
-
-      await ProgressModel.updateOne(
-        { sessionId },
-        {
-          $set: { currentStepId: stepId },
-          $push: { steps: newStepProgress },
+    const result = await ProgressModel.updateOne({ sessionId }, [
+      { $set: { currentStepId: stepId } },
+      {
+        $set: {
+          steps: {
+            $cond: {
+              if: { $in: [stepId, '$steps.stepId'] },
+              then: '$steps',
+              else: { $concatArrays: ['$steps', [newStepProgress]] },
+            },
+          },
         },
-      );
+      },
+    ]);
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError('Session not found');
     }
 
     return { currentStepId: stepId, currentStepIndex: stepIndex };
