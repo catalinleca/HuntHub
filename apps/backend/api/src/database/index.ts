@@ -1,6 +1,7 @@
 import 'dotenv';
 import mongoose from 'mongoose';
 import { logger } from '@/utils/logger';
+import CounterModel from './models/Counter';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function baseTransform(_: unknown, ret: any) {
@@ -21,6 +22,19 @@ function baseTransform(_: unknown, ret: any) {
   };
 }
 
+const COUNTER_DEFAULTS = [
+  { name: 'hunt', seq: 999 },
+  { name: 'step', seq: 9999 },
+  { name: 'asset', seq: 99999 },
+];
+
+async function ensureCounters(): Promise<void> {
+  for (const counter of COUNTER_DEFAULTS) {
+    await CounterModel.updateOne({ name: counter.name }, { $setOnInsert: counter }, { upsert: true });
+  }
+  logger.info('Counters initialized');
+}
+
 export default async function mustConnectDb(connectionURI: string) {
   try {
     await mongoose.connect(connectionURI);
@@ -29,6 +43,8 @@ export default async function mustConnectDb(connectionURI: string) {
     });
 
     logger.info('Connected to MongoDB');
+
+    await ensureCounters();
   } catch (err) {
     logger.error({ err }, 'MongoDB connection failed');
     process.exit(1);
