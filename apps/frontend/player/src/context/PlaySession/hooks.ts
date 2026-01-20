@@ -30,7 +30,7 @@ export const useHuntMeta = () => useSessionState().huntMeta;
 export const useIsLastStep = () => useSessionState().isLastStep;
 export const usePreviewHint = () => useSessionState().previewHint;
 export const useIsPreview = () => useSessionState().isPreview ?? false;
-export const useStepOrder = () => useSessionState().stepOrder;
+export const useStepOrder = () => useSessionState().stepOrder ?? [];
 
 export const useStepResponse = () => useSessionState().stepResponse;
 export const useCurrentStep = () => useSessionState().stepResponse?.step ?? null;
