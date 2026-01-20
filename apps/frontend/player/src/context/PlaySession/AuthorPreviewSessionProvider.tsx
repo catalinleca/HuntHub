@@ -90,19 +90,23 @@ export const AuthorPreviewSessionProvider = ({ previewToken, children }: AuthorP
           return;
         }
 
-        const result = await navigateToStepMutate({ sessionId: currentSessionId, stepId });
+        try {
+          const result = await navigateToStepMutate({ sessionId: currentSessionId, stepId });
 
-        queryClient.setQueryData<PreviewSessionResponse>(playKeys.previewSession(previewToken), (old) => {
-          if (!old) {
-            return old;
-          }
+          queryClient.setQueryData<PreviewSessionResponse>(playKeys.previewSession(previewToken), (old) => {
+            if (!old) {
+              return old;
+            }
 
-          return {
-            ...old,
-            currentStepIndex: result.currentStepIndex,
-            currentStepId: result.currentStepId,
-          };
-        });
+            return {
+              ...old,
+              currentStepIndex: result.currentStepIndex,
+              currentStepId: result.currentStepId,
+            };
+          });
+        } catch (err) {
+          console.error('Failed to navigate to step:', err);
+        }
       },
       navigateNext: async () => {
         const stepOrder = stepOrderRef.current;
@@ -119,19 +123,23 @@ export const AuthorPreviewSessionProvider = ({ previewToken, children }: AuthorP
           return;
         }
 
-        const result = await navigateToStepMutate({ sessionId: currentSessionId, stepId: nextStepId });
+        try {
+          const result = await navigateToStepMutate({ sessionId: currentSessionId, stepId: nextStepId });
 
-        queryClient.setQueryData<PreviewSessionResponse>(playKeys.previewSession(previewToken), (old) => {
-          if (!old) {
-            return old;
-          }
+          queryClient.setQueryData<PreviewSessionResponse>(playKeys.previewSession(previewToken), (old) => {
+            if (!old) {
+              return old;
+            }
 
-          return {
-            ...old,
-            currentStepIndex: result.currentStepIndex,
-            currentStepId: result.currentStepId,
-          };
-        });
+            return {
+              ...old,
+              currentStepIndex: result.currentStepIndex,
+              currentStepId: result.currentStepId,
+            };
+          });
+        } catch (err) {
+          console.error('Failed to navigate to next step:', err);
+        }
       },
       navigatePrev: async () => {
         const stepOrder = stepOrderRef.current;
@@ -148,19 +156,23 @@ export const AuthorPreviewSessionProvider = ({ previewToken, children }: AuthorP
           return;
         }
 
-        const result = await navigateToStepMutate({ sessionId: currentSessionId, stepId: prevStepId });
+        try {
+          const result = await navigateToStepMutate({ sessionId: currentSessionId, stepId: prevStepId });
 
-        queryClient.setQueryData<PreviewSessionResponse>(playKeys.previewSession(previewToken), (old) => {
-          if (!old) {
-            return old;
-          }
+          queryClient.setQueryData<PreviewSessionResponse>(playKeys.previewSession(previewToken), (old) => {
+            if (!old) {
+              return old;
+            }
 
-          return {
-            ...old,
-            currentStepIndex: result.currentStepIndex,
-            currentStepId: result.currentStepId,
-          };
-        });
+            return {
+              ...old,
+              currentStepIndex: result.currentStepIndex,
+              currentStepId: result.currentStepId,
+            };
+          });
+        } catch (err) {
+          console.error('Failed to navigate to previous step:', err);
+        }
       },
     }),
     [previewToken, queryClient, navigateToStepMutate],
