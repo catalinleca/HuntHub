@@ -60,17 +60,8 @@ export const PlaySessionProvider = ({ playSlug, children }: PlaySessionProviderP
       error,
       sessionId: session?.sessionId ?? null,
       huntMeta: session?.hunt ?? null,
-      currentStep: stepQuery.data?.step ?? null,
-      currentStepIndex: session?.currentStepIndex ?? 0,
-      totalSteps: session?.totalSteps ?? 0,
-      isLastStep: !!session && nextStepId === null && !!stepQuery.data?.step,
-      stepPlayProgress: stepQuery.data
-        ? {
-            attempts: stepQuery.data.attempts,
-            hintsUsed: stepQuery.data.hintsUsed,
-            startedAt: stepQuery.data.startedAt ?? null,
-          }
-        : null,
+      stepResponse: stepQuery.data ?? null,
+      isLastStep: !!session && nextStepId === null && !!stepQuery.data,
     }),
     [status, error, session, stepQuery.data, nextStepId],
   );

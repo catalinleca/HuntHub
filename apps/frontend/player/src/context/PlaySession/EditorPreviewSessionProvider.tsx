@@ -16,12 +16,9 @@ export const EditorPreviewSessionProvider = ({ children, previewHint }: EditorPr
       error: null,
       sessionId: null,
       huntMeta: null,
-      currentStep: null,
-      currentStepIndex: 0,
-      totalSteps: 0,
+      stepResponse: null,
       isLastStep: false,
       previewHint,
-      stepPlayProgress: null,
     }),
     [previewHint],
   );

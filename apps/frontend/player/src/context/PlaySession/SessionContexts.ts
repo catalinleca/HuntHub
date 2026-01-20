@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import type { StepPF, HuntMetaPF } from '@hunthub/shared';
+import type { StepResponse, HuntMetaPF } from '@hunthub/shared';
 
 export const SessionStatus = {
   Loading: 'loading',
@@ -11,23 +11,14 @@ export const SessionStatus = {
 
 export type SessionStatus = (typeof SessionStatus)[keyof typeof SessionStatus];
 
-export interface StepPlayProgress {
-  attempts: number;
-  hintsUsed: number;
-  startedAt: string | null;
-}
-
 export interface SessionState {
   status: SessionStatus;
   error: Error | null;
   sessionId: string | null;
   huntMeta: HuntMetaPF | null;
-  currentStep: StepPF | null;
-  currentStepIndex: number;
-  totalSteps: number;
+  stepResponse: StepResponse | null;
   isLastStep: boolean;
   previewHint?: string;
-  stepPlayProgress: StepPlayProgress | null;
 }
 
 export interface SessionActions {

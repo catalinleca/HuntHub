@@ -9,6 +9,7 @@ export {
   useHuntMeta,
   useIsLastStep,
   usePreviewHint,
+  useStepResponse,
   useStepProgress,
   useStepPlayProgress,
   useSessionActions,
@@ -17,4 +18,5 @@ export {
 } from './hooks';
 
 export { SessionStatus } from './SessionContexts';
-export type { SessionState, SessionActions, StepPlayProgress } from './SessionContexts';
+export type { SessionState, SessionActions } from './SessionContexts';
+export type { StepPlayProgress } from './hooks';

@@ -20,8 +20,8 @@ Manages player session state, step navigation, and data flow in the Player app.
 │                        React Query                               │
 │  Source of truth for server data                                │
 │                                                                  │
-│  • useGetSession(sessionId) → session data                      │
-│  • useStep(sessionId, stepId) → step data + _links              │
+│  • useGetSession(sessionId) → SessionResponse                   │
+│  • useStep(sessionId, stepId) → StepResponse (pass-through)     │
 │  • useStartSession(playSlug) → mutation                         │
 │  • usePrefetchStep(sessionId, nextStepId) → cache warming       │
 └─────────────────────────────────────────────────────────────────┘
@@ -33,8 +33,9 @@ Manages player session state, step navigation, and data flow in the Player app.
 │                                                                  │
 │  1. Calls React Query hooks                                     │
 │  2. Derives status from query states                            │
-│  3. Creates stable action functions (via refs)                  │
-│  4. Provides two contexts:                                      │
+│  3. Passes stepResponse through (no transformation)             │
+│  4. Creates stable action functions (via refs)                  │
+│  5. Provides two contexts:                                      │
 │     • SessionStateContext (changes on data updates)             │
 │     • SessionActionsContext (stable, never changes)             │
 └─────────────────────────────────────────────────────────────────┘
@@ -48,11 +49,23 @@ Manages player session state, step navigation, and data flow in the Player app.
 │  • error              │   │  • abandonSession()  │
 │  • sessionId          │   │  • advanceToNextStep()│
 │  • huntMeta           │   │                       │
-│  • currentStep        │   │  (Memoized, stable)  │
-│  • currentStepIndex   │   │                       │
-│  • totalSteps         │   │                       │
+│  • stepResponse ←─────│   │  (Memoized, stable)  │
 │  • isLastStep         │   │                       │
+│                       │   │                       │
+│  (stepResponse is     │   │                       │
+│   React Query stable  │   │                       │
+│   reference)          │   │                       │
 └───────────────────────┘   └───────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      Selector Hooks                              │
+│  Derive specific data from stepResponse                         │
+│                                                                  │
+│  • useCurrentStep() → stepResponse?.step                        │
+│  • useStepProgress() → { stepIndex, totalSteps, isLastStep }    │
+│  • useStepPlayProgress() → { attempts, hintsUsed, startedAt }   │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -92,13 +105,17 @@ Components subscribe only to what they need:
 | `useSessionId()` | `string \| null` | API calls, upload hooks |
 | `useSessionStatus()` | `SessionStatus` | Status-based rendering |
 | `useSessionError()` | `Error \| null` | Error display |
-| `useCurrentStep()` | `StepPF \| null` | Step rendering |
 | `useHuntMeta()` | `HuntMetaPF \| null` | Hunt name display |
 | `useIsLastStep()` | `boolean` | "Finish" vs "Continue" button |
+| `useStepResponse()` | `StepResponse \| null` | Raw step data (stable ref) |
+| `useCurrentStep()` | `StepPF \| null` | Step rendering |
 | `useStepProgress()` | `{ currentStepIndex, totalSteps, isLastStep }` | Progress display |
+| `useStepPlayProgress()` | `StepPlayProgress \| null` | Time/attempts on resume |
 | `useSessionActions()` | `{ startSession, abandonSession, advanceToNextStep }` | User actions |
 | `usePreviewHint()` | `string \| undefined` | Editor preview mode |
 | `usePlaySession()` | All state + actions | When you need everything |
+
+**Note:** `useStepProgress()` and `useStepPlayProgress()` create new objects on each call. Components typically destructure immediately, so this is fine. If stable references are needed, use `useMemo` in the consumer.
 
 ---
 
