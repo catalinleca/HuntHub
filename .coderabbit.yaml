@@ -22,7 +22,7 @@ reviews:
 
         IGNORE: TODO comments - do not flag them.
 
-        REUSE PATTERNS: Check existing patterns in codebase before suggesting new approaches.
+        REUSE EXISTING CODE: Before suggesting fixes, search the codebase for existing utilities, helpers, or patterns that solve the same problem. Suggest reusing them instead of writing new code.
 
         Focus on actual bugs and security issues:
         - SQL injection risks (string concatenation in queries)
@@ -50,7 +50,7 @@ reviews:
 
         IGNORE: TODO comments - do not flag them.
 
-        REUSE PATTERNS: Check existing patterns in codebase before suggesting new approaches.
+        REUSE EXISTING CODE: Before suggesting fixes, search the codebase for existing utilities, helpers, or patterns that solve the same problem. Suggest reusing them instead of writing new code.
 
         Focus on actual bugs:
         - Missing useEffect dependencies causing stale data
@@ -78,7 +78,7 @@ reviews:
 
         IGNORE: TODO comments - do not flag them.
 
-        REUSE PATTERNS: Check existing patterns in codebase before suggesting new approaches.
+        REUSE EXISTING CODE: Before suggesting fixes, search the codebase for existing utilities, helpers, or patterns that solve the same problem. Suggest reusing them instead of writing new code.
 
         Focus on:
         - Type mismatches that will cause runtime errors
