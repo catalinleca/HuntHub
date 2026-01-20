@@ -100,6 +100,12 @@ export const MissionMediaValidator: IAnswerValidator = {
     }
 
     if (!aiMediaType) {
+      if (hasAiInstructions) {
+        return {
+          isCorrect: false,
+          feedback: 'This media type cannot be validated. Please upload an image or audio file.',
+        };
+      }
       return { isCorrect: true, feedback: 'Media received!' };
     }
 
