@@ -33,6 +33,8 @@ export const useStepProgress = () => {
   return { currentStepIndex, totalSteps, isLastStep };
 };
 
+export const useStepPlayProgress = () => useSessionState().stepPlayProgress;
+
 export const useSessionActions = () => useSessionActionsContext();
 export const useAdvanceToNextStep = () => useSessionActionsContext().advanceToNextStep;
 

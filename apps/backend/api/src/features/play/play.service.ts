@@ -382,6 +382,7 @@ export class PlayService implements IPlayService {
       maxAttempts: step.maxAttempts ?? null,
       hintsUsed: stepProgress?.hintsUsed ?? 0,
       maxHints: 1,
+      startedAt: stepProgress?.startedAt?.toISOString() ?? null,
       _links: {
         self: { href: `/api/play/sessions/${sessionId}/step/${step.stepId}` },
         ...(nextStepId !== null && { next: { href: `/api/play/sessions/${sessionId}/step/${nextStepId}` } }),

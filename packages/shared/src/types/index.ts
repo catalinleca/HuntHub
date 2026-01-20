@@ -1083,6 +1083,11 @@ export interface StepResponse {
   hintsUsed: number;
   /** Maximum hints available per step */
   maxHints: number;
+  /**
+   * When the player started this step (null if step not started yet)
+   * @format date-time
+   */
+  startedAt: string | null;
   /** HATEOAS links for step navigation */
   _links: StepLinks;
 }

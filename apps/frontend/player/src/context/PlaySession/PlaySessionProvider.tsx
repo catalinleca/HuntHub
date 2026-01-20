@@ -64,6 +64,13 @@ export const PlaySessionProvider = ({ playSlug, children }: PlaySessionProviderP
       currentStepIndex: session?.currentStepIndex ?? 0,
       totalSteps: session?.totalSteps ?? 0,
       isLastStep: !!session && nextStepId === null && !!stepQuery.data?.step,
+      stepPlayProgress: stepQuery.data
+        ? {
+            attempts: stepQuery.data.attempts,
+            hintsUsed: stepQuery.data.hintsUsed,
+            startedAt: stepQuery.data.startedAt ?? null,
+          }
+        : null,
     }),
     [status, error, session, stepQuery.data, nextStepId],
   );

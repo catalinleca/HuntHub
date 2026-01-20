@@ -11,6 +11,12 @@ export const SessionStatus = {
 
 export type SessionStatus = (typeof SessionStatus)[keyof typeof SessionStatus];
 
+export interface StepPlayProgress {
+  attempts: number;
+  hintsUsed: number;
+  startedAt: string | null;
+}
+
 export interface SessionState {
   status: SessionStatus;
   error: Error | null;
@@ -21,6 +27,7 @@ export interface SessionState {
   totalSteps: number;
   isLastStep: boolean;
   previewHint?: string;
+  stepPlayProgress: StepPlayProgress | null;
 }
 
 export interface SessionActions {

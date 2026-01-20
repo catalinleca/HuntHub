@@ -441,6 +441,7 @@ export const StepResponse = z
     maxAttempts: z.number().int().nullable(),
     hintsUsed: z.number().int(),
     maxHints: z.number().int(),
+    startedAt: z.string().datetime({ offset: true }).nullable(),
     _links: StepLinks,
   })
   .strict();
