@@ -11,10 +11,10 @@ Enable content authors to preview their hunt in the production player environmen
 | Layer | Status |
 |-------|--------|
 | Backend | ✓ Implemented |
-| Frontend (Editor) | ○ Planned |
+| Frontend (Editor) | ✓ Implemented |
 | Frontend (Player) | ○ Planned |
 
-**Last Updated:** 2025-01-20 — Backend implementation complete.
+**Last Updated:** 2025-01-20 — Editor implementation complete.
 
 ### Backend Implementation Status
 - [x] Add `isPreview` field to Progress model
@@ -25,8 +25,8 @@ Enable content authors to preview their hunt in the production player environmen
 - [x] Routes added (GET /hunts/:id/preview-link, POST /play/preview/start, POST /sessions/:id/navigate)
 
 ### Editor Implementation Status
-- [ ] useGetPreviewLink hook
-- [ ] "Preview as Player" button in SharePanel/LinkSection
+- [x] useGetPreviewLink hook (`apps/frontend/editor/src/api/Hunt/sharing/getPreviewLink.ts`)
+- [x] "Preview Hunt" dropdown in HuntPreview component (content preview area)
 
 ### Player Implementation Status
 - [ ] `/play/preview` route
@@ -49,13 +49,13 @@ sequenceDiagram
 
     rect rgb(70, 70, 40)
     Note right of U: EDITOR: GENERATE PREVIEW LINK
-    U->>FE: [FE ○] Click "Preview as Player"
+    U->>FE: [FE ✓] Click "Preview Hunt" dropdown
     FE->>API: [BE ✓] GET /hunts/:id/preview-link
     Note right of API: PreviewService.generatePreviewLink()
     API->>API: [BE ✓] Validate View permission
     API->>API: [BE ✓] Create signed token (huntId, userId, exp)
     API-->>FE: [BE ✓] { previewUrl, expiresIn }
-    FE->>FE: [FE ○] window.open(previewUrl, '_blank')
+    FE->>FE: [FE ✓] Open in Browser OR Copy Link
     end
 
     rect rgb(40, 70, 70)
@@ -302,17 +302,25 @@ GET /play/sessions/:sessionId/step/:stepId
 
 ## Frontend Implementation Notes
 
-### Editor: SharePanel/LinkSection
+### Editor: HuntPreview (Content Preview Area) ✓
+
+**Location:** `apps/frontend/editor/src/pages/Hunt/HuntPreview/HuntPreview.tsx`
+
+**Why HuntPreview instead of SharePanel:**
+- Preview is about **testing/validation**, not **sharing/distribution**
+- Groups with other testing controls (Simulate Success/Fail)
+- Available when preview panel is open (natural testing workflow)
 
 ```
-SharePanel
-├── [NEW] "Preview as Player" button (always visible)
-│   └── onClick: getPreviewLink(huntId) → window.open(previewUrl)
-├── [EXISTING] Link display (hunt.playSlug)
-├── [EXISTING] Copy button
-├── [EXISTING] Access mode toggle
-└── [EXISTING] Reset link button
+HuntPreview
+├── [EXISTING] Simulate: Success/Fail toggle
+├── [NEW] "Preview Hunt" dropdown button
+│   ├── "Open in Browser" → getPreviewLink(huntId) → window.open(previewUrl)
+│   └── "Copy Link" → getPreviewLink(huntId) → copy to clipboard + toast with expiry
+└── [EXISTING] Mobile preview iframe
 ```
+
+**Hook:** `useGetPreviewLink()` in `apps/frontend/editor/src/api/Hunt/sharing/getPreviewLink.ts`
 
 ### Player: AuthorPreviewPage
 
@@ -369,11 +377,13 @@ PreviewNavigation
 - [ ] Get any step in preview session → success
 - [ ] Preview session uses latestVersion (not liveVersion)
 
-### Frontend Editor
-- [ ] "Preview as Player" button visible in SharePanel
-- [ ] Button works even before hunt is released
-- [ ] Clicking button opens preview URL in new tab
-- [ ] Loading state while generating link
+### Frontend Editor ✓
+- [x] "Preview Hunt" dropdown visible in HuntPreview (content preview area)
+- [x] Dropdown has "Open in Browser" and "Copy Link" options
+- [x] Button works even before hunt is released
+- [x] "Open in Browser" opens preview URL in new tab
+- [x] "Copy Link" copies URL and shows toast with expiry info
+- [x] Button disabled while generating link
 
 ### Frontend Player
 - [ ] `/play/preview?token=X` auto-starts session (no identification form)

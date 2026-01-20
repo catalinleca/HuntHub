@@ -12,6 +12,7 @@ export { useReleaseHunt } from './releaseHunt';
 export { useTakeOfflineHunt } from './takeOfflineHunt';
 export {
   useGetPlayerInvitations,
+  useGetPreviewLink,
   useInvitePlayer,
   useRevokeInvitation,
   useResetPlayLink,
