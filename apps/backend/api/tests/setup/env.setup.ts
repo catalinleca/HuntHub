@@ -21,3 +21,4 @@ process.env.AWS_S3_BUCKET = 'test-bucket';
 
 // Set other test environment variables
 process.env.NODE_ENV = 'test';
+process.env.PREVIEW_TOKEN_SECRET = 'test-preview-token-secret';
