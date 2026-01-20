@@ -31,6 +31,10 @@ router.get(
   },
 );
 
+router.post('/preview/start', (req, res, next) => {
+  previewController.startPreviewSession(req, res).catch(next);
+});
+
 router.post('/:playSlug/start', optionalAuthMiddleware, validateRequest(startSessionSchema), (req, res, next) => {
   controller.startSession(req, res).catch(next);
 });
@@ -57,10 +61,6 @@ router.post('/sessions/:sessionId/upload', (req, res, next) => {
 
 router.post('/sessions/:sessionId/assets', validateRequest(createAssetSchema), (req, res, next) => {
   controller.createAsset(req, res).catch(next);
-});
-
-router.post('/preview/start', (req, res, next) => {
-  previewController.startPreviewSession(req, res).catch(next);
 });
 
 router.post('/sessions/:sessionId/navigate', validateRequest(navigateSchema), (req, res, next) => {
