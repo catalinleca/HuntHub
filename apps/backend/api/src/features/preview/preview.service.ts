@@ -58,6 +58,8 @@ export class PreviewService implements IPreviewService {
 
     const { huntId, userId } = result.payload;
 
+    await this.authorizationService.requireAccess(huntId, userId, HuntPermission.View);
+
     const hunt = await HuntModel.findOne({ huntId, isDeleted: false }).exec();
     if (!hunt) {
       throw new NotFoundError('Hunt not found');
