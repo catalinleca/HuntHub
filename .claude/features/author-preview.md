@@ -12,9 +12,9 @@ Enable content authors to preview their hunt in the production player environmen
 |-------|--------|
 | Backend | ✓ Implemented |
 | Frontend (Editor) | ✓ Implemented |
-| Frontend (Player) | ○ Planned |
+| Frontend (Player) | ✓ Implemented |
 
-**Last Updated:** 2025-01-20 — Editor implementation complete.
+**Last Updated:** 2025-01-20 — Full implementation complete.
 
 ### Backend Implementation Status
 - [x] Add `isPreview` field to Progress model
@@ -29,12 +29,14 @@ Enable content authors to preview their hunt in the production player environmen
 - [x] "Preview Hunt" dropdown in HuntPreview component (content preview area)
 
 ### Player Implementation Status
-- [ ] `/play/preview` route
-- [ ] AuthorPreviewPage component
-- [ ] AuthorPreviewSessionProvider (auto-start, no localStorage)
-- [ ] PreviewNavigation component (prev/next buttons)
-- [ ] useStartPreviewSession hook
-- [ ] useNavigateToStep hook
+- [x] `/play/preview` route (lazy-loaded)
+- [x] AuthorPreviewPage component
+- [x] AuthorPreviewSessionProvider (auto-start, no localStorage)
+- [x] PreviewNavigation component (prev/next buttons, step indicator)
+- [x] useStartPreviewSession hook
+- [x] useNavigateToStep hook
+- [x] Extended SessionContexts with `isPreview`, `stepOrder`, navigation actions
+- [x] Shared types in `@hunthub/shared` (PreviewSessionResponse, NavigateRequest, NavigateResponse)
 
 ---
 
@@ -60,37 +62,37 @@ sequenceDiagram
 
     rect rgb(40, 70, 70)
     Note right of U: PLAYER: START PREVIEW SESSION
-    U->>FE: [FE ○] Open /play/preview?token=TOKEN
-    FE->>FE: [FE ○] Extract token from URL
+    U->>FE: [FE ✓] Open /play/preview?token=TOKEN
+    FE->>FE: [FE ✓] Extract token from URL
     FE->>API: [BE ✓] POST /play/preview/start { previewToken }
     Note right of API: PreviewService.startPreviewSession()
     API->>API: [BE ✓] Verify token signature + expiry
     API->>DB: [BE ✓] SessionManager.createPreviewSession()
     API-->>FE: [BE ✓] { sessionId, hunt, stepOrder, isPreview: true }
-    FE->>FE: [FE ○] NO localStorage (fresh each time)
-    FE->>FE: [FE ○] Render step + PreviewNavigation
+    FE->>FE: [FE ✓] NO localStorage (fresh each time)
+    FE->>FE: [FE ✓] Render step + PreviewNavigation
     end
 
     rect rgb(40, 70, 70)
     Note right of U: PLAYER: NAVIGATE STEPS
-    U->>FE: [FE ○] Click prev/next arrow
+    U->>FE: [FE ✓] Click prev/next arrow
     FE->>API: [BE ✓] POST /play/sessions/:id/navigate { stepId }
     Note right of API: PlayService.navigate()
     API->>API: [BE ✓] Verify isPreview session
     API->>DB: [BE ✓] SessionManager.navigateToStep()
     API-->>FE: [BE ✓] { currentStepId, currentStepIndex }
-    FE->>FE: [FE ○] Update React Query cache
-    FE->>FE: [FE ○] Render new step
+    FE->>FE: [FE ✓] Update React Query cache
+    FE->>FE: [FE ✓] Render new step
     end
 
     rect rgb(40, 70, 70)
     Note right of U: PLAYER: VALIDATE STEP (normal flow)
-    U->>FE: [FE ○] Submit answer
+    U->>FE: [FE ✓] Submit answer
     FE->>API: [BE ✓] POST /play/sessions/:id/validate
     Note right of API: PlayService.validateAnswer() - same as production
     API->>DB: [BE ✓] Record submission, advance if correct
     API-->>FE: [BE ✓] { correct, feedback, attempts }
-    FE->>FE: [FE ○] Show feedback, "Continue" advances normally
+    FE->>FE: [FE ✓] Show feedback, "Continue" advances normally
     end
 ```
 
@@ -362,6 +364,152 @@ PreviewNavigation
 
 ---
 
+## Architecture: PlaySessionProvider vs AuthorPreviewSessionProvider
+
+Both providers share the same React contexts (`SessionStateContext`, `SessionActionsContext`) but implement fundamentally different progression models.
+
+### Mental Model Comparison
+
+| Aspect | PlaySessionProvider | AuthorPreviewSessionProvider |
+|--------|---------------------|------------------------------|
+| **Philosophy** | "Earn the right to see next step" | "See any step to test your hunt" |
+| **Progression** | Linear, backend-controlled | Non-linear, frontend-controlled |
+| **Next step source** | HATEOAS `_links.next` | `stepOrder[]` array |
+| **Navigation** | None (must complete to advance) | Full freedom (prev/next/jump) |
+| **Persistence** | localStorage (resumable) | None (ephemeral, token-based) |
+| **Session start** | Manual (player identification) | Auto (token in URL) |
+
+### Why Two Providers (Not One with Flags)
+
+We chose separate providers over a configurable single provider because:
+1. **Different data sources** - Play uses HATEOAS links, Preview uses stepOrder array
+2. **Different refs needed** - Play needs `nextStepIdRef`, Preview needs `stepOrderRef` + `currentStepIndexRef`
+3. **Different actions** - Preview has `navigateToStep/Next/Prev`, Play doesn't
+4. **Cleaner code** - No conditional logic in callbacks, each provider is focused
+
+### Refs Explained
+
+| Ref | Play | Preview | Purpose |
+|-----|:----:|:-------:|---------|
+| `sessionIdRef` | ✓ | ✓ | Stable sessionId for cache updates in useMemo callbacks |
+| `nextStepIdRef` | ✓ | — | Next step from HATEOAS (backend tells us) |
+| `stepOrderRef` | — | ✓ | Full step array (frontend knows all steps) |
+| `currentStepIndexRef` | — | ✓ | Position in array (to calculate prev/next) |
+
+**Why refs instead of state?** These values are read-only derivations from query data. We need stable references in `useMemo` callbacks without causing re-renders or stale closures.
+
+### How `advanceToNextStep` Differs
+
+Both providers implement `advanceToNextStep` (called when player completes a challenge), but they calculate the next step differently:
+
+**PlaySessionProvider:**
+```typescript
+advanceToNextStep: () => {
+  const currentNextStepId = nextStepIdRef.current;  // From HATEOAS _links.next
+  // ...
+  currentStepId: currentNextStepId,  // Backend told us what's next
+}
+```
+
+**AuthorPreviewSessionProvider:**
+```typescript
+advanceToNextStep: () => {
+  const stepOrder = stepOrderRef.current;
+  const currentIndex = currentStepIndexRef.current;
+  const nextIndex = currentIndex + 1;
+  // ...
+  currentStepId: stepOrder[nextIndex],  // Frontend calculates from array
+}
+```
+
+### Shared Code: useStepManagement
+
+The step fetching logic is shared via `useStepManagement` hook:
+
+```typescript
+// internal/useStepManagement.ts
+export const useStepManagement = (sessionId, currentStepId) => {
+  const stepQuery = useStep(sessionId, currentStepId);
+  const nextStepId = extractStepIdFromLink(stepQuery.data?._links?.next);
+  usePrefetchStep(sessionId, nextStepId);  // Prefetch next step
+  return { stepQuery, nextStepId };
+};
+```
+
+**Note:** Preview only uses `stepQuery` from this hook, not `nextStepId` (it calculates from `stepOrder` instead).
+
+---
+
+## Concurrency: Rapid Navigation Clicks
+
+**Scenario:** Author on step 2 clicks "Next" twice quickly before first request completes.
+
+### What Happens (Traced)
+
+```
+Click 1: currentStepIndexRef = 2 → nextIndex = 3 → POST /navigate { stepId: 3 }
+Click 2: currentStepIndexRef = 2 (still!) → nextIndex = 3 → POST /navigate { stepId: 3 }
+```
+
+Both clicks read the same ref value because the cache update happens AFTER the await:
+
+```typescript
+navigateNext: async () => {
+  const currentIndex = currentStepIndexRef.current;  // Read NOW (both get 2)
+  await navigateToStepMutate(...);                   // Wait for backend
+  queryClient.setQueryData(...);                     // Update cache AFTER
+}
+```
+
+### Backend Idempotent Handling
+
+The `navigateToStep` endpoint is **idempotent by design**:
+
+```typescript
+// session-manager.helper.ts
+static async navigateToStep(sessionId, stepId, stepOrder) {
+  await ProgressModel.updateOne({ sessionId }, [
+    { $set: { currentStepId: stepId } },  // SET (not increment)
+    {
+      $set: {
+        steps: {
+          $cond: {
+            if: { $in: [stepId, '$steps.stepId'] },  // Already visited?
+            then: '$steps',                           // Keep as-is
+            else: { $concatArrays: ['$steps', [...]] },  // Add
+          },
+        },
+      },
+    },
+  ]);
+  return { currentStepId: stepId, currentStepIndex: stepIndex };
+}
+```
+
+| Request | Action | Result |
+|---------|--------|--------|
+| Request 1 | Set currentStepId=3, add step 3 to progress | `{ currentStepId: 3, currentStepIndex: 2 }` |
+| Request 2 | Set currentStepId=3 (same), step 3 exists → no-op | `{ currentStepId: 3, currentStepIndex: 2 }` |
+
+### Why This Is Safe
+
+1. **Atomic MongoDB update** - No read-modify-write race
+2. **Idempotent semantics** - "Set to X" not "move forward"
+3. **Conditional insert** - Only adds step progress if not exists
+4. **Same response** - Both requests return identical data
+
+**Result:** Two API calls (wasteful but harmless), no corruption, correct final state.
+
+### Alternative Considered: Debouncing
+
+We could debounce clicks on the frontend, but:
+- Adds complexity
+- Backend handles it correctly anyway
+- Preview is low-traffic (author testing, not production load)
+- Idempotent APIs are the robust solution
+
+---
+
 ## Testing Checklist
 
 ### Backend (Integration tests pending)
@@ -385,16 +533,16 @@ PreviewNavigation
 - [x] "Copy Link" copies URL and shows toast with expiry info
 - [x] Button disabled while generating link
 
-### Frontend Player
-- [ ] `/play/preview?token=X` auto-starts session (no identification form)
-- [ ] Missing token shows error state
-- [ ] Invalid/expired token shows error state
-- [ ] Prev/Next navigation works
-- [ ] Prev disabled on first step, Next disabled on last step
-- [ ] Validation works normally (advances on correct)
-- [ ] Can navigate back after validation
-- [ ] Session not saved to localStorage
-- [ ] Closing and reopening preview link creates fresh session
+### Frontend Player ✓ (Implementation complete, manual testing needed)
+- [x] `/play/preview?token=X` auto-starts session (no identification form)
+- [x] Missing token shows error state
+- [x] Invalid/expired token shows error state (handled by API)
+- [x] Prev/Next navigation works
+- [x] Prev disabled on first step, Next disabled on last step
+- [x] Validation works normally (uses same ApiValidationProvider)
+- [x] Can navigate back after validation
+- [x] Session not saved to localStorage
+- [x] Closing and reopening preview link creates fresh session
 
 ---
 

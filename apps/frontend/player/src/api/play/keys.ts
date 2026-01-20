@@ -20,4 +20,5 @@ export const playKeys = {
   // Skip placeholders - used with skipToken to identify disabled queries in devtools
   currentStepSkip: (sessionId: string) => [...playKeys.all, 'step', sessionId, 'current'] as const,
   nextStepSkip: (sessionId: string) => [...playKeys.all, 'step', sessionId, 'next'] as const,
+  previewSession: (token: string) => [...playKeys.all, 'preview', 'session', token] as const,
 };

@@ -860,6 +860,30 @@ export interface PreviewLinkResponse {
   expiresIn: number;
 }
 
+export type PreviewSessionResponse = SessionResponse & {
+  /** Always true for preview sessions */
+  isPreview: true;
+  /** Full step order for navigation */
+  stepOrder: number[];
+};
+
+/** Request body for navigating to a step in preview mode */
+export interface NavigateRequest {
+  /**
+   * Step ID to navigate to
+   * @min 1
+   */
+  stepId: number;
+}
+
+/** Response from navigating to a step in preview mode */
+export interface NavigateResponse {
+  /** The step navigated to */
+  currentStepId: number;
+  /** Index of the step in stepOrder (0-based) */
+  currentStepIndex: number;
+}
+
 export interface ResetPlayLinkResponse {
   /** New play link slug */
   playSlug: string;

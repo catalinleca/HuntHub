@@ -5,3 +5,5 @@ export { useStep } from './useStep';
 export { usePrefetchStep } from './usePrefetchStep';
 export { useValidateAnswer } from './useValidateAnswer';
 export { useHint } from './useHint';
+export { useStartPreviewSession } from './useStartPreviewSession';
+export { useNavigateToStep } from './useNavigateToStep';

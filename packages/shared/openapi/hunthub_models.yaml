@@ -1199,6 +1199,51 @@ components:
         - expiresIn
       additionalProperties: false
 
+    PreviewSessionResponse:
+      allOf:
+        - $ref: '#/components/schemas/SessionResponse'
+        - type: object
+          properties:
+            isPreview:
+              type: boolean
+              enum: [true]
+              description: Always true for preview sessions
+            stepOrder:
+              type: array
+              items:
+                type: integer
+              description: Full step order for navigation
+          required:
+            - isPreview
+            - stepOrder
+
+    NavigateRequest:
+      type: object
+      description: Request body for navigating to a step in preview mode
+      properties:
+        stepId:
+          type: integer
+          minimum: 1
+          description: Step ID to navigate to
+      required:
+        - stepId
+      additionalProperties: false
+
+    NavigateResponse:
+      type: object
+      description: Response from navigating to a step in preview mode
+      properties:
+        currentStepId:
+          type: integer
+          description: The step navigated to
+        currentStepIndex:
+          type: integer
+          description: Index of the step in stepOrder (0-based)
+      required:
+        - currentStepId
+        - currentStepIndex
+      additionalProperties: false
+
     ResetPlayLinkResponse:
       type: object
       properties:

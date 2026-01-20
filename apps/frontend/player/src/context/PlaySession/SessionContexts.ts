@@ -19,12 +19,17 @@ export interface SessionState {
   stepResponse: StepResponse | null;
   isLastStep: boolean;
   previewHint?: string;
+  isPreview?: boolean;
+  stepOrder?: number[];
 }
 
 export interface SessionActions {
   startSession: (playerName: string, email?: string) => void;
   abandonSession: () => void;
   advanceToNextStep: () => void;
+  navigateToStep?: (stepId: number) => Promise<void>;
+  navigateNext?: () => Promise<void>;
+  navigatePrev?: () => Promise<void>;
 }
 
 export const SessionStateContext = createContext<SessionState | null>(null);

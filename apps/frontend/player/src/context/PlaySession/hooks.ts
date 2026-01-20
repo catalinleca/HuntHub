@@ -29,6 +29,8 @@ export const useSessionError = () => useSessionState().error;
 export const useHuntMeta = () => useSessionState().huntMeta;
 export const useIsLastStep = () => useSessionState().isLastStep;
 export const usePreviewHint = () => useSessionState().previewHint;
+export const useIsPreview = () => useSessionState().isPreview ?? false;
+export const useStepOrder = () => useSessionState().stepOrder ?? [];
 
 export const useStepResponse = () => useSessionState().stepResponse;
 export const useCurrentStep = () => useSessionState().stepResponse?.step ?? null;
@@ -58,6 +60,9 @@ export const useStepPlayProgress = (): StepPlayProgress | null => {
 
 export const useSessionActions = () => useSessionActionsContext();
 export const useAdvanceToNextStep = () => useSessionActionsContext().advanceToNextStep;
+export const useNavigateToStep = () => useSessionActionsContext().navigateToStep;
+export const useNavigateNext = () => useSessionActionsContext().navigateNext;
+export const useNavigatePrev = () => useSessionActionsContext().navigatePrev;
 
 export const usePlaySession = () => ({
   ...useSessionState(),
