@@ -14,6 +14,7 @@ export interface IPlayController {
   requestHint(req: Request, res: Response): Promise<Response>;
   requestUpload(req: Request, res: Response): Promise<Response>;
   createAsset(req: Request, res: Response): Promise<Response>;
+  navigate(req: Request, res: Response): Promise<Response>;
 }
 
 /**
@@ -149,6 +150,25 @@ export class PlayController implements IPlayController {
     const result = await this.playService.createAsset(sessionId, req.body);
 
     return res.status(201).json(result);
+  }
+
+  async navigate(req: Request, res: Response): Promise<Response> {
+    const { sessionId } = req.params;
+
+    if (!sessionId || !this.isValidUUID(sessionId)) {
+      throw new ValidationError('Invalid session ID', []);
+    }
+
+    const { stepId } = req.body;
+    const parsedStepId = parseNumericId(stepId);
+
+    if (isNaN(parsedStepId)) {
+      throw new ValidationError('Invalid step ID', [{ field: 'stepId', message: 'Step ID must be a number' }]);
+    }
+
+    const result = await this.playService.navigate(sessionId, parsedStepId);
+
+    return res.status(200).json(result);
   }
 
   private isValidUUID(str: string): boolean {
