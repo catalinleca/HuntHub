@@ -347,6 +347,37 @@ export const PlayerInvitation = z
 export const CreatePlayerInvitationRequest = z.object({ email: z.string().email() }).strict();
 export const UpdateAccessModeRequest = z.object({ accessMode: HuntAccessMode }).strict();
 export const PreviewLinkResponse = z.object({ previewUrl: z.string(), expiresIn: z.number().int() }).strict();
+export const HuntMetaPF = z
+  .object({
+    huntId: z.number().int(),
+    name: z.string(),
+    description: z.string().optional(),
+    totalSteps: z.number().int(),
+    coverImage: Media.nullish(),
+  })
+  .strict();
+export const SessionResponse = z
+  .object({
+    sessionId: z.string().uuid(),
+    hunt: HuntMetaPF,
+    status: z.string(),
+    currentStepIndex: z.number().int(),
+    currentStepId: z.number().int().nullish(),
+    totalSteps: z.number().int(),
+    startedAt: z.string().datetime({ offset: true }),
+    completedAt: z.string().datetime({ offset: true }).optional(),
+  })
+  .strict();
+export const PreviewSessionResponse = SessionResponse.and(
+  z
+    .object({ isPreview: z.literal(true), stepOrder: z.array(z.number().int()) })
+    .strict()
+    .passthrough(),
+);
+export const NavigateRequest = z.object({ stepId: z.number().int().gte(1) }).strict();
+export const NavigateResponse = z
+  .object({ currentStepId: z.number().int(), currentStepIndex: z.number().int() })
+  .strict();
 export const ResetPlayLinkResponse = z.object({ playSlug: z.string() }).strict();
 export const CluePF = z.object({ title: z.string(), description: z.string() }).strict();
 export const QuizPF = z
@@ -380,15 +411,6 @@ export const StepPF = z
     timeLimit: z.number().int().nullish(),
     maxAttempts: z.number().int().nullish(),
     hasHint: z.boolean(),
-  })
-  .strict();
-export const HuntMetaPF = z
-  .object({
-    huntId: z.number().int(),
-    name: z.string(),
-    description: z.string().optional(),
-    totalSteps: z.number().int(),
-    coverImage: Media.nullish(),
   })
   .strict();
 export const AnswerType = z.enum(['clue', 'quiz-choice', 'quiz-input', 'mission-location', 'mission-media', 'task']);
@@ -443,18 +465,6 @@ export const StepResponse = z
     maxHints: z.number().int(),
     startedAt: z.string().datetime({ offset: true }).nullable(),
     _links: StepLinks,
-  })
-  .strict();
-export const SessionResponse = z
-  .object({
-    sessionId: z.string().uuid(),
-    hunt: HuntMetaPF,
-    status: z.string(),
-    currentStepIndex: z.number().int(),
-    currentStepId: z.number().int().nullish(),
-    totalSteps: z.number().int(),
-    startedAt: z.string().datetime({ offset: true }),
-    completedAt: z.string().datetime({ offset: true }).optional(),
   })
   .strict();
 export const SortOrder = z.enum(['asc', 'desc']);
@@ -544,6 +554,11 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   CreatePlayerInvitationRequest,
   UpdateAccessModeRequest,
   PreviewLinkResponse,
+  HuntMetaPF,
+  SessionResponse,
+  PreviewSessionResponse,
+  NavigateRequest,
+  NavigateResponse,
   ResetPlayLinkResponse,
   CluePF,
   QuizPF,
@@ -551,7 +566,6 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   TaskPF,
   ChallengePF,
   StepPF,
-  HuntMetaPF,
   AnswerType,
   ClueAnswerPayload,
   QuizChoicePayload,
@@ -568,7 +582,6 @@ export const schemas: Record<string, z.ZodTypeAny> = {
   StepLinks,
   ValidateAnswerLinks,
   StepResponse,
-  SessionResponse,
   SortOrder,
   HuntSortField,
   AssetSortField,

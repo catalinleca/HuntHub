@@ -1,27 +1,18 @@
 import { useMemo, useRef, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { HuntProgressStatus, type SessionResponse } from '@hunthub/shared';
-import { useGetSession, useStartSession, useStep, usePrefetchStep, playKeys } from '@/api';
+import { useGetSession, useStartSession, playKeys } from '@/api';
 import { SessionStatus, SessionStateContext, SessionActionsContext } from './SessionContexts';
 import { deriveStatus } from './internal/deriveStatus';
 import { sessionStorage } from './internal/sessionStorage';
 import { useClearInvalidSession } from './internal/useClearInvalidSession';
+import { useStepManagement } from './internal/useStepManagement';
 import type { SessionState, SessionActions } from './SessionContexts';
 
 interface PlaySessionProviderProps {
   playSlug: string;
   children: ReactNode;
 }
-
-const extractStepIdFromLink = (link?: { href: string }): number | null => {
-  if (!link) {
-    return null;
-  }
-
-  const match = link.href.match(/\/step\/(\d+)$/);
-
-  return match ? parseInt(match[1], 10) : null;
-};
 
 export const PlaySessionProvider = ({ playSlug, children }: PlaySessionProviderProps) => {
   const queryClient = useQueryClient();
@@ -38,21 +29,21 @@ export const PlaySessionProvider = ({ playSlug, children }: PlaySessionProviderP
     error: sessionQuery.error,
   });
 
-  const stepQuery = useStep(session?.sessionId ?? null, session?.currentStepId ?? null);
-  const nextStepId = extractStepIdFromLink(stepQuery.data?._links?.next);
-
-  usePrefetchStep(session?.sessionId ?? null, nextStepId);
+  const { stepQuery, nextStepId } = useStepManagement(session?.sessionId ?? null, session?.currentStepId ?? null);
 
   const { mutate: startSessionMutate, error: startError } = useStartSession(playSlug);
 
   const sessionIdRef = useRef<string | null>(null);
   const nextStepIdRef = useRef<number | null>(null);
+
   sessionIdRef.current = session?.sessionId ?? null;
   nextStepIdRef.current = nextStepId;
 
   const derivedStatus = deriveStatus(sessionQuery, stepQuery);
   const status = startError ? SessionStatus.Error : derivedStatus;
   const error = sessionQuery.error ?? stepQuery.error ?? startError ?? null;
+
+  const isLastStep = !!session && nextStepId === null && !!stepQuery.data;
 
   const stateValue: SessionState = useMemo(
     () => ({
@@ -61,9 +52,9 @@ export const PlaySessionProvider = ({ playSlug, children }: PlaySessionProviderP
       sessionId: session?.sessionId ?? null,
       huntMeta: session?.hunt ?? null,
       stepResponse: stepQuery.data ?? null,
-      isLastStep: !!session && nextStepId === null && !!stepQuery.data,
+      isLastStep,
     }),
-    [status, error, session, stepQuery.data, nextStepId],
+    [status, error, session, stepQuery.data, isLastStep],
   );
 
   const actionsValue: SessionActions = useMemo(

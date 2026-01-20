@@ -316,3 +316,56 @@ it('should validate fuzzy match with typo', () => {
   expect(result.confidence).toBeGreaterThanOrEqual(0.8);
 });
 ```
+
+---
+
+## Shared Types (MANDATORY)
+
+**All API types live in `@hunthub/shared` - the single source of truth.**
+
+### Where Types Come From
+
+```
+packages/shared/openapi/hunthub_models.yaml  →  npm run generate  →  packages/shared/src/types/index.ts
+```
+
+- **OpenAPI spec** defines all request/response shapes
+- **Generated types** are imported by both backend and frontend
+- **Never duplicate** API types locally - import from `@hunthub/shared`
+
+### Usage
+
+```typescript
+// GOOD - import from shared
+import { SessionResponse, NavigateResponse, StepResponse } from '@hunthub/shared';
+
+// BAD - defining types locally that should be in shared
+interface SessionResponse { ... }  // Duplicates shared type!
+```
+
+### When Adding New API Types
+
+1. Add schema to `packages/shared/openapi/hunthub_models.yaml`
+2. Run `npm run generate` from root
+3. Export from `packages/shared/src/types/index.ts`
+4. Import in both backend and frontend
+
+### Backend-Only Types
+
+Some types are internal to backend (DB interfaces, service internals). These stay in backend:
+
+```typescript
+// Internal to backend - NOT in shared
+interface IProgress { ... }  // Mongoose document interface
+interface IHuntService { ... }  // Service interface
+```
+
+### Frontend-Only Types
+
+UI-specific types stay in frontend:
+
+```typescript
+// Internal to frontend - NOT in shared
+interface FormState { ... }  // React Hook Form state
+type ValidationStatus = 'idle' | 'validating' | 'success' | 'error';  // UI state
+```

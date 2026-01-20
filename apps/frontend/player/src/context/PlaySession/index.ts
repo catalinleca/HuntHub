@@ -1,5 +1,6 @@
 export { PlaySessionProvider } from './PlaySessionProvider';
 export { EditorPreviewSessionProvider } from './EditorPreviewSessionProvider';
+export { AuthorPreviewSessionProvider } from './AuthorPreviewSessionProvider';
 
 export {
   useSessionId,
@@ -9,11 +10,16 @@ export {
   useHuntMeta,
   useIsLastStep,
   usePreviewHint,
+  useIsPreview,
+  useStepOrder,
   useStepResponse,
   useStepProgress,
   useStepPlayProgress,
   useSessionActions,
   useAdvanceToNextStep,
+  useNavigateToStep,
+  useNavigateNext,
+  useNavigatePrev,
   usePlaySession,
 } from './hooks';
 

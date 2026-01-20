@@ -19,6 +19,13 @@ export const routes: RouteObject[] = [
         },
       },
       {
+        path: '/play/preview',
+        lazy: async () => {
+          const { AuthorPreviewPage } = await import('@/pages/AuthorPreviewPage');
+          return { Component: AuthorPreviewPage };
+        },
+      },
+      {
         path: '*',
         element: <NotFoundPage />,
       },
