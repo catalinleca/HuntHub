@@ -4,7 +4,13 @@ import { container } from '@/config/inversify';
 import { IPlayController } from './play.controller';
 import { IPreviewController } from '@/features/preview/preview.controller';
 import { validateRequest, validateQuery, optionalAuthMiddleware } from '@/shared/middlewares';
-import { startSessionSchema, validateAnswerSchema, discoverQuerySchema, createAssetSchema } from './play.validation';
+import {
+  startSessionSchema,
+  validateAnswerSchema,
+  discoverQuerySchema,
+  createAssetSchema,
+  navigateSchema,
+} from './play.validation';
 
 const router = Router();
 const controller = container.get<IPlayController>(TYPES.PlayController);
@@ -57,7 +63,7 @@ router.post('/preview/start', (req, res, next) => {
   previewController.startPreviewSession(req, res).catch(next);
 });
 
-router.post('/sessions/:sessionId/navigate', (req, res, next) => {
+router.post('/sessions/:sessionId/navigate', validateRequest(navigateSchema), (req, res, next) => {
   controller.navigate(req, res).catch(next);
 });
 
