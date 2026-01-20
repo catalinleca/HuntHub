@@ -1,15 +1,18 @@
 import crypto from 'crypto';
+import { z } from 'zod';
 import { previewTokenSecret } from '@/config/env.config';
 import { logger } from '@/utils/logger';
 
 export const TOKEN_EXPIRATION_SECONDS = 15 * 60; // 15 minutes
 
-export interface PreviewTokenPayload {
-  huntId: number;
-  userId: string;
-  exp: number;
-  nonce: string;
-}
+const PreviewTokenPayloadSchema = z.object({
+  huntId: z.number().int(),
+  userId: z.string().min(1),
+  exp: z.number().int().finite(),
+  nonce: z.string(),
+});
+
+export type PreviewTokenPayload = z.infer<typeof PreviewTokenPayloadSchema>;
 
 export type VerifyTokenResult =
   | { valid: true; payload: PreviewTokenPayload }
@@ -77,12 +80,9 @@ export const verifyPreviewToken = (token: string): VerifyTokenResult => {
   let payload: PreviewTokenPayload;
   try {
     const payloadString = base64UrlDecode(encodedPayload);
-    payload = JSON.parse(payloadString);
+    const parsed = JSON.parse(payloadString);
+    payload = PreviewTokenPayloadSchema.parse(parsed);
   } catch {
-    return { valid: false, reason: 'malformed' };
-  }
-
-  if (typeof payload.huntId !== 'number' || typeof payload.userId !== 'string') {
     return { valid: false, reason: 'malformed' };
   }
 
