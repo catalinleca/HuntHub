@@ -180,8 +180,12 @@ POST /play/preview/start { previewToken }
    ├─ verifyPreviewToken(previewToken)
    │  ├─ Decode base64url
    │  ├─ Verify HMAC-SHA256 signature
+   │  ├─ Validate payload with Zod schema
    │  ├─ Check exp > now
-   │  └─ Return { huntId, userId } or null
+   │  └─ Return { huntId, userId } or error
+   │
+   ├─ authorizationService.requireAccess(huntId, userId, View)
+   │  └─ Re-verify access (in case revoked after token issued)
    │
    ├─ HuntModel.findOne({ huntId })
    │  └─ Throw 404 if not found
@@ -204,6 +208,9 @@ POST /play/preview/start { previewToken }
 ```
 POST /play/sessions/:sessionId/navigate { stepId }
 │
+├─ validateRequest(navigateSchema)
+│  └─ Validates stepId is positive integer
+│
 ├─ PlayController.navigate()
 │
 └─ PlayService.navigate()
@@ -215,11 +222,8 @@ POST /play/sessions/:sessionId/navigate { stepId }
    │
    ├─ requireHuntVersion(huntId, version)
    │
-   ├─ if (!stepOrder.includes(stepId))
-   │  └─ Throw 404 "Step not found in hunt"
-   │
-   └─ SessionManager.navigateToStep(sessionId, stepId)
-      └─ ProgressModel.updateOne({ currentStepId: stepId })
+   └─ SessionManager.navigateToStep(sessionId, stepId, stepOrder)
+      └─ Atomic aggregation: set currentStepId + conditional push step progress
 
 → Response: { currentStepId, currentStepIndex }
 ```
@@ -279,7 +283,7 @@ GET /play/sessions/:sessionId/step/:stepId
 }
 ```
 
-**TTL:** Preview sessions use the same TTL as regular sessions (MongoDB only allows one TTL index per collection). Token expires in 15 minutes, but once a session starts, authors can preview until the standard session TTL.
+**TTL:** Preview sessions have a separate 2-hour TTL index in production (anonymous sessions have 24-hour TTL). Token expires in 15 minutes, session expires in 2 hours. This is sufficient for preview testing.
 
 ### Preview Token Payload (transient, not stored)
 
