@@ -7,7 +7,7 @@ import { IAnswerValidator, ValidationResult } from '../answer-validator.helper';
 import { logger } from '@/utils/logger';
 
 export const TaskValidator: IAnswerValidator = {
-  async validate(payload: AnswerPayload, step: IStep): Promise<ValidationResult> {
+  async validate(payload: AnswerPayload, step: IStep, attemptCount?: number): Promise<ValidationResult> {
     const response = payload.task?.response?.trim();
 
     if (!response) {
@@ -20,16 +20,22 @@ export const TaskValidator: IAnswerValidator = {
     const challenge = step.challenge as Challenge;
     const task = challenge.task;
 
-    if (!task?.instructions) {
+    const hasTitle = !!task?.title?.trim();
+    const hasInstructions = !!task?.instructions?.trim();
+    const hasAiInstructions = !!task?.aiInstructions?.trim();
+
+    if (!hasTitle && !hasInstructions && !hasAiInstructions) {
       return {
         isCorrect: true,
         feedback: 'Response recorded!',
       };
     }
 
+    const instructions = task?.instructions?.trim() || task?.title?.trim() || '';
+
     try {
       const aiService = container.get<IAIValidationService>(TYPES.AIValidationService);
-      const result = await aiService.validateTaskResponse(response, task.instructions, task.aiInstructions);
+      const result = await aiService.validateTaskResponse(response, instructions, task?.aiInstructions, attemptCount);
 
       return {
         isCorrect: result.isCorrect,

@@ -22,6 +22,7 @@ export interface IAIValidationService {
     userResponse: string,
     instructions: string,
     aiInstructions?: string,
+    attemptCount?: number,
   ): Promise<AIValidationResult>;
 
   validateAudioResponse(
@@ -29,6 +30,7 @@ export interface IAIValidationService {
     mimeType: string,
     instructions: string,
     aiInstructions?: string,
+    attemptCount?: number,
   ): Promise<AIValidationResult>;
 
   validateImageResponse(
@@ -36,6 +38,7 @@ export interface IAIValidationService {
     mimeType: string,
     instructions: string,
     aiInstructions?: string,
+    attemptCount?: number,
   ): Promise<AIValidationResult>;
 
   isAvailable(): boolean;
@@ -59,6 +62,7 @@ export class AIValidationService implements IAIValidationService {
     userResponse: string,
     instructions: string,
     aiInstructions?: string,
+    attemptCount?: number,
   ): Promise<AIValidationResult> {
     const startTime = Date.now();
 
@@ -68,6 +72,7 @@ export class AIValidationService implements IAIValidationService {
           userResponse,
           instructions,
           aiInstructions,
+          attemptCount,
         }),
         this.config.timeoutMs,
       );
@@ -91,6 +96,7 @@ export class AIValidationService implements IAIValidationService {
     mimeType: string,
     instructions: string,
     aiInstructions?: string,
+    attemptCount?: number,
   ): Promise<AIValidationResult> {
     const startTime = Date.now();
 
@@ -101,6 +107,7 @@ export class AIValidationService implements IAIValidationService {
           mimeType,
           instructions,
           aiInstructions,
+          attemptCount,
         }),
         this.config.timeoutMs,
       );
@@ -125,6 +132,7 @@ export class AIValidationService implements IAIValidationService {
     mimeType: string,
     instructions: string,
     aiInstructions?: string,
+    attemptCount?: number,
   ): Promise<AIValidationResult> {
     const startTime = Date.now();
 
@@ -135,6 +143,7 @@ export class AIValidationService implements IAIValidationService {
           mimeType,
           instructions,
           aiInstructions,
+          attemptCount,
         }),
         this.config.timeoutMs,
       );

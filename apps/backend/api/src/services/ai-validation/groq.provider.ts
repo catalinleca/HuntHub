@@ -19,14 +19,14 @@ export class GroqProvider implements ITextValidationProvider {
   }
 
   async validateText(params: TextValidationParams): Promise<ValidationResponse> {
-    const { userResponse, instructions, aiInstructions } = params;
+    const { userResponse, instructions, aiInstructions, attemptCount } = params;
 
     if (userResponse.length > MAX_RESPONSE_CHARS) {
       throw new Error(`Response too long: ${userResponse.length} chars (max ${MAX_RESPONSE_CHARS})`);
     }
 
     const { safeInstructions, criteria } = sanitizeInstructions(instructions, aiInstructions, this.name);
-    const prompt = buildTextPrompt(safeInstructions, criteria, userResponse);
+    const prompt = buildTextPrompt(safeInstructions, criteria, userResponse, attemptCount);
 
     const response = await this.client.chat.completions.create({
       model: 'llama-3.3-70b-versatile',
