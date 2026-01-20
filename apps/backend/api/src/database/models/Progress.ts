@@ -80,13 +80,20 @@ progressSchema.index({ sessionId: 1 }, { unique: true }); // Session lookup
 progressSchema.index({ completedAt: -1, huntId: 1 }); // Recent completions per hunt
 
 // Dev: 1 day (all sessions) for testing cleanup
-// Prod: 7 days (anonymous only)
+// Prod: 24 hours (anonymous), 2 hours (preview)
 if (process.env.NODE_ENV === 'production') {
   progressSchema.index(
     { startedAt: 1 },
     {
-      expireAfterSeconds: 7 * 24 * 60 * 60,
+      expireAfterSeconds: 24 * 60 * 60, // 24 hours
       partialFilterExpression: { isAnonymous: true },
+    },
+  );
+  progressSchema.index(
+    { startedAt: 1 },
+    {
+      expireAfterSeconds: 2 * 60 * 60, // 2 hours
+      partialFilterExpression: { isPreview: true },
     },
   );
 } else {

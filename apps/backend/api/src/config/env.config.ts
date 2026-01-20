@@ -41,4 +41,6 @@ export const logLevel = process.env.LOG_LEVEL || 'info';
 export const sentryDsn = process.env.SENTRY_DSN;
 
 export const previewTokenSecret = getRequiredEnv('PREVIEW_TOKEN_SECRET');
-export const playerUrl = process.env.PLAYER_URL || 'http://localhost:5174';
+export const playerUrl = isProduction
+  ? getRequiredEnv('PLAYER_URL')
+  : process.env.PLAYER_URL || 'http://localhost:5174';
