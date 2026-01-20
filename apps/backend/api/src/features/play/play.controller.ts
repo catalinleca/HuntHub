@@ -37,20 +37,7 @@ export class PlayController implements IPlayController {
   }
 
   async startSession(req: Request, res: Response): Promise<Response> {
-    const { playSlug } = req.params;
-
-    if (!playSlug || typeof playSlug !== 'string') {
-      throw new ValidationError('Invalid play slug', []);
-    }
-
-    const { playerName, email } = req.body;
-
-    if (!playerName || typeof playerName !== 'string' || !playerName.trim()) {
-      throw new ValidationError('Player name is required', [
-        { field: 'playerName', message: 'Player name is required' },
-      ]);
-    }
-
+    const { playSlug, playerName, email } = req.body;
     const userId = req.user?.id;
 
     const result = await this.playService.startSession(playSlug, playerName.trim(), email, userId);

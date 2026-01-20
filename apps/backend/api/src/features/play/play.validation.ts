@@ -13,3 +13,7 @@ export const discoverQuerySchema = z.object({
 export const navigateSchema = z.object({
   stepId: z.number().int().positive(),
 });
+
+export const startPreviewSessionSchema = z.object({
+  previewToken: z.string().min(1),
+});

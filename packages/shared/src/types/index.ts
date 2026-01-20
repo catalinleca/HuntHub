@@ -1027,6 +1027,11 @@ export interface AnswerPayload {
 /** Request to start a play session */
 export interface StartSessionRequest {
   /**
+   * Hunt play slug identifier
+   * @minLength 1
+   */
+  playSlug: string;
+  /**
    * @minLength 1
    * @maxLength 50
    */

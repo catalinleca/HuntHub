@@ -434,7 +434,7 @@ export const AnswerPayload = z
   .partial()
   .strict();
 export const StartSessionRequest = z
-  .object({ playerName: z.string().min(1).max(50), email: z.string().email().optional() })
+  .object({ playSlug: z.string().min(1), playerName: z.string().min(1).max(50), email: z.string().email().optional() })
   .strict();
 export const ValidateAnswerRequest = z.object({ answerType: AnswerType, payload: AnswerPayload }).strict();
 export const ValidateAnswerResponse = z
