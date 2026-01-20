@@ -53,6 +53,11 @@ export interface UploadUrlResponse {
   s3Key: string;
 }
 
+export interface NavigateResponse {
+  currentStepId: number;
+  currentStepIndex: number;
+}
+
 export interface IPlayService {
   discoverHunts(page: number, limit: number): Promise<DiscoverHuntsResponse>;
   startSession(playSlug: string, playerName: string, email?: string, userId?: string): Promise<SessionResponse>;
@@ -62,6 +67,7 @@ export interface IPlayService {
   requestHint(sessionId: string): Promise<HintResponse>;
   requestUpload(sessionId: string, extension: string): Promise<UploadUrlResponse>;
   createAsset(sessionId: string, assetData: AssetCreate): Promise<AssetDTO>;
+  navigate(sessionId: string, stepId: number): Promise<NavigateResponse>;
 }
 
 @injectable()
@@ -159,14 +165,19 @@ export class PlayService implements IPlayService {
 
     const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version);
 
-    // SERVER STATE is source of truth
-    const currentIndex = huntVersion.stepOrder.indexOf(progress.currentStepId);
-    const currentStepId = progress.currentStepId;
-    const nextStepId = huntVersion.stepOrder[currentIndex + 1]; // may be undefined
+    if (progress.isPreview) {
+      if (!huntVersion.stepOrder.includes(requestedStepId)) {
+        throw new NotFoundError('Step not found in hunt');
+      }
+    } else {
+      const currentIndex = huntVersion.stepOrder.indexOf(progress.currentStepId);
+      const currentStepId = progress.currentStepId;
+      const nextStepId = huntVersion.stepOrder[currentIndex + 1]; // may be undefined
 
-    const allowedStepIds = [currentStepId, nextStepId].filter((id): id is number => id !== undefined);
-    if (!allowedStepIds.includes(requestedStepId)) {
-      throw new ForbiddenError('Step not accessible from current position');
+      const allowedStepIds = [currentStepId, nextStepId].filter((id): id is number => id !== undefined);
+      if (!allowedStepIds.includes(requestedStepId)) {
+        throw new ForbiddenError('Step not accessible from current position');
+      }
     }
 
     const step = await StepNavigator.getStepById(progress.huntId, progress.version, requestedStepId);
@@ -174,10 +185,10 @@ export class PlayService implements IPlayService {
       throw new NotFoundError('Step not found');
     }
 
-    const stepProgress =
-      requestedStepId === currentStepId ? SessionManager.getCurrentStepProgress(progress) : undefined;
+    // After validation: requestedStepId is current/next for non-preview, any valid step for preview
+    const stepProgress = progress.steps?.find((sp) => sp.stepId === requestedStepId);
 
-    return this.buildStepResponse(sessionId, step, huntVersion, stepProgress ?? undefined);
+    return this.buildStepResponse(sessionId, step, huntVersion, stepProgress);
   }
 
   /**
@@ -433,5 +444,18 @@ export class PlayService implements IPlayService {
     });
 
     return AssetMapper.fromDocument(asset);
+  }
+
+  async navigate(sessionId: string, stepId: number): Promise<NavigateResponse> {
+    const progress = await SessionManager.requireSession(sessionId);
+    SessionManager.validateSessionActive(progress);
+
+    if (!progress.isPreview) {
+      throw new ForbiddenError('Navigation is only available in preview mode');
+    }
+
+    const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version);
+
+    return SessionManager.navigateToStep(sessionId, stepId, huntVersion.stepOrder);
   }
 }

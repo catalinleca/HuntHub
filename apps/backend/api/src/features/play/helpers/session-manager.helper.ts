@@ -46,6 +46,41 @@ export class SessionManager {
     return progress;
   }
 
+  static async createPreviewSession(
+    huntId: number,
+    version: number,
+    firstStepId: number,
+    userId: string,
+  ): Promise<HydratedDocument<IProgress>> {
+    const sessionId = this.generateSessionId();
+
+    const initialStepProgress: IStepProgress = {
+      stepId: firstStepId,
+      attempts: 0,
+      completed: false,
+      responses: [],
+      startedAt: new Date(),
+      hintsUsed: 0,
+    };
+
+    const progressData: Partial<IProgress> = {
+      sessionId,
+      huntId,
+      version,
+      playerName: 'Preview',
+      userId: new mongoose.Types.ObjectId(userId),
+      isAnonymous: false,
+      isPreview: true,
+      status: HuntProgressStatus.InProgress,
+      startedAt: new Date(),
+      currentStepId: firstStepId,
+      steps: [initialStepProgress],
+    };
+
+    const [progress] = await ProgressModel.create([progressData]);
+    return progress;
+  }
+
   static async getSession(sessionId: string): Promise<HydratedDocument<IProgress> | null> {
     return ProgressModel.findBySession(sessionId);
   }
@@ -233,5 +268,47 @@ export class SessionManager {
 
     const stepProgress = result.steps?.find((sp) => sp.stepId === stepId);
     return stepProgress?.hintsUsed ?? 1;
+  }
+
+  /**
+   * Navigate to any step in the hunt (preview mode only).
+   * Initializes step progress if visiting a new step.
+   */
+  static async navigateToStep(
+    sessionId: string,
+    stepId: number,
+    stepOrder: number[],
+  ): Promise<{ currentStepId: number; currentStepIndex: number }> {
+    const stepIndex = stepOrder.indexOf(stepId);
+    if (stepIndex === -1) {
+      throw new NotFoundError('Step not found in hunt');
+    }
+
+    const progress = await this.requireSession(sessionId);
+
+    const existingStepProgress = progress.steps?.find((sp) => sp.stepId === stepId);
+
+    if (existingStepProgress) {
+      await ProgressModel.updateOne({ sessionId }, { $set: { currentStepId: stepId } });
+    } else {
+      const newStepProgress: IStepProgress = {
+        stepId,
+        attempts: 0,
+        completed: false,
+        responses: [],
+        startedAt: new Date(),
+        hintsUsed: 0,
+      };
+
+      await ProgressModel.updateOne(
+        { sessionId },
+        {
+          $set: { currentStepId: stepId },
+          $push: { steps: newStepProgress },
+        },
+      );
+    }
+
+    return { currentStepId: stepId, currentStepIndex: stepIndex };
   }
 }

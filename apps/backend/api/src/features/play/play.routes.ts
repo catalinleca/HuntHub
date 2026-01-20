@@ -2,11 +2,13 @@ import { Router } from 'express';
 import { TYPES } from '@/shared/types';
 import { container } from '@/config/inversify';
 import { IPlayController } from './play.controller';
+import { IPreviewController } from '@/features/preview/preview.controller';
 import { validateRequest, validateQuery, optionalAuthMiddleware } from '@/shared/middlewares';
 import { startSessionSchema, validateAnswerSchema, discoverQuerySchema, createAssetSchema } from './play.validation';
 
 const router = Router();
 const controller = container.get<IPlayController>(TYPES.PlayController);
+const previewController = container.get<IPreviewController>(TYPES.PreviewController);
 
 // Discovery endpoint - development only
 router.get(
@@ -49,6 +51,14 @@ router.post('/sessions/:sessionId/upload', (req, res, next) => {
 
 router.post('/sessions/:sessionId/assets', validateRequest(createAssetSchema), (req, res, next) => {
   controller.createAsset(req, res).catch(next);
+});
+
+router.post('/preview/start', (req, res, next) => {
+  previewController.startPreviewSession(req, res).catch(next);
+});
+
+router.post('/sessions/:sessionId/navigate', (req, res, next) => {
+  controller.navigate(req, res).catch(next);
 });
 
 export default router;

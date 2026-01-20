@@ -8,6 +8,7 @@ export const TYPES = {
   PlayController: Symbol.for('PlayController'),
   CloneController: Symbol.for('CloneController'),
   PlayerInvitationController: Symbol.for('PlayerInvitationController'),
+  PreviewController: Symbol.for('PreviewController'),
 
   AuthService: Symbol.for('AuthService'),
   UserService: Symbol.for('UserService'),
@@ -24,6 +25,7 @@ export const TYPES = {
   AssetValidator: Symbol.for('AssetValidator'),
   PlayService: Symbol.for('PlayService'),
   PlayerInvitationService: Symbol.for('PlayerInvitationService'),
+  PreviewService: Symbol.for('PreviewService'),
 
   TextValidationProvider: Symbol.for('TextValidationProvider'),
   AudioValidationProvider: Symbol.for('AudioValidationProvider'),

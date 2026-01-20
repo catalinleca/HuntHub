@@ -31,6 +31,8 @@ import {
   PlayerInvitationService,
   IPlayerInvitationService,
 } from '@/features/player-invitations/player-invitation.service';
+import { PreviewController, IPreviewController } from '@/features/preview/preview.controller';
+import { PreviewService, IPreviewService } from '@/features/preview/preview.service';
 import { GroqProvider, GeminiProvider, AIValidationService } from '@/services/ai-validation';
 import type {
   ITextValidationProvider,
@@ -50,6 +52,7 @@ container.bind<IHuntShareController>(TYPES.HuntShareController).to(HuntShareCont
 container.bind<IPlayController>(TYPES.PlayController).to(PlayController);
 container.bind<ICloneController>(TYPES.CloneController).to(CloneController);
 container.bind<IPlayerInvitationController>(TYPES.PlayerInvitationController).to(PlayerInvitationController);
+container.bind<IPreviewController>(TYPES.PreviewController).to(PreviewController);
 
 container.bind<IAuthService>(TYPES.AuthService).to(AuthService);
 container.bind<IUserService>(TYPES.UserService).to(UserService);
@@ -66,6 +69,7 @@ container.bind<IHuntShareService>(TYPES.HuntShareService).to(HuntShareService);
 container.bind<IPlayService>(TYPES.PlayService).to(PlayService);
 container.bind<ICloneService>(TYPES.CloneService).to(CloneService);
 container.bind<IPlayerInvitationService>(TYPES.PlayerInvitationService).to(PlayerInvitationService);
+container.bind<IPreviewService>(TYPES.PreviewService).to(PreviewService);
 
 container.bind<ITextValidationProvider>(TYPES.TextValidationProvider).to(GroqProvider).inSingletonScope();
 container.bind<IAudioValidationProvider>(TYPES.AudioValidationProvider).to(GeminiProvider).inSingletonScope();
