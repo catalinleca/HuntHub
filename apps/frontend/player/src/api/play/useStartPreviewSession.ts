@@ -5,7 +5,7 @@ import { queryFnOrSkip } from '@/utils/queryFnOrSkip';
 import { playKeys, SKIP_KEY } from './keys';
 
 const startPreviewSession = async (token: string): Promise<PreviewSessionResponse> => {
-  const { data } = await httpClient.post<PreviewSessionResponse>('/play/preview/start', {
+  const { data } = await httpClient.post<PreviewSessionResponse>('/preview/sessions', {
     previewToken: token,
   });
   return data;

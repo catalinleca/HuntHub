@@ -24,6 +24,7 @@ import assetRouter from '@/modules/assets/asset.routes';
 import publishingRouter from '@/features/publishing/publishing.routes';
 import huntShareRouter from '@/features/sharing/hunt-share.routes';
 import playRouter from '@/features/play/play.routes';
+import previewRouter from '@/features/preview/preview.routes';
 import cloneRouter from '@/features/cloning/clone.routes';
 import playerInvitationRouter from '@/features/player-invitations/player-invitation.routes';
 
@@ -55,9 +56,10 @@ async function bootstrap() {
     res.status(200).json({ status: 'ok' });
   });
 
-  app.use('/auth', authRouter);
+  app.use('/api/auth', authRouter);
 
   app.use('/api/play', playRouter);
+  app.use('/api/preview', previewRouter);
 
   app.use('/api', authMiddleware);
   app.use('/api/hunts', huntRouter);

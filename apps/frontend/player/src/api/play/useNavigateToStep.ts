@@ -3,7 +3,7 @@ import type { NavigateRequest, NavigateResponse } from '@hunthub/shared';
 import { httpClient } from '@/services/http-client';
 
 const navigateToStep = async (sessionId: string, stepId: number): Promise<NavigateResponse> => {
-  const { data } = await httpClient.post<NavigateResponse>(`/play/sessions/${sessionId}/navigate`, {
+  const { data } = await httpClient.post<NavigateResponse>(`/preview/sessions/${sessionId}/navigate`, {
     stepId,
   });
   return data;
