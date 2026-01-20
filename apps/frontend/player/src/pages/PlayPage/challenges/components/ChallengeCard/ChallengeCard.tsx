@@ -30,7 +30,12 @@ const calculateRemainingSeconds = (timeLimit: number, startedAt: string | null):
     return timeLimit;
   }
 
-  const elapsedMs = Date.now() - new Date(startedAt).getTime();
+  const startTime = new Date(startedAt).getTime();
+  if (Number.isNaN(startTime)) {
+    return timeLimit;
+  }
+
+  const elapsedMs = Date.now() - startTime;
   const elapsedSeconds = Math.floor(elapsedMs / 1000);
   return Math.max(0, timeLimit - elapsedSeconds);
 };
