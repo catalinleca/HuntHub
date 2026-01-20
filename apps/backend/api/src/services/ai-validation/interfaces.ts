@@ -2,6 +2,7 @@ export interface TextValidationParams {
   userResponse: string;
   instructions: string;
   aiInstructions?: string;
+  attemptCount?: number;
 }
 
 export interface AudioValidationParams {
@@ -9,6 +10,7 @@ export interface AudioValidationParams {
   mimeType: string;
   instructions: string;
   aiInstructions?: string;
+  attemptCount?: number;
 }
 
 export interface ImageValidationParams {
@@ -16,6 +18,7 @@ export interface ImageValidationParams {
   mimeType: string;
   instructions: string;
   aiInstructions?: string;
+  attemptCount?: number;
 }
 
 export interface ValidationResponse {

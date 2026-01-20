@@ -37,13 +37,20 @@ const validateWithAI = async (
   mimeType: string,
   instructions: string,
   aiInstructions: string,
+  attemptCount?: number,
 ): Promise<ValidationResult> => {
   const buffer = await fetchMediaBuffer(url);
   const aiService = container.get<IAIValidationService>(TYPES.AIValidationService);
 
   switch (mediaType) {
     case 'audio': {
-      const result = await aiService.validateAudioResponse(buffer, mimeType, instructions, aiInstructions);
+      const result = await aiService.validateAudioResponse(
+        buffer,
+        mimeType,
+        instructions,
+        aiInstructions,
+        attemptCount,
+      );
       return {
         isCorrect: result.isCorrect,
         feedback: result.feedback,
@@ -52,7 +59,13 @@ const validateWithAI = async (
       };
     }
     case 'image': {
-      const result = await aiService.validateImageResponse(buffer, mimeType, instructions, aiInstructions);
+      const result = await aiService.validateImageResponse(
+        buffer,
+        mimeType,
+        instructions,
+        aiInstructions,
+        attemptCount,
+      );
       return {
         isCorrect: result.isCorrect,
         feedback: result.feedback,
@@ -63,7 +76,7 @@ const validateWithAI = async (
 };
 
 export const MissionMediaValidator: IAnswerValidator = {
-  async validate(payload: AnswerPayload, step: IStep): Promise<ValidationResult> {
+  async validate(payload: AnswerPayload, step: IStep, attemptCount?: number): Promise<ValidationResult> {
     const assetId = payload.missionMedia?.assetId;
     if (!assetId) {
       return { isCorrect: false, feedback: 'Please upload your media' };
@@ -85,7 +98,7 @@ export const MissionMediaValidator: IAnswerValidator = {
     }
 
     try {
-      return await validateWithAI(aiMediaType, asset.url, asset.mimeType, instructions, aiInstructions);
+      return await validateWithAI(aiMediaType, asset.url, asset.mimeType, instructions, aiInstructions, attemptCount);
     } catch (error) {
       logger.error({ err: error, mediaType: aiMediaType }, 'Media validation failed');
       return { isCorrect: false, feedback: `Unable to process your ${aiMediaType}. Please try again.` };
