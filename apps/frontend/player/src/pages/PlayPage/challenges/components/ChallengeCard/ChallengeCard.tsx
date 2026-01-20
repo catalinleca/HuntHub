@@ -87,9 +87,7 @@ export const ChallengeCard = ({
         </IconButton>
         {hasIndicators && (
           <Stack direction="row" gap={1}>
-            {remainingSeconds !== null && remainingSeconds > 0 && (
-              <TimeLimit seconds={remainingSeconds} onExpire={onTimeExpire} />
-            )}
+            {remainingSeconds !== null && <TimeLimit seconds={remainingSeconds} onExpire={onTimeExpire} />}
             {maxAttempts && (
               <AttemptsCounter current={currentAttempts} max={maxAttempts} onMaxAttempts={onMaxAttempts} />
             )}
