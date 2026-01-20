@@ -3,6 +3,18 @@ import { RootLayout } from './RootLayout';
 import { PlayPage } from '@/pages/PlayPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
+const devOnlyRoutes: RouteObject[] = import.meta.env.DEV
+  ? [
+      {
+        path: '/dev/hunts',
+        lazy: async () => {
+          const { HuntPicker } = await import('@/pages/PreviewPage/components/HuntPicker');
+          return { Component: HuntPicker };
+        },
+      },
+    ]
+  : [];
+
 export const routes: RouteObject[] = [
   {
     element: <RootLayout />,
@@ -25,6 +37,7 @@ export const routes: RouteObject[] = [
           return { Component: AuthorPreviewPage };
         },
       },
+      ...devOnlyRoutes,
       {
         path: '*',
         element: <NotFoundPage />,
