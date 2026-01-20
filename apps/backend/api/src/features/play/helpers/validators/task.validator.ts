@@ -20,21 +20,22 @@ export const TaskValidator: IAnswerValidator = {
     const challenge = step.challenge as Challenge;
     const task = challenge.task;
 
-    if (!task?.instructions) {
+    const hasTitle = !!task?.title?.trim();
+    const hasInstructions = !!task?.instructions?.trim();
+    const hasAiInstructions = !!task?.aiInstructions?.trim();
+
+    if (!hasTitle && !hasInstructions && !hasAiInstructions) {
       return {
         isCorrect: true,
         feedback: 'Response recorded!',
       };
     }
 
+    const instructions = task?.instructions?.trim() || task?.title?.trim() || '';
+
     try {
       const aiService = container.get<IAIValidationService>(TYPES.AIValidationService);
-      const result = await aiService.validateTaskResponse(
-        response,
-        task.instructions,
-        task.aiInstructions,
-        attemptCount,
-      );
+      const result = await aiService.validateTaskResponse(response, instructions, task?.aiInstructions, attemptCount);
 
       return {
         isCorrect: result.isCorrect,

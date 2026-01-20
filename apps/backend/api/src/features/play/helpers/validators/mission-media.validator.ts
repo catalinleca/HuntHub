@@ -89,13 +89,22 @@ export const MissionMediaValidator: IAnswerValidator = {
 
     const challenge = step.challenge as Challenge;
     const mission = challenge.mission;
-    const instructions = mission?.title || mission?.description;
-    const aiInstructions = mission?.aiInstructions;
     const aiMediaType = getAIMediaType(asset.mimeType);
 
-    if (!aiMediaType || !aiInstructions || !instructions) {
+    const hasTitle = !!mission?.title?.trim();
+    const hasDescription = !!mission?.description?.trim();
+    const hasAiInstructions = !!mission?.aiInstructions?.trim();
+
+    if (!hasTitle && !hasDescription && !hasAiInstructions) {
       return { isCorrect: true, feedback: 'Media received!' };
     }
+
+    if (!aiMediaType) {
+      return { isCorrect: true, feedback: 'Media received!' };
+    }
+
+    const instructions = mission?.title?.trim() || mission?.description?.trim() || '';
+    const aiInstructions = mission?.aiInstructions?.trim() || '';
 
     try {
       return await validateWithAI(aiMediaType, asset.url, asset.mimeType, instructions, aiInstructions, attemptCount);
