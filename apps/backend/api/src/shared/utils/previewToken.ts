@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import { previewTokenSecret } from '@/config/env.config';
 import { logger } from '@/utils/logger';
 
-const TOKEN_EXPIRATION_SECONDS = 15 * 60; // 15 minutes
+export const TOKEN_EXPIRATION_SECONDS = 15 * 60; // 15 minutes
 
 export interface PreviewTokenPayload {
   huntId: number;

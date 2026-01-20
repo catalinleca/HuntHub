@@ -19,11 +19,6 @@ export class PreviewController implements IPreviewController {
 
   async generatePreviewLink(req: Request, res: Response): Promise<Response> {
     const huntId = parseNumericId(req.params.id);
-
-    if (isNaN(huntId)) {
-      throw new ValidationError('Invalid hunt ID', []);
-    }
-
     const userId = req.user!.id;
 
     const result = await this.previewService.generatePreviewLink(huntId, userId);

@@ -5,7 +5,7 @@ import HuntVersionModel from '@/database/models/HuntVersion';
 import { TYPES } from '@/shared/types';
 import { IAuthorizationService } from '@/services/authorization/authorization.service';
 import { NotFoundError, UnauthorizedError, ValidationError } from '@/shared/errors';
-import { createPreviewToken, verifyPreviewToken } from '@/shared/utils/previewToken';
+import { createPreviewToken, verifyPreviewToken, TOKEN_EXPIRATION_SECONDS } from '@/shared/utils/previewToken';
 import { playerUrl } from '@/config/env.config';
 import { logger } from '@/utils/logger';
 import { SessionManager } from '@/features/play/helpers/session-manager.helper';
@@ -42,7 +42,7 @@ export class PreviewService implements IPreviewService {
 
     return {
       previewUrl,
-      expiresIn: 900, // 15 minutes
+      expiresIn: TOKEN_EXPIRATION_SECONDS,
     };
   }
 
