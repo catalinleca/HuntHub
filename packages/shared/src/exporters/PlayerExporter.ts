@@ -17,7 +17,7 @@ import {
  */
 interface HuntVersionLike {
   name: string;
-  description?: string;
+  description?: string | null;
   stepOrder: number[];
   coverImage?: Step['media'] | null;
 }
@@ -40,7 +40,7 @@ export class PlayerExporter {
       stepId: step.stepId,
       type: step.type,
       challenge: this.challenge(step.type, step.challenge),
-      media: step.media ?? undefined,
+      media: step.media ?? null,
       timeLimit: step.timeLimit ?? null,
       maxAttempts: step.maxAttempts ?? null,
       hasHint: !!step.hint,

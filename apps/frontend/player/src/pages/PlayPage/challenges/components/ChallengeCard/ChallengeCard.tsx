@@ -47,7 +47,7 @@ interface ChallengeCardProps {
   description?: string;
   footer: React.ReactNode;
   showHint?: boolean;
-  media?: Media;
+  media?: Media | null;
   timeLimit?: number | null;
   maxAttempts?: number | null;
   currentAttempts?: number;

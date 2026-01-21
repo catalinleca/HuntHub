@@ -99,13 +99,13 @@ export const MediaHelper = {
 
     switch (media.type) {
       case MediaType.Image:
-        return media.content.image?.title;
+        return media.content.image?.title ?? undefined;
       case MediaType.Audio:
-        return media.content.audio?.title;
+        return media.content.audio?.title ?? undefined;
       case MediaType.Video:
-        return media.content.video?.title;
+        return media.content.video?.title ?? undefined;
       case MediaType.ImageAudio:
-        return media.content.imageAudio?.image?.title;
+        return media.content.imageAudio?.image?.title ?? undefined;
       default:
         return undefined;
     }
@@ -128,11 +128,11 @@ export const MediaHelper = {
 
     switch (media.type) {
       case MediaType.Image:
-        return media.content.image?.alt;
+        return media.content.image?.alt ?? undefined;
       case MediaType.Video:
-        return media.content.video?.alt;
+        return media.content.video?.alt ?? undefined;
       case MediaType.ImageAudio:
-        return media.content.imageAudio?.image?.alt;
+        return media.content.imageAudio?.image?.alt ?? undefined;
       default:
         return undefined;
     }
@@ -145,9 +145,9 @@ export const MediaHelper = {
 
     switch (media.type) {
       case MediaType.Audio:
-        return media.content.audio?.transcript;
+        return media.content.audio?.transcript ?? undefined;
       case MediaType.ImageAudio:
-        return media.content.imageAudio?.audio?.transcript;
+        return media.content.imageAudio?.audio?.transcript ?? undefined;
       default:
         return undefined;
     }

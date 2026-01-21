@@ -4,9 +4,9 @@ import { hasValidCoordinates } from '@/utils';
 
 /**
  * Transform API Location to form LocationFormData
- * Handles undefined → all nulls (disabled state)
+ * Handles null/undefined → all nulls (disabled state)
  */
-const transformLocationToFormData = (location?: Location): LocationFormData => {
+const transformLocationToFormData = (location?: Location | null): LocationFormData => {
   if (!location) {
     return { lat: null, lng: null, radius: null, address: null };
   }

@@ -3,10 +3,10 @@ import { Step, Challenge } from '@hunthub/shared/schemas';
 import { ClueFormSchema, QuizFormSchema, MissionFormSchema, TaskFormSchema } from './step';
 
 const ChallengeFormSchema = Challenge.extend({
-  clue: ClueFormSchema.optional(),
-  quiz: QuizFormSchema.optional(),
-  mission: MissionFormSchema.optional(),
-  task: TaskFormSchema.optional(),
+  clue: ClueFormSchema.nullish(),
+  quiz: QuizFormSchema.nullish(),
+  mission: MissionFormSchema.nullish(),
+  task: TaskFormSchema.nullish(),
 });
 
 // Form-specific location schema: allows null/undefined for disabled state or partial data

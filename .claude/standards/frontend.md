@@ -522,3 +522,94 @@ const useAttemptTracking = (feedback) => {
 // GOOD - context/backend tracks attemptCount
 const { attemptCount } = useValidation();
 ```
+
+---
+
+## Null vs Undefined Strategy
+
+### The Rule
+
+- **Backend/API**: Uses `null` (JSON/MongoDB standard)
+- **Frontend internal**: Uses `undefined` (TypeScript/Zod standard)
+- **Boundary (transformers/extractors)**: Normalize `null` → `undefined`
+
+### Why Two Standards?
+
+| Layer | Uses | Reason |
+|-------|------|--------|
+| JSON/API | `null` | JSON has no `undefined` |
+| TypeScript | `undefined` | `?:` produces undefined, Zod `.optional()` expects it |
+| MongoDB | `null` | Explicit absent value |
+
+### Pattern: Normalize at the Source
+
+**Extractors and helpers should normalize to `undefined`** so consumers don't need to handle `null`:
+
+```typescript
+// GOOD - extractor normalizes at the source
+getTitle: (media?: Media | null): string | undefined => {
+  return media?.content?.image?.title ?? undefined;
+}
+
+// Interface stays clean - no null leaks to UI
+interface StepTypeConfig {
+  getTitle: (challenge: Challenge) => string | undefined;
+}
+
+// Implementation normalizes
+getTitle: (challenge) => challenge.clue?.title ?? undefined,
+```
+
+**Why normalize:**
+- Consumers can use `??` without unexpected `null`
+- Interface stays clean (`string | undefined`)
+- Truthy checks work the same: `if (title)` handles both
+
+### Utility Functions: Accept Both
+
+**Utility functions should accept API types (which may have `null`):**
+
+```typescript
+// GOOD - accepts both, handles internally
+const prettyBytes = (bytes?: number | null): string => {
+  if (bytes == null) return '';  // == catches both null and undefined
+  // ...
+};
+
+// Consumer doesn't need workarounds
+{prettyBytes(asset.size)}  // Just pass it
+```
+
+### Transform Functions: Accept Both
+
+**Input transformers accept API data (which may have `null`):**
+
+```typescript
+// GOOD - accepts null from API
+const transformLocationToFormData = (location?: Location | null): LocationFormData => {
+  if (!location) {  // handles both null and undefined
+    return { lat: null, lng: null, radius: null, address: null };
+  }
+  // ...
+};
+```
+
+### Checking for Absence
+
+```typescript
+// GOOD - handles both null and undefined
+if (value == null) { }
+const safe = value ?? 'default';
+
+// BAD - misses null from API
+if (value === undefined) { }
+```
+
+### Summary
+
+| Location | Pattern | Example |
+|----------|---------|---------|
+| Extractors/helpers | Return `T \| undefined`, use `?? undefined` | `getTitle() => title ?? undefined` |
+| Utility functions | Accept `T \| null \| undefined` | `prettyBytes(bytes?: number \| null)` |
+| Transformers | Accept `T \| null \| undefined` | `transform(location?: Location \| null)` |
+| Interfaces | Use `T \| undefined` (no null) | `getTitle: () => string \| undefined` |

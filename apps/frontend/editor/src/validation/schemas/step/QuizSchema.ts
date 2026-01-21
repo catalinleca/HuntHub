@@ -9,13 +9,13 @@ import { errorMessage } from '../../messages';
 export const QuizFormSchema = z
   .object({
     title: z.string().min(1, errorMessage('Question').required),
-    description: z.string().optional(),
+    description: z.string().nullish(),
     type: z.enum(['choice', 'input']),
-    options: z.array(Option).optional(),
-    targetId: z.string().optional(),
-    expectedAnswer: z.string().optional(),
-    randomizeOrder: z.boolean().optional(),
-    validation: QuizValidation.optional(),
+    options: z.array(Option).nullish(),
+    targetId: z.string().nullish(),
+    expectedAnswer: z.string().nullish(),
+    randomizeOrder: z.boolean().nullish(),
+    validation: QuizValidation.nullish(),
   })
   .superRefine((data, ctx) => {
     if (data.type === 'choice') {

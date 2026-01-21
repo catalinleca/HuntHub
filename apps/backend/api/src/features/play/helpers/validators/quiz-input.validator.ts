@@ -137,7 +137,7 @@ interface ValidationConfig {
   acceptableAnswers: string[];
 }
 
-const getValidationConfig = (validation: QuizValidation | undefined): ValidationConfig => ({
+const getValidationConfig = (validation: QuizValidation | null | undefined): ValidationConfig => ({
   mode: validation?.mode ?? ValidationMode.Exact,
   caseSensitive: validation?.caseSensitive ?? false,
   fuzzyThreshold: validation?.fuzzyThreshold ?? 80,

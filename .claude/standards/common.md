@@ -369,3 +369,84 @@ UI-specific types stay in frontend:
 interface FormState { ... }  // React Hook Form state
 type ValidationStatus = 'idle' | 'validating' | 'success' | 'error';  // UI state
 ```
+
+---
+
+## Zod Schemas - ALWAYS CHECK SHARED FIRST (MANDATORY)
+
+**Generated Zod schemas exist in `@hunthub/shared/schemas`. NEVER recreate them.**
+
+### Two Exports, Same Source
+
+```
+packages/shared/openapi/hunthub_models.yaml
+    │
+    ├── npm run generate:types  →  TypeScript types  →  import { Hunt } from '@hunthub/shared'
+    │
+    └── npm run generate:zod    →  Zod schemas       →  import { Hunt } from '@hunthub/shared/schemas'
+```
+
+Both come from OpenAPI. Both stay in sync. Use the right one for your purpose.
+
+### When to Use What
+
+| Need | Import From | Example |
+|------|-------------|---------|
+| Type annotations | `@hunthub/shared` | `const hunt: Hunt = ...` |
+| Runtime validation | `@hunthub/shared/schemas` | `Hunt.parse(data)` |
+| Form validation | `@hunthub/shared/schemas` | `resolver: zodResolver(HuntCreate)` |
+| API request validation | `@hunthub/shared/schemas` | `validateRequest(GenerateHuntRequest)` |
+
+### BEFORE Writing Any Zod Schema
+
+1. **Check `@hunthub/shared/schemas`** - Does the schema already exist?
+2. **If yes** - Import and use it directly, or extend it
+3. **If no** - Consider adding to OpenAPI and regenerating
+4. **Only create local schemas** for truly internal logic (not shared across apps)
+
+### Extending Existing Schemas
+
+When you need a variation, **extend** - don't recreate:
+
+```typescript
+// GOOD - extend existing schema
+import { Challenge, ChallengeType } from '@hunthub/shared/schemas';
+
+const AIGeneratedStepSchema = z.object({
+  type: ChallengeType,        // Reuse existing enum
+  challenge: Challenge,        // Reuse existing schema
+  hint: z.string().optional(), // Add specific field
+}).strict();
+
+// BAD - recreating what already exists
+const AIGeneratedStepSchema = z.object({
+  type: z.enum(['clue', 'quiz', 'mission', 'task']),  // Duplicate!
+  challenge: z.object({                               // Duplicate!
+    clue: z.object({ title: z.string(), description: z.string() }).partial(),
+    // ... recreating the entire Challenge schema
+  }),
+  hint: z.string().optional(),
+});
+```
+
+### Why This Matters
+
+1. **Single source of truth** - Change OpenAPI → everything updates
+2. **No drift** - Backend and frontend schemas stay in sync
+3. **Less code** - Don't maintain duplicate validation logic
+4. **Type safety** - Zod infers types, no separate type definitions needed
+
+### Available Schemas (Check These First!)
+
+Core schemas in `@hunthub/shared/schemas`:
+
+- **Enums**: `ChallengeType`, `OptionType`, `MissionType`, `HuntStatus`, `HuntAccessMode`, `ValidationMode`
+- **Challenge**: `Clue`, `Quiz`, `Mission`, `Task`, `Challenge`, `Option`, `QuizValidation`
+- **Hunt/Step**: `Hunt`, `HuntCreate`, `HuntUpdate`, `Step`, `StepCreate`, `StepUpdate`
+- **API Requests**: `GenerateHuntRequest`, `StartSessionRequest`, `ValidateAnswerRequest`, etc.
+- **API Responses**: `GenerateHuntResponse`, `SessionResponse`, `HintResponse`, etc.
+
+**When in doubt, grep the generated file:**
+```bash
+grep -n "export const" packages/shared/src/schemas/gen/index.ts
+```

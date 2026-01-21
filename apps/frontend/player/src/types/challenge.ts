@@ -6,7 +6,7 @@ export interface BaseChallengeProps {
   isLastStep: boolean;
   feedback: string | null;
   currentAttempts: number;
-  media?: Media;
+  media?: Media | null;
   timeLimit?: number | null;
   maxAttempts?: number | null;
   hasHint: boolean;
