@@ -34,7 +34,7 @@ export class OpenAIHuntGenerator implements IAIHuntGenerator {
 
   constructor() {
     if (!openaiApiKey) {
-      logger.warn('OPENAI_API_KEY not set - AI hunt generation will fail');
+      throw new Error('OPENAI_API_KEY is required for AI hunt generation');
     }
     this.client = new OpenAI({ apiKey: openaiApiKey });
   }
@@ -91,6 +91,10 @@ export class OpenAIHuntGenerator implements IAIHuntGenerator {
       });
 
       const message = completion.choices[0]?.message;
+
+      if (!message) {
+        throw new GenerationError('AI returned no response');
+      }
 
       if (message.refusal) {
         throw new GenerationError(`AI refused to generate: ${message.refusal}`);
