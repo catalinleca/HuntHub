@@ -41,7 +41,7 @@ export interface DiscoverHuntsResponse {
   hunts: Array<{
     huntId: number;
     name: string;
-    description?: string;
+    description?: string | null;
     totalSteps: number;
   }>;
   total: number;

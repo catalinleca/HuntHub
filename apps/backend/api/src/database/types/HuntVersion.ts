@@ -6,16 +6,16 @@ export interface IHuntVersion {
   version: number;
 
   name: string;
-  description?: string;
-  startLocation?: ILocation;
+  description?: string | null;
+  startLocation?: ILocation | null;
   stepOrder: number[];
   coverImage?: Media | null;
 
   isPublished: boolean; // true = read-only
 
-  publishedAt?: Date;
-  publishedBy?: string;
+  publishedAt?: Date | null;
+  publishedBy?: string | null;
 
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
 }

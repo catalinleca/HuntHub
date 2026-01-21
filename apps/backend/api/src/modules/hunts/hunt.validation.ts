@@ -40,6 +40,7 @@ const StepSave = StepSchema.extend({
 
 export const saveHuntSchema = HuntSchema.extend({
   steps: z.array(StepSave).optional(),
+  isLive: z.boolean().optional(),
 });
 
 export const reorderStepsSchema = z.object({

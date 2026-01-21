@@ -229,7 +229,7 @@ export class HuntSaveService implements IHuntSaveService {
   private async handleUpdateFailure(
     huntId: number,
     huntVersion: number,
-    updatedAt: string | undefined,
+    updatedAt: string | null | undefined,
     session: ClientSession,
   ): Promise<never> {
     const versionDoc = await HuntVersionModel.findOne({

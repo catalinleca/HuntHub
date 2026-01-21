@@ -34,6 +34,7 @@ components:
           type: number
         address:
           type: string
+          nullable: true
           description: Cached address from geocoding
       required:
         - lat
@@ -111,9 +112,11 @@ components:
           $ref: '#/components/schemas/AssetSnapshot'
         title:
           type: string
+          nullable: true
           description: Display title (user-provided)
         alt:
           type: string
+          nullable: true
           description: Accessibility text for screen readers
       required:
         - asset
@@ -127,9 +130,11 @@ components:
           $ref: '#/components/schemas/AssetSnapshot'
         title:
           type: string
+          nullable: true
           description: Display title (user-provided)
         transcript:
           type: string
+          nullable: true
           description: Text transcript for accessibility
       required:
         - asset
@@ -143,9 +148,11 @@ components:
           $ref: '#/components/schemas/AssetSnapshot'
         title:
           type: string
+          nullable: true
           description: Display title (user-provided)
         alt:
           type: string
+          nullable: true
           description: Accessibility text for screen readers
       required:
         - asset
@@ -161,6 +168,7 @@ components:
           $ref: '#/components/schemas/AudioMedia'
         title:
           type: string
+          nullable: true
           description: Overall title for the combined media
       required:
         - image
@@ -172,13 +180,21 @@ components:
       description: Content container for media (discriminated by parent type field)
       properties:
         image:
-          $ref: '#/components/schemas/ImageMedia'
+          allOf:
+            - $ref: '#/components/schemas/ImageMedia'
+          nullable: true
         audio:
-          $ref: '#/components/schemas/AudioMedia'
+          allOf:
+            - $ref: '#/components/schemas/AudioMedia'
+          nullable: true
         video:
-          $ref: '#/components/schemas/VideoMedia'
+          allOf:
+            - $ref: '#/components/schemas/VideoMedia'
+          nullable: true
         imageAudio:
-          $ref: '#/components/schemas/ImageAudioMedia'
+          allOf:
+            - $ref: '#/components/schemas/ImageAudioMedia'
+          nullable: true
       additionalProperties: false
 
     Media:
@@ -220,10 +236,13 @@ components:
           type: string
         description:
           type: string
+          nullable: true
         status:
           $ref: '#/components/schemas/HuntStatus'
         startLocation:
-          $ref: '#/components/schemas/Location'
+          allOf:
+            - $ref: '#/components/schemas/Location'
+          nullable: true
         stepOrder:
           type: array
           description: "Ordered array of step IDs defining step sequence"
@@ -232,6 +251,7 @@ components:
           example: [10, 23, 15]
         steps:
           type: array
+          nullable: true
           description: "Optional: Full step details (when populated)"
           items:
               $ref: '#/components/schemas/Step'
@@ -272,14 +292,17 @@ components:
         permission:
           type: string
           enum: [owner, admin, view]
+          nullable: true
           description: "Authenticated user's permission level for this hunt (included in user-specific contexts like dashboard)"
           example: "owner"
         createdAt:
           type: string
+          nullable: true
           example: "2024-02-01T10:12:45Z"
           format: date-time
         updatedAt:
           type: string
+          nullable: true
           example: "2024-02-01T10:12:45Z"
           format: date-time
         coverImage:
@@ -295,6 +318,7 @@ components:
         - name
         - status
         - isPublished
+        - isLive
         - stepOrder
         - playSlug
         - accessMode
@@ -309,11 +333,15 @@ components:
           maxLength: 100
         description:
           type: string
+          nullable: true
           maxLength: 500
         startLocation:
-          $ref: '#/components/schemas/Location'
+          allOf:
+            - $ref: '#/components/schemas/Location'
+          nullable: true
         steps:
           type: array
+          nullable: true
           items:
               $ref: '#/components/schemas/StepCreate'
         coverImage:
@@ -335,11 +363,15 @@ components:
           maxLength: 100
         description:
           type: string
+          nullable: true
           maxLength: 500
         startLocation:
-          $ref: '#/components/schemas/Location'
+          allOf:
+            - $ref: '#/components/schemas/Location'
+          nullable: true
         updatedAt:
           type: string
+          nullable: true
           format: date-time
           description: Timestamp for optimistic locking (optional)
         coverImage:
@@ -382,14 +414,17 @@ components:
           nullable: true
         metadata:
           type: object
+          nullable: true
           additionalProperties: true
           description: Flexible key-value storage for extensibility
         createdAt:
           type: string
+          nullable: true
           example: "2024-02-01T10:12:45Z"
           format: date-time
         updatedAt:
           type: string
+          nullable: true
           example: "2024-02-01T10:12:45Z"
           format: date-time
       required:
@@ -465,13 +500,21 @@ components:
       type: object
       properties:
         clue:
-          $ref: '#/components/schemas/Clue'
+          allOf:
+            - $ref: '#/components/schemas/Clue'
+          nullable: true
         quiz:
-          $ref: '#/components/schemas/Quiz'
+          allOf:
+            - $ref: '#/components/schemas/Quiz'
+          nullable: true
         mission:
-          $ref: '#/components/schemas/Mission'
+          allOf:
+            - $ref: '#/components/schemas/Mission'
+          nullable: true
         task:
-          $ref: '#/components/schemas/Task'
+          allOf:
+            - $ref: '#/components/schemas/Task'
+          nullable: true
       additionalProperties: false
 
     Clue:
@@ -479,8 +522,10 @@ components:
       properties:
         title:
           type: string
+          nullable: true
         description:
           type: string
+          nullable: true
       additionalProperties: false
 
     Option:
@@ -500,23 +545,29 @@ components:
       description: Validation configuration for quiz input answers
       properties:
         mode:
-          $ref: '#/components/schemas/ValidationMode'
+          allOf:
+            - $ref: '#/components/schemas/ValidationMode'
+          nullable: true
         caseSensitive:
           type: boolean
+          nullable: true
           default: false
           description: Whether validation should be case-sensitive (default false)
         fuzzyThreshold:
           type: number
+          nullable: true
           minimum: 1
           maximum: 100
           default: 80
           description: Similarity threshold percentage for fuzzy mode (1-100%, default 80%)
         numericTolerance:
           type: number
+          nullable: true
           minimum: 0
           description: Tolerance for numeric-range mode (expectedAnswer +/- tolerance)
         acceptableAnswers:
           type: array
+          nullable: true
           items:
             type: string
           description: Additional acceptable answers (any match is correct)
@@ -527,28 +578,38 @@ components:
       properties:
         title:
           type: string
+          nullable: true
         description:
           type: string
+          nullable: true
         type:
-          $ref: '#/components/schemas/OptionType'
+          allOf:
+            - $ref: '#/components/schemas/OptionType'
+          nullable: true
         # For CHOICE type:
         options:
           type: array
+          nullable: true
           items:
             $ref: '#/components/schemas/Option'
           description: All answer options in display order (choice type)
         targetId:
           type: string
+          nullable: true
           description: ID of the correct answer option (choice type)
         # For INPUT type:
         expectedAnswer:
           type: string
+          nullable: true
           description: The correct answer text (input type)
         randomizeOrder:
           type: boolean
+          nullable: true
           description: Whether to randomize option order when displayed to player
         validation:
-          $ref: '#/components/schemas/QuizValidation'
+          allOf:
+            - $ref: '#/components/schemas/QuizValidation'
+          nullable: true
       additionalProperties: false
 
     Mission:
@@ -556,22 +617,31 @@ components:
       properties:
         title:
           type: string
+          nullable: true
         description:
           type: string
+          nullable: true
         referenceAssetIds:
           type: array
+          nullable: true
           items:
             type: integer
           description: Author's reference images/media shown to player
         targetLocation:
-          $ref: '#/components/schemas/Location'
+          allOf:
+            - $ref: '#/components/schemas/Location'
+          nullable: true
         type:
-          $ref: '#/components/schemas/MissionType'
+          allOf:
+            - $ref: '#/components/schemas/MissionType'
+          nullable: true
         aiInstructions:
           type: string
+          nullable: true
           description: Instructions for AI to validate player's upload (future feature)
         aiModel:
           type: string
+          nullable: true
           enum: [gpt-4-vision, claude-vision, gemini-vision]
           description: Which AI model to use for validation (future feature)
       additionalProperties: false
@@ -581,14 +651,17 @@ components:
       properties:
         title:
           type: string
+          nullable: true
         instructions:
           type: string
           description: What the player should do (shown to player)
         aiInstructions:
           type: string
+          nullable: true
           description: Optional. Specific criteria for AI validation. If not provided, AI validates against the instructions field.
         aiModel:
           type: string
+          nullable: true
           enum: [gpt-4, claude, gemini]
           description: Which AI model to use for validation (future feature)
       required:
@@ -607,20 +680,27 @@ components:
           type: string
         firstName:
           type: string
+          nullable: true
         lastName:
           type: string
+          nullable: true
         displayName:
           type: string
+          nullable: true
         profilePicture:
           type: string
+          nullable: true
         bio:
           type: string
+          nullable: true
         createdAt:
           type: string
+          nullable: true
           example: "2024-02-01T10:12:45Z"
           format: date-time
         updatedAt:
           type: string
+          nullable: true
           example: "2024-02-01T10:12:45Z"
           format: date-time
       required:
@@ -671,6 +751,9 @@ components:
           type: string
         path:
           type: string
+      required:
+        - bucket
+        - path
       additionalProperties: false
 
     Asset:
@@ -689,24 +772,32 @@ components:
           $ref: '#/components/schemas/MimeTypes'
         originalFilename:
           type: string
+          nullable: true
         size:
           type: number
+          nullable: true
           description: File size in bytes
         thumbnailUrl:
           type: string
+          nullable: true
         storageLocation:
-          $ref: '#/components/schemas/StorageLocation'
+          allOf:
+            - $ref: '#/components/schemas/StorageLocation'
+          nullable: true
         usage:
           type: array
+          nullable: true
           items:
             $ref: '#/components/schemas/AssetUsage'
           description: Track where this asset is used
         createdAt:
           type: string
+          nullable: true
           example: "2024-02-01T10:12:45Z"
           format: date-time
         updatedAt:
           type: string
+          nullable: true
           example: "2024-02-01T10:12:45Z"
           format: date-time
       required:
@@ -783,12 +874,15 @@ components:
           type: boolean
         score:
           type: number
+          nullable: true
           description: Quality/confidence score (0-1 or 0-10)
         feedback:
           type: string
+          nullable: true
           description: Player guidance message from AI or system
         metadata:
           type: object
+          nullable: true
           additionalProperties: true
           description: Extensibility (e.g., branchTaken, AI model used)
       required:
@@ -812,16 +906,20 @@ components:
           default: false
         responses:
           type: array
+          nullable: true
           items:
             $ref: '#/components/schemas/Submission'
         startedAt:
           type: string
+          nullable: true
           format: date-time
         completedAt:
           type: string
+          nullable: true
           format: date-time
         duration:
           type: number
+          nullable: true
           description: Time spent on step in seconds
       required:
         - stepId
@@ -835,6 +933,7 @@ components:
           type: string
         userId:
           type: string
+          nullable: true
           description: Optional - only for authenticated players
         sessionId:
           type: string
@@ -855,9 +954,11 @@ components:
           format: date-time
         completedAt:
           type: string
+          nullable: true
           format: date-time
         duration:
           type: number
+          nullable: true
           description: Total time in seconds
         currentStepId:
           type: integer
@@ -865,6 +966,7 @@ components:
           example: 10000
         steps:
           type: array
+          nullable: true
           items:
             $ref: '#/components/schemas/StepProgress'
         playerName:
@@ -873,14 +975,17 @@ components:
           maxLength: 50
         rating:
           type: number
+          nullable: true
           minimum: 0
           maximum: 5
           description: Player's rating of the hunt (0-5 stars)
         createdAt:
           type: string
+          nullable: true
           format: date-time
         updatedAt:
           type: string
+          nullable: true
           format: date-time
       required:
         - id
@@ -912,13 +1017,16 @@ components:
           description: Number of players currently playing this hunt
         lastPlayedAt:
           type: string
+          nullable: true
           format: date-time
           description: When someone last played this hunt
         createdAt:
           type: string
+          nullable: true
           format: date-time
         updatedAt:
           type: string
+          nullable: true
           format: date-time
       required:
         - huntId
@@ -1024,10 +1132,12 @@ components:
           description: User's display name
         email:
           type: string
+          nullable: true
           format: email
           description: User's email address
         profilePicture:
           type: string
+          nullable: true
           description: User's profile picture URL
         permission:
           type: string
@@ -1040,6 +1150,7 @@ components:
           example: "2024-02-01T10:30:00Z"
         sharedBy:
           type: string
+          nullable: true
           description: Display name of user who granted access
       required:
         - userId
@@ -1085,6 +1196,7 @@ components:
       properties:
         version:
           type: integer
+          nullable: true
           description: Version number to release (optional - auto-detects latest published if not provided)
           example: 1
         currentLiveVersion:
@@ -1113,6 +1225,7 @@ components:
       properties:
         version:
           type: integer
+          nullable: true
           description: Version number to clone (optional - defaults to latest version)
           example: 1
       additionalProperties: false
@@ -1284,11 +1397,13 @@ components:
           $ref: '#/components/schemas/OptionType'
         options:
           type: array
+          nullable: true
           items:
             $ref: '#/components/schemas/Option'
           description: Options to display (may be randomized by backend)
         randomizeOrder:
           type: boolean
+          nullable: true
       required:
         - title
         - description
@@ -1307,6 +1422,7 @@ components:
           $ref: '#/components/schemas/MissionType'
         referenceAssetIds:
           type: array
+          nullable: true
           items:
             type: integer
           description: Reference images shown to player
@@ -1335,13 +1451,21 @@ components:
       description: "Player Format - Challenge container (only one populated based on step.type)"
       properties:
         clue:
-          $ref: '#/components/schemas/CluePF'
+          allOf:
+            - $ref: '#/components/schemas/CluePF'
+          nullable: true
         quiz:
-          $ref: '#/components/schemas/QuizPF'
+          allOf:
+            - $ref: '#/components/schemas/QuizPF'
+          nullable: true
         mission:
-          $ref: '#/components/schemas/MissionPF'
+          allOf:
+            - $ref: '#/components/schemas/MissionPF'
+          nullable: true
         task:
-          $ref: '#/components/schemas/TaskPF'
+          allOf:
+            - $ref: '#/components/schemas/TaskPF'
+          nullable: true
       additionalProperties: false
 
     StepPF:
@@ -1356,7 +1480,9 @@ components:
         challenge:
           $ref: '#/components/schemas/ChallengePF'
         media:
-          $ref: '#/components/schemas/Media'
+          allOf:
+            - $ref: '#/components/schemas/Media'
+          nullable: true
           description: Optional media attachment
         timeLimit:
           type: integer
@@ -1387,6 +1513,7 @@ components:
           type: string
         description:
           type: string
+          nullable: true
         totalSteps:
           type: integer
           description: Total number of steps in the hunt
@@ -1486,17 +1613,29 @@ components:
       description: Container for answer data (only one field populated based on answerType)
       properties:
         clue:
-          $ref: '#/components/schemas/ClueAnswerPayload'
+          allOf:
+            - $ref: '#/components/schemas/ClueAnswerPayload'
+          nullable: true
         quizChoice:
-          $ref: '#/components/schemas/QuizChoicePayload'
+          allOf:
+            - $ref: '#/components/schemas/QuizChoicePayload'
+          nullable: true
         quizInput:
-          $ref: '#/components/schemas/QuizInputPayload'
+          allOf:
+            - $ref: '#/components/schemas/QuizInputPayload'
+          nullable: true
         missionLocation:
-          $ref: '#/components/schemas/MissionLocationPayload'
+          allOf:
+            - $ref: '#/components/schemas/MissionLocationPayload'
+          nullable: true
         missionMedia:
-          $ref: '#/components/schemas/MissionMediaPayload'
+          allOf:
+            - $ref: '#/components/schemas/MissionMediaPayload'
+          nullable: true
         task:
-          $ref: '#/components/schemas/TaskAnswerPayload'
+          allOf:
+            - $ref: '#/components/schemas/TaskAnswerPayload'
+          nullable: true
       additionalProperties: false
 
     # ============================================================
@@ -1517,6 +1656,7 @@ components:
           maxLength: 50
         email:
           type: string
+          nullable: true
           format: email
       required:
         - playSlug
@@ -1544,21 +1684,26 @@ components:
           type: boolean
         feedback:
           type: string
+          nullable: true
           description: Hint or explanation message
         isComplete:
           type: boolean
+          nullable: true
           description: Whether the hunt is complete
         attempts:
           type: integer
           description: Number of attempts on this step
         maxAttempts:
           type: integer
+          nullable: true
           description: Maximum attempts allowed for this step
         expired:
           type: boolean
+          nullable: true
           description: Whether the time limit expired
         exhausted:
           type: boolean
+          nullable: true
           description: Whether all attempts have been used
       required:
         - correct
@@ -1603,7 +1748,9 @@ components:
         self:
           $ref: '#/components/schemas/HateoasLink'
         next:
-          $ref: '#/components/schemas/HateoasLink'
+          allOf:
+            - $ref: '#/components/schemas/HateoasLink'
+          nullable: true
         validate:
           $ref: '#/components/schemas/HateoasLink'
       required:
@@ -1618,7 +1765,9 @@ components:
         currentStep:
           $ref: '#/components/schemas/HateoasLink'
         nextStep:
-          $ref: '#/components/schemas/HateoasLink'
+          allOf:
+            - $ref: '#/components/schemas/HateoasLink'
+          nullable: true
       required:
         - currentStep
       additionalProperties: false
@@ -1696,6 +1845,7 @@ components:
           description: When the session started
         completedAt:
           type: string
+          nullable: true
           format: date-time
           description: When the session was completed (if finished)
       required:
@@ -1839,5 +1989,64 @@ components:
       required:
         - data
         - pagination
+      additionalProperties: false
+
+    # ============================================================
+    # AI Hunt Generation Schemas
+    # ============================================================
+
+    GenerateHuntStyle:
+      type: string
+      enum: [educational, adventure, team-building, family-friendly]
+      description: Style/theme guidance for AI hunt generation
+
+    GenerateHuntRequest:
+      type: object
+      description: Request body for AI hunt generation
+      properties:
+        prompt:
+          type: string
+          minLength: 10
+          maxLength: 500
+          description: Natural language description of the hunt to generate
+        style:
+          allOf:
+            - $ref: '#/components/schemas/GenerateHuntStyle'
+          nullable: true
+      required:
+        - prompt
+      additionalProperties: false
+
+    GenerationMetadata:
+      type: object
+      description: Metadata about the AI generation process
+      properties:
+        model:
+          type: string
+          description: AI model used for generation
+          example: gpt-4o
+        processingTimeMs:
+          type: integer
+          description: Time taken to generate the hunt in milliseconds
+        prompt:
+          type: string
+          description: Echo of the original prompt
+      required:
+        - model
+        - processingTimeMs
+        - prompt
+      additionalProperties: false
+
+    GenerateHuntResponse:
+      type: object
+      description: Response from AI hunt generation
+      properties:
+        hunt:
+          $ref: '#/components/schemas/Hunt'
+        generationMetadata:
+          $ref: '#/components/schemas/GenerationMetadata'
+      required:
+        - hunt
+        - generationMetadata
       additionalProperties: false
 

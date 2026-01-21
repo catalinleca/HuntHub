@@ -40,6 +40,12 @@ import type {
   IImageValidationProvider,
   IAIValidationService,
 } from '@/services/ai-validation';
+import { OpenAIHuntGenerator, IAIHuntGenerator } from '@/features/ai-generation/ai-hunt-generator.provider';
+import { AIHuntGenerationService, IAIHuntGenerationService } from '@/features/ai-generation/ai-hunt-generation.service';
+import {
+  AIHuntGenerationController,
+  IAIHuntGenerationController,
+} from '@/features/ai-generation/ai-hunt-generation.controller';
 
 const container = new Container();
 
@@ -75,5 +81,9 @@ container.bind<ITextValidationProvider>(TYPES.TextValidationProvider).to(GroqPro
 container.bind<IAudioValidationProvider>(TYPES.AudioValidationProvider).to(GeminiProvider).inSingletonScope();
 container.bind<IImageValidationProvider>(TYPES.ImageValidationProvider).to(GeminiProvider).inSingletonScope();
 container.bind<IAIValidationService>(TYPES.AIValidationService).to(AIValidationService);
+
+container.bind<IAIHuntGenerator>(TYPES.AIHuntGenerator).to(OpenAIHuntGenerator).inSingletonScope();
+container.bind<IAIHuntGenerationService>(TYPES.AIHuntGenerationService).to(AIHuntGenerationService);
+container.bind<IAIHuntGenerationController>(TYPES.AIHuntGenerationController).to(AIHuntGenerationController);
 
 export { container };

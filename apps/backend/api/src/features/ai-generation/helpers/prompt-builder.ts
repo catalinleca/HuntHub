@@ -1,4 +1,4 @@
-import { GenerateHuntStyle } from '../ai-generation.types';
+import { GenerateHuntStyle } from '@hunthub/shared';
 
 const CHALLENGE_TYPE_DOCS = `
 ## Challenge Types
@@ -114,6 +114,7 @@ Return a valid JSON object with this exact structure:
 8. Create variety - mix different challenge types.
 9. Do NOT include: locations, media, timeLimit, maxAttempts.
 10. Each step can optionally have a "hint" field with a brief hint for players who get stuck.
+11. Generate between 3-10 steps based on the complexity implied by the description.
 `;
 
 const STYLE_PROMPTS: Record<GenerateHuntStyle, string> = {
@@ -158,14 +159,14 @@ ${CHALLENGE_TYPE_DOCS}
 ${OUTPUT_FORMAT}`;
 };
 
-export const buildUserPrompt = (prompt: string, style: GenerateHuntStyle | undefined, stepCount: number): string => {
+export const buildUserPrompt = (prompt: string, style: GenerateHuntStyle | undefined): string => {
   const styleSection = style ? STYLE_PROMPTS[style] : '';
 
   return `Create a treasure hunt based on this description:
 "${prompt}"
 
 Requirements:
-- Generate exactly ${stepCount} steps
+- Determine the appropriate number of steps (3-10) based on the scope and complexity described
 - Use a variety of challenge types (clue, quiz, mission, task)
 - Make it engaging and coherent
 ${styleSection}

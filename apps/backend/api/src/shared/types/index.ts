@@ -32,6 +32,10 @@ export const TYPES = {
   ImageValidationProvider: Symbol.for('ImageValidationProvider'),
 
   AIValidationService: Symbol.for('AIValidationService'),
+
+  AIHuntGenerator: Symbol.for('AIHuntGenerator'),
+  AIHuntGenerationService: Symbol.for('AIHuntGenerationService'),
+  AIHuntGenerationController: Symbol.for('AIHuntGenerationController'),
 };
 
 export interface ISerializer<TModel, TDTO> {

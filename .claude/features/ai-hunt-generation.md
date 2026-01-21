@@ -10,18 +10,21 @@ Generate complete treasure hunts from natural language prompts using OpenAI gpt-
 
 | Layer | Status |
 |-------|--------|
-| Backend | ○ Planned |
+| Backend | ◐ In Progress |
 | Frontend (Editor) | ○ Planned |
 | Frontend (Player) | N/A |
 
-**Last Updated:** 2025-01-20 — Feature planned, not yet implemented.
+**Last Updated:** 2025-01-21 — Backend implementation in progress.
 
 ### Backend Implementation Status
-- [ ] OpenAI generation provider
+- [x] Error classes (RateLimitError, ServiceUnavailableError, GenerationError)
+- [x] OpenAPI types (GenerateHuntRequest, GenerateHuntResponse, etc.)
+- [x] Prompt builder helper
+- [ ] LLM hunt output validator (semantic validation only)
+- [ ] Rate limiter (10/hour per user, in-memory)
+- [ ] OpenAI generation provider (uses Structured Outputs)
 - [ ] AI generation service (orchestration)
-- [ ] Output parser (validate LLM JSON)
-- [ ] Rate limiter (10/hour per user)
-- [ ] API endpoint POST /api/ai/generate-hunt
+- [ ] API endpoint POST /api/hunts/generate
 
 ### Editor Implementation Status
 - [ ] "Create with AI" button on dashboard
@@ -46,14 +49,14 @@ sequenceDiagram
     Note right of U: EDITOR: GENERATE HUNT
     U->>FE: [FE ○] Click "Create with AI"
     FE->>FE: [FE ○] Open AIGenerationDialog
-    U->>FE: [FE ○] Enter prompt + options
-    FE->>API: [BE ○] POST /api/ai/generate-hunt { prompt, style?, stepCount? }
+    U->>FE: [FE ○] Enter prompt + optional style
+    FE->>API: [BE ○] POST /api/hunts/generate { prompt, style? }
     Note right of API: AIGenerationService.generateHunt()
     API->>API: [BE ○] RateLimiter.checkRateLimit(userId)
-    API->>AI: [BE ○] OpenAIGenerationProvider.generateHunt()
-    AI-->>API: [BE ○] { name, description, steps[] }
-    API->>API: [BE ○] OutputParser.parseAndValidate()
-    Note right of API: Retry once if validation fails
+    API->>AI: [BE ○] OpenAIProvider.generateHunt()
+    Note right of AI: Structured Outputs with zodResponseFormat
+    AI-->>API: [BE ○] Parsed & typed { name, description, steps[] }
+    API->>API: [BE ○] LLMHuntOutputValidator.validateSemantics()
     API->>DB: [BE ○] HuntService.createHunt()
     API->>DB: [BE ○] HuntSaveService.saveHunt()
     API-->>FE: [BE ○] 201 { hunt, generationMetadata }
@@ -68,10 +71,10 @@ sequenceDiagram
 ### Generate Hunt (main flow)
 
 ```
-POST /api/ai/generate-hunt { prompt, style?, stepCount? }
+POST /api/hunts/generate { prompt, style? }
 │
 ├─ AIGenerationController.generateHunt()
-│  └─ Extract prompt, style, stepCount from request body
+│  └─ Extract prompt, style from request body
 │
 └─ AIGenerationService.generateHunt()
    │
@@ -79,23 +82,23 @@ POST /api/ai/generate-hunt { prompt, style?, stepCount? }
    │  ├─ if count >= 10 per hour → 429 RateLimitError
    │  └─ else → increment counter
    │
-   ├─ OpenAIGenerationProvider.generateHunt()
+   ├─ OpenAIProvider.generateHunt()
    │  ├─ PromptBuilder.buildSystemPrompt()
-   │  │  └─ Challenge types, rules, JSON format
-   │  ├─ PromptBuilder.buildUserPrompt(prompt, style, stepCount)
-   │  └─ OpenAI.chat.completions.create()
-   │     └─ gpt-4o with response_format: json_object
-   │
-   ├─ OutputParser.parseAndValidate(llmResponse)
-   │  ├─ Strip markdown code blocks
-   │  ├─ JSON.parse()
-   │  ├─ Validate against AIGeneratedHuntSchema
-   │  │  └─ Reuses StepCreate schema from @hunthub/shared
-   │  ├─ Semantic validation (quiz-choice has options, etc.)
+   │  │  └─ Challenge types, rules, examples
+   │  ├─ PromptBuilder.buildUserPrompt(prompt, style)
    │  │
-   │  └─ ON VALIDATION FAILURE:
-   │     ├─ Retry once with error context in prompt
-   │     └─ If still fails → 500 GenerationError
+   │  └─ openai.beta.chat.completions.parse()
+   │     └─ Uses zodResponseFormat(AIGeneratedHuntSchema, 'hunt')
+   │     └─ OpenAI guarantees schema adherence at generation time
+   │     └─ Returns pre-parsed, typed result via message.parsed
+   │
+   ├─ LLMHuntOutputValidator.validateSemantics(parsedHunt)
+   │  └─ Business rules only (structure already guaranteed):
+   │     ├─ quiz-choice: targetId matches an option id
+   │     ├─ quiz-input: expectedAnswer is non-empty
+   │     ├─ mission: type is upload-media (not match-location)
+   │     ├─ steps: has variety (not all same type)
+   │     └─ ON FAILURE → 500 GenerationError
    │
    ├─ HuntService.createHunt({ name, description }, userId)
    │  └─ Creates empty Hunt + HuntVersion
@@ -125,21 +128,78 @@ RateLimiter.checkRateLimit(userId)
 
 ---
 
+## OpenAI Structured Outputs
+
+This feature uses **OpenAI Structured Outputs** with native Zod support for guaranteed schema adherence.
+
+### Why Structured Outputs?
+
+1. **Guaranteed valid JSON** - OpenAI constrains generation to match schema
+2. **No manual parsing** - No JSON.parse(), no markdown stripping
+3. **No structural validation** - Schema adherence guaranteed at generation time
+4. **Pre-parsed results** - `message.parsed` returns typed object
+5. **Better error handling** - Refusals handled via `message.refusal`
+
+### Implementation Pattern
+
+```typescript
+import OpenAI from 'openai';
+import { zodResponseFormat } from 'openai/helpers/zod';
+import { z } from 'zod';
+
+const AIGeneratedHuntSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+  steps: z.array(StepSchema),
+});
+
+const completion = await openai.beta.chat.completions.parse({
+  model: 'gpt-4o-2024-08-06',
+  messages: [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: userPrompt },
+  ],
+  response_format: zodResponseFormat(AIGeneratedHuntSchema, 'hunt'),
+});
+
+const message = completion.choices[0].message;
+
+if (message.refusal) {
+  throw new GenerationError(message.refusal);
+}
+
+const hunt = message.parsed; // Already typed as AIGeneratedHunt!
+```
+
+### What Still Needs Validation
+
+Semantic/business rules that OpenAI can't guarantee:
+
+| Rule | Validation |
+|------|------------|
+| quiz-choice targetId | Must match one of the option ids |
+| quiz-input expectedAnswer | Must be non-empty |
+| mission type | Must be 'upload-media' (not 'match-location') |
+| step variety | Should have mix of challenge types |
+
+---
+
 ## API Endpoints
 
 | Method | Endpoint | Auth | Purpose |
 |--------|----------|------|---------|
-| `POST` | `/api/ai/generate-hunt` | Required | Generate hunt from prompt |
+| `POST` | `/api/hunts/generate` | Required | Generate hunt from prompt |
 
 ### Request Schema
 
 ```typescript
 {
   prompt: string,        // 10-500 chars, required
-  style?: 'educational' | 'adventure' | 'team-building' | 'family-friendly',
-  stepCount?: number     // 3-10, default 5
+  style?: 'educational' | 'adventure' | 'team-building' | 'family-friendly'
 }
 ```
+
+Note: Step count is NOT a parameter. AI determines appropriate number (3-10) based on prompt complexity.
 
 ### Response Schema
 
@@ -147,7 +207,7 @@ RateLimiter.checkRateLimit(userId)
 {
   hunt: Hunt,            // Full Hunt DTO with steps
   generationMetadata: {
-    model: string,       // "gpt-4o"
+    model: string,       // "gpt-4o-2024-08-06"
     processingTimeMs: number,
     prompt: string       // Echo original prompt
   }
@@ -161,7 +221,7 @@ RateLimiter.checkRateLimit(userId)
 | 400 | VALIDATION_ERROR | Prompt too short (<10) or too long (>500) |
 | 401 | UNAUTHORIZED | Not authenticated |
 | 429 | RATE_LIMIT_EXCEEDED | >10 generations per hour |
-| 500 | GENERATION_FAILED | AI failed after retries |
+| 500 | GENERATION_FAILED | AI refused or semantic validation failed |
 | 503 | SERVICE_UNAVAILABLE | OpenAI service down |
 
 ---
@@ -211,7 +271,6 @@ AIGenerationDialog
 ├── Prompt textarea (required, 10-500 chars)
 ├── Style dropdown (optional)
 │   └─ educational | adventure | team-building | family-friendly
-├── Step count slider (3-10, default 5)
 ├── Generate button
 │   └─ Disabled while generating
 └── Loading state (5-10 seconds typical)
@@ -225,7 +284,7 @@ const { generateHunt, isGenerating, error } = useGenerateHunt();
 
 // Usage in dialog
 const handleGenerate = async () => {
-  const { hunt } = await generateHunt({ prompt, style, stepCount });
+  const { hunt } = await generateHunt({ prompt, style });
   navigate(`/edit/${hunt.huntId}`);
 };
 ```
@@ -243,18 +302,18 @@ const handleGenerate = async () => {
 ## Testing Checklist
 
 ### Backend
-- [ ] Valid prompt → hunt created with requested step count
-- [ ] Style parameter influences challenge type distribution
+- [ ] Valid prompt → hunt created with steps
+- [ ] Style parameter influences content tone
+- [ ] AI determines appropriate step count (3-10)
 - [ ] Generated steps have variety (not all same type)
-- [ ] Quiz-choice steps have options and targetId
+- [ ] Quiz-choice steps have options and valid targetId
 - [ ] Quiz-input steps have expectedAnswer
-- [ ] Mission steps have type (upload-media only, no match-location)
+- [ ] Mission steps have type upload-media only
 - [ ] Task steps have instructions
 - [ ] Rate limit blocks after 10 requests/hour
 - [ ] Rate limit resets after 1 hour
-- [ ] Malformed LLM output triggers retry
-- [ ] Retry with error context succeeds
-- [ ] Exhausted retries return 500
+- [ ] Semantic validation catches invalid targetId
+- [ ] OpenAI refusal returns 500
 - [ ] Prompt too short returns 400
 - [ ] Unauthorized returns 401
 - [ ] Hunt + steps created atomically

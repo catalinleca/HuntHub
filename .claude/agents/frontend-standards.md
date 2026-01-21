@@ -13,6 +13,7 @@ You review frontend code to ensure it follows HuntHub's established patterns. Do
 
 1. **Read the standards file first:**
    ```
+   Read .claude/standards/common.md
    Read .claude/standards/frontend.md
    ```
 2. Then read the code files you're reviewing

@@ -27,6 +27,7 @@ import playRouter from '@/features/play/play.routes';
 import previewRouter from '@/features/preview/preview.routes';
 import cloneRouter from '@/features/cloning/clone.routes';
 import playerInvitationRouter from '@/features/player-invitations/player-invitation.routes';
+import aiHuntGenerationRouter from '@/features/ai-generation/ai-hunt-generation.routes';
 
 import { errorHandler, authMiddleware, requestLogger } from '@/shared/middlewares';
 
@@ -68,6 +69,7 @@ async function bootstrap() {
   app.use('/api/hunts', huntShareRouter);
   app.use('/api/hunts', cloneRouter);
   app.use('/api/hunts', playerInvitationRouter);
+  app.use('/api/hunts', aiHuntGenerationRouter);
   app.use('/api/assets', assetRouter);
 
   app.use(errorHandler);

@@ -10,6 +10,14 @@
  * ---------------------------------------------------------------
  */
 
+/** Style/theme guidance for AI hunt generation */
+export enum GenerateHuntStyle {
+  Educational = 'educational',
+  Adventure = 'adventure',
+  TeamBuilding = 'team-building',
+  FamilyFriendly = 'family-friendly',
+}
+
 /**
  * Field to sort assets by
  * @example "createdAt"
@@ -139,7 +147,7 @@ export interface Location {
   lng: number;
   radius: number;
   /** Cached address from geocoding */
-  address?: string;
+  address?: string | null;
 }
 
 /** Snapshot of asset data (copied at selection time) */
@@ -159,9 +167,9 @@ export interface ImageMedia {
   /** Snapshot of asset data (copied at selection time) */
   asset: AssetSnapshot;
   /** Display title (user-provided) */
-  title?: string;
+  title?: string | null;
   /** Accessibility text for screen readers */
-  alt?: string;
+  alt?: string | null;
 }
 
 /** Audio media with nested asset snapshot */
@@ -169,9 +177,9 @@ export interface AudioMedia {
   /** Snapshot of asset data (copied at selection time) */
   asset: AssetSnapshot;
   /** Display title (user-provided) */
-  title?: string;
+  title?: string | null;
   /** Text transcript for accessibility */
-  transcript?: string;
+  transcript?: string | null;
 }
 
 /** Video media with nested asset snapshot */
@@ -179,9 +187,9 @@ export interface VideoMedia {
   /** Snapshot of asset data (copied at selection time) */
   asset: AssetSnapshot;
   /** Display title (user-provided) */
-  title?: string;
+  title?: string | null;
   /** Accessibility text for screen readers */
-  alt?: string;
+  alt?: string | null;
 }
 
 /** Combined image + audio (composes ImageMedia and AudioMedia) */
@@ -191,19 +199,15 @@ export interface ImageAudioMedia {
   /** Audio media with nested asset snapshot */
   audio: AudioMedia;
   /** Overall title for the combined media */
-  title?: string;
+  title?: string | null;
 }
 
 /** Content container for media (discriminated by parent type field) */
 export interface MediaContent {
-  /** Image media with nested asset snapshot */
-  image?: ImageMedia;
-  /** Audio media with nested asset snapshot */
-  audio?: AudioMedia;
-  /** Video media with nested asset snapshot */
-  video?: VideoMedia;
-  /** Combined image + audio (composes ImageMedia and AudioMedia) */
-  imageAudio?: ImageAudioMedia;
+  image?: ImageMedia | null;
+  audio?: AudioMedia | null;
+  video?: VideoMedia | null;
+  imageAudio?: ImageAudioMedia | null;
 }
 
 /** Step media attachment (self-contained snapshot with asset data) */
@@ -235,17 +239,17 @@ export interface Hunt {
    */
   liveVersion?: number | null;
   name: string;
-  description?: string;
+  description?: string | null;
   /** Hunt status: draft (editable) or published (read-only) */
   status: HuntStatus;
-  startLocation?: Location;
+  startLocation?: Location | null;
   /**
    * Ordered array of step IDs defining step sequence
    * @example [10,23,15]
    */
   stepOrder: number[];
   /** Optional: Full step details (when populated) */
-  steps?: Step[];
+  steps?: Step[] | null;
   /**
    * Is THIS version published?
    * @example false
@@ -263,7 +267,7 @@ export interface Hunt {
    * Is this version currently live/active for players? (computed: version === liveVersion)
    * @example false
    */
-  isLive?: boolean;
+  isLive: boolean;
   /**
    * When hunt was last released/made live (null if never released)
    * @format date-time
@@ -283,17 +287,17 @@ export interface Hunt {
    * Authenticated user's permission level for this hunt (included in user-specific contexts like dashboard)
    * @example "owner"
    */
-  permission?: 'owner' | 'admin' | 'view';
+  permission?: 'owner' | 'admin' | 'view' | null;
   /**
    * @format date-time
    * @example "2024-02-01T10:12:45Z"
    */
-  createdAt?: string;
+  createdAt?: string | null;
   /**
    * @format date-time
    * @example "2024-02-01T10:12:45Z"
    */
-  updatedAt?: string;
+  updatedAt?: string | null;
   /** Optional cover image for the hunt */
   coverImage?: Media | null;
 }
@@ -305,9 +309,9 @@ export interface HuntCreate {
    */
   name: string;
   /** @maxLength 500 */
-  description?: string;
-  startLocation?: Location;
-  steps?: StepCreate[];
+  description?: string | null;
+  startLocation?: Location | null;
+  steps?: StepCreate[] | null;
   /** Optional cover image for the hunt */
   coverImage?: Media | null;
 }
@@ -320,13 +324,13 @@ export interface HuntUpdate {
    */
   name?: string;
   /** @maxLength 500 */
-  description?: string;
-  startLocation?: Location;
+  description?: string | null;
+  startLocation?: Location | null;
   /**
    * Timestamp for optimistic locking (optional)
    * @format date-time
    */
-  updatedAt?: string;
+  updatedAt?: string | null;
   /** Optional cover image for the hunt */
   coverImage?: Media | null;
 }
@@ -350,12 +354,12 @@ export interface Step {
    * @format date-time
    * @example "2024-02-01T10:12:45Z"
    */
-  createdAt?: string;
+  createdAt?: string | null;
   /**
    * @format date-time
    * @example "2024-02-01T10:12:45Z"
    */
-  updatedAt?: string;
+  updatedAt?: string | null;
 }
 
 /** Step creation (huntId comes from URL parameter) */
@@ -383,15 +387,15 @@ export interface StepUpdate {
 }
 
 export interface Challenge {
-  clue?: Clue;
-  quiz?: Quiz;
-  mission?: Mission;
-  task?: Task;
+  clue?: Clue | null;
+  quiz?: Quiz | null;
+  mission?: Mission | null;
+  task?: Task | null;
 }
 
 export interface Clue {
-  title?: string;
-  description?: string;
+  title?: string | null;
+  description?: string | null;
 }
 
 export interface Option {
@@ -401,93 +405,85 @@ export interface Option {
 
 /** Validation configuration for quiz input answers */
 export interface QuizValidation {
-  /**
-   * Validation mode for quiz input answers:
-   * - exact: Case-insensitive exact match (default)
-   * - fuzzy: Levenshtein distance similarity match
-   * - contains: Substring match
-   * - numeric-range: Numeric value within tolerance
-   */
-  mode?: ValidationMode;
+  mode?: ValidationMode | null;
   /**
    * Whether validation should be case-sensitive (default false)
    * @default false
    */
-  caseSensitive?: boolean;
+  caseSensitive?: boolean | null;
   /**
    * Similarity threshold percentage for fuzzy mode (1-100%, default 80%)
    * @min 1
    * @max 100
    * @default 80
    */
-  fuzzyThreshold?: number;
+  fuzzyThreshold?: number | null;
   /**
    * Tolerance for numeric-range mode (expectedAnswer +/- tolerance)
    * @min 0
    */
-  numericTolerance?: number;
+  numericTolerance?: number | null;
   /** Additional acceptable answers (any match is correct) */
-  acceptableAnswers?: string[];
+  acceptableAnswers?: string[] | null;
 }
 
 export interface Quiz {
-  title?: string;
-  description?: string;
-  type?: OptionType;
+  title?: string | null;
+  description?: string | null;
+  type?: OptionType | null;
   /** All answer options in display order (choice type) */
-  options?: Option[];
+  options?: Option[] | null;
   /** ID of the correct answer option (choice type) */
-  targetId?: string;
+  targetId?: string | null;
   /** The correct answer text (input type) */
-  expectedAnswer?: string;
+  expectedAnswer?: string | null;
   /** Whether to randomize option order when displayed to player */
-  randomizeOrder?: boolean;
-  /** Validation configuration for quiz input answers */
-  validation?: QuizValidation;
+  randomizeOrder?: boolean | null;
+  validation?: QuizValidation | null;
 }
 
 export interface Mission {
-  title?: string;
-  description?: string;
+  title?: string | null;
+  description?: string | null;
   /** Author's reference images/media shown to player */
-  referenceAssetIds?: number[];
-  targetLocation?: Location;
-  type?: MissionType;
+  referenceAssetIds?: number[] | null;
+  targetLocation?: Location | null;
+  type?: MissionType | null;
   /** Instructions for AI to validate player's upload (future feature) */
-  aiInstructions?: string;
+  aiInstructions?: string | null;
   /** Which AI model to use for validation (future feature) */
-  aiModel?: 'gpt-4-vision' | 'claude-vision' | 'gemini-vision';
+  aiModel?: 'gpt-4-vision' | 'claude-vision' | 'gemini-vision' | null;
 }
 
 export interface Task {
-  title?: string;
+  title?: string | null;
   /** What the player should do (shown to player) */
   instructions: string;
   /** Optional. Specific criteria for AI validation. If not provided, AI validates against the instructions field. */
-  aiInstructions?: string;
+  aiInstructions?: string | null;
   /** Which AI model to use for validation (future feature) */
-  aiModel?: 'gpt-4' | 'claude' | 'gemini';
+  aiModel?: 'gpt-4' | 'claude' | 'gemini' | null;
 }
 
 export interface User {
   id: string;
   firebaseUid: string;
   email: string;
-  firstName?: string;
-  lastName?: string;
-  displayName?: string;
-  profilePicture?: string;
-  bio?: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  displayName?: string | null;
+  profilePicture?: string | null;
+  bio?: string | null;
   /**
    * @format date-time
    * @example "2024-02-01T10:12:45Z"
    */
-  createdAt?: string;
+  createdAt?: string | null;
   /**
    * @format date-time
    * @example "2024-02-01T10:12:45Z"
    */
-  updatedAt?: string;
+  updatedAt?: string | null;
 }
 
 export interface HuntAccess {
@@ -508,8 +504,8 @@ export interface AssetUsage {
 }
 
 export interface StorageLocation {
-  bucket?: string;
-  path?: string;
+  bucket: string;
+  path: string;
 }
 
 export interface Asset {
@@ -519,23 +515,23 @@ export interface Asset {
   ownerId: string;
   url: string;
   mimeType: MimeTypes;
-  originalFilename?: string;
+  originalFilename?: string | null;
   /** File size in bytes */
-  size?: number;
-  thumbnailUrl?: string;
-  storageLocation?: StorageLocation;
+  size?: number | null;
+  thumbnailUrl?: string | null;
+  storageLocation?: StorageLocation | null;
   /** Track where this asset is used */
-  usage?: AssetUsage[];
+  usage?: AssetUsage[] | null;
   /**
    * @format date-time
    * @example "2024-02-01T10:12:45Z"
    */
-  createdAt?: string;
+  createdAt?: string | null;
   /**
    * @format date-time
    * @example "2024-02-01T10:12:45Z"
    */
-  updatedAt?: string;
+  updatedAt?: string | null;
 }
 
 export interface AssetCreate {
@@ -578,9 +574,9 @@ export interface Submission {
   content: any;
   isCorrect: boolean;
   /** Quality/confidence score (0-1 or 0-10) */
-  score?: number;
+  score?: number | null;
   /** Player guidance message from AI or system */
-  feedback?: string;
+  feedback?: string | null;
   /** Extensibility (e.g., branchTaken, AI model used) */
   metadata?: Record<string, any>;
 }
@@ -593,20 +589,20 @@ export interface StepProgress {
   attempts?: number;
   /** @default false */
   completed?: boolean;
-  responses?: Submission[];
+  responses?: Submission[] | null;
   /** @format date-time */
-  startedAt?: string;
+  startedAt?: string | null;
   /** @format date-time */
-  completedAt?: string;
+  completedAt?: string | null;
   /** Time spent on step in seconds */
-  duration?: number;
+  duration?: number | null;
 }
 
 /** Player's progress through a hunt (supports anonymous players) */
 export interface Progress {
   id: string;
   /** Optional - only for authenticated players */
-  userId?: string;
+  userId?: string | null;
   /** UUID for localStorage-based sessions */
   sessionId: string;
   isAnonymous: boolean;
@@ -622,15 +618,15 @@ export interface Progress {
   /** @format date-time */
   startedAt: string;
   /** @format date-time */
-  completedAt?: string;
+  completedAt?: string | null;
   /** Total time in seconds */
-  duration?: number;
+  duration?: number | null;
   /**
    * Current step player is on
    * @example 10000
    */
   currentStepId: number;
-  steps?: StepProgress[];
+  steps?: StepProgress[] | null;
   /**
    * @minLength 1
    * @maxLength 50
@@ -641,11 +637,11 @@ export interface Progress {
    * @min 0
    * @max 5
    */
-  rating?: number;
+  rating?: number | null;
   /** @format date-time */
-  createdAt?: string;
+  createdAt?: string | null;
   /** @format date-time */
-  updatedAt?: string;
+  updatedAt?: string | null;
 }
 
 /** Runtime operational state for published hunts (tracks which version is live + metrics) */
@@ -669,11 +665,11 @@ export interface LiveHunt {
    * When someone last played this hunt
    * @format date-time
    */
-  lastPlayedAt?: string;
+  lastPlayedAt?: string | null;
   /** @format date-time */
-  createdAt?: string;
+  createdAt?: string | null;
   /** @format date-time */
-  updatedAt?: string;
+  updatedAt?: string | null;
 }
 
 /** Lightweight response for hunt release operations */
@@ -749,9 +745,9 @@ export interface Collaborator {
    * User's email address
    * @format email
    */
-  email?: string;
+  email?: string | null;
   /** User's profile picture URL */
-  profilePicture?: string;
+  profilePicture?: string | null;
   /** User's permission level (owner is not listed as collaborator) */
   permission: 'admin' | 'view';
   /**
@@ -761,7 +757,7 @@ export interface Collaborator {
    */
   sharedAt: string;
   /** Display name of user who granted access */
-  sharedBy?: string;
+  sharedBy?: string | null;
 }
 
 /** Response from sharing a hunt with another user */
@@ -791,7 +787,7 @@ export interface ReleaseHuntRequest {
    * Version number to release (optional - auto-detects latest published if not provided)
    * @example 1
    */
-  version?: number;
+  version?: number | null;
   /**
    * Current live version number for optimistic locking (null if never released)
    * @example 1
@@ -814,7 +810,7 @@ export interface CloneHuntRequest {
    * Version number to clone (optional - defaults to latest version)
    * @example 1
    */
-  version?: number;
+  version?: number | null;
 }
 
 /** Request body for sharing a hunt with another user */
@@ -901,8 +897,8 @@ export interface QuizPF {
   description: string;
   type: OptionType;
   /** Options to display (may be randomized by backend) */
-  options?: Option[];
-  randomizeOrder?: boolean;
+  options?: Option[] | null;
+  randomizeOrder?: boolean | null;
 }
 
 /** Player Format - Mission without target location */
@@ -911,7 +907,7 @@ export interface MissionPF {
   description: string;
   type: MissionType;
   /** Reference images shown to player */
-  referenceAssetIds?: number[];
+  referenceAssetIds?: number[] | null;
 }
 
 /** Player Format - Task without AI instructions */
@@ -923,14 +919,10 @@ export interface TaskPF {
 
 /** Player Format - Challenge container (only one populated based on step.type) */
 export interface ChallengePF {
-  /** Player Format - Clue (same as Clue, no answers to strip) */
-  clue?: CluePF;
-  /** Player Format - Quiz without correct answer */
-  quiz?: QuizPF;
-  /** Player Format - Mission without target location */
-  mission?: MissionPF;
-  /** Player Format - Task without AI instructions */
-  task?: TaskPF;
+  clue?: CluePF | null;
+  quiz?: QuizPF | null;
+  mission?: MissionPF | null;
+  task?: TaskPF | null;
 }
 
 /** Player Format - Step without answers or internal metadata */
@@ -941,7 +933,7 @@ export interface StepPF {
   /** Player Format - Challenge container (only one populated based on step.type) */
   challenge: ChallengePF;
   /** Optional media attachment */
-  media?: Media;
+  media?: Media | null;
   /** Time limit in seconds (for display - server enforces) */
   timeLimit?: number | null;
   /** Maximum attempts allowed (for display - server enforces) */
@@ -955,7 +947,7 @@ export interface HuntMetaPF {
   /** @example 1332 */
   huntId: number;
   name: string;
-  description?: string;
+  description?: string | null;
   /** Total number of steps in the hunt */
   totalSteps: number;
   coverImage?: Media | null;
@@ -1010,18 +1002,12 @@ export interface TaskAnswerPayload {
 
 /** Container for answer data (only one field populated based on answerType) */
 export interface AnswerPayload {
-  /** Clue acknowledgment (no actual answer needed) */
-  clue?: ClueAnswerPayload;
-  /** Multiple choice quiz answer */
-  quizChoice?: QuizChoicePayload;
-  /** Free text quiz answer */
-  quizInput?: QuizInputPayload;
-  /** GPS location for location-based missions */
-  missionLocation?: MissionLocationPayload;
-  /** Uploaded media for media missions */
-  missionMedia?: MissionMediaPayload;
-  /** Free text response for tasks */
-  task?: TaskAnswerPayload;
+  clue?: ClueAnswerPayload | null;
+  quizChoice?: QuizChoicePayload | null;
+  quizInput?: QuizInputPayload | null;
+  missionLocation?: MissionLocationPayload | null;
+  missionMedia?: MissionMediaPayload | null;
+  task?: TaskAnswerPayload | null;
 }
 
 /** Request to start a play session */
@@ -1037,7 +1023,7 @@ export interface StartSessionRequest {
    */
   playerName: string;
   /** @format email */
-  email?: string;
+  email?: string | null;
 }
 
 /** Request to validate a player's answer (session tracks current step) */
@@ -1052,17 +1038,17 @@ export interface ValidateAnswerRequest {
 export interface ValidateAnswerResponse {
   correct: boolean;
   /** Hint or explanation message */
-  feedback?: string;
+  feedback?: string | null;
   /** Whether the hunt is complete */
-  isComplete?: boolean;
+  isComplete?: boolean | null;
   /** Number of attempts on this step */
   attempts: number;
   /** Maximum attempts allowed for this step */
-  maxAttempts?: number;
+  maxAttempts?: number | null;
   /** Whether the time limit expired */
-  expired?: boolean;
+  expired?: boolean | null;
   /** Whether all attempts have been used */
-  exhausted?: boolean;
+  exhausted?: boolean | null;
 }
 
 /** Response with hint data */
@@ -1082,8 +1068,7 @@ export interface HateoasLink {
 export interface StepLinks {
   /** Hypermedia link for REST navigation */
   self: HateoasLink;
-  /** Hypermedia link for REST navigation */
-  next?: HateoasLink;
+  next?: HateoasLink | null;
   /** Hypermedia link for REST navigation */
   validate: HateoasLink;
 }
@@ -1092,8 +1077,7 @@ export interface StepLinks {
 export interface ValidateAnswerLinks {
   /** Hypermedia link for REST navigation */
   currentStep: HateoasLink;
-  /** Hypermedia link for REST navigation */
-  nextStep?: HateoasLink;
+  nextStep?: HateoasLink | null;
 }
 
 /** Step data with HATEOAS navigation links */
@@ -1144,7 +1128,7 @@ export interface SessionResponse {
    * When the session was completed (if finished)
    * @format date-time
    */
-  completedAt?: string;
+  completedAt?: string | null;
 }
 
 /** Standard pagination query parameters */
@@ -1229,4 +1213,36 @@ export interface PaginatedAssetsResponse {
   data: Asset[];
   /** Pagination metadata in response */
   pagination: PaginationMeta;
+}
+
+/** Request body for AI hunt generation */
+export interface GenerateHuntRequest {
+  /**
+   * Natural language description of the hunt to generate
+   * @minLength 10
+   * @maxLength 500
+   */
+  prompt: string;
+  style?: GenerateHuntStyle | null;
+}
+
+/** Metadata about the AI generation process */
+export interface GenerationMetadata {
+  /**
+   * AI model used for generation
+   * @example "gpt-4o"
+   */
+  model: string;
+  /** Time taken to generate the hunt in milliseconds */
+  processingTimeMs: number;
+  /** Echo of the original prompt */
+  prompt: string;
+}
+
+/** Response from AI hunt generation */
+export interface GenerateHuntResponse {
+  /** Hunt DTO (merges Hunt master + HuntVersion content for frontend) */
+  hunt: Hunt;
+  /** Metadata about the AI generation process */
+  generationMetadata: GenerationMetadata;
 }

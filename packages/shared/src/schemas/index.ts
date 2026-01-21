@@ -113,5 +113,11 @@ export {
   PaginationMeta,
   PaginatedHuntsResponse,
   PaginatedAssetsResponse,
+
+  // AI Hunt Generation
+  GenerateHuntStyle,
+  GenerateHuntRequest,
+  GenerationMetadata,
+  GenerateHuntResponse,
   schemas,
 } from './gen';

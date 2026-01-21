@@ -4,7 +4,7 @@ export interface ILocation {
   lat: number;
   lng: number;
   radius: number;
-  address?: string;
+  address?: string | null;
 }
 
 export const locationSchema = new Schema<ILocation>({

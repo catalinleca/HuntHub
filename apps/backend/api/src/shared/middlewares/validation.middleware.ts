@@ -13,7 +13,7 @@ export const validateRequest = (schema: ZodSchema) => async (req: Request, res: 
         message: err.message,
       }));
 
-      next(new ValidationError('Wrong payload', errors));
+      return next(new ValidationError('Wrong payload', errors));
     }
 
     return next(error);

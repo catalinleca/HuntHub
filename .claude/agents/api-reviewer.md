@@ -30,6 +30,8 @@ Ensure API contracts are stable, type-safe, and aligned with frontend needs. Pre
 
 ### Response Shape Stability (Contract)
 - [ ] Response structure matches OpenAPI spec
+- [ ] Check any type usage, addition, deletion, or modification and make sure it's not duplicated in the shared types
+- [ ] Check any type, models, interface changes and make sure that if they are an API Contract ( being used by frontend ), they are mentioned in the OpenAPI spec. Which means interface and zod schemas must be generated
 - [ ] No unintentional breaking changes to existing endpoints
 - [ ] Nested objects have consistent shapes across endpoints
 - [ ] New fields are additive (don't remove existing fields)

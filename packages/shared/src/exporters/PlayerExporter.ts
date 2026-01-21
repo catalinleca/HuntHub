@@ -17,7 +17,7 @@ import {
  */
 interface HuntVersionLike {
   name: string;
-  description?: string;
+  description?: string | null;
   stepOrder: number[];
   coverImage?: Step['media'] | null;
 }
