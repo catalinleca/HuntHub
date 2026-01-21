@@ -1,4 +1,12 @@
-import { Hunt, Step, GenerateHuntRequest, GenerateHuntResponse, ChallengeType, Challenge } from '@hunthub/shared';
+import {
+  Hunt,
+  Step,
+  StepCreate,
+  GenerateHuntRequest,
+  GenerateHuntResponse,
+  ChallengeType,
+  Challenge,
+} from '@hunthub/shared';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/shared/types';
 import { IHuntService } from '@/modules/hunts/hunt.service';
@@ -67,18 +75,18 @@ export class AIHuntGenerationService implements IAIHuntGenerationService {
   }
 
   private buildHuntWithSteps(createdHunt: Hunt, aiHunt: AIGeneratedHunt): Hunt {
-    const steps: Step[] = aiHunt.steps.map((aiStep) => this.transformAIStep(aiStep, createdHunt.huntId));
+    const steps = aiHunt.steps.map((aiStep) => this.transformAIStep(aiStep));
 
+    // saveHunt handles steps without stepId (creates them)
+    // Type assertion at boundary since Hunt.steps expects Step[] but we have StepCreate[]
     return {
       ...createdHunt,
-      steps,
+      steps: steps as Step[],
     };
   }
 
-  private transformAIStep(aiStep: AIGeneratedStep, huntId: number): Step {
+  private transformAIStep(aiStep: AIGeneratedStep): StepCreate {
     return {
-      stepId: undefined as unknown as number,
-      huntId,
       type: aiStep.type as ChallengeType,
       challenge: aiStep.challenge as Challenge,
       hint: aiStep.hint ?? null,
