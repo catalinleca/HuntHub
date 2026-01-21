@@ -54,7 +54,7 @@ export class PlayerExporter {
     return {
       huntId,
       name: version.name,
-      description: version.description ?? null,
+      description: version.description,
       totalSteps: version.stepOrder.length,
       coverImage: version.coverImage ?? null,
     };
