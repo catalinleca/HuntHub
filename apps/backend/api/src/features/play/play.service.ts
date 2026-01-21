@@ -229,7 +229,7 @@ export class PlayService implements IPlayService {
       exhausted = true;
     }
 
-    const validationResult = await AnswerValidator.validate(request.answerType, request.payload, step);
+    const validationResult = await AnswerValidator.validate(request.answerType, request.payload, step, currentAttempts);
 
     logger.debug(
       {

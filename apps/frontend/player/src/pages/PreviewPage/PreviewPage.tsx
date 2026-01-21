@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { EmbeddedPreview } from './components/EmbeddedPreview';
-import { HuntPicker } from './components/HuntPicker';
+import { NotFoundPage } from '@/pages/NotFoundPage';
 
 const isInIframe = (): boolean => {
   try {
@@ -32,5 +32,5 @@ export const PreviewPage = () => {
     return null;
   }
 
-  return <HuntPicker />;
+  return <NotFoundPage />;
 };

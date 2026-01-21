@@ -17,7 +17,7 @@ export interface ValidationResult {
 }
 
 export interface IAnswerValidator {
-  validate(payload: AnswerPayload, step: IStep): Promise<ValidationResult>;
+  validate(payload: AnswerPayload, step: IStep, attemptCount?: number): Promise<ValidationResult>;
 }
 
 const ANSWER_TYPE_TO_CHALLENGE_TYPE: Record<AnswerType, ChallengeType> = {
@@ -39,7 +39,12 @@ export class AnswerValidator {
     [AnswerType.Task]: TaskValidator,
   };
 
-  static async validate(answerType: AnswerType, payload: AnswerPayload, step: IStep): Promise<ValidationResult> {
+  static async validate(
+    answerType: AnswerType,
+    payload: AnswerPayload,
+    step: IStep,
+    attemptCount?: number,
+  ): Promise<ValidationResult> {
     const expectedChallengeType = ANSWER_TYPE_TO_CHALLENGE_TYPE[answerType];
     if (step.type !== expectedChallengeType) {
       throw new ValidationError(
@@ -53,7 +58,7 @@ export class AnswerValidator {
       throw new ValidationError(`Unknown answer type: ${answerType}`, []);
     }
 
-    return validator.validate(payload, step);
+    return validator.validate(payload, step, attemptCount);
   }
 
   static getExpectedAnswerTypes(stepType: ChallengeType): AnswerType[] {

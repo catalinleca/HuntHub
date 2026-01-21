@@ -26,10 +26,10 @@ export class GeminiProvider implements IAudioValidationProvider, IImageValidatio
   }
 
   async validateAudio(params: AudioValidationParams): Promise<AudioValidationResponse> {
-    const { audioBuffer, mimeType, instructions, aiInstructions } = params;
+    const { audioBuffer, mimeType, instructions, aiInstructions, attemptCount } = params;
 
     const { safeInstructions, criteria } = sanitizeInstructions(instructions, aiInstructions, this.name);
-    const prompt = buildAudioPrompt(safeInstructions, criteria);
+    const prompt = buildAudioPrompt(safeInstructions, criteria, attemptCount);
 
     const content = await this.callGemini(prompt, mimeType, audioBuffer);
     const result = parseJsonResponse(content, this.name);
@@ -42,10 +42,10 @@ export class GeminiProvider implements IAudioValidationProvider, IImageValidatio
   }
 
   async validateImage(params: ImageValidationParams): Promise<ValidationResponse> {
-    const { imageBuffer, mimeType, instructions, aiInstructions } = params;
+    const { imageBuffer, mimeType, instructions, aiInstructions, attemptCount } = params;
 
     const { safeInstructions, criteria } = sanitizeInstructions(instructions, aiInstructions, this.name);
-    const prompt = buildImagePrompt(safeInstructions, criteria);
+    const prompt = buildImagePrompt(safeInstructions, criteria, attemptCount);
 
     const content = await this.callGemini(prompt, mimeType, imageBuffer);
     const result = parseJsonResponse(content, this.name);
