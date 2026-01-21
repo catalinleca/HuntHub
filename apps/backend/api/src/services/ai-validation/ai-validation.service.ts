@@ -21,7 +21,7 @@ export interface IAIValidationService {
   validateTaskResponse(
     userResponse: string,
     instructions: string,
-    aiInstructions?: string,
+    aiInstructions?: string | null,
     attemptCount?: number,
   ): Promise<AIValidationResult>;
 
