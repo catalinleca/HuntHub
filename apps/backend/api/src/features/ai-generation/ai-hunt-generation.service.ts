@@ -36,27 +36,34 @@ export class AIHuntGenerationService implements IAIHuntGenerationService {
       userId,
     );
 
-    const huntWithSteps = this.buildHuntWithSteps(createdHunt, generationResult.hunt);
-    const savedHunt = await this.huntSaveService.saveHunt(createdHunt.huntId, huntWithSteps, userId);
+    try {
+      const huntWithSteps = this.buildHuntWithSteps(createdHunt, generationResult.hunt);
+      const savedHunt = await this.huntSaveService.saveHunt(createdHunt.huntId, huntWithSteps, userId);
 
-    logger.info(
-      {
-        huntId: savedHunt.huntId,
-        stepCount: savedHunt.steps?.length ?? 0,
-        processingTimeMs: generationResult.processingTimeMs,
-        retryCount: generationResult.retryCount,
-      },
-      'AI-generated hunt saved',
-    );
+      logger.info(
+        {
+          huntId: savedHunt.huntId,
+          stepCount: savedHunt.steps?.length ?? 0,
+          processingTimeMs: generationResult.processingTimeMs,
+          retryCount: generationResult.retryCount,
+        },
+        'AI-generated hunt saved',
+      );
 
-    return {
-      hunt: savedHunt,
-      generationMetadata: {
-        model: generationResult.model,
-        processingTimeMs: generationResult.processingTimeMs,
-        prompt,
-      },
-    };
+      return {
+        hunt: savedHunt,
+        generationMetadata: {
+          model: generationResult.model,
+          processingTimeMs: generationResult.processingTimeMs,
+          prompt,
+        },
+      };
+    } catch (error) {
+      await this.huntService.deleteHunt(createdHunt.huntId, userId).catch((deleteError) => {
+        logger.error({ huntId: createdHunt.huntId, deleteError }, 'Failed to clean up hunt after save failure');
+      });
+      throw error;
+    }
   }
 
   private buildHuntWithSteps(createdHunt: Hunt, aiHunt: AIGeneratedHunt): Hunt {
