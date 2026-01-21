@@ -1,6 +1,6 @@
 import { useStep, usePrefetchStep } from '@/api';
 
-const extractStepIdFromLink = (link?: { href: string }): number | null => {
+const extractStepIdFromLink = (link?: { href: string } | null): number | null => {
   if (!link) {
     return null;
   }
