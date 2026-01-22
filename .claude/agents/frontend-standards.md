@@ -47,6 +47,17 @@ Ensure frontend code follows MUI + styled-components patterns, React best practi
 - [ ] Output transformers strip what API doesn't need
 - [ ] React Query initialData used for cache seeding
 
+### Shared Types (CRITICAL)
+- [ ] API types imported from `@hunthub/shared` - NOT defined locally
+- [ ] Zod schemas from `@hunthub/shared/schemas` - NOT recreated
+- [ ] **NO LOCAL INTERFACES FOR API DATA** - if it comes from backend, type is in shared
+
+**BLOCK if you see:**
+```typescript
+// BAD - local interface for API data
+interface HuntResponse { ... }  // Should import from @hunthub/shared!
+```
+
 ### File Structure
 - [ ] Components with styles use folder + barrel export
 - [ ] Props/types in same file as component

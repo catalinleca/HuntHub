@@ -2,7 +2,7 @@
 
 Generate complete treasure hunts from natural language prompts using OpenAI gpt-4o.
 
-> **Documentation rules:** See [DOCUMENTATION-RULES.md](./DOCUMENTATION-RULES.md)
+> **Documentation rules:** See [DOCUMENTATION-RULES.md](DOCUMENTATION-RULES.md)
 
 ---
 

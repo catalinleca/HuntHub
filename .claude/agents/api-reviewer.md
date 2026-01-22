@@ -36,11 +36,20 @@ Ensure API contracts are stable, type-safe, and aligned with frontend needs. Pre
 - [ ] Nested objects have consistent shapes across endpoints
 - [ ] New fields are additive (don't remove existing fields)
 
-### Type Safety
+### Type Safety (CRITICAL - Your Main Job)
+- [ ] **NO LOCAL INTERFACES FOR API CONTRACTS** - If it crosses API boundary, it MUST be in `@hunthub/shared`
+- [ ] New type needed? → Add to OpenAPI first, run generate, import from shared
 - [ ] DTOs properly typed (no `any`, no loose types)
-- [ ] Request validation with Zod at API boundary
+- [ ] Request validation with Zod from `@hunthub/shared/schemas`
 - [ ] Response mappers strip internal fields (no `_id`, `__v` leaking)
-- [ ] Both frontend and backend use types from `@hunthub/shared`
+- [ ] Both frontend and backend import from `@hunthub/shared`
+
+**BLOCK if you see:**
+```typescript
+// LOCAL INTERFACE FOR API TYPE - BLOCK THIS
+interface SessionResponse { ... }  // Should be in @hunthub/shared!
+type HuntListItem = { ... }        // Should be in OpenAPI!
+```
 
 ### Error Envelope Consistency
 - [ ] All errors follow standard envelope: `{ error: { code, message, details? } }`
@@ -113,10 +122,15 @@ Ensure API contracts are stable, type-safe, and aligned with frontend needs. Pre
 
 ## Rules
 
-1. **OpenAPI spec is source of truth** - Code must match it
-2. **Never leak internal MongoDB fields** - No `_id`, `__v` unless intentional
-3. **Breaking changes require explicit approval** - Flag and explain impact
-4. **Prefer additive changes** - Add fields, don't remove or rename
-5. **Single source of truth** - `@hunthub/shared` types used everywhere
-6. **Backend returns domain data** - Not UI-formatted data
-7. **If UI reshapes extensively** - Backend should change instead
+1. **NEVER CREATE LOCAL INTERFACES FOR API TYPES** - This is the #1 violation. If a type crosses the API boundary, it goes in OpenAPI → generates to `@hunthub/shared`. No exceptions.
+2. **OpenAPI spec is source of truth** - Code must match it
+3. **Never leak internal MongoDB fields** - No `_id`, `__v` unless intentional
+4. **Breaking changes require explicit approval** - Flag and explain impact
+5. **Prefer additive changes** - Add fields, don't remove or rename
+6. **Single source of truth** - `@hunthub/shared` types used everywhere
+7. **Backend returns domain data** - Not UI-formatted data
+8. **If UI reshapes extensively** - Backend should change instead
+
+**If you see a new interface/type that represents API data:**
+→ STOP. Ask: "Is this in `@hunthub/shared`?"
+→ If NO: **BLOCK** and require adding to OpenAPI first.
