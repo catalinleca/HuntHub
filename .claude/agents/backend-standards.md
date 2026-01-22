@@ -31,9 +31,18 @@ Ensure backend code follows service/controller patterns, MongoDB best practices,
 - [ ] Interface defined first (IServiceName)
 - [ ] @injectable() decorator used
 - [ ] Returns OpenAPI types, not DB types (IHunt)
-- [ ] Uses toJSON() for serialization
+- [ ] Uses **Mappers** for DB ↔ API transformations (NOT toJSON)
 - [ ] Throws custom errors, doesn't return null
 - [ ] Async/await everywhere
+
+**Mapper pattern:**
+```typescript
+// GOOD - use mappers
+return HuntMapper.fromDocuments(huntDoc, versionDoc);
+
+// BAD - don't use toJSON directly
+return huntDoc.toJSON() as Hunt;
+```
 
 ### Controller Pattern
 - [ ] Interface defined first
@@ -61,9 +70,10 @@ Ensure backend code follows service/controller patterns, MongoDB best practices,
 - [ ] validateRequest() middleware in routes
 
 ### Type Patterns
-- [ ] Services return API types (Hunt)
-- [ ] Models use DB types (IHunt)
-- [ ] Converts via .toJSON()
+- [ ] Services return API types (Hunt) from `@hunthub/shared`
+- [ ] Models use DB types (IHunt) from `database/types/`
+- [ ] Converts via **Mappers** (`src/shared/mappers/`)
+- [ ] **NO LOCAL INTERFACES FOR API TYPES** - must be in `@hunthub/shared`
 
 ### SOLID Principles
 - [ ] Single Responsibility: Controllers = HTTP, Services = business logic

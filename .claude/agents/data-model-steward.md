@@ -24,7 +24,9 @@ Review data model changes to ensure schema evolution is deliberate, invariants a
 ### Invariants
 - [ ] Business rules encoded at the right layer (model vs service)
 - [ ] Validation schemas (Zod) match Mongoose schemas
-- [ ] Shared types (`@hunthub/shared`) updated if API shape changes
+- [ ] **If API shape changes → Update OpenAPI first, then run generate**
+- [ ] Shared types (`@hunthub/shared`) stay in sync with models
+- [ ] Mappers (`src/shared/mappers/`) handle any new fields
 
 ### Backwards Compatibility - Extremely important!!!
 - [ ] Existing documents won't break with new schema
@@ -40,9 +42,11 @@ Review data model changes to ensure schema evolution is deliberate, invariants a
 ## Key Files to Reference
 
 - `apps/backend/api/src/database/models/` - Mongoose models
-- `packages/shared/src/types/` - Shared types
+- `apps/backend/api/src/database/types/` - DB interfaces (IHunt, IStep, etc.)
+- `apps/backend/api/src/shared/mappers/` - DB ↔ API transformations
+- `packages/shared/src/types/` - API types (Hunt, Step, etc.)
 - `packages/shared/src/schemas/` - Zod validation schemas
-- `.claude/guides/data-model-decisions.md` - Design rationale
+- `.claude/architecture/backend.md` - Backend architecture
 
 ## Output Format
 
