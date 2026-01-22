@@ -2,7 +2,7 @@
 
 Enable content authors to preview their hunt in the production player environment via signed URL with free step navigation.
 
-> **Documentation rules:** See [DOCUMENTATION-RULES.md](./DOCUMENTATION-RULES.md)
+> **Documentation rules:** See [DOCUMENTATION-RULES.md](DOCUMENTATION-RULES.md)
 
 ---
 

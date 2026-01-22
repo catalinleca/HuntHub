@@ -2,7 +2,7 @@
 
 Share hunts with players via link. Control access with open/invite-only modes.
 
-> **Documentation rules:** See [DOCUMENTATION-RULES.md](./DOCUMENTATION-RULES.md)
+> **Documentation rules:** See [DOCUMENTATION-RULES.md](DOCUMENTATION-RULES.md)
 
 ---
 
