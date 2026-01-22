@@ -1,4 +1,4 @@
-# Player App Architecture
+``# Player App Architecture
 
 This document explains everything implemented in the Player app. Read this from top to bottom - each section builds on the previous one.
 

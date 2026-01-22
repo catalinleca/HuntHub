@@ -25,25 +25,35 @@ Enforceable patterns for HuntHub backend (Node.js + Express + MongoDB).
 ```typescript
 export interface IHuntService {
   createHunt(hunt: HuntCreate, creatorId: string): Promise<Hunt>;
-  getHuntById(id: string): Promise<Hunt>;
+  getHuntById(huntId: number): Promise<Hunt>;
 }
 
 @injectable()
 export class HuntService implements IHuntService {
+  constructor(@inject(TYPES.AuthorizationService) private authService: IAuthorizationService) {}
+
   async createHunt(hunt: HuntCreate, creatorId: string): Promise<Hunt> {
-    const createdHunt = await HuntModel.create({
-      creatorId,
-      ...hunt,
+    return withTransaction(async (session) => {
+      const huntData = HuntMapper.toHuntDocument(creatorId);
+      const [createdHunt] = await HuntModel.create([huntData], { session });
+
+      const versionData = HuntMapper.toVersionDocument(hunt, createdHunt.huntId, 1);
+      const [createdVersion] = await HuntVersionModel.create([versionData], { session });
+
+      return HuntMapper.fromDocuments(createdHunt, createdVersion);
     });
-    return createdHunt.toJSON() as Hunt;
   }
 
-  async getHuntById(id: string): Promise<Hunt> {
-    const hunt = await HuntModel.findById(id).exec();
-    if (!hunt) {
-      throw new NotFoundError();
-    }
-    return hunt.toJSON() as Hunt;
+  async getHuntById(huntId: number): Promise<Hunt> {
+    const huntDoc = await HuntModel.findOne({ huntId }).exec();
+    if (!huntDoc) throw new NotFoundError('Hunt not found');
+
+    const versionDoc = await HuntVersionModel.findOne({
+      huntId, version: huntDoc.latestVersion
+    }).exec();
+    if (!versionDoc) throw new NotFoundError('Hunt version not found');
+
+    return HuntMapper.fromDocuments(huntDoc, versionDoc);
   }
 }
 ```
@@ -51,10 +61,39 @@ export class HuntService implements IHuntService {
 **Key conventions:**
 - Always define interface first
 - Use @injectable() decorator
+- Inject dependencies via constructor with @inject
 - Return OpenAPI types (Hunt), not DB types (IHunt)
-- Use toJSON() for serialization
+- Use Mappers for ALL DB ↔ API transformations
 - Throw custom errors, don't return null
 - Async/await everywhere
+
+---
+
+## Mapper Pattern
+
+**ALL transformations between DB documents and API DTOs go through mappers.**
+
+```typescript
+// Location: src/shared/mappers/
+
+// API → DB (for creation/updates)
+HuntMapper.toHuntDocument(creatorId) → Partial<IHunt>
+HuntMapper.toVersionDocument(dto, huntId, version) → Partial<IHuntVersion>
+
+// DB → API (for responses)
+HuntMapper.fromDocuments(huntDoc, versionDoc) → Hunt
+HuntMapper.fromDocumentPairs(pairs) → Hunt[]
+
+// Similar for other entities
+StepMapper.toDocument(dto, huntId, version) → Partial<IStep>
+StepMapper.fromDocument(doc) → Step
+```
+
+**Key conventions:**
+- Services NEVER manually build DB objects
+- All type conversions (ObjectId → string, Date → ISO string) happen in mappers
+- Mappers handle null/undefined normalization
+- Batch mapping methods for lists (avoid N+1 transformations)
 
 ---
 
@@ -99,26 +138,26 @@ export class HuntController implements IHuntController {
 
 ```typescript
 const router = Router();
-const container = getContainer();
 const controller = container.get<IHuntController>(TYPES.HuntController);
 
 router.post('/',
   validateRequest(createHuntSchema),
-  asyncHandler(controller.createHunt.bind(controller))
+  (req, res, next) => controller.createHunt(req, res).catch(next)
 );
 
 router.get('/:id',
-  asyncHandler(controller.getHuntById.bind(controller))
+  (req, res, next) => controller.getHuntById(req, res).catch(next)
 );
 
 export default router;
 ```
 
 **Key conventions:**
-- Get controller from DI container
-- Use validateRequest() middleware for validation
-- Bind controller methods to preserve `this` context
-- Use asyncHandler to catch errors
+- Get controller from DI container at module scope
+- Use `validateRequest()` middleware for body validation
+- Use `validateQuery()` middleware for query params
+- `.catch(next)` propagates errors to error middleware
+- Controllers return promises, no need for `bind()`
 
 ---
 
