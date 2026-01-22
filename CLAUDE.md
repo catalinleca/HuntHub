@@ -17,16 +17,16 @@ We are in **January 2026**.
 ## Auto-Loaded Context
 
 ### Working Style
-@.claude2/active/working-style.md
+@.claude/active/working-style.md
 
 ### Standards
-@.claude2/active/common-standards.md
-@.claude2/active/frontend-standards.md
-@.claude2/active/backend-standards.md
+@.claude/active/common-standards.md
+@.claude/active/frontend-standards.md
+@.claude/active/backend-standards.md
 
 ### Architecture Overview
-@.claude2/active/architecture.md
-@.claude2/active/codebase.md
+@.claude/active/architecture.md
+@.claude/active/codebase.md
 
 ---
 
@@ -34,9 +34,9 @@ We are in **January 2026**.
 
 | App | File |
 |-----|------|
-| Backend | `.claude2/architecture/backend.md` |
-| Editor | `.claude2/architecture/editor.md` |
-| Player | `.claude2/architecture/player.md` |
+| Backend | `.claude/architecture/backend.md` |
+| Editor | `.claude/architecture/editor.md` |
+| Player | `.claude/architecture/player.md` |
 
 ---
 

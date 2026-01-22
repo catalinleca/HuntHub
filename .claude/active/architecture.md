@@ -357,7 +357,7 @@ HuntHub/
 │   ├── shared/                   # Types, schemas (MOST IMPORTANT)
 │   ├── compass/                  # MUI theme library
 │   └── player-sdk/               # Editor-Player communication
-└── .claude2/                     # Documentation
+└── .claude/                     # Documentation
 ```
 
 ---
