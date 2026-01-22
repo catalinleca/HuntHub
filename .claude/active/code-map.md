@@ -1,6 +1,6 @@
 # Codebase Guide
 
-Complete location reference. No searching needed.
+Location reference. Shows WHERE things are and naming patterns.
 
 ---
 
@@ -8,13 +8,13 @@ Complete location reference. No searching needed.
 
 ```
 apps/
-├── backend/api/          # Express API (Node.js + TypeScript)
-├── frontend/editor/      # Hunt creation app (React + Vite)
-└── frontend/player/      # Hunt playing app (React + Vite)
+├── backend/api/          # Express API
+├── frontend/editor/      # Hunt creation (React)
+└── frontend/player/      # Hunt playing (React)
 
 packages/
-├── shared/               # Types, schemas, constants, exporters
-└── compass/              # UI component library + theme
+├── shared/               # Types, schemas, constants
+└── compass/              # Theme + design tokens
 ```
 
 ---
@@ -22,95 +22,48 @@ packages/
 ## Backend (`apps/backend/api/src/`)
 
 ### Entry Points
-| File | Purpose |
-|------|---------|
-| `server.ts` | Express app setup, middleware chain |
-| `config/inversify.ts` | DI container, service bindings |
-| `config/env.config.ts` | Environment variables |
+| Purpose | Location |
+|---------|----------|
+| Server setup | `server.ts` |
+| DI container | `config/inversify.ts` |
+| Environment | `config/env.config.ts` |
 
-### modules/ (Core CRUD)
+### Core Structure
 ```
-modules/
-├── hunts/
-│   ├── hunt.service.ts      # Hunt CRUD, getUserHunts
-│   ├── hunt.controller.ts   # HTTP handlers
-│   ├── hunt.routes.ts       # Route definitions
-│   └── hunt.validation.ts   # Zod schemas
+modules/                  # CRUD resources
+├── hunts/               # hunt.service.ts, hunt.controller.ts, hunt.routes.ts
 ├── steps/
-│   ├── step.service.ts      # Step CRUD with transactions
-│   ├── step.controller.ts
-│   └── step.routes.ts
 ├── assets/
-│   ├── asset.service.ts     # S3 upload, asset CRUD
-│   └── asset.controller.ts
 ├── auth/
-│   └── auth.middleware.ts   # Firebase token verification
 └── users/
-    └── user.service.ts      # User lookup/creation
-```
 
-### features/ (Domain Workflows)
-```
-features/
-├── play/
-│   ├── play.service.ts      # Session management, validation
-│   ├── play.controller.ts
-│   ├── play.routes.ts
+features/                 # Domain workflows
+├── play/                # Session, validation
+│   └── helpers/validators/
+├── publishing/          # Publish, release
 │   └── helpers/
-│       ├── validators/      # Quiz, Clue, Mission, Task validators
-│       └── answer-validator.helper.ts
-├── publishing/
-│   ├── publishing.service.ts
-│   └── helpers/
-│       ├── version-validator.ts
-│       ├── version-publisher.ts
-│       ├── step-cloner.ts
-│       └── release-manager.ts
-├── sharing/
-│   └── sharing.service.ts   # Hunt collaboration
+├── sharing/             # hunt-share.*.ts
 ├── preview/
-│   └── preview.service.ts   # Author preview with signed URLs
-├── ai-generation/
-│   └── ai-generation.service.ts
-└── cloning/
-    └── cloning.service.ts   # Hunt duplication
-```
+├── ai-generation/       # ai-hunt-generation.*.ts
+├── cloning/             # clone.*.ts
+└── player-invitations/
 
-### services/ (Cross-Cutting)
-```
-services/
+services/                 # Cross-cutting
 ├── authorization/
-│   └── authorization.service.ts  # Permission checks, AccessContext
 ├── storage/
-│   └── storage.service.ts        # S3 presigned URLs
 ├── ai-validation/
-│   └── ai-validation.service.ts  # OpenAI validation
 └── asset-usage/
-    └── asset-usage.service.ts    # Track asset references
-```
 
-### shared/ (Internal Utilities)
-```
 shared/
-├── mappers/          # DB ↔ API transformers (HuntMapper, StepMapper)
-├── errors/           # Custom errors (NotFoundError, ForbiddenError)
-├── middlewares/      # Auth, validation, error handling
-├── validation/       # validateRequest helper
-└── types/            # TYPES symbols for DI
-```
+├── mappers/             # DB ↔ API transformers
+├── errors/              # Custom error classes
+├── middlewares/         # auth, validation, error, rate-limiter
+└── types/               # DI symbols
 
-### database/
-```
 database/
-├── models/           # Mongoose models (Hunt.ts, Step.ts, HuntVersion.ts)
-├── types/            # DB interfaces (IHunt, IStep, IHuntVersion)
-└── schemas/          # Embedded schemas (location, challenge)
-```
-
-### tests/
-```
-tests/
-└── integration/      # All integration tests by feature
+├── models/              # Mongoose models (Hunt.ts, Step.ts, etc.)
+├── types/               # Interfaces (IHunt, IStep, etc.)
+└── schemas/             # Embedded schemas
 ```
 
 ---
@@ -118,93 +71,46 @@ tests/
 ## Editor (`apps/frontend/editor/src/`)
 
 ### Entry Points
-| File | Purpose |
-|------|---------|
-| `main.tsx` | React app bootstrap |
-| `App.tsx` | Router, providers |
-| `config/queryClient.ts` | React Query setup |
+| Purpose | Location |
+|---------|----------|
+| App bootstrap | `main.tsx`, `App.tsx` |
+| Query client | `config/queryClient.ts` |
 
-### pages/
+### Core Structure
 ```
 pages/
 ├── Dashboard/
-│   ├── DashboardPage.tsx
 │   └── components/
-│       ├── HuntActionCard/
-│       ├── DashboardHero/
-│       ├── RecentHunts/
-│       └── AllHunts/
 └── Hunt/
-    ├── HuntPage.tsx              # Main hunt editor page
-    ├── context/                  # Hunt page context
-    ├── hooks/                    # Hunt-specific hooks
-    ├── HuntHeader/               # Top bar with actions
-    │   └── components/
-    ├── HuntForm/                 # Hunt metadata form
-    ├── HuntStepTimeline/         # Step list/timeline
-    │   └── components/
-    ├── HuntSteps/                # Step editing
-    │   ├── StepSettings/         # Challenge type config
-    │   └── components/
-    └── HuntPreview/              # Preview iframe
-```
+    ├── HuntPage.tsx
+    ├── HuntLayout.tsx
+    ├── context/
+    ├── hooks/
+    ├── HuntHeader/
+    ├── HuntForm/
+    ├── HuntStepTimeline/
+    ├── HuntSteps/
+    │   └── StepSettings/
+    └── HuntPreview/
 
-### api/ (React Query)
-```
-api/
-├── Hunt/
-│   ├── useGetHunt.ts
-│   ├── useGetHunts.ts
-│   ├── useCreateHunt.ts
-│   ├── useUpdateHunt.ts
-│   ├── useDeleteHunt.ts
-│   ├── usePublishHunt.ts
-│   ├── useReleaseHunt.ts
-│   └── sharing/              # Collaboration hooks
+api/                      # React Query
+├── Hunt/                # getHunt.ts, createHunt.ts, etc.
+│   └── sharing/
 ├── Step/
-│   ├── useCreateStep.ts
-│   ├── useUpdateStep.ts
-│   └── useDeleteStep.ts
 └── Asset/
-    ├── useUploadAsset.ts
-    └── useGetAssets.ts
-```
 
-### components/
-```
 components/
-├── form/                     # Form primitives
-│   ├── core/                 # Base inputs
-│   ├── components/           # Composed form fields
-│   └── ArrayInput/           # Dynamic arrays
-├── asset/                    # Asset management
-│   ├── AssetPreview/
-│   ├── ImagePreview/
-│   ├── AudioPreview/
-│   ├── VideoPreview/
-│   ├── AssetLibraryDrawer/
-│   └── CreateAssetModal/
-├── common/                   # Shared UI
-│   ├── SimpleModal/
-│   ├── ToggleButton/
-│   └── Select/
-├── HuntCard/
-├── HuntCardMenu/
-├── HuntDialog/
-├── ConfirmationDialog/
-├── NavBar/
-└── UserMenu/
-```
+├── form/                # Form primitives
+├── asset/               # Asset management
+├── common/              # Shared UI
+└── ...                  # HuntCard, NavBar, etc.
 
-### Other
-```
-stores/               # Zustand stores (UI state)
-contexts/             # React contexts
+stores/                   # Zustand (use*Store.ts)
+contexts/                 # AuthContext.tsx
 utils/
-├── transformers/     # Form ↔ API data transforms
-├── factories/        # Default object creators
-└── stepSettings/     # Step type configurations
-types/                # Local TypeScript types
+├── transformers/
+├── factories/
+└── stepSettings/
 ```
 
 ---
@@ -212,124 +118,78 @@ types/                # Local TypeScript types
 ## Player (`apps/frontend/player/src/`)
 
 ### Entry Points
-| File | Purpose |
-|------|---------|
-| `main.tsx` | React app bootstrap |
-| `App.tsx` | Router, providers |
-| `router/` | Route definitions |
+| Purpose | Location |
+|---------|----------|
+| App bootstrap | `main.tsx`, `App.tsx` |
+| Routes | `router/` |
 
-### pages/
+### Core Structure
 ```
 pages/
 ├── PlayPage/
-│   ├── PlayPage.tsx          # Main play page
-│   ├── challenges/           # Challenge type renderers
-│   └── components/           # Play UI components
-├── PreviewPage/
-│   ├── PreviewPage.tsx       # Editor preview (iframe)
+│   ├── challenges/
 │   └── components/
-├── AuthorPreviewPage/        # Author preview with signed URLs
+├── PreviewPage/
+├── AuthorPreviewPage/
 └── NotFoundPage/
-```
 
-### context/ (State Management)
-```
 context/
-├── PlaySession/
-│   ├── PlaySessionProvider.tsx       # Main session provider
-│   ├── EditorPreviewSessionProvider.tsx
-│   ├── SessionContexts.ts            # Types, contexts
-│   ├── hooks.ts                      # Selector hooks
+├── PlaySession/         # *SessionProvider.tsx, hooks.ts
 │   └── internal/
-│       ├── deriveStatus.ts
-│       └── sessionStorage.ts
-└── Validation/
-    ├── ApiValidationProvider.tsx     # Real validation
-    └── EditorPreviewProvider.tsx     # Mock validation
-```
+└── Validation/          # *ValidationProvider.tsx
 
-### api/
-```
 api/
-├── play/
-│   ├── useStartSession.ts
-│   ├── useGetSession.ts
-│   ├── useValidateAnswer.ts
-│   └── useRequestHint.ts
+├── play/                # useStartSession.ts, useValidateAnswer.ts, etc.
 └── asset/
-    └── useUploadPlayerAsset.ts
-```
 
-### components/
-```
 components/
-├── step/             # Step rendering components
-├── media/            # Media capture/display
-├── preview/          # Preview-specific components
+├── step/
+├── media/
+├── preview/
 └── core/
-    ├── ErrorFallback/
-    └── Spinner/
-```
 
-### Other
-```
 hooks/
-├── preview/          # Preview-specific hooks
-services/             # Non-React services
-styles/               # Global styles
-constants/            # App constants
-types/                # Local types
+services/
 ```
 
 ---
 
-## Shared Package (`packages/shared/src/`)
+## Shared Package (`packages/shared/`)
 
-### Source of Truth
-| File | Purpose |
-|------|---------|
-| `openapi/hunthub_models.yaml` | API type definitions (edit this) |
-| `types/index.ts` | Generated TypeScript types |
-| `schemas/gen/index.ts` | Generated Zod schemas |
-
-### Structure
-```
-src/
-├── types/            # Generated from OpenAPI
-├── schemas/
-│   ├── gen/          # Generated Zod schemas
-│   └── validation/   # Manual validation helpers
-├── constants/        # Enums, config values
-└── exporters/        # PlayerExporter (strips answers)
-```
+| Purpose | Location |
+|---------|----------|
+| API types (source) | `openapi/hunthub_models.yaml` |
+| Generated types | `src/types/index.ts` |
+| Generated Zod | `src/schemas/gen/index.ts` |
+| Constants | `src/constants/` |
+| PlayerExporter | `src/exporters/` |
 
 ---
 
 ## Compass Package (`packages/compass/src/`)
 
-```
-src/
-├── presets/
-│   └── treasure-map/
-│       └── theme.ts      # MUI theme configuration
-├── tokens/               # Design tokens
-├── mixins/               # Reusable style mixins
-└── utils/                # Theme utilities
-```
+| Purpose | Location |
+|---------|----------|
+| MUI theme | `presets/treasure-map/theme.ts` |
+| Design tokens | `tokens/` |
+| Style mixins | `mixins/` |
+| Component overrides | `overrides/` |
 
 ---
 
-## Naming Conventions
+## Naming Patterns
 
 | Type | Pattern | Example |
 |------|---------|---------|
 | Backend service | `*.service.ts` | `hunt.service.ts` |
 | Backend controller | `*.controller.ts` | `hunt.controller.ts` |
 | Backend routes | `*.routes.ts` | `hunt.routes.ts` |
-| DB model | `PascalCase.ts` | `Hunt.ts`, `HuntVersion.ts` |
-| DB interface | `I{Model}` | `IHunt`, `IStep` |
+| Backend helper | `*.helper.ts` | `step-cloner.helper.ts` |
+| DB model | `PascalCase.ts` | `Hunt.ts` |
+| DB interface | `I{Model}` | `IHunt` |
 | Mapper | `*.mapper.ts` | `hunt.mapper.ts` |
-| React Query hook | `use*.ts` | `useGetHunt.ts` |
-| React context | `*Provider.tsx` | `PlaySessionProvider.tsx` |
+| React Query hook | `use*.ts` | `useGetSession.ts` |
+| React Query fn | `camelCase.ts` | `getHunt.ts` |
+| Context provider | `*Provider.tsx` | `PlaySessionProvider.tsx` |
 | Styled component | `*.styles.ts` | `HuntCard.styles.ts` |
-| Zod schema | `*Schema` | `StepFormSchema` |
+| Zustand store | `use*Store.ts` | `useDialogStore.ts` |
