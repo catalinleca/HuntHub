@@ -4,6 +4,36 @@
 
 ---
 
+## Monorepo Setup
+
+**npm workspaces** - all packages share one `node_modules/` at root.
+
+```json
+// Root package.json
+"workspaces": ["apps/backend/*", "apps/frontend/*", "packages/*"]
+```
+
+**Package references:**
+```json
+// apps/backend/api/package.json
+"dependencies": { "@hunthub/shared": "*" }  // Local package, not npm
+```
+
+**Critical workflow:**
+```bash
+npm install          # Install all workspaces
+npm run build:shared # MUST run before apps can import @hunthub/shared
+npm run generate     # Regenerate types from OpenAPI
+```
+
+**Caveats:**
+- `@hunthub/shared` must be built before apps start (compiles `src/` → `dist/`)
+- After modifying `packages/shared/`, run `npm run build:shared`
+- "Cannot find module '@hunthub/shared'" → rebuild shared package
+- Type generation: OpenAPI YAML → TypeScript types → Zod schemas → `dist/`
+
+---
+
 ## What We're Building
 
 **HedgeHunt** - A location-based treasure hunt platform.
