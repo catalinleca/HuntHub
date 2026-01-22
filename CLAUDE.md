@@ -26,7 +26,7 @@ We are in **January 2026**.
 
 ### Architecture Overview
 @.claude/active/architecture.md
-@.claude/active/codebase.md
+@.claude/active/code-map.md
 
 ---
 
