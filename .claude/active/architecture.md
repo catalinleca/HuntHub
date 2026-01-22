@@ -9,28 +9,31 @@
 **npm workspaces** - all packages share one `node_modules/` at root.
 
 ```json
-// Root package.json
 "workspaces": ["apps/backend/*", "apps/frontend/*", "packages/*"]
 ```
 
-**Package references:**
-```json
-// apps/backend/api/package.json
-"dependencies": { "@hunthub/shared": "*" }  // Local package, not npm
-```
+**Local packages:**
+| Package | Purpose | Used by |
+|---------|---------|---------|
+| `@hunthub/shared` | Types, schemas, constants | All apps |
+| `@hunthub/compass` | MUI theme, design tokens | Frontend apps |
+| `@hunthub/player-sdk` | Editor↔Player iframe comms | Editor, Player |
 
-**Critical workflow:**
+**Package references:** `"@hunthub/shared": "*"` (local, not npm)
+
+**Build commands:**
 ```bash
-npm install          # Install all workspaces
-npm run build:shared # MUST run before apps can import @hunthub/shared
-npm run generate     # Regenerate types from OpenAPI
+npm install           # Install all workspaces
+npm run build:shared  # Build shared (required for backend)
+npm run build:compass # Build compass (required for backend)
+npm run generate      # Regenerate types from OpenAPI
 ```
 
 **Caveats:**
-- `@hunthub/shared` must be built before apps start (compiles `src/` → `dist/`)
-- After modifying `packages/shared/`, run `npm run build:shared`
-- "Cannot find module '@hunthub/shared'" → rebuild shared package
-- Type generation: OpenAPI YAML → TypeScript types → Zod schemas → `dist/`
+- **Backend (Node.js/CJS)** needs packages built (`dist/`) before importing
+- **Frontend (Vite/ESM)** imports from `src/` directly (no build needed for dev)
+- "Cannot find module '@hunthub/shared'" → run `npm run build:shared`
+- After modifying a package → rebuild it before backend can use changes
 
 ---
 
