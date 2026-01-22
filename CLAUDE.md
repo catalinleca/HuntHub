@@ -1,4 +1,4 @@
-# HuntHub - Claude Code Memory
+# HuntHub - Claude Code Memory - We are in January 2026!!
 
 We are in **January 2026**.
 
