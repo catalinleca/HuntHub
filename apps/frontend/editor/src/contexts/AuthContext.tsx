@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import {
   User,
-  browserSessionPersistence,
+  browserLocalPersistence,
   setPersistence,
   onAuthStateChanged,
   GoogleAuthProvider,
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setPersistence(auth, browserSessionPersistence).catch(console.error);
+    setPersistence(auth, browserLocalPersistence).catch(console.error);
 
     return onAuthStateChanged(
       auth,
