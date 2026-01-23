@@ -4,7 +4,7 @@ import { LoginHeader, PromptPreview, ProgressStepper, AuthActions, TermsFooter }
 import * as S from './LoginPage.styles';
 
 export const LoginPage = () => {
-  const { signInWithGoogle, error, loading } = useAuth();
+  const { signInWithGoogle, error, isSigningIn } = useAuth();
   const pendingPrompt = sessionStorage.getItem('pendingPrompt');
 
   const handleGoogleSignIn = async () => {
@@ -22,7 +22,7 @@ export const LoginPage = () => {
           <LoginHeader />
           {pendingPrompt && <PromptPreview prompt={pendingPrompt} />}
           <ProgressStepper currentStep={1} />
-          <AuthActions onGoogleSignIn={handleGoogleSignIn} isLoading={loading} error={error} />
+          <AuthActions onGoogleSignIn={handleGoogleSignIn} isLoading={isSigningIn} error={error} />
           <TermsFooter />
         </Stack>
       </S.Card>
