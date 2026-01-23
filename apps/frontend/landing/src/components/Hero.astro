@@ -1,6 +1,12 @@
 ---
 import PromptForm from './PromptForm.astro';
 import PhoneMockup from './PhoneMockup.astro';
+
+const phoneImages = [
+  { src: '/images/Screen-1.webp', alt: 'HedgeHunt app showing a quiz challenge' },
+  { src: '/images/Screen-2.webp', alt: 'HedgeHunt app showing a location step' },
+  { src: '/images/Screen-3.webp', alt: 'HedgeHunt app showing hunt completion' },
+];
 ---
 
 <section class="hero-gradient min-h-screen pt-44 px-6 pb-16">
@@ -23,7 +29,7 @@ import PhoneMockup from './PhoneMockup.astro';
 
       <!-- Right: Phone -->
       <div class="hidden lg:flex items-center">
-        <PhoneMockup src="/images/Screen-1.webp" alt="HedgeHunt app showing a quiz challenge" />
+        <PhoneMockup images={phoneImages} />
       </div>
     </div>
   </div>
