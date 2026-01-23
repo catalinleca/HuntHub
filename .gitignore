@@ -32,6 +32,9 @@ Thumbs.db
 # Local dev certificates (mkcert)
 *.pem
 
+# Chrome for Testing
+chrome/
+
 # Logs
 logs/
 *.log
