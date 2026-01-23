@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Stack, Paper, alpha } from '@mui/material';
+import { Stack, Paper, Button, alpha } from '@mui/material';
 
 export const PageContainer = styled(Stack)`
   min-height: 100vh;
@@ -73,5 +73,21 @@ export const Divider = styled(Stack)`
     flex: 1;
     height: 1px;
     background-color: ${({ theme }) => theme.palette.divider};
+  }
+`;
+
+export const GoogleButton = styled(Button)`
+  background: linear-gradient(
+    135deg,
+    ${({ theme }) => theme.palette.primary.main} 0%,
+    ${({ theme }) => theme.palette.primary.dark} 100%
+  );
+
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      ${({ theme }) => theme.palette.primary.dark} 0%,
+      ${({ theme }) => theme.palette.primary.main} 100%
+    );
   }
 `;
