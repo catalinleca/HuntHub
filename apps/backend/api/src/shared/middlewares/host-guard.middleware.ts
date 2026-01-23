@@ -8,8 +8,9 @@ export const hostGuard = (req: Request, res: Response, next: NextFunction) => {
     return next();
   }
 
-  const host = req.headers.host || '';
-  const isBlockedHost = BLOCKED_HOST_PATTERNS.some((pattern) => host.includes(pattern));
+  const rawHost = req.headers.host || '';
+  const hostname = rawHost.split(':')[0].toLowerCase();
+  const isBlockedHost = BLOCKED_HOST_PATTERNS.some((pattern) => hostname.endsWith(pattern));
 
   if (isBlockedHost) {
     return res.status(421).json({
