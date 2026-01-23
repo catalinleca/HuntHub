@@ -1,4 +1,6 @@
-import { Stack, Button, Alert, Typography } from '@mui/material';
+import { Stack, Button, Alert, Typography, Link } from '@mui/material';
+import { GoogleLogoIcon, ArrowRightIcon } from '@phosphor-icons/react';
+import { getColor } from '@hunthub/compass';
 import * as S from '../LoginPage.styles';
 
 interface AuthActionsProps {
@@ -9,7 +11,14 @@ interface AuthActionsProps {
 
 export const AuthActions = ({ onGoogleSignIn, isLoading, error }: AuthActionsProps) => (
   <Stack gap={3} sx={{ width: '100%' }}>
-    <Button variant="contained" size="large" fullWidth onClick={onGoogleSignIn} disabled={isLoading}>
+    <Button
+      variant="contained"
+      size="large"
+      fullWidth
+      onClick={onGoogleSignIn}
+      disabled={isLoading}
+      startIcon={<GoogleLogoIcon size={20} weight="bold" />}
+    >
       {isLoading ? 'Signing in...' : 'Continue with Google'}
     </Button>
 
@@ -21,8 +30,11 @@ export const AuthActions = ({ onGoogleSignIn, isLoading, error }: AuthActionsPro
       </Typography>
     </S.Divider>
 
-    <Typography variant="smRegular" color="text.secondary" textAlign="center">
-      Continue with email →
-    </Typography>
+    <Stack direction="row" justifyContent="center" alignItems="center" gap={1}>
+      <Link component="button" variant="body2" color="primary.main" underline="none">
+        Continue with email
+      </Link>
+      <ArrowRightIcon size={16} color={getColor('primary.main')} />
+    </Stack>
   </Stack>
 );

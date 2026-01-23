@@ -18,7 +18,7 @@ export const LoginPage = () => {
   return (
     <S.PageContainer alignItems="center" justifyContent="center">
       <S.Card elevation={4}>
-        <Stack alignItems="center" gap={4}>
+        <Stack alignItems="center" gap={5}>
           <LoginHeader />
           {pendingPrompt && <PromptPreview prompt={pendingPrompt} />}
           <ProgressStepper currentStep={1} />

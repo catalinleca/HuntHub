@@ -9,8 +9,12 @@ export const LoginHeader = () => (
       <MapPinIcon size={32} weight="fill" color={getColor('common.white')} />
     </S.IconCircle>
     <Stack alignItems="center" gap={1}>
-      <Typography variant="displayH4">Almost there!</Typography>
-      <Typography color="text.secondary">Sign in to start creating your adventure</Typography>
+      <Typography variant="h4" fontWeight={700}>
+        Almost there!
+      </Typography>
+      <Typography variant="smRegular" color="text.secondary">
+        Sign in to start creating your adventure
+      </Typography>
     </Stack>
   </Stack>
 );

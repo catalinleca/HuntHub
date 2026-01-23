@@ -1,15 +1,20 @@
-import { Typography } from '@mui/material';
+import { Typography, styled } from '@mui/material';
 import * as S from '../LoginPage.styles';
 
 interface PromptPreviewProps {
   prompt: string;
 }
 
+const PromptText = styled(Typography)`
+  font-family: ${({ theme }) => theme.typography.displayFontFamily};
+  font-style: italic;
+`;
+
 export const PromptPreview = ({ prompt }: PromptPreviewProps) => (
-  <S.PromptCard gap={1}>
-    <Typography variant="smMedium" color="text.secondary">
+  <S.PromptCard>
+    <Typography variant="xsMedium" color="accent.light">
       Creating:
     </Typography>
-    <Typography variant="bodyItalic">"{prompt}"</Typography>
+    <PromptText variant="smRegular">"{prompt}"</PromptText>
   </S.PromptCard>
 );

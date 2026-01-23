@@ -5,15 +5,24 @@ export const PageContainer = styled(Stack)`
   min-height: 100vh;
   padding: ${({ theme }) => theme.spacing(4)};
   background:
-    radial-gradient(ellipse at 30% 20%, ${({ theme }) => alpha(theme.palette.accent.light, 0.4)} 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 80%, ${({ theme }) => alpha(theme.palette.primary.main, 0.25)} 0%, transparent 50%),
-    radial-gradient(ellipse at 90% 30%, ${({ theme }) => alpha(theme.palette.divider, 0.5)} 0%, transparent 40%),
-    linear-gradient(
-      160deg,
-      ${({ theme }) => theme.palette.background.defaultLight} 0%,
-      ${({ theme }) => theme.palette.background.default} 50%,
-      ${({ theme }) => alpha(theme.palette.accent.medium, 0.2)} 100%
-    );
+    radial-gradient(
+      ellipse 80% 60% at 10% 20%,
+      ${({ theme }) => alpha(theme.palette.accent.main, 0.55)} 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 70% 80% at 90% 80%,
+      ${({ theme }) => alpha(theme.palette.primary.main, 0.5)} 0%,
+      transparent 55%
+    ),
+    radial-gradient(ellipse 50% 40% at 80% 15%, ${({ theme }) => alpha('#F4A261', 0.45)} 0%, transparent 45%),
+    radial-gradient(
+      ellipse 60% 50% at 20% 85%,
+      ${({ theme }) => alpha(theme.palette.accent.light, 0.4)} 0%,
+      transparent 50%
+    ),
+    radial-gradient(circle at 50% 50%, ${({ theme }) => alpha(theme.palette.primary.light, 0.15)} 0%, transparent 60%),
+    linear-gradient(145deg, #f8ede3 0%, ${({ theme }) => theme.palette.background.default} 50%, #fff8f3 100%);
 `;
 
 export const Card = styled(Paper)`
@@ -34,8 +43,9 @@ export const IconCircle = styled(Stack)`
 export const PromptCard = styled(Stack)`
   width: 100%;
   padding: ${({ theme }) => theme.spacing(3)};
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  border-radius: ${({ theme }) => theme.shape.sm}px;
+  background-color: ${({ theme }) => alpha(theme.palette.primary.main, 0.05)};
+  border: 1px solid ${({ theme }) => theme.palette.divider};
+  border-radius: ${({ theme }) => theme.shape.md}px;
 `;
 
 export const StepCircle = styled(Stack)<{ $isActive?: boolean }>`
