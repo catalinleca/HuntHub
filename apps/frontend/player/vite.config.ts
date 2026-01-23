@@ -14,7 +14,7 @@ export default defineConfig({
   server: {
     port: 5175,
     host: true,
-    allowedHosts: ['.ngrok-free.dev', '.loca.lt', '.trycloudflare.com'],
+    allowedHosts: ['.ngrok-free.dev', '.loca.lt', '.trycloudflare.com', 'play.hedgehunt.local'],
     proxy: {
       '/api': {
         target: 'http://localhost:3000',

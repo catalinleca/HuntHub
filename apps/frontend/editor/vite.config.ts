@@ -18,6 +18,7 @@ export default defineConfig({
   },
   server: {
     port: 5174,
+    allowedHosts: ['build.hedgehunt.local'],
     proxy: {
       '/api': {
         target: 'http://localhost:3000',

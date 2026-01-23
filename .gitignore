@@ -29,6 +29,9 @@ build/
 .DS_Store
 Thumbs.db
 
+# Local dev certificates (mkcert)
+*.pem
+
 # Logs
 logs/
 *.log
