@@ -14,15 +14,15 @@ const suggestions = [
     id="prompt-form"
     action={editorLoginUrl}
     method="GET"
-    class="bg-background-paper rounded-2xl shadow-warm-lg p-4 relative"
+    class="form-card bg-background-paper rounded-2xl shadow-warm-lg p-5 relative"
   >
     <textarea
       id="prompt-input"
       name="prompt"
       placeholder="Describe your treasure hunt idea..."
-      rows={3}
+      rows={4}
       maxlength={500}
-      class="w-full resize-none border-none bg-transparent text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-0"
+      class="w-full resize-none border-none bg-transparent text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-0 text-lg"
     ></textarea>
 
     <button
@@ -48,6 +48,17 @@ const suggestions = [
     ))}
   </div>
 </div>
+
+<style>
+  .form-card {
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .form-card:hover {
+    box-shadow: var(--hh-shadow-lg);
+    transform: translateY(-2px);
+  }
+</style>
 
 <script>
   const textarea = document.getElementById('prompt-input') as HTMLTextAreaElement | null;
