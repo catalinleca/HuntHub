@@ -112,6 +112,109 @@ background: #B6591B;
 
 ---
 
+## Typography
+
+**Use props. Never styled(Typography) unless you need text-shadow or transforms.**
+
+```tsx
+// GOOD - use variant and color props
+<Typography variant="h4">Title</Typography>
+<Typography variant="body1" color="text.secondary">Subtitle</Typography>
+<Typography variant="displayH6">Display font title</Typography>
+<Typography variant="smBold" color="primary.main">Small bold text</Typography>
+
+// BAD - don't style Typography for things props can do
+const Title = styled(Typography)`
+  font-family: ${({ theme }) => theme.typography.displayFontFamily};
+  color: ${({ theme }) => theme.palette.text.primary};
+`;
+```
+
+**Custom variants available:** `displayH4`, `displayH6`, `displayBody2` (serif font), `smRegular`, `smMedium`, `smBold`, `xsRegular`, `xsMedium`, `xsBold`, `label`, `bodyItalic`, `smItalic`
+
+**When styled(Typography) IS needed:**
+- `text-shadow` (not available as prop)
+- `transform` (not available as prop)
+- Complex hover/active states
+
+```tsx
+// GOOD - styled needed for text-shadow
+export const HeroTitle = styled(Typography)`
+  color: ${({ theme }) => theme.palette.common.white};
+  text-shadow: ${({ theme }) => theme.shadows[7]};
+`;
+```
+
+---
+
+## getColor Utility
+
+**Import from `@hunthub/compass`. Returns color string from palette path.**
+
+```tsx
+import { getColor } from '@hunthub/compass';
+```
+
+**Use for:**
+1. Icon colors (Phosphor icons take string values)
+2. Styled component transient props
+3. Non-MUI components that need color strings
+
+```tsx
+// Icon colors
+<MapPinIcon color={getColor('primary.main')} />
+<TrashIcon color={getColor('error.main')} />
+
+// Styled component props
+<S.IconRow $color={getColor('grey.600')}>
+
+// Inside styled definitions
+export const Tile = styled(Stack)<{ $color: string }>`
+  background: ${({ $color }) => $color};
+`;
+```
+
+**DON'T use getColor for:**
+- Typography `color` prop (accepts palette paths directly)
+- MUI components with `color` prop
+- sx prop values
+
+```tsx
+// BAD - getColor not needed
+<Typography color={getColor('text.secondary')}>
+
+// GOOD - MUI accepts palette paths
+<Typography color="text.secondary">
+```
+
+---
+
+## Button
+
+**Use MUI Button with props. styled() only for custom shapes/animations.**
+
+```tsx
+// GOOD - MUI Button with props
+<Button variant="contained">Primary Action</Button>
+<Button variant="outlined" color="secondary">Secondary</Button>
+<Button variant="text" color="error">Delete</Button>
+<Button variant="contained" fullWidth disabled={isLoading}>
+  {isLoading ? 'Loading...' : 'Submit'}
+</Button>
+
+// BAD - don't style for things props can do
+const PrimaryButton = styled(Button)`
+  background-color: ${({ theme }) => theme.palette.primary.main};
+`;
+```
+
+**When styled(Button) IS needed:**
+- Custom border-radius different from theme
+- Complex hover animations/transforms
+- Non-standard shapes
+
+---
+
 ## Forms (React Hook Form)
 
 ### Sync External Data - NO useEffect
@@ -246,11 +349,15 @@ const Component = memo(({ items }) => {
 });
 ```
 
-### Small Components
+### Component Composition
 
-**Extract when:** own state/handlers, visually distinct, parent > 50 lines JSX.
+**Apply Single Responsibility Principle to components.**
 
-**Don't over-extract:** section component is the leaf.
+Each component should have one reason to change. Pages orchestrate; sections render. Break down by domain concept, not by visual size.
+
+**Extract when:** distinct responsibility, own state/handlers, or improves readability.
+
+**Organize in folders:** Pages with multiple sections get a `components/` subfolder for page-specific components. Shared components go in `@/components/`.
 
 ---
 

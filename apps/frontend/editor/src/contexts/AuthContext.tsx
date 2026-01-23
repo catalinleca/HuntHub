@@ -15,6 +15,7 @@ import { FirebaseError } from 'firebase/app';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  isSigningIn: boolean;
   error: string | null;
 
   signInWithGoogle: () => Promise<void>;
@@ -27,6 +28,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSigningIn, setIsSigningIn] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -55,7 +57,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signInWithGoogle = async () => {
     try {
-      setLoading(true);
+      setIsSigningIn(true);
       setError(null);
 
       const provider = new GoogleAuthProvider();
@@ -75,8 +77,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setError('Failed to sign in');
       }
 
-      setLoading(false);
       throw err;
+    } finally {
+      setIsSigningIn(false);
     }
   };
 
@@ -107,6 +110,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const value: AuthContextType = {
     user,
     loading,
+    isSigningIn,
     error,
     signInWithGoogle,
     signOut,
