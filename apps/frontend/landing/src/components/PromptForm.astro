@@ -51,12 +51,13 @@ const suggestions = [
 
 <style>
   .form-card {
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    transition: box-shadow 0.2s ease;
+    border: 1px solid var(--hh-divider);
   }
 
-  .form-card:hover {
-    box-shadow: var(--hh-shadow-lg);
-    transform: translateY(-2px);
+  .form-card:focus-within {
+    border-color: var(--hh-primary-main);
+    box-shadow: 0 0 0 3px rgba(182, 89, 27, 0.1);
   }
 </style>
 

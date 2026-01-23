@@ -12,7 +12,7 @@ const editorUrl = 'https://build.hedgehunt.app';
     <div class="flex items-center gap-3">
       <a
         href={editorUrl}
-        class="text-foreground-muted hover:text-foreground px-4 py-2 rounded-xl transition-colors"
+        class="login-btn text-foreground-muted hover:text-foreground px-4 py-2 rounded-xl transition-all"
       >
         Log in
       </a>
@@ -40,5 +40,15 @@ const editorUrl = 'https://build.hedgehunt.app';
 
   .get-started-btn:hover {
     background: linear-gradient(135deg, var(--hh-primary-dark) 0%, var(--hh-primary-main) 100%);
+  }
+
+  .login-btn {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--hh-divider);
+  }
+
+  .login-btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--hh-grey-400);
   }
 </style>
