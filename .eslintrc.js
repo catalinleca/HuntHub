@@ -5,11 +5,7 @@ module.exports = {
     ecmaVersion: 2020,
     sourceType: 'module',
   },
-  extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-    'prettier',
-  ],
+  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
   plugins: ['@typescript-eslint', 'prettier'],
   env: {
     node: true,
@@ -17,17 +13,8 @@ module.exports = {
   },
   rules: {
     'prettier/prettier': 'error',
-    '@typescript-eslint/no-unused-vars': [
-      'warn',
-      { argsIgnorePattern: '^_' },
-    ],
+    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/no-explicit-any': 'warn',
   },
-  ignorePatterns: [
-    'node_modules/',
-    'dist/',
-    'build/',
-    '*.js',
-    '**/*.md',
-  ],
+  ignorePatterns: ['node_modules/', 'dist/', 'build/', '*.js', '**/*.md'],
 };

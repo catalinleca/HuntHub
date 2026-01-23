@@ -2,42 +2,42 @@
 
 :root {
   --hh-mode: light;
-  --hh-common-black: #2C1810;
-  --hh-common-white: #FFFFFF;
-  --hh-primary-main: #B6591B;
+  --hh-common-black: #2c1810;
+  --hh-common-white: #ffffff;
+  --hh-primary-main: #b6591b;
   --hh-primary-dark: #903300;
   --hh-primary-light: rgba(182, 89, 27, 0.1);
-  --hh-primary-contrastText: #FFFFFF;
+  --hh-primary-contrastText: #ffffff;
   --hh-secondary-main: #8b4513;
   --hh-secondary-dark: #651f00;
-  --hh-secondary-contrastText: #FFFFFF;
+  --hh-secondary-contrastText: #ffffff;
   --hh-success-main: #4a6841;
-  --hh-success-contrastText: #FFFFFF;
+  --hh-success-contrastText: #ffffff;
   --hh-error-main: #d32f2f;
-  --hh-error-contrastText: #FFFFFF;
+  --hh-error-contrastText: #ffffff;
   --hh-accent-light: #c17a3a;
   --hh-accent-main: #d4af35;
   --hh-accent-medium: #a8651f;
   --hh-accent-dark: #b8941f;
-  --hh-accent-contrastText: #2C1810;
-  --hh-background-default: #E4D5C1;
-  --hh-background-defaultLight: #EFE4D7;
+  --hh-accent-contrastText: #2c1810;
+  --hh-background-default: #e4d5c1;
+  --hh-background-defaultLight: #efe4d7;
   --hh-background-paper: #f5f1e8;
-  --hh-background-surface: #FFFBF5;
-  --hh-text-primary: #2C1810;
-  --hh-text-secondary: #5D4E37;
-  --hh-text-disabled: #8B7355;
-  --hh-divider: #D4A574;
-  --hh-grey-50: #F5EFE6;
-  --hh-grey-100: #E4D5C1;
-  --hh-grey-200: #D4C4B0;
-  --hh-grey-300: #D4A574;
-  --hh-grey-400: #8B7355;
-  --hh-grey-500: #5D4E37;
-  --hh-grey-600: #8B6F47;
-  --hh-grey-700: #2C1810;
-  --hh-grey-800: #1F110A;
-  --hh-grey-900: #120A06;
+  --hh-background-surface: #fffbf5;
+  --hh-text-primary: #2c1810;
+  --hh-text-secondary: #5d4e37;
+  --hh-text-disabled: #8b7355;
+  --hh-divider: #d4a574;
+  --hh-grey-50: #f5efe6;
+  --hh-grey-100: #e4d5c1;
+  --hh-grey-200: #d4c4b0;
+  --hh-grey-300: #d4a574;
+  --hh-grey-400: #8b7355;
+  --hh-grey-500: #5d4e37;
+  --hh-grey-600: #8b6f47;
+  --hh-grey-700: #2c1810;
+  --hh-grey-800: #1f110a;
+  --hh-grey-900: #120a06;
 
   --hh-shadow-none: none;
   --hh-shadow-sm: 0 2px 4px rgba(44, 24, 16, 0.06);
@@ -45,8 +45,8 @@
   --hh-shadow-lg: 0 8px 16px rgba(44, 24, 16, 0.08);
   --hh-shadow-xl: 0 12px 24px rgba(44, 24, 16, 0.08);
 
-  --hh-font-display: Georgia, "Times New Roman", serif;
-  --hh-font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --hh-font-display: Georgia, 'Times New Roman', serif;
+  --hh-font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   --hh-radius-sm: 4px;
   --hh-radius-md: 8px;
