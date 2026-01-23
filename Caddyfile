@@ -1,0 +1,14 @@
+build.hedgehunt.local {
+	tls build.hedgehunt.local+2.pem build.hedgehunt.local+2-key.pem
+	reverse_proxy localhost:5174
+}
+
+play.hedgehunt.local {
+	tls build.hedgehunt.local+2.pem build.hedgehunt.local+2-key.pem
+	reverse_proxy localhost:5175
+}
+
+api.hedgehunt.local {
+	tls build.hedgehunt.local+2.pem build.hedgehunt.local+2-key.pem
+	reverse_proxy localhost:3000
+}

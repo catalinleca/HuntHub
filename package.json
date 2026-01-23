@@ -9,6 +9,11 @@
     "packages/*"
   ],
   "scripts": {
+    "start": "concurrently -n caddy,api,editor,player -c blue,green,yellow,magenta \"sudo caddy run --config Caddyfile\" \"npm run dev:api\" \"npm run dev:editor\" \"npm run dev:player\"",
+    "api": "concurrently -n caddy,api -c blue,green \"sudo caddy run --config Caddyfile\" \"npm run dev:api\"",
+    "editor": "concurrently -n caddy,editor -c blue,yellow \"sudo caddy run --config Caddyfile\" \"npm run dev:editor\"",
+    "player": "concurrently -n caddy,player -c blue,magenta \"sudo caddy run --config Caddyfile\" \"npm run dev:player\"",
+    "caddy": "sudo caddy run --config Caddyfile",
     "build:compass": "npm run build --workspace=@hunthub/compass",
     "build:shared": "npm run build --workspace=@hunthub/shared",
     "build:api": "npm run build --workspace=@hunthub/api",
@@ -41,6 +46,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
+    "concurrently": "^9.2.1",
     "eslint": "^8.45.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
