@@ -51,13 +51,34 @@ const suggestions = [
 
 <style>
   .form-card {
-    transition: box-shadow 0.2s ease;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
     border: 1px solid var(--hh-divider);
   }
 
   .form-card:focus-within {
     border-color: var(--hh-primary-main);
-    box-shadow: 0 0 0 3px rgba(182, 89, 27, 0.1);
+    box-shadow: var(--hh-shadow-lg), 0 0 0 3px rgba(182, 89, 27, 0.1);
+  }
+
+  #prompt-input::placeholder {
+    background: linear-gradient(
+      90deg,
+      var(--hh-grey-400),
+      var(--hh-primary-main),
+      var(--hh-accent-main),
+      var(--hh-primary-main),
+      var(--hh-grey-400)
+    );
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-text 3s ease infinite;
+  }
+
+  @keyframes gradient-text {
+    0%, 100% { background-position: 0% center; }
+    50% { background-position: 100% center; }
   }
 </style>
 
