@@ -15,14 +15,23 @@ export const PageContainer = styled(Stack)`
       ${({ theme }) => alpha(theme.palette.primary.main, 0.5)} 0%,
       transparent 55%
     ),
-    radial-gradient(ellipse 50% 40% at 80% 15%, ${({ theme }) => alpha('#F4A261', 0.45)} 0%, transparent 45%),
+    radial-gradient(
+      ellipse 50% 40% at 80% 15%,
+      ${({ theme }) => alpha(theme.palette.divider, 0.45)} 0%,
+      transparent 45%
+    ),
     radial-gradient(
       ellipse 60% 50% at 20% 85%,
       ${({ theme }) => alpha(theme.palette.accent.light, 0.4)} 0%,
       transparent 50%
     ),
     radial-gradient(circle at 50% 50%, ${({ theme }) => alpha(theme.palette.primary.light, 0.15)} 0%, transparent 60%),
-    linear-gradient(145deg, #f8ede3 0%, ${({ theme }) => theme.palette.background.default} 50%, #fff8f3 100%);
+    linear-gradient(
+      145deg,
+      ${({ theme }) => theme.palette.grey[50]} 0%,
+      ${({ theme }) => theme.palette.background.default} 50%,
+      ${({ theme }) => theme.palette.background.surface} 100%
+    );
 `;
 
 export const Card = styled(Paper)`
