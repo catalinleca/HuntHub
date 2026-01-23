@@ -29,7 +29,7 @@ import cloneRouter from '@/features/cloning/clone.routes';
 import playerInvitationRouter from '@/features/player-invitations/player-invitation.routes';
 import aiHuntGenerationRouter from '@/features/ai-generation/ai-hunt-generation.routes';
 
-import { errorHandler, authMiddleware, requestLogger } from '@/shared/middlewares';
+import { errorHandler, authMiddleware, requestLogger, hostGuard } from '@/shared/middlewares';
 
 async function bootstrap() {
   if (!databaseUrl) {
@@ -38,6 +38,8 @@ async function bootstrap() {
   await mustConnectDb(databaseUrl);
 
   const app = express();
+
+  app.use(hostGuard);
 
   const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',')
     .map((s) => s.trim())
