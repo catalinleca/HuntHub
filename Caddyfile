@@ -1,3 +1,10 @@
+# Local HTTPS reverse proxy for development
+#
+# Generate certificates (one time):
+#   mkcert build.hedgehunt.local play.hedgehunt.local api.hedgehunt.local
+#
+# This creates: build.hedgehunt.local+2.pem and build.hedgehunt.local+2-key.pem
+
 build.hedgehunt.local {
 	tls build.hedgehunt.local+2.pem build.hedgehunt.local+2-key.pem
 	reverse_proxy localhost:5174
