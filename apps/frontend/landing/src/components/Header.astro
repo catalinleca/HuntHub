@@ -1,0 +1,44 @@
+---
+const editorUrl = 'https://build.hedgehunt.app';
+---
+
+<header class="fixed top-0 left-0 right-0 z-50 px-6 py-4">
+  <nav class="navbar max-w-5xl mx-auto flex items-center justify-between px-4 py-2 rounded-2xl">
+    <a href="/" class="flex items-center gap-2">
+      <span class="text-2xl">🦔</span>
+      <span class="font-display text-xl font-semibold text-foreground">HedgeHunt</span>
+    </a>
+
+    <div class="flex items-center gap-3">
+      <a
+        href={editorUrl}
+        class="text-foreground-muted hover:text-foreground px-4 py-2 rounded-xl transition-colors"
+      >
+        Log in
+      </a>
+      <a
+        href={editorUrl}
+        class="get-started-btn text-white font-medium px-4 py-2 rounded-xl transition-all"
+      >
+        Get Started
+      </a>
+    </div>
+  </nav>
+</header>
+
+<style>
+  .navbar {
+    background: rgba(255, 251, 245, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--hh-divider);
+    box-shadow: var(--hh-shadow-sm);
+  }
+
+  .get-started-btn {
+    background: linear-gradient(135deg, var(--hh-primary-main) 0%, var(--hh-primary-dark) 100%);
+  }
+
+  .get-started-btn:hover {
+    background: linear-gradient(135deg, var(--hh-primary-dark) 0%, var(--hh-primary-main) 100%);
+  }
+</style>

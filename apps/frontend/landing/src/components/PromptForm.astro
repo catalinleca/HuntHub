@@ -1,0 +1,65 @@
+---
+const editorLoginUrl = 'https://build.hedgehunt.app';
+
+const suggestions = [
+  { emoji: '🏴‍☠️', label: 'Pirate', prompt: "A pirate treasure hunt for my son's birthday party" },
+  { emoji: '🔍', label: 'Mystery', prompt: 'A mystery scavenger hunt for corporate team building' },
+  { emoji: '🎂', label: 'Birthday', prompt: 'A birthday party treasure hunt with clues and riddles' },
+  { emoji: '🌲', label: 'Outdoor', prompt: 'An outdoor adventure hunt in a park or nature trail' },
+];
+---
+
+<div class="w-full max-w-xl mx-auto">
+  <form
+    id="prompt-form"
+    action={editorLoginUrl}
+    method="GET"
+    class="bg-background-paper rounded-2xl shadow-warm-lg p-4 relative"
+  >
+    <textarea
+      id="prompt-input"
+      name="prompt"
+      placeholder="Describe your treasure hunt idea..."
+      rows={3}
+      maxlength={500}
+      class="w-full resize-none border-none bg-transparent text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-0"
+    ></textarea>
+
+    <button
+      type="submit"
+      class="absolute bottom-4 right-4 bg-primary hover:bg-primary-dark text-white rounded-full p-3 transition-colors"
+      aria-label="Generate hunt"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256">
+        <path d="M248,152a8,8,0,0,1-8,8H224v16a8,8,0,0,1-16,0V160H192a8,8,0,0,1,0-16h16V128a8,8,0,0,1,16,0v16h16A8,8,0,0,1,248,152ZM56,72H72V88a8,8,0,0,0,16,0V72h16a8,8,0,0,0,0-16H88V40a8,8,0,0,0-16,0V56H56a8,8,0,0,0,0,16ZM184,192h-8v-8a8,8,0,0,0-16,0v8h-8a8,8,0,0,0,0,16h8v8a8,8,0,0,0,16,0v-8h8a8,8,0,0,0,0-16Zm-2.34-89.66-96,96a8,8,0,0,1-11.32,0l-44-44a8,8,0,0,1,11.32-11.32L80,181.37l90.34-90.35a8,8,0,0,1,11.32,11.32Z"></path>
+      </svg>
+    </button>
+  </form>
+
+  <div class="flex gap-2 mt-4 flex-wrap justify-center">
+    {suggestions.map((s) => (
+      <button
+        type="button"
+        class="chip bg-background-surface hover:bg-background-paper border border-divider text-foreground-muted hover:text-foreground px-3 py-1.5 rounded-full text-sm transition-colors cursor-pointer"
+        data-prompt={s.prompt}
+      >
+        {s.emoji} {s.label}
+      </button>
+    ))}
+  </div>
+</div>
+
+<script>
+  const textarea = document.getElementById('prompt-input') as HTMLTextAreaElement | null;
+  const chips = document.querySelectorAll('.chip[data-prompt]');
+
+  chips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      const prompt = chip.getAttribute('data-prompt');
+      if (textarea && prompt) {
+        textarea.value = prompt;
+        textarea.focus();
+      }
+    });
+  });
+</script>
