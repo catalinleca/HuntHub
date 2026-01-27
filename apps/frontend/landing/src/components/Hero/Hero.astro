@@ -1,8 +1,7 @@
 ---
 import './Hero.styles.css';
 import PromptForm from '../PromptForm/PromptForm.astro';
-
-const editorUrl = import.meta.env.PUBLIC_EDITOR_URL || 'https://build.hedgehunt.app';
+import { EDITOR_URL } from '../../config/urls';
 ---
 
 <section class="hero-gradient min-h-screen pt-32 px-6 pb-24 flex items-center">
@@ -19,11 +18,8 @@ const editorUrl = import.meta.env.PUBLIC_EDITOR_URL || 'https://build.hedgehunt.
     </p>
 
     <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8">
-      <a href={editorUrl} class="cta-button px-6 py-3 rounded-full font-medium whitespace-nowrap"> Create a hunt </a>
-      <a
-        href="#how-it-works"
-        class="text-foreground hover:text-primary px-6 py-3 rounded-full border border-divider whitespace-nowrap"
-      >
+      <a href={EDITOR_URL} class="cta-button px-6 py-3 rounded-full font-medium whitespace-nowrap"> Create a hunt </a>
+      <a href="#how-it-works" class="cta-button-secondary px-6 py-3 rounded-full whitespace-nowrap">
         See how it works
       </a>
     </div>
