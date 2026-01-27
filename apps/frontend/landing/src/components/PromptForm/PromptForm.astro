@@ -7,7 +7,7 @@ interface Suggestion {
   prompt: string;
 }
 
-const editorLoginUrl = import.meta.env.PUBLIC_EDITOR_URL || 'https://build.hedgehunt.app';
+const editorUrl = import.meta.env.PUBLIC_EDITOR_URL || 'https://build.hedgehunt.app';
 
 const suggestions: Suggestion[] = [
   {
@@ -22,11 +22,7 @@ const suggestions: Suggestion[] = [
 ---
 
 <div class="prompt-form-container w-full mx-auto" data-component="prompt-form">
-  <form
-    action={editorLoginUrl}
-    method="GET"
-    class="form-card bg-background-paper rounded-2xl shadow-warm-lg p-5 relative"
-  >
+  <form action={editorUrl} method="GET" class="form-card bg-background-paper rounded-2xl shadow-warm-lg p-5 relative">
     <textarea
       data-prompt-input
       name="prompt"

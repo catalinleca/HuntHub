@@ -61,24 +61,29 @@
   object-fit: cover;
   object-position: top;
   opacity: 0;
-  animation: slideshow var(--cycle-duration) infinite;
+  animation: slideshow var(--cycle-duration) infinite ease-in-out;
 }
 
 @keyframes slideshow {
   0% {
     opacity: 0;
+    transform: translateX(16px);
   }
-  5% {
+  15% {
     opacity: 1;
+    transform: translateX(0);
   }
-  33% {
+  60% {
     opacity: 1;
+    transform: translateX(0);
   }
-  38% {
+  80% {
     opacity: 0;
+    transform: translateX(-16px);
   }
   100% {
     opacity: 0;
+    transform: translateX(-16px);
   }
 }
 

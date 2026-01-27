@@ -1,0 +1,15 @@
+.cta-button {
+  background: linear-gradient(135deg, var(--hh-primary-main) 0%, var(--hh-primary-dark) 100%);
+  color: var(--hh-common-white);
+  box-shadow: var(--hh-shadow-md);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--hh-shadow-lg);
+  opacity: 0.95;
+}

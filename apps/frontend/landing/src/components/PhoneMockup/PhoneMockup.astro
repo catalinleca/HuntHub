@@ -12,7 +12,7 @@ interface Props {
 
 const { images = [] } = Astro.props;
 
-const SLIDE_DURATION_SECONDS = 3;
+const SLIDE_DURATION_SECONDS = 5;
 const imageCount = Math.max(1, images.length);
 const cycleDuration = imageCount * SLIDE_DURATION_SECONDS;
 ---
