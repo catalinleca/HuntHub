@@ -1,14 +1,20 @@
 ---
 import './PhoneMockup.styles.css';
 
-interface Props {
-  images: { src: string; alt: string }[];
+export interface PhoneImage {
+  src: string;
+  alt: string;
 }
 
-const { images } = Astro.props;
+interface Props {
+  images: PhoneImage[];
+}
+
+const { images = [] } = Astro.props;
 
 const SLIDE_DURATION_SECONDS = 3;
-const cycleDuration = images.length * SLIDE_DURATION_SECONDS;
+const imageCount = Math.max(1, images.length);
+const cycleDuration = imageCount * SLIDE_DURATION_SECONDS;
 ---
 
 <div class="phone-device" style={`--cycle-duration: ${cycleDuration}s;`}>

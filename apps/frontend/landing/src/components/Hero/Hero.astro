@@ -1,12 +1,7 @@
 ---
 import './Hero.styles.css';
 import PromptForm from '../PromptForm/PromptForm.astro';
-import PhoneMockup from '../PhoneMockup/PhoneMockup.astro';
-
-interface PhoneImage {
-  src: string;
-  alt: string;
-}
+import PhoneMockup, { type PhoneImage } from '../PhoneMockup/PhoneMockup.astro';
 
 const phoneImages: PhoneImage[] = [
   { src: '/images/Screen-1.webp', alt: 'HedgeHunt app showing a quiz challenge' },

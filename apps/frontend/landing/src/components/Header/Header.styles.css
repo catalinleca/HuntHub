@@ -3,6 +3,7 @@
   --navbar-opacity: 80%;
 
   background: color-mix(in srgb, var(--hh-background-surface) var(--navbar-opacity), transparent);
+  -webkit-backdrop-filter: blur(var(--navbar-blur));
   backdrop-filter: blur(var(--navbar-blur));
   border: 1px solid var(--hh-divider);
   box-shadow: var(--hh-shadow-sm);

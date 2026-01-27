@@ -1,4 +1,5 @@
 .phone-device {
+  --cycle-duration: 9s;
   --phone-width: 280px;
   --phone-height: 572px;
   --phone-border-radius: 50px;
@@ -155,4 +156,22 @@
   height: 50px;
   background: var(--phone-frame-color);
   border-radius: 0 2px 2px 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide {
+    animation: none;
+  }
+
+  .slide:first-child {
+    opacity: 1;
+  }
+
+  .dot {
+    animation: none;
+  }
+
+  .dot:first-child {
+    background: var(--hh-primary-main);
+  }
 }
