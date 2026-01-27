@@ -1,5 +1,6 @@
 .step-card {
-  box-shadow: var(--hh-shadow-sm);
+  background: var(--hh-common-white);
+  box-shadow: var(--hh-shadow-md);
   border: 1px solid var(--hh-divider);
   transition:
     transform 0.2s ease,
@@ -8,11 +9,12 @@
 
 .step-card:hover {
   transform: translateY(-4px);
-  box-shadow: var(--hh-shadow-md);
+  box-shadow: var(--hh-shadow-lg);
 }
 
 .step-icon {
   display: inline-block;
+  font-size: 3rem;
 }
 
 .step-number {

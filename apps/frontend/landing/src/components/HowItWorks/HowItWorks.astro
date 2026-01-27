@@ -35,8 +35,8 @@ const steps: Step[] = [
     <div class="grid md:grid-cols-3 gap-8">
       {
         steps.map((step, index) => (
-          <div class="step-card bg-background-paper rounded-2xl p-8 text-center">
-            <div class="step-icon text-4xl mb-4">{step.icon}</div>
+          <div class="step-card rounded-2xl p-8 text-center">
+            <div class="step-icon mb-4">{step.icon}</div>
             <div class="step-number text-sm font-medium text-primary mb-2">Step {index + 1}</div>
             <h3 class="font-display text-xl font-semibold text-foreground mb-3">{step.title}</h3>
             <p class="text-foreground-muted">{step.description}</p>
