@@ -54,3 +54,9 @@
   --hh-radius-xl: 16px;
   --hh-radius-2xl: 24px;
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}

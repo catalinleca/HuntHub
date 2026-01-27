@@ -1,0 +1,38 @@
+.cta-button {
+  background: linear-gradient(135deg, var(--hh-primary-main) 0%, var(--hh-primary-dark) 100%);
+  color: var(--hh-common-white);
+  box-shadow: var(--hh-shadow-md);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--hh-shadow-lg);
+  opacity: 0.95;
+}
+
+.cta-button:focus-visible {
+  outline: 2px solid var(--hh-primary-main);
+  outline-offset: 2px;
+}
+
+.cta-button-secondary {
+  color: var(--hh-text-primary);
+  border: 1px solid var(--hh-divider);
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.cta-button-secondary:hover {
+  color: var(--hh-primary-main);
+  border-color: var(--hh-primary-main);
+}
+
+.cta-button-secondary:focus-visible {
+  outline: 2px solid var(--hh-primary-main);
+  outline-offset: 2px;
+}

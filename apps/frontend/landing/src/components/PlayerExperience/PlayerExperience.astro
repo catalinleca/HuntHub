@@ -1,0 +1,52 @@
+---
+import './PlayerExperience.styles.css';
+import PhoneMockup, { type PhoneImage } from '../PhoneMockup/PhoneMockup.astro';
+
+const phoneImages: PhoneImage[] = [
+  { src: '/images/Screen-1.webp', alt: 'Player starting a hunt' },
+  { src: '/images/Screen-2.webp', alt: 'Player following a clue' },
+  { src: '/images/Screen-3.webp', alt: 'Player completing a challenge' },
+];
+
+const features = [
+  'No app to download — it runs in any browser',
+  'Clues, riddles, and challenges that feel personal',
+  'Great for small groups playing together',
+];
+---
+
+<section id="player-experience" class="player-section py-24 px-6">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+      <div class="flex-1 text-center lg:text-left lg:max-w-xl lg:mt-8">
+        <h2 class="font-display text-3xl lg:text-4xl font-semibold text-foreground mb-6 leading-tight tracking-tight">
+          Players just tap and play
+        </h2>
+
+        <p class="text-lg text-foreground-muted mb-8 leading-relaxed">
+          One link, no app to download. Players follow clues step by step, solve riddles, and complete playful
+          challenges along the way. It runs right in their browser, so they’re hunting in seconds.
+        </p>
+
+        <ul class="space-y-3">
+          {
+            features.map((feature) => (
+              <li class="flex items-start gap-3 text-foreground-muted justify-center lg:justify-start leading-relaxed">
+                <span class="text-primary mt-0.5" aria-hidden="true">
+                  ✓
+                </span>
+                <span>{feature}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="flex-1 flex justify-center lg:justify-end">
+        <div class="phone-wrapper">
+          <PhoneMockup images={phoneImages} />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

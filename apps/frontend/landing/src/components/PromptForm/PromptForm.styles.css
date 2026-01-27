@@ -1,3 +1,13 @@
+.prompt-form-container {
+  max-width: min(860px, 70vw);
+}
+
+@media (max-width: 768px) {
+  .prompt-form-container {
+    max-width: 100%;
+  }
+}
+
 .form-card {
   --focus-ring-color: color-mix(in srgb, var(--hh-primary-main) 10%, transparent);
 

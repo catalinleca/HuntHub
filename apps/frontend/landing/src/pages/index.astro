@@ -2,9 +2,21 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header';
 import Hero from '../components/Hero';
+import SocialProofBar from '../components/SocialProofBar';
+import HowItWorks from '../components/HowItWorks';
+import PlayerExperience from '../components/PlayerExperience';
+import FinalCta from '../components/FinalCta';
+import Footer from '../components/Footer';
 ---
 
-<Layout title="HedgeHunt - Create AI-Powered Treasure Hunts">
+<Layout title="HedgeHunt - Create Personal Treasure Hunts">
   <Header />
-  <Hero />
+  <main>
+    <Hero />
+    <SocialProofBar />
+    <HowItWorks />
+    <PlayerExperience />
+    <FinalCta />
+  </main>
+  <Footer />
 </Layout>

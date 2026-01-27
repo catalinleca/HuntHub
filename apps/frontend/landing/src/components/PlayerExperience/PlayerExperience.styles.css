@@ -1,0 +1,7 @@
+.player-section {
+  background: var(--hh-background);
+}
+
+.phone-wrapper {
+  transform: rotate(3deg);
+}

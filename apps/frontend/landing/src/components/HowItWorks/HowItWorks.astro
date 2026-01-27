@@ -1,0 +1,52 @@
+---
+import './HowItWorks.styles.css';
+
+interface Step {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+const steps: Step[] = [
+  {
+    icon: '💡',
+    title: 'Describe the moment',
+    description: 'Tell us who it’s for, where it happens, and the vibe. A sentence or two is enough.',
+  },
+  {
+    icon: '✨',
+    title: 'Make it personal',
+    description: 'AI drafts the route and clues. You tweak, add photos, and make it feel like you.',
+  },
+  {
+    icon: '🔗',
+    title: 'Share and watch',
+    description: 'Send a link or QR. They open it on their phone and the adventure begins.',
+  },
+];
+---
+
+<section id="how-it-works" class="py-24 px-6 bg-background">
+  <div class="max-w-6xl mx-auto">
+    <h2
+      class="font-display text-3xl lg:text-4xl font-semibold text-foreground text-center mb-14 max-w-3xl mx-auto leading-tight tracking-tight"
+    >
+      From idea to adventure in minutes
+    </h2>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      {
+        steps.map((step, index) => (
+          <div class="step-card rounded-2xl p-8 text-center">
+            <div class="step-icon mb-4" aria-hidden="true">
+              {step.icon}
+            </div>
+            <div class="step-number text-sm font-medium text-primary mb-2">Step {index + 1}</div>
+            <h3 class="font-display text-xl font-semibold text-foreground mb-3 leading-tight">{step.title}</h3>
+            <p class="text-foreground-muted leading-relaxed">{step.description}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

@@ -1,38 +1,33 @@
 ---
 import './Hero.styles.css';
 import PromptForm from '../PromptForm/PromptForm.astro';
-import PhoneMockup, { type PhoneImage } from '../PhoneMockup/PhoneMockup.astro';
-
-const phoneImages: PhoneImage[] = [
-  { src: '/images/Screen-1.webp', alt: 'HedgeHunt app showing a quiz challenge' },
-  { src: '/images/Screen-2.webp', alt: 'HedgeHunt app showing a location step' },
-  { src: '/images/Screen-3.webp', alt: 'HedgeHunt app showing hunt completion' },
-];
+import { EDITOR_URL } from '../../config/urls';
 ---
 
-<section class="hero-gradient min-h-screen pt-44 px-6 pb-16">
-  <div class="max-w-6xl mx-auto">
-    <div class="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-28">
-      <!-- Content: Headline + Form -->
-      <div class="flex-1 max-w-2xl text-center">
-        <h1 class="font-display text-5xl lg:text-6xl font-semibold text-foreground mb-6">
-          <span class="md:whitespace-nowrap">Create treasure hunts</span>
-          <br />
-          <span class="text-primary">in minutes</span>
-        </h1>
+<section class="hero-gradient min-h-screen pt-32 px-6 pb-24 flex items-center">
+  <div class="w-full max-w-5xl mx-auto text-center">
+    <h1
+      class="font-display text-5xl lg:text-6xl font-semibold text-foreground mb-6 max-w-3xl mx-auto leading-tight tracking-tight"
+    >
+      Create a treasure hunt <span class="text-primary">made just for them</span>
+    </h1>
 
-        <p class="text-lg text-foreground-muted mb-10">
-          Describe your idea and let AI generate an interactive treasure hunt. Perfect for birthdays, team building, or
-          outdoor adventures.
-        </p>
+    <p class="text-lg text-foreground-muted mb-10 max-w-2xl mx-auto leading-relaxed">
+      HedgeHunt turns your idea into a playful adventure with clues, locations, and challenges. Personalize it, share a
+      link, and watch them play.
+    </p>
 
-        <PromptForm />
-      </div>
-
-      <!-- Phone Mockup (hidden on mobile) -->
-      <div class="hidden lg:flex items-center">
-        <PhoneMockup images={phoneImages} />
-      </div>
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8">
+      <a href={EDITOR_URL} class="cta-button px-6 py-3 rounded-full font-medium whitespace-nowrap"> Create a hunt </a>
+      <a href="#how-it-works" class="cta-button-secondary px-6 py-3 rounded-full whitespace-nowrap">
+        See how it works
+      </a>
     </div>
+
+    <p class="text-sm text-foreground-muted mb-6 max-w-2xl mx-auto leading-relaxed">
+      Perfect for birthdays, proposals, friend groups, classrooms, and community events.
+    </p>
+
+    <PromptForm />
   </div>
 </section>

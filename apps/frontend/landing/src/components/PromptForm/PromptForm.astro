@@ -1,5 +1,6 @@
 ---
 import './PromptForm.styles.css';
+import { EDITOR_URL } from '../../config/urls';
 
 interface Suggestion {
   emoji: string;
@@ -7,26 +8,24 @@ interface Suggestion {
   prompt: string;
 }
 
-const editorLoginUrl = import.meta.env.PUBLIC_EDITOR_URL || 'https://build.hedgehunt.app';
-
 const suggestions: Suggestion[] = [
-  { emoji: '🏴‍☠️', label: 'Pirate', prompt: "A pirate treasure hunt for my son's birthday party" },
-  { emoji: '🔍', label: 'Mystery', prompt: 'A mystery scavenger hunt for corporate team building' },
-  { emoji: '🎂', label: 'Birthday', prompt: 'A birthday party treasure hunt with clues and riddles' },
-  { emoji: '🌲', label: 'Outdoor', prompt: 'An outdoor adventure hunt in a park or nature trail' },
+  {
+    emoji: '🎂',
+    label: 'Birthday',
+    prompt: "A birthday treasure hunt for my friend's 30th across our neighborhood...",
+  },
+  { emoji: '💍', label: 'Proposal', prompt: 'A romantic hunt leading to a proposal at our favorite park...' },
+  { emoji: '🎓', label: 'Campus', prompt: 'A welcome-week scavenger hunt for new students around campus...' },
+  { emoji: '🧩', label: 'Family', prompt: 'A cozy indoor hunt for a rainy-day family game night...' },
 ];
 ---
 
-<div class="w-full max-w-xl mx-auto" data-component="prompt-form">
-  <form
-    action={editorLoginUrl}
-    method="GET"
-    class="form-card bg-background-paper rounded-2xl shadow-warm-lg p-5 relative"
-  >
+<div class="prompt-form-container w-full mx-auto" data-component="prompt-form">
+  <form action={EDITOR_URL} method="GET" class="form-card bg-background-paper rounded-2xl shadow-warm-lg p-5 relative">
     <textarea
       data-prompt-input
       name="prompt"
-      placeholder="Describe your treasure hunt idea..."
+      placeholder="Describe your hunt idea (occasion, location, vibe)..."
       aria-label="Describe your treasure hunt idea"
       rows={4}
       maxlength={500}

@@ -1,0 +1,15 @@
+.footer {
+  background: var(--hh-background-surface);
+  border-top: 1px solid var(--hh-divider);
+}
+
+.footer-link {
+  transition: color 0.15s ease;
+}
+
+.footer-link:focus-visible {
+  color: var(--hh-text-primary);
+  outline: 2px solid var(--hh-primary-main);
+  outline-offset: 2px;
+  border-radius: var(--hh-radius-sm);
+}

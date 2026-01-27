@@ -1,0 +1,36 @@
+---
+import './Footer.styles.css';
+---
+
+<footer class="footer py-12 px-6">
+  <div class="max-w-5xl mx-auto">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">🦔</span>
+        <span class="font-display text-lg font-semibold text-foreground">HedgeHunt</span>
+      </div>
+
+      <nav class="flex gap-6">
+        <a href="/about" class="footer-link text-foreground-muted hover:text-foreground">About</a>
+        <a href="/contact" class="footer-link text-foreground-muted hover:text-foreground">Contact</a>
+        <a
+          href="https://github.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="footer-link text-foreground-muted hover:text-foreground">GitHub</a
+        >
+      </nav>
+    </div>
+
+    <div class="mt-8 pt-6 border-t border-divider text-center">
+      <p class="text-sm text-foreground-muted">
+        Built by <a
+          href="https://github.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="footer-link hover:text-foreground">Catalin Leca</a
+        >
+      </p>
+    </div>
+  </div>
+</footer>
