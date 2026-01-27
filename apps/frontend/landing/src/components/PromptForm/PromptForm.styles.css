@@ -1,5 +1,5 @@
 .prompt-form-container {
-  max-width: min(750px, 60vw);
+  max-width: min(860px, 70vw);
 }
 
 @media (max-width: 768px) {

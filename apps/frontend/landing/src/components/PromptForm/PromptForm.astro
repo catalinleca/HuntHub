@@ -10,10 +10,14 @@ interface Suggestion {
 const editorLoginUrl = import.meta.env.PUBLIC_EDITOR_URL || 'https://build.hedgehunt.app';
 
 const suggestions: Suggestion[] = [
-  { emoji: '🏴‍☠️', label: 'Pirate', prompt: "A pirate quest for my son's 8th birthday in our backyard..." },
-  { emoji: '💕', label: 'Romance', prompt: 'A romantic scavenger hunt through the city for our anniversary...' },
-  { emoji: '🔍', label: 'Mystery', prompt: "A mystery adventure for my team's offsite..." },
-  { emoji: '🎃', label: 'Halloween', prompt: 'A spooky Halloween hunt around the neighborhood...' },
+  {
+    emoji: '🎂',
+    label: 'Birthday',
+    prompt: "A birthday treasure hunt for my friend's 30th across our neighborhood...",
+  },
+  { emoji: '💍', label: 'Proposal', prompt: 'A romantic hunt leading to a proposal at our favorite park...' },
+  { emoji: '🎓', label: 'Campus', prompt: 'A welcome-week scavenger hunt for new students around campus...' },
+  { emoji: '🧩', label: 'Family', prompt: 'A cozy indoor hunt for a rainy-day family game night...' },
 ];
 ---
 
@@ -26,7 +30,7 @@ const suggestions: Suggestion[] = [
     <textarea
       data-prompt-input
       name="prompt"
-      placeholder="Describe your treasure hunt idea..."
+      placeholder="Describe your hunt idea (occasion, location, vibe)..."
       aria-label="Describe your treasure hunt idea"
       rows={4}
       maxlength={500}
