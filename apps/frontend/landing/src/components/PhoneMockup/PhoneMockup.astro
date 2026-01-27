@@ -1,0 +1,41 @@
+---
+import './PhoneMockup.styles.css';
+
+interface Props {
+  images: { src: string; alt: string }[];
+}
+
+const { images } = Astro.props;
+
+const SLIDE_DURATION_SECONDS = 3;
+const cycleDuration = images.length * SLIDE_DURATION_SECONDS;
+---
+
+<div class="phone-device" style={`--cycle-duration: ${cycleDuration}s;`}>
+  <div class="phone-frame">
+    <div class="btn-left-top"></div>
+    <div class="btn-left-bottom"></div>
+    <div class="btn-right"></div>
+
+    <div class="phone-screen">
+      <div class="dynamic-island"></div>
+
+      <div class="slideshow">
+        {
+          images.map((image, index) => (
+            <img
+              src={image.src}
+              alt={image.alt}
+              class="slide"
+              style={`animation-delay: ${index * SLIDE_DURATION_SECONDS}s;`}
+            />
+          ))
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="dots">
+    {images.map((_, index) => <span class="dot" style={`animation-delay: ${index * SLIDE_DURATION_SECONDS}s;`} />)}
+  </div>
+</div>

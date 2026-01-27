@@ -1,0 +1,29 @@
+.hero-gradient {
+  --gradient-accent-opacity: 45%;
+  --gradient-primary-opacity: 40%;
+  --gradient-warm-opacity: 35%;
+  --gradient-light-opacity: 30%;
+
+  background:
+    radial-gradient(
+      ellipse 80% 60% at 10% 20%,
+      color-mix(in srgb, var(--hh-accent-main) var(--gradient-accent-opacity), transparent) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 70% 80% at 90% 80%,
+      color-mix(in srgb, var(--hh-primary-main) var(--gradient-primary-opacity), transparent) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 50% 40% at 80% 15%,
+      color-mix(in srgb, var(--hh-grey-300) var(--gradient-warm-opacity), transparent) 0%,
+      transparent 45%
+    ),
+    radial-gradient(
+      ellipse 60% 50% at 20% 85%,
+      color-mix(in srgb, var(--hh-accent-light) var(--gradient-light-opacity), transparent) 0%,
+      transparent 50%
+    ),
+    linear-gradient(145deg, var(--hh-grey-50) 0%, var(--hh-background-default) 50%, var(--hh-background-surface) 100%);
+}

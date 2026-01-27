@@ -1,0 +1,32 @@
+.navbar {
+  --navbar-blur: 12px;
+  --navbar-opacity: 80%;
+
+  background: color-mix(in srgb, var(--hh-background-surface) var(--navbar-opacity), transparent);
+  backdrop-filter: blur(var(--navbar-blur));
+  border: 1px solid var(--hh-divider);
+  box-shadow: var(--hh-shadow-sm);
+}
+
+.get-started-btn {
+  background: linear-gradient(135deg, var(--hh-primary-main) 0%, var(--hh-primary-dark) 100%);
+}
+
+.get-started-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.login-btn {
+  --btn-opacity: 60%;
+
+  background: color-mix(in srgb, var(--hh-common-white) var(--btn-opacity), transparent);
+  border: 1px solid var(--hh-divider);
+}
+
+.login-btn:hover {
+  --btn-opacity: 90%;
+
+  background: color-mix(in srgb, var(--hh-common-white) var(--btn-opacity), transparent);
+  border-color: var(--hh-grey-400);
+}

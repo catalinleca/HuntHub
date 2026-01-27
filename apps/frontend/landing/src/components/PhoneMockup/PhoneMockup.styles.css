@@ -1,0 +1,158 @@
+.phone-device {
+  --phone-width: 280px;
+  --phone-height: 572px;
+  --phone-border-radius: 50px;
+  --phone-padding: 12px;
+  --screen-border-radius: 38px;
+  --island-width: 95px;
+  --island-height: 26px;
+  --island-top: 10px;
+  --phone-frame-color: var(--hh-common-black);
+  --phone-screen-bg: var(--hh-common-white);
+  --phone-island-color: var(--hh-common-black);
+
+  filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.25));
+}
+
+.phone-frame {
+  position: relative;
+  width: var(--phone-width);
+  height: var(--phone-height);
+  background: var(--phone-frame-color);
+  border-radius: var(--phone-border-radius);
+  padding: var(--phone-padding);
+  box-sizing: border-box;
+}
+
+.phone-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--phone-screen-bg);
+  border-radius: var(--screen-border-radius);
+  overflow: hidden;
+}
+
+.dynamic-island {
+  position: absolute;
+  top: var(--island-top);
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--island-width);
+  height: var(--island-height);
+  background: var(--phone-island-color);
+  border-radius: 20px;
+  z-index: 10;
+}
+
+.slideshow {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  opacity: 0;
+  animation: slideshow var(--cycle-duration) infinite;
+}
+
+@keyframes slideshow {
+  0% {
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  33% {
+    opacity: 1;
+  }
+  38% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.dot {
+  --dot-size: 8px;
+
+  width: var(--dot-size);
+  height: var(--dot-size);
+  border-radius: 50%;
+  background: var(--hh-grey-400);
+  animation: dot-pulse var(--cycle-duration) infinite;
+}
+
+@keyframes dot-pulse {
+  0% {
+    background: var(--hh-grey-400);
+    transform: scale(1);
+  }
+  5% {
+    background: var(--hh-primary-main);
+    transform: scale(1.2);
+  }
+  33% {
+    background: var(--hh-primary-main);
+    transform: scale(1.2);
+  }
+  38% {
+    background: var(--hh-grey-400);
+    transform: scale(1);
+  }
+  100% {
+    background: var(--hh-grey-400);
+    transform: scale(1);
+  }
+}
+
+.phone-side-btn {
+  position: absolute;
+  width: 3px;
+  background: var(--phone-frame-color);
+}
+
+.btn-left-top {
+  position: absolute;
+  left: -3px;
+  top: 100px;
+  width: 3px;
+  height: 32px;
+  background: var(--phone-frame-color);
+  border-radius: 2px 0 0 2px;
+}
+
+.btn-left-bottom {
+  position: absolute;
+  left: -3px;
+  top: 140px;
+  width: 3px;
+  height: 50px;
+  background: var(--phone-frame-color);
+  border-radius: 2px 0 0 2px;
+}
+
+.btn-right {
+  position: absolute;
+  right: -3px;
+  top: 120px;
+  width: 3px;
+  height: 50px;
+  background: var(--phone-frame-color);
+  border-radius: 0 2px 2px 0;
+}

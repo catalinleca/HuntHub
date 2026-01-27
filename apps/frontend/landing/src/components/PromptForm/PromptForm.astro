@@ -1,7 +1,15 @@
 ---
+import './PromptForm.styles.css';
+
+interface Suggestion {
+  emoji: string;
+  label: string;
+  prompt: string;
+}
+
 const editorLoginUrl = import.meta.env.PUBLIC_EDITOR_URL || 'https://build.hedgehunt.app';
 
-const suggestions = [
+const suggestions: Suggestion[] = [
   { emoji: '🏴‍☠️', label: 'Pirate', prompt: "A pirate treasure hunt for my son's birthday party" },
   { emoji: '🔍', label: 'Mystery', prompt: 'A mystery scavenger hunt for corporate team building' },
   { emoji: '🎂', label: 'Birthday', prompt: 'A birthday party treasure hunt with clues and riddles' },
@@ -40,74 +48,36 @@ const suggestions = [
 
   <div class="flex gap-2 mt-4 flex-wrap justify-center">
     {
-      suggestions.map((s) => (
+      suggestions.map((suggestion) => (
         <button
           type="button"
           class="chip bg-background-surface hover:bg-background-paper border border-divider text-foreground-muted hover:text-foreground px-3 py-1.5 rounded-full text-sm transition-colors cursor-pointer"
-          data-prompt={s.prompt}
+          data-prompt={suggestion.prompt}
         >
-          {s.emoji} {s.label}
+          {suggestion.emoji} {suggestion.label}
         </button>
       ))
     }
   </div>
 </div>
 
-<style>
-  .form-card {
-    transition:
-      box-shadow 0.2s ease,
-      border-color 0.2s ease;
-    border: 1px solid var(--hh-divider);
-  }
-
-  .form-card:focus-within {
-    border-color: var(--hh-primary-main);
-    box-shadow:
-      var(--hh-shadow-lg),
-      0 0 0 3px rgba(182, 89, 27, 0.1);
-  }
-
-  .prompt-input::placeholder {
-    background: linear-gradient(
-      90deg,
-      var(--hh-grey-400),
-      var(--hh-primary-main),
-      var(--hh-accent-main),
-      var(--hh-primary-main),
-      var(--hh-grey-400)
-    );
-    background-size: 300% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: gradient-text 3s ease infinite;
-  }
-
-  @keyframes gradient-text {
-    0%,
-    100% {
-      background-position: 0% center;
-    }
-    50% {
-      background-position: 100% center;
-    }
-  }
-</style>
-
 <script>
-  document.querySelectorAll<HTMLElement>('[data-component="prompt-form"]').forEach((root) => {
-    const textarea = root.querySelector<HTMLTextAreaElement>('[data-prompt-input]');
-    const chips = root.querySelectorAll<HTMLElement>('.chip[data-prompt]');
+  const initPromptForms = () => {
+    document.querySelectorAll<HTMLElement>('[data-component="prompt-form"]').forEach((root) => {
+      const textarea = root.querySelector<HTMLTextAreaElement>('[data-prompt-input]');
+      const chips = root.querySelectorAll<HTMLElement>('.chip[data-prompt]');
 
-    chips.forEach((chip) => {
-      chip.addEventListener('click', () => {
-        const prompt = chip.getAttribute('data-prompt');
-        if (textarea && prompt) {
-          textarea.value = prompt;
-          textarea.focus();
-        }
+      chips.forEach((chip) => {
+        chip.addEventListener('click', () => {
+          const prompt = chip.getAttribute('data-prompt');
+          if (textarea && prompt) {
+            textarea.value = prompt;
+            textarea.focus();
+          }
+        });
       });
     });
-  });
+  };
+
+  initPromptForms();
 </script>

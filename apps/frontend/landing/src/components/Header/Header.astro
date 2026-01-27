@@ -1,4 +1,6 @@
 ---
+import './Header.styles.css';
+
 const editorUrl = import.meta.env.PUBLIC_EDITOR_URL || 'https://build.hedgehunt.app';
 ---
 
@@ -22,30 +24,3 @@ const editorUrl = import.meta.env.PUBLIC_EDITOR_URL || 'https://build.hedgehunt.
     </div>
   </nav>
 </header>
-
-<style>
-  .navbar {
-    background: color-mix(in srgb, var(--hh-background-surface) 80%, transparent);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--hh-divider);
-    box-shadow: var(--hh-shadow-sm);
-  }
-
-  .get-started-btn {
-    background: linear-gradient(135deg, var(--hh-primary-main) 0%, var(--hh-primary-dark) 100%);
-  }
-
-  .get-started-btn:hover {
-    background: linear-gradient(135deg, var(--hh-primary-dark) 0%, var(--hh-primary-main) 100%);
-  }
-
-  .login-btn {
-    background: color-mix(in srgb, var(--hh-common-white) 60%, transparent);
-    border: 1px solid var(--hh-divider);
-  }
-
-  .login-btn:hover {
-    background: color-mix(in srgb, var(--hh-common-white) 90%, transparent);
-    border-color: var(--hh-grey-400);
-  }
-</style>

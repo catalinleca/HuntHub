@@ -1,0 +1,43 @@
+---
+import './Hero.styles.css';
+import PromptForm from '../PromptForm/PromptForm.astro';
+import PhoneMockup from '../PhoneMockup/PhoneMockup.astro';
+
+interface PhoneImage {
+  src: string;
+  alt: string;
+}
+
+const phoneImages: PhoneImage[] = [
+  { src: '/images/Screen-1.webp', alt: 'HedgeHunt app showing a quiz challenge' },
+  { src: '/images/Screen-2.webp', alt: 'HedgeHunt app showing a location step' },
+  { src: '/images/Screen-3.webp', alt: 'HedgeHunt app showing hunt completion' },
+];
+---
+
+<section class="hero-gradient min-h-screen pt-44 px-6 pb-16">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-28">
+      <!-- Content: Headline + Form -->
+      <div class="flex-1 max-w-2xl text-center">
+        <h1 class="font-display text-5xl lg:text-6xl font-semibold text-foreground mb-6">
+          <span class="md:whitespace-nowrap">Create treasure hunts</span>
+          <br />
+          <span class="text-primary">in minutes</span>
+        </h1>
+
+        <p class="text-lg text-foreground-muted mb-10">
+          Describe your idea and let AI generate an interactive treasure hunt. Perfect for birthdays, team building, or
+          outdoor adventures.
+        </p>
+
+        <PromptForm />
+      </div>
+
+      <!-- Phone Mockup (hidden on mobile) -->
+      <div class="hidden lg:flex items-center">
+        <PhoneMockup images={phoneImages} />
+      </div>
+    </div>
+  </div>
+</section>
