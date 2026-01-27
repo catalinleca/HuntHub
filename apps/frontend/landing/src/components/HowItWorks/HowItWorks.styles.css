@@ -1,0 +1,21 @@
+.step-card {
+  box-shadow: var(--hh-shadow-sm);
+  border: 1px solid var(--hh-divider);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.step-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--hh-shadow-md);
+}
+
+.step-icon {
+  display: inline-block;
+}
+
+.step-number {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

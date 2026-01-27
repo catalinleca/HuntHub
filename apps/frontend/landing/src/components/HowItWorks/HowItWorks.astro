@@ -1,0 +1,48 @@
+---
+import './HowItWorks.styles.css';
+
+interface Step {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+const steps: Step[] = [
+  {
+    icon: '💡',
+    title: 'Describe your idea',
+    description: 'Tell us the occasion, location, and vibe. Just a sentence or two is enough.',
+  },
+  {
+    icon: '✨',
+    title: 'Make it yours',
+    description: 'AI generates the steps. You tweak clues, add photos, adjust the route.',
+  },
+  {
+    icon: '🔗',
+    title: 'Share and play',
+    description: 'Send a link. Players open it on their phones and the adventure begins.',
+  },
+];
+---
+
+<section class="py-20 px-6 bg-background">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="font-display text-3xl lg:text-4xl font-semibold text-foreground text-center mb-14">
+      From idea to adventure in minutes
+    </h2>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      {
+        steps.map((step, index) => (
+          <div class="step-card bg-background-paper rounded-2xl p-8 text-center">
+            <div class="step-icon text-4xl mb-4">{step.icon}</div>
+            <div class="step-number text-sm font-medium text-primary mb-2">Step {index + 1}</div>
+            <h3 class="font-display text-xl font-semibold text-foreground mb-3">{step.title}</h3>
+            <p class="text-foreground-muted">{step.description}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

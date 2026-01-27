@@ -1,0 +1,19 @@
+---
+import './FinalCta.styles.css';
+
+const editorUrl = import.meta.env.PUBLIC_EDITOR_URL || 'https://build.hedgehunt.app';
+---
+
+<section class="cta-section py-24 px-6">
+  <div class="max-w-2xl mx-auto text-center">
+    <h2 class="font-display text-3xl lg:text-4xl font-semibold text-foreground mb-4">
+      Ready to create something unforgettable?
+    </h2>
+
+    <p class="text-lg text-foreground-muted mb-10">Free to start. No credit card needed.</p>
+
+    <a href={editorUrl} class="cta-button inline-block px-8 py-4 rounded-full text-lg font-medium">
+      Create your first hunt
+    </a>
+  </div>
+</section>
