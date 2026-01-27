@@ -54,3 +54,7 @@
   --hh-radius-xl: 16px;
   --hh-radius-2xl: 24px;
 }
+
+html {
+  scroll-behavior: smooth;
+}
