@@ -1,5 +1,5 @@
 ---
-const editorUrl = 'https://build.hedgehunt.app';
+const editorUrl = import.meta.env.PUBLIC_EDITOR_URL || 'https://build.hedgehunt.app';
 ---
 
 <header class="fixed top-0 left-0 right-0 z-50 px-6 py-4">
@@ -25,7 +25,7 @@ const editorUrl = 'https://build.hedgehunt.app';
 
 <style>
   .navbar {
-    background: rgba(255, 251, 245, 0.8);
+    background: color-mix(in srgb, var(--hh-background-surface) 80%, transparent);
     backdrop-filter: blur(12px);
     border: 1px solid var(--hh-divider);
     box-shadow: var(--hh-shadow-sm);
@@ -40,12 +40,12 @@ const editorUrl = 'https://build.hedgehunt.app';
   }
 
   .login-btn {
-    background: rgba(255, 255, 255, 0.6);
+    background: color-mix(in srgb, var(--hh-common-white) 60%, transparent);
     border: 1px solid var(--hh-divider);
   }
 
   .login-btn:hover {
-    background: rgba(255, 255, 255, 0.9);
+    background: color-mix(in srgb, var(--hh-common-white) 90%, transparent);
     border-color: var(--hh-grey-400);
   }
 </style>

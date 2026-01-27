@@ -4,9 +4,12 @@ interface Props {
 }
 
 const { images } = Astro.props;
+
+const SLIDE_DURATION = 3;
+const cycleDuration = images.length * SLIDE_DURATION;
 ---
 
-<div class="phone-device">
+<div class="phone-device" style={`--cycle-duration: ${cycleDuration}s;`}>
   <div class="phone-frame">
     <!-- Side buttons -->
     <div class="btn-left-top"></div>
@@ -20,7 +23,7 @@ const { images } = Astro.props;
       <div class="slideshow">
         {
           images.map((image, index) => (
-            <img src={image.src} alt={image.alt} class="slide" style={`animation-delay: ${index * 3}s;`} />
+            <img src={image.src} alt={image.alt} class="slide" style={`animation-delay: ${index * SLIDE_DURATION}s;`} />
           ))
         }
       </div>
@@ -29,7 +32,7 @@ const { images } = Astro.props;
 
   <!-- Dot indicators -->
   <div class="dots">
-    {images.map((_, index) => <span class="dot" style={`animation-delay: ${index * 3}s;`} />)}
+    {images.map((_, index) => <span class="dot" style={`animation-delay: ${index * SLIDE_DURATION}s;`} />)}
   </div>
 </div>
 
@@ -84,7 +87,7 @@ const { images } = Astro.props;
     object-fit: cover;
     object-position: top;
     opacity: 0;
-    animation: slideshow 9s infinite;
+    animation: slideshow var(--cycle-duration) infinite;
   }
 
   @keyframes slideshow {
@@ -117,7 +120,7 @@ const { images } = Astro.props;
     height: 8px;
     border-radius: 50%;
     background: var(--hh-grey-400);
-    animation: dot-pulse 9s infinite;
+    animation: dot-pulse var(--cycle-duration) infinite;
   }
 
   @keyframes dot-pulse {

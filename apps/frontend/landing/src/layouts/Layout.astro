@@ -1,4 +1,6 @@
 ---
+import '../styles/tokens.css';
+
 interface Props {
   title: string;
 }
@@ -19,7 +21,3 @@ const { title } = Astro.props;
     <slot />
   </body>
 </html>
-
-<style is:global>
-  @import '../styles/tokens.css';
-</style>

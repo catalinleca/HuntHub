@@ -30,8 +30,8 @@ export default {
         'warm-lg': 'var(--hh-shadow-lg)',
       },
       fontFamily: {
-        display: 'var(--hh-font-display)',
-        body: 'var(--hh-font-body)',
+        display: ['var(--hh-font-display)'],
+        body: ['var(--hh-font-body)'],
       },
       borderRadius: {
         sm: 'var(--hh-radius-sm)',

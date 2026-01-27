@@ -15,7 +15,7 @@ const phoneImages = [
       <!-- Left: Title + Form -->
       <div class="flex-1 max-w-2xl text-center">
         <h1 class="font-display text-5xl lg:text-6xl font-semibold text-foreground mb-6">
-          <span class="whitespace-nowrap">Create treasure hunts</span><br />
+          <span class="md:whitespace-nowrap">Create treasure hunts</span><br />
           <span class="text-primary">in minutes</span>
         </h1>
 
@@ -38,10 +38,26 @@ const phoneImages = [
 <style>
   .hero-gradient {
     background:
-      radial-gradient(ellipse 80% 60% at 10% 20%, rgba(212, 175, 53, 0.45) 0%, transparent 50%),
-      radial-gradient(ellipse 70% 80% at 90% 80%, rgba(182, 89, 27, 0.4) 0%, transparent 55%),
-      radial-gradient(ellipse 50% 40% at 80% 15%, rgba(212, 165, 116, 0.35) 0%, transparent 45%),
-      radial-gradient(ellipse 60% 50% at 20% 85%, rgba(193, 122, 58, 0.3) 0%, transparent 50%),
+      radial-gradient(
+        ellipse 80% 60% at 10% 20%,
+        color-mix(in srgb, var(--hh-accent-main) 45%, transparent) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        ellipse 70% 80% at 90% 80%,
+        color-mix(in srgb, var(--hh-primary-main) 40%, transparent) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse 50% 40% at 80% 15%,
+        color-mix(in srgb, var(--hh-grey-300) 35%, transparent) 0%,
+        transparent 45%
+      ),
+      radial-gradient(
+        ellipse 60% 50% at 20% 85%,
+        color-mix(in srgb, var(--hh-accent-light) 30%, transparent) 0%,
+        transparent 50%
+      ),
       linear-gradient(145deg, var(--hh-grey-50) 0%, var(--hh-background-default) 50%, var(--hh-background-surface) 100%);
   }
 </style>

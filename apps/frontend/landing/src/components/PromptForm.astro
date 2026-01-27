@@ -1,5 +1,5 @@
 ---
-const editorLoginUrl = 'https://build.hedgehunt.app';
+const editorLoginUrl = import.meta.env.PUBLIC_EDITOR_URL || 'https://build.hedgehunt.app';
 
 const suggestions = [
   { emoji: '🏴‍☠️', label: 'Pirate', prompt: "A pirate treasure hunt for my son's birthday party" },
@@ -9,20 +9,20 @@ const suggestions = [
 ];
 ---
 
-<div class="w-full max-w-xl mx-auto">
+<div class="w-full max-w-xl mx-auto" data-component="prompt-form">
   <form
-    id="prompt-form"
     action={editorLoginUrl}
     method="GET"
     class="form-card bg-background-paper rounded-2xl shadow-warm-lg p-5 relative"
   >
     <textarea
-      id="prompt-input"
+      data-prompt-input
       name="prompt"
       placeholder="Describe your treasure hunt idea..."
+      aria-label="Describe your treasure hunt idea"
       rows={4}
       maxlength={500}
-      class="w-full resize-none border-none bg-transparent text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-0 text-lg"
+      class="prompt-input w-full resize-none border-none bg-transparent text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-0 text-lg"
     ></textarea>
 
     <button
@@ -68,7 +68,7 @@ const suggestions = [
       0 0 0 3px rgba(182, 89, 27, 0.1);
   }
 
-  #prompt-input::placeholder {
+  .prompt-input::placeholder {
     background: linear-gradient(
       90deg,
       var(--hh-grey-400),
@@ -96,16 +96,18 @@ const suggestions = [
 </style>
 
 <script>
-  const textarea = document.getElementById('prompt-input') as HTMLTextAreaElement | null;
-  const chips = document.querySelectorAll('.chip[data-prompt]');
+  document.querySelectorAll<HTMLElement>('[data-component="prompt-form"]').forEach((root) => {
+    const textarea = root.querySelector<HTMLTextAreaElement>('[data-prompt-input]');
+    const chips = root.querySelectorAll<HTMLElement>('.chip[data-prompt]');
 
-  chips.forEach((chip) => {
-    chip.addEventListener('click', () => {
-      const prompt = chip.getAttribute('data-prompt');
-      if (textarea && prompt) {
-        textarea.value = prompt;
-        textarea.focus();
-      }
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const prompt = chip.getAttribute('data-prompt');
+        if (textarea && prompt) {
+          textarea.value = prompt;
+          textarea.focus();
+        }
+      });
     });
   });
 </script>

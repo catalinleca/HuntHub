@@ -30,6 +30,11 @@ const flattenToCssVars = (obj, prefix = '--hh') => {
 const paletteVars = flattenToCssVars(treasureMapPaletteConfig);
 const shadows = treasureMapThemeOptions.shadows;
 
+if (!shadows?.length) {
+  console.error('ERROR: treasureMapThemeOptions.shadows is missing or empty');
+  process.exit(1);
+}
+
 const css = `/* Auto-generated from @hunthub/compass - DO NOT EDIT */
 
 :root {
