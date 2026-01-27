@@ -2,6 +2,10 @@
   background: var(--hh-common-white);
   box-shadow: var(--hh-shadow-md);
   border: 1px solid var(--hh-divider);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
