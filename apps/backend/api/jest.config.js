@@ -10,21 +10,21 @@ module.exports = {
     '^@hunthub/shared/(.*)$': '<rootDir>/../../../packages/shared/src/$1',
   },
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      tsconfig: 'tsconfig.test.json',
-    }],
-    '^.+\\.m?js$': ['ts-jest', {
-      tsconfig: 'tsconfig.test.json',
-    }],
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        tsconfig: 'tsconfig.test.json',
+      },
+    ],
+    '^.+\\.m?js$': [
+      'ts-jest',
+      {
+        tsconfig: 'tsconfig.test.json',
+      },
+    ],
   },
-  transformIgnorePatterns: [
-    'node_modules/(?!(@faker-js|@hunthub)/)',
-  ],
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.d.ts',
-    '!src/index.ts',
-  ],
+  transformIgnorePatterns: ['node_modules/(?!(@faker-js|@hunthub)/)'],
+  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts', '!src/index.ts'],
   coverageDirectory: 'coverage',
   testTimeout: 30000, // 30s for first run (MongoDB binary download)
   setupFiles: ['<rootDir>/tests/setup/env.setup.ts'], // Load env vars before anything

@@ -1,0 +1,26 @@
+---
+import './Header.styles.css';
+
+const editorUrl = import.meta.env.PUBLIC_EDITOR_URL || 'https://build.hedgehunt.app';
+---
+
+<header class="fixed top-0 left-0 right-0 z-50 px-6 py-4">
+  <nav class="navbar max-w-6xl mx-auto flex items-center justify-between px-6 py-3 rounded-2xl">
+    <a href="/" class="flex items-center gap-2">
+      <span class="text-2xl">🦔</span>
+      <span class="font-display text-xl font-semibold text-foreground">HedgeHunt</span>
+    </a>
+
+    <div class="flex items-center gap-3">
+      <a
+        href={editorUrl}
+        class="login-btn text-foreground-muted hover:text-foreground px-4 py-2 rounded-xl transition-all"
+      >
+        Log in
+      </a>
+      <a href={editorUrl} class="get-started-btn text-white font-medium px-4 py-2 rounded-xl transition-all">
+        Get Started
+      </a>
+    </div>
+  </nav>
+</header>

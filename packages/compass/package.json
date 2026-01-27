@@ -60,7 +60,8 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "export:css-vars": "node scripts/export-css-vars.mjs"
   },
   "peerDependencies": {
     "@mui/material": "^6.0.0",

@@ -38,6 +38,7 @@ jobs:
       backend: ${{ steps.filter.outputs.backend }}
       editor: ${{ steps.filter.outputs.editor }}
       player: ${{ steps.filter.outputs.player }}
+      landing: ${{ steps.filter.outputs.landing }}
       common: ${{ steps.filter.outputs.common }}
     steps:
       - uses: actions/checkout@v4
@@ -59,6 +60,9 @@ jobs:
             player:
               - 'apps/frontend/player/**'
               - 'packages/shared/**'
+            landing:
+              - 'apps/frontend/landing/**'
+              - 'packages/compass/**'
 
   # Backend CI
   backend:
@@ -154,3 +158,30 @@ jobs:
 
       - name: Build
         run: npm run build --workspace=@hunthub/player
+
+  # Landing CI
+  landing:
+    name: Landing CI
+    needs: changes
+    if: needs.changes.outputs.landing == 'true' || needs.changes.outputs.common == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.1
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Compass
+        run: npm run build:compass
+
+      - name: Export CSS variables
+        run: npm run export:css-vars --workspace=@hunthub/compass
+
+      - name: Build Landing
+        run: npm run build --workspace=@hunthub/landing

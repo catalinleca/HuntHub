@@ -1,0 +1,59 @@
+name: Deploy Landing Page
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/frontend/landing/**'
+      - 'packages/compass/**'
+      - '.github/workflows/deploy-landing.yml'
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy'
+        required: false
+        default: 'main'
+
+jobs:
+  deploy:
+    name: Deploy Landing
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-landing
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      deployments: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.1
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Compass
+        run: npm run build:compass
+
+      - name: Export CSS variables
+        run: npm run export:css-vars --workspace=@hunthub/compass
+
+      - name: Build Landing Page
+        run: npm run build --workspace=@hunthub/landing
+        env:
+          PUBLIC_EDITOR_URL: https://build.hedgehunt.app
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy apps/frontend/landing/dist --project-name=hedgehunt-landing --commit-dirty=true

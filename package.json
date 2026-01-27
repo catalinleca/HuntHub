@@ -19,12 +19,14 @@
     "build:api": "npm run build --workspace=@hunthub/api",
     "build:backend": "npm run build:api",
     "build:editor": "npm run build --workspace=@hunthub/editor",
+    "build:landing": "npm run build:compass && npm run export:css-vars --workspace=@hunthub/compass && npm run build --workspace=@hunthub/landing",
     "build:frontend": "npm run build:editor",
     "build:all": "npm run build --workspaces --if-present",
     "dev:api": "npm run dev --workspace=@hunthub/api",
     "dev:backend": "npm run dev:api",
     "dev:editor": "npm run dev --workspace=@hunthub/editor",
     "dev:player": "npm run dev --workspace=@hunthub/player",
+    "dev:landing": "npm run dev --workspace=@hunthub/landing",
     "dev:frontend": "npm run dev:editor",
     "generate": "npm run generate --workspace=@hunthub/shared",
     "test:api": "npm run test --workspace=@hunthub/api",
@@ -33,17 +35,18 @@
     "test:api:coverage": "npm run test:coverage --workspace=@hunthub/api",
     "test:api:debug": "npm run test:debug --workspace=@hunthub/api",
     "lint": "eslint . --ext .ts",
-    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\"",
+    "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,md,astro,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,json,md,astro,css}\"",
     "type-check": "tsc --noEmit --workspaces",
     "type-check:editor": "npm run type-check --workspace=@hunthub/editor",
     "type-check:player": "npm run type-check --workspace=@hunthub/player",
     "prepare": "husky || true"
   },
   "lint-staged": {
-    "**/*.{ts,tsx,json,md}": "prettier --write"
+    "**/*.{ts,tsx,js,mjs,json,md,astro,css}": "prettier --write"
   },
   "devDependencies": {
+    "prettier-plugin-astro": "^0.14.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "concurrently": "^9.2.1",
