@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Typography, Chip } from '@mui/material';
+import { Typography } from '@mui/material';
 import { ArrowLeftIcon, CaretDownIcon } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { usePublishingContext } from '@/pages/Hunt/context';
@@ -9,31 +9,32 @@ import * as S from './HuntTitle.styles';
 interface HuntTitleProps {
   huntName: string;
   lastUpdatedBy: string;
-  hasUnsavedChanges: boolean;
 }
 
-const getStatusBadge = (
+type VersionStatus = 'live' | 'ready' | 'draft';
+
+const getVersionStatus = (
   latestVersion: number,
   liveVersion: number | null,
-): { label: string; color: 'default' | 'primary' | 'success' } => {
+): { version: string; status: VersionStatus } => {
   if (liveVersion !== null) {
-    return { label: `v${liveVersion} Live`, color: 'success' };
+    return { version: `v${liveVersion}`, status: 'live' };
   }
 
   if (latestVersion > 1) {
-    return { label: `v${latestVersion - 1} Ready`, color: 'primary' };
+    return { version: `v${latestVersion - 1}`, status: 'ready' };
   }
 
-  return { label: `Draft`, color: 'default' };
+  return { version: '', status: 'draft' };
 };
 
-export const HuntTitle = ({ huntName, lastUpdatedBy, hasUnsavedChanges }: HuntTitleProps) => {
+export const HuntTitle = ({ huntName, lastUpdatedBy }: HuntTitleProps) => {
   const navigate = useNavigate();
   const { latestVersion, liveVersion } = usePublishingContext();
 
   const [versionPanelAnchor, setVersionPanelAnchor] = useState<HTMLElement | null>(null);
 
-  const statusBadge = getStatusBadge(latestVersion, liveVersion);
+  const { version, status } = getVersionStatus(latestVersion, liveVersion);
 
   const handleStatusClick = (event: React.MouseEvent<HTMLElement>) => {
     setVersionPanelAnchor(event.currentTarget);
@@ -54,16 +55,18 @@ export const HuntTitle = ({ huntName, lastUpdatedBy, hasUnsavedChanges }: HuntTi
           <Typography variant="h6" fontWeight={600}>
             {huntName}
           </Typography>
-          <Chip
-            label={statusBadge.label}
-            size="small"
-            color={statusBadge.color}
-            onClick={handleStatusClick}
-            onDelete={handleStatusClick}
-            deleteIcon={<CaretDownIcon size={14} />}
-            sx={{ cursor: 'pointer' }}
-          />
-          {hasUnsavedChanges && <Chip label="Unsaved changes" size="small" color="warning" variant="outlined" />}
+          <S.VersionBadge onClick={handleStatusClick}>
+            {version && <span>{version}</span>}
+            {status === 'live' && (
+              <>
+                <S.LiveDot />
+                <span>Live</span>
+              </>
+            )}
+            {status === 'ready' && <span>Ready</span>}
+            {status === 'draft' && <span>Draft</span>}
+            <CaretDownIcon size={14} />
+          </S.VersionBadge>
         </S.TitleRow>
         <Typography variant="caption" color="text.secondary">
           Last updated by {lastUpdatedBy}

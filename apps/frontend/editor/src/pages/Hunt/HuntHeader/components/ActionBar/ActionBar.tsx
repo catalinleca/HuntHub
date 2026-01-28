@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, CircularProgress } from '@mui/material';
+import { Button, CircularProgress, Tooltip } from '@mui/material';
 import { ShareNetworkIcon, RocketLaunchIcon } from '@phosphor-icons/react';
 import { usePublishingContext } from '@/pages/Hunt/context';
 import { SharePanel } from '../SharePanel';
@@ -16,18 +16,29 @@ export const ActionBar = ({ hasUnsavedChanges, isSaving, onSave }: ActionBarProp
   const { handleRelease, isPublishing, isReleasing } = usePublishingContext();
 
   const isBusy = isPublishing || isReleasing;
+  const isSaveDisabled = !hasUnsavedChanges || isSaving || isBusy;
+
+  const saveButton = (
+    <Button
+      variant="outlined"
+      size="small"
+      onClick={onSave}
+      disabled={isSaveDisabled}
+      startIcon={isSaving ? <CircularProgress size={16} /> : hasUnsavedChanges ? <S.UnsavedDot /> : undefined}
+    >
+      {isSaving ? 'Saving' : 'Save'}
+    </Button>
+  );
 
   return (
     <S.Container>
-      <Button
-        variant="outlined"
-        size="small"
-        disabled={!hasUnsavedChanges || isSaving || isBusy}
-        onClick={onSave}
-        startIcon={isSaving ? <CircularProgress size={16} /> : undefined}
-      >
-        Save
-      </Button>
+      {hasUnsavedChanges && !isSaving ? (
+        <Tooltip title="You have unsaved changes" placement="bottom" arrow>
+          {saveButton}
+        </Tooltip>
+      ) : (
+        saveButton
+      )}
 
       <Button
         variant="outlined"

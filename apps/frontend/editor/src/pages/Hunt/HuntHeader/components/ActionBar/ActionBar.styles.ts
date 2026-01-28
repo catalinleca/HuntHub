@@ -6,3 +6,11 @@ export const Container = styled(Stack)`
   align-items: center;
   gap: ${({ theme }) => theme.spacing(2)};
 `;
+
+export const UnsavedDot = styled.span`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: ${({ theme }) => theme.palette.accent.main};
+  flex-shrink: 0;
+`;
