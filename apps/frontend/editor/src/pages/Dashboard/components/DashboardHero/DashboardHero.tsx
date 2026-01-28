@@ -1,4 +1,5 @@
-import { CompassIcon, ScrollIcon, SwordIcon } from '@phosphor-icons/react';
+import { ScrollIcon, SwordIcon } from '@phosphor-icons/react';
+import { HHLogo } from '@/components/HHLogo';
 import * as S from './DashboardHero.styles';
 
 interface DashboardHeroProps {
@@ -10,7 +11,7 @@ export const DashboardHero = ({ onCreateClick }: DashboardHeroProps) => {
     <S.HeroContainer>
       <S.HeroContent>
         <S.CompassCircle>
-          <CompassIcon size={52} />
+          <HHLogo size={52} />
         </S.CompassCircle>
 
         <S.HeroTitle variant="h1">YOUR QUEST AWAITS</S.HeroTitle>

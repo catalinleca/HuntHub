@@ -1,0 +1,1 @@
+export { HHLogo } from './HHLogo';
