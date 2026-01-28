@@ -2,24 +2,24 @@
 import './HowItWorks.styles.css';
 
 interface Step {
-  icon: string;
+  image: string;
   title: string;
   description: string;
 }
 
 const steps: Step[] = [
   {
-    icon: '💡',
+    image: '/images/step-1-logo.svg',
     title: 'Describe the moment',
-    description: 'Tell us who it’s for, where it happens, and the vibe. A sentence or two is enough.',
+    description: "Tell us who it's for, where it happens, and the vibe. A sentence or two is enough.",
   },
   {
-    icon: '✨',
+    image: '/images/step-2-logo.svg',
     title: 'Make it personal',
     description: 'AI drafts the route and clues. You tweak, add photos, and make it feel like you.',
   },
   {
-    icon: '🔗',
+    image: '/images/step-3-logo.svg',
     title: 'Share and watch',
     description: 'Send a link or QR. They open it on their phone and the adventure begins.',
   },
@@ -34,14 +34,14 @@ const steps: Step[] = [
       From idea to adventure in minutes
     </h2>
 
-    <div class="grid md:grid-cols-3 gap-8">
+    <div class="grid md:grid-cols-3 gap-8 mt-6">
       {
         steps.map((step, index) => (
-          <div class="step-card rounded-2xl p-8 text-center">
-            <div class="step-icon mb-4" aria-hidden="true">
-              {step.icon}
+          <div class="step-card rounded-2xl p-8 pt-10 text-center">
+            <div class="step-number-circle">{index + 1}</div>
+            <div class="mb-6" aria-hidden="true">
+              <img src={step.image} alt="" class="h-20 w-auto mx-auto" />
             </div>
-            <div class="step-number text-sm font-medium text-primary mb-2">Step {index + 1}</div>
             <h3 class="font-display text-xl font-semibold text-foreground mb-3 leading-tight">{step.title}</h3>
             <p class="text-foreground-muted leading-relaxed">{step.description}</p>
           </div>

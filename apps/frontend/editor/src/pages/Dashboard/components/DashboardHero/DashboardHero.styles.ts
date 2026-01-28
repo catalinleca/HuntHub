@@ -62,8 +62,7 @@ export const CompassCircle = styled(Box)`
   box-shadow: ${({ theme }) => theme.shadows[7]};
   margin-bottom: ${({ theme }) => theme.spacing(5)};
 
-  > svg {
-    color: ${({ theme }) => theme.palette.common.white};
+  > img {
     filter: drop-shadow(${({ theme }) => theme.shadows[8]});
   }
 `;

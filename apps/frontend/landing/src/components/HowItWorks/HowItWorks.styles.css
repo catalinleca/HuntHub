@@ -1,4 +1,5 @@
 .step-card {
+  position: relative;
   background: var(--hh-common-white);
   box-shadow: var(--hh-shadow-md);
   border: 1px solid var(--hh-divider);
@@ -16,12 +17,19 @@
   box-shadow: var(--hh-shadow-lg);
 }
 
-.step-icon {
-  display: inline-block;
-  font-size: 3rem;
-}
-
-.step-number {
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+.step-number-circle {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 1.75rem;
+  height: 1.75rem;
+  background: var(--hh-primary-main);
+  color: var(--hh-common-white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.75rem;
 }

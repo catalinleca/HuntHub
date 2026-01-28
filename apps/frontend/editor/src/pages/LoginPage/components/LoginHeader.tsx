@@ -1,13 +1,9 @@
 import { Stack, Typography } from '@mui/material';
-import { CompassIcon } from '@phosphor-icons/react';
-import { getColor } from '@hunthub/compass';
-import * as S from '../LoginPage.styles';
+import { HHLogo } from '@/components/HHLogo';
 
 export const LoginHeader = () => (
   <Stack alignItems="center" gap={3}>
-    <S.IconCircle alignItems="center" justifyContent="center">
-      <CompassIcon size={32} weight="fill" color={getColor('common.white')} />
-    </S.IconCircle>
+    <HHLogo size={40} />
     <Stack alignItems="center" gap={1}>
       <Typography variant="h4" fontWeight={700}>
         Almost there!
