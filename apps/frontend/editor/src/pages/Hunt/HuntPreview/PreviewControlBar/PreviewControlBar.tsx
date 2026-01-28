@@ -8,6 +8,7 @@ interface PreviewControlBarProps {
   onModeChange: (mode: ValidationMode) => void;
   onOpenInBrowser: () => void;
   onCopyLink: () => void;
+  onClose: () => void;
   isLoading: boolean;
 }
 
@@ -34,22 +35,28 @@ export const PreviewControlBar = ({
   onModeChange,
   onOpenInBrowser,
   onCopyLink,
+  onClose,
   isLoading,
 }: PreviewControlBarProps) => (
-  <S.Container direction="row" alignItems="center">
-    <SimulationToggle mode={validationMode} onChange={onModeChange} />
-    <S.Divider orientation="vertical" flexItem />
-    <S.ActionButtons direction="row" alignItems="center">
-      <Tooltip title="Open in Browser" placement="top" arrow>
-        <IconButton size="small" onClick={onOpenInBrowser} disabled={isLoading}>
-          <ArrowSquareOutIcon size={18} />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Copy Link" placement="top" arrow>
-        <IconButton size="small" onClick={onCopyLink} disabled={isLoading}>
-          <CopyIcon size={18} />
-        </IconButton>
-      </Tooltip>
-    </S.ActionButtons>
-  </S.Container>
+  <S.Wrapper direction="row" alignItems="center" gap={1}>
+    <S.Container direction="row" alignItems="center">
+      <SimulationToggle mode={validationMode} onChange={onModeChange} />
+      <S.Divider orientation="vertical" flexItem />
+      <S.ActionButtons direction="row" alignItems="center">
+        <Tooltip title="Open in Browser" placement="top" arrow>
+          <IconButton size="small" onClick={onOpenInBrowser} disabled={isLoading}>
+            <ArrowSquareOutIcon size={18} />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Copy Link" placement="top" arrow>
+          <IconButton size="small" onClick={onCopyLink} disabled={isLoading}>
+            <CopyIcon size={18} />
+          </IconButton>
+        </Tooltip>
+      </S.ActionButtons>
+    </S.Container>
+    <S.CloseButton size="small" onClick={onClose}>
+      <XIcon size={18} />
+    </S.CloseButton>
+  </S.Wrapper>
 );

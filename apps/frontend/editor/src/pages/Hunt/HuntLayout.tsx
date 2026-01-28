@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import { useForm, useFormContext, useWatch, FormProvider, FieldErrors } from 'react-hook-form';
-import { IconButton, Tooltip } from '@mui/material';
 import { DeviceMobileIcon } from '@phosphor-icons/react';
 import { Hunt } from '@hunthub/shared';
 import { NavBar } from '@/components';
@@ -122,25 +121,28 @@ const HuntLayoutContent = ({ huntFormData }: HuntLayoutContentProps) => {
   const selectedStepIndex = selectedFormKey ? steps.findIndex((s) => s.formKey === selectedFormKey) : -1;
   const selectedStepType = selectedStepIndex >= 0 ? steps[selectedStepIndex]?.type : undefined;
 
-  const previewToggleButton = (
-    <Tooltip title={isPreviewOpen ? 'Hide Preview' : 'Show Preview'} placement="bottom" arrow>
-      <IconButton onClick={togglePreview} color={isPreviewOpen ? 'primary' : 'default'}>
-        <DeviceMobileIcon size={24} weight={isPreviewOpen ? 'fill' : 'regular'} />
-      </IconButton>
-    </Tooltip>
-  );
-
   return (
     <S.Container>
       <NavBar />
       <HuntHeader huntName={huntFormData.name} lastUpdatedBy="You" onSave={handleSubmit(onSubmit, onInvalid)} />
-      <HuntStepTimeline actions={previewToggleButton} />
+      <HuntStepTimeline />
       <S.ContentArea>
         {selectedStepIndex !== -1 && (
           <HuntForm stepIndex={selectedStepIndex} stepType={selectedStepType} isPreviewOpen={isPreviewOpen} />
         )}
 
-        <HuntPreview hunt={previewHunt} isOpen={isPreviewOpen} selectedStepIndex={selectedStepIndex} />
+        <HuntPreview
+          hunt={previewHunt}
+          isOpen={isPreviewOpen}
+          selectedStepIndex={selectedStepIndex}
+          onClose={togglePreview}
+        />
+
+        {!isPreviewOpen && (
+          <S.ShowPreviewTab onClick={togglePreview}>
+            <DeviceMobileIcon size={20} />
+          </S.ShowPreviewTab>
+        )}
       </S.ContentArea>
     </S.Container>
   );

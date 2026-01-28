@@ -26,9 +26,10 @@ interface HuntPreviewProps {
   hunt: Hunt;
   isOpen: boolean;
   selectedStepIndex: number;
+  onClose: () => void;
 }
 
-export const HuntPreview = ({ hunt, isOpen, selectedStepIndex }: HuntPreviewProps) => {
+export const HuntPreview = ({ hunt, isOpen, selectedStepIndex, onClose }: HuntPreviewProps) => {
   const [validationMode, setValidationMode] = useState<ValidationMode>('success');
   const sdkRef = useRef<PlayerSDK | null>(null);
 
@@ -68,6 +69,7 @@ export const HuntPreview = ({ hunt, isOpen, selectedStepIndex }: HuntPreviewProp
         onModeChange={handleModeChange}
         onOpenInBrowser={handleOpenInBrowser}
         onCopyLink={handleCopyLink}
+        onClose={onClose}
         isLoading={isGettingPreviewLink}
       />
       <PhoneFrame>

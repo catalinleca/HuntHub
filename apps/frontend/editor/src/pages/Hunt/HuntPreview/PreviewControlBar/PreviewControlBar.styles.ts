@@ -1,15 +1,25 @@
 import styled from 'styled-components';
-import { Stack, Divider as MuiDivider, alpha } from '@mui/material';
+import { Stack, Divider as MuiDivider, IconButton, alpha } from '@mui/material';
+
+export const Wrapper = styled(Stack)`
+  align-self: center;
+`;
 
 export const Container = styled(Stack)`
-  width: fit-content;
-  align-self: center;
   background: ${({ theme }) => alpha(theme.palette.background.surface, 0.9)};
   backdrop-filter: blur(12px);
   border: 1px solid ${({ theme }) => theme.palette.divider};
   border-radius: ${({ theme }) => theme.shape.md}px;
   box-shadow: ${({ theme }) => theme.shadows[2]};
   padding: 6px 8px;
+`;
+
+export const CloseButton = styled(IconButton)`
+  color: ${({ theme }) => theme.palette.text.secondary};
+
+  &:hover {
+    color: ${({ theme }) => theme.palette.text.primary};
+  }
 `;
 
 export const ToggleGroup = styled(Stack)`

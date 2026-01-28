@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Stack } from '@mui/material';
+import { Stack, alpha } from '@mui/material';
 
 export const Container = styled(Stack)`
   flex-direction: column;
@@ -14,4 +14,32 @@ export const ContentArea = styled(Stack)`
   padding: ${({ theme }) => theme.spacing(0, 3)};
   justify-content: center;
   overflow-x: clip;
+  position: relative;
+`;
+
+export const ShowPreviewTab = styled.button`
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 48px;
+  background: ${({ theme }) => alpha(theme.palette.background.surface, 0.9)};
+  backdrop-filter: blur(8px);
+  border: 1px solid ${({ theme }) => theme.palette.divider};
+  border-right: none;
+  border-radius: ${({ theme }) => theme.shape.sm}px 0 0 ${({ theme }) => theme.shape.sm}px;
+  color: ${({ theme }) => theme.palette.text.secondary};
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: ${({ theme }) => theme.shadows[2]};
+
+  &:hover {
+    background: ${({ theme }) => theme.palette.background.surface};
+    color: ${({ theme }) => theme.palette.primary.main};
+    width: 44px;
+  }
 `;
