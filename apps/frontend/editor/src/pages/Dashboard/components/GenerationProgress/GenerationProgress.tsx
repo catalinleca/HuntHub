@@ -7,17 +7,12 @@ export const GenerationProgress = () => {
   const [messageIndex, setMessageIndex] = useState(0);
   const [displayedChars, setDisplayedChars] = useState(0);
 
-  const currentMessage = PROGRESS_MESSAGES[messageIndex];
-
-  if (!currentMessage) {
-    return null;
-  }
-
+  const currentMessage = PROGRESS_MESSAGES[messageIndex] ?? '';
   const isTypingComplete = displayedChars >= currentMessage.length;
   const isLastMessage = messageIndex >= PROGRESS_MESSAGES.length - 1;
 
   useEffect(() => {
-    if (isTypingComplete) {
+    if (isTypingComplete || !currentMessage) {
       return;
     }
 
@@ -26,10 +21,10 @@ export const GenerationProgress = () => {
     }, TYPING_SPEED_MS);
 
     return () => clearTimeout(timer);
-  }, [displayedChars, isTypingComplete]);
+  }, [displayedChars, isTypingComplete, currentMessage]);
 
   useEffect(() => {
-    if (!isTypingComplete || isLastMessage) {
+    if (!isTypingComplete || isLastMessage || !currentMessage) {
       return;
     }
 
@@ -39,7 +34,11 @@ export const GenerationProgress = () => {
     }, MESSAGE_DISPLAY_MS);
 
     return () => clearTimeout(timer);
-  }, [isTypingComplete, isLastMessage]);
+  }, [isTypingComplete, isLastMessage, currentMessage]);
+
+  if (!currentMessage) {
+    return null;
+  }
 
   return (
     <Stack alignItems="center" justifyContent="center" sx={{ py: 8, px: 4 }}>

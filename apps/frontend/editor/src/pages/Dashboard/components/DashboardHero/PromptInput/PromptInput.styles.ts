@@ -38,8 +38,9 @@ export const GenerateButton = styled(IconButton)`
   right: ${({ theme }) => theme.spacing(1)};
   background: ${({ theme }) => theme.palette.primary.main};
   color: ${({ theme }) => theme.palette.common.white};
-  width: 44px;
-  height: 44px;
+  border-radius: 50%;
+  padding: ${({ theme }) => theme.spacing(1.5)};
+  transition: background-color 0.2s ease;
 
   &:hover {
     background: ${({ theme }) => theme.palette.primary.dark};

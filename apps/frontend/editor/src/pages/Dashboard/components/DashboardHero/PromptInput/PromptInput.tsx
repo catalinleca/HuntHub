@@ -1,5 +1,6 @@
+import type { KeyboardEvent } from 'react';
 import { CircularProgress } from '@mui/material';
-import { MagicWandIcon } from '@phosphor-icons/react';
+import { SparkleIcon } from '@phosphor-icons/react';
 import * as S from './PromptInput.styles';
 
 const PROMPT_MIN_LENGTH = 10;
@@ -17,7 +18,7 @@ export const PromptInput = ({ value, onChange, onSubmit, isLoading }: PromptInpu
   const isValid = value.trim().length >= PROMPT_MIN_LENGTH && value.trim().length <= PROMPT_MAX_LENGTH;
   const isNearLimit = value.length >= PROMPT_WARNING_THRESHOLD;
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     const isEnterWithoutShift = e.key === 'Enter' && !e.shiftKey;
 
     if (isEnterWithoutShift && isValid && !isLoading) {
@@ -38,15 +39,13 @@ export const PromptInput = ({ value, onChange, onSubmit, isLoading }: PromptInpu
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isLoading}
-          slotProps={{
-            htmlInput: { maxLength: PROMPT_MAX_LENGTH },
-          }}
+          slotProps={{ htmlInput: { maxLength: PROMPT_MAX_LENGTH } }}
         />
         <S.CharacterCount $isNearLimit={isNearLimit}>
           {value.length}/{PROMPT_MAX_LENGTH}
         </S.CharacterCount>
         <S.GenerateButton onClick={onSubmit} disabled={!isValid || isLoading}>
-          {isLoading ? <CircularProgress size={24} color="inherit" /> : <MagicWandIcon size={24} />}
+          {isLoading ? <CircularProgress size={20} color="inherit" /> : <SparkleIcon size={20} weight="fill" />}
         </S.GenerateButton>
       </S.InputWrapper>
     </S.Card>
