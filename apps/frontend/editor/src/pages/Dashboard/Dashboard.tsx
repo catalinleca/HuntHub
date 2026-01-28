@@ -2,35 +2,56 @@ import { Stack, Typography } from '@mui/material';
 import { useDashboardHunts } from '@/api/Hunt';
 import { RECENT_HUNTS_COUNT } from '@/api/Hunt/config';
 import { useHuntDialogStore } from '@/stores';
-import { DashboardNavBar, DashboardHero, EmptyState, ErrorState, RecentHunts, AllHunts } from './components';
+import {
+  DashboardNavBar,
+  DashboardHero,
+  GenerationProgress,
+  EmptyState,
+  ErrorState,
+  RecentHunts,
+  AllHunts,
+} from './components';
+import { useHuntGeneration } from './hooks';
 import { DashboardContainer, ContentContainer } from './Dashboard.styles';
 
 const Dashboard = () => {
   const { open: openHuntDialog } = useHuntDialogStore();
   const { hunts, isLoading, error } = useDashboardHunts();
-
-  const handleCreateClick = () => openHuntDialog();
+  const { prompt, setPrompt, style, handleStyleChange, generate, isGenerating } = useHuntGeneration();
 
   const recentHunts = hunts.slice(0, RECENT_HUNTS_COUNT);
   const hasHunts = hunts.length > 0;
 
   return (
     <DashboardContainer>
-      <DashboardNavBar onCreateClick={handleCreateClick} />
-      <DashboardHero onCreateClick={handleCreateClick} />
+      <DashboardNavBar onCreateClick={openHuntDialog} />
+      <DashboardHero
+        prompt={prompt}
+        onPromptChange={setPrompt}
+        style={style}
+        onStyleChange={handleStyleChange}
+        onGenerate={generate}
+        isGenerating={isGenerating}
+      />
 
       <ContentContainer maxWidth="xl">
-        {isLoading && <Typography color="text.secondary">Loading hunts...</Typography>}
+        {isGenerating && <GenerationProgress />}
 
-        {error && <ErrorState />}
+        {!isGenerating && (
+          <>
+            {isLoading && <Typography color="text.secondary">Loading hunts...</Typography>}
 
-        {!isLoading && !error && !hasHunts && <EmptyState onCreateClick={handleCreateClick} />}
+            {error && <ErrorState />}
 
-        {!isLoading && hasHunts && (
-          <Stack direction="column" gap={8}>
-            <RecentHunts hunts={recentHunts} />
-            <AllHunts hunts={hunts} />
-          </Stack>
+            {!isLoading && !error && !hasHunts && <EmptyState onCreateClick={openHuntDialog} />}
+
+            {!isLoading && hasHunts && (
+              <Stack direction="column" gap={8}>
+                <RecentHunts hunts={recentHunts} />
+                <AllHunts hunts={hunts} />
+              </Stack>
+            )}
+          </>
         )}
       </ContentContainer>
     </DashboardContainer>
