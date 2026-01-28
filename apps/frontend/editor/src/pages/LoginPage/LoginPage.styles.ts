@@ -57,22 +57,6 @@ export const PromptCard = styled(Stack)`
   border-radius: ${({ theme }) => theme.shape.md}px;
 `;
 
-export const StepCircle = styled(Stack)<{ $isActive?: boolean }>`
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background-color: ${({ theme, $isActive }) => ($isActive ? theme.palette.primary.main : theme.palette.grey[200])};
-  color: ${({ theme, $isActive }) => ($isActive ? theme.palette.common.white : theme.palette.text.secondary)};
-  font-size: 12px;
-  font-weight: 600;
-`;
-
-export const StepConnector = styled.div`
-  width: 40px;
-  height: 2px;
-  background-color: ${({ theme }) => theme.palette.grey[300]};
-`;
-
 export const Divider = styled(Stack)`
   width: 100%;
 

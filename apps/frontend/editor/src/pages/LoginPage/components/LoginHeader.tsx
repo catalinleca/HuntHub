@@ -4,9 +4,7 @@ import * as S from '../LoginPage.styles';
 
 export const LoginHeader = () => (
   <Stack alignItems="center" gap={3}>
-    <S.IconCircle alignItems="center" justifyContent="center">
-      <HHLogo />
-    </S.IconCircle>
+    <HHLogo size={60} />
     <Stack alignItems="center" gap={1}>
       <Typography variant="h4" fontWeight={700}>
         Almost there!
