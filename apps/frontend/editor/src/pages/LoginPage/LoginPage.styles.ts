@@ -41,14 +41,6 @@ export const Card = styled(Paper)`
   border-radius: ${({ theme }) => theme.shape.lg}px;
 `;
 
-export const IconCircle = styled(Stack)`
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background-color: ${({ theme }) => theme.palette.primary.main};
-  color: ${({ theme }) => theme.palette.common.white};
-`;
-
 export const PromptCard = styled(Stack)`
   width: 100%;
   padding: ${({ theme }) => theme.spacing(3)};
