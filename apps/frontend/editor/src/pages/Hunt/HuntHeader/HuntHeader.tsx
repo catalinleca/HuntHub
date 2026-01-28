@@ -11,6 +11,7 @@ interface HuntHeaderProps {
 export const HuntHeader = ({ huntName, lastUpdatedBy, onSave }: HuntHeaderProps) => {
   const { dirtyFields, isSubmitting } = useFormState();
 
+  // TODO: check this, we shouldn't need it
   const hasUnsavedChanges = Object.keys(dirtyFields).length > 0;
 
   return (
