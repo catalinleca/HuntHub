@@ -1,10 +1,9 @@
 import { Stack, Typography } from '@mui/material';
 import { HHLogo } from '@/components/HHLogo';
-import * as S from '../LoginPage.styles';
 
 export const LoginHeader = () => (
   <Stack alignItems="center" gap={3}>
-    <HHLogo size={60} />
+    <HHLogo size={40} />
     <Stack alignItems="center" gap={1}>
       <Typography variant="h4" fontWeight={700}>
         Almost there!

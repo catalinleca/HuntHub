@@ -18,6 +18,8 @@ export const LogoContainer = styled(Box)`
   gap: ${({ theme }) => theme.spacing(1)};
   flex: 1;
   color: ${({ theme }) => theme.palette.primary.main};
+  text-decoration: none;
+  cursor: pointer;
 `;
 
 export const ActionsContainer = styled(Box)`
