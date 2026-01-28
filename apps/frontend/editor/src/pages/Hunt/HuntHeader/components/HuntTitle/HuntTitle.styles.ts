@@ -48,4 +48,6 @@ export const LiveDot = styled.span`
   height: 6px;
   border-radius: 50%;
   background: ${({ theme }) => theme.palette.success.main};
+  margin-left: 4px;
+  margin-right: -2px;
 `;
