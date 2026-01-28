@@ -2,10 +2,15 @@ import styled from 'styled-components';
 import { Stack, Divider as MuiDivider, IconButton, alpha } from '@mui/material';
 
 export const Wrapper = styled(Stack)`
+  flex-direction: row;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing(1)};
   align-self: center;
 `;
 
 export const Container = styled(Stack)`
+  flex-direction: row;
+  align-items: center;
   background: ${({ theme }) => alpha(theme.palette.background.surface, 0.9)};
   backdrop-filter: blur(12px);
   border: 1px solid ${({ theme }) => theme.palette.divider};
@@ -23,6 +28,8 @@ export const CloseButton = styled(IconButton)`
 `;
 
 export const ToggleGroup = styled(Stack)`
+  flex-direction: row;
+  padding-right: ${({ theme }) => theme.spacing(2)};
   border-radius: ${({ theme }) => theme.shape.sm}px;
   overflow: hidden;
 `;
@@ -88,5 +95,7 @@ export const Divider = styled(MuiDivider)`
 `;
 
 export const ActionButtons = styled(Stack)`
+  flex-direction: row;
+  align-items: center;
   color: ${({ theme }) => theme.palette.text.secondary};
 `;

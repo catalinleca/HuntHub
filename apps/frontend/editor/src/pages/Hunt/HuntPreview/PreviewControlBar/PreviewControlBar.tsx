@@ -18,7 +18,7 @@ interface SimulationToggleProps {
 }
 
 const SimulationToggle = ({ mode, onChange }: SimulationToggleProps) => (
-  <S.ToggleGroup direction="row" sx={{ pr: 2 }}>
+  <S.ToggleGroup>
     <S.ToggleButton $isActive={mode === 'success'} $variant="success" onClick={() => onChange('success')}>
       <CheckIcon size={14} weight="bold" />
       Pass
@@ -38,11 +38,11 @@ export const PreviewControlBar = ({
   onClose,
   isLoading,
 }: PreviewControlBarProps) => (
-  <S.Wrapper direction="row" alignItems="center" gap={1}>
-    <S.Container direction="row" alignItems="center">
+  <S.Wrapper>
+    <S.Container>
       <SimulationToggle mode={validationMode} onChange={onModeChange} />
       <S.Divider orientation="vertical" flexItem />
-      <S.ActionButtons direction="row" alignItems="center">
+      <S.ActionButtons>
         <Tooltip title="Open in Browser" placement="top" arrow>
           <IconButton size="small" onClick={onOpenInBrowser} disabled={isLoading}>
             <ArrowSquareOutIcon size={18} />
