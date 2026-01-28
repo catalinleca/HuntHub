@@ -4,9 +4,7 @@ import { AxiosError } from 'axios';
 import { GenerateHuntStyle } from '@hunthub/shared';
 import { useGenerateHunt } from '@/api/Hunt';
 import { useSnackbarStore } from '@/stores';
-
-const PROMPT_MAX_LENGTH = 500;
-const PROMPT_MIN_LENGTH = 10;
+import { PROMPT_MIN_LENGTH, PROMPT_MAX_LENGTH } from '../constants';
 
 const ERROR_MESSAGES: Record<string, string> = {
   RATE_LIMIT_EXCEEDED: 'Generation limit reached. You can generate up to 10 hunts per hour.',
