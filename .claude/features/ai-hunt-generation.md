@@ -11,10 +11,10 @@ Generate complete treasure hunts from natural language prompts using OpenAI gpt-
 | Layer | Status |
 |-------|--------|
 | Backend | ✓ Complete |
-| Frontend (Editor) | ○ Planned |
+| Frontend (Editor) | ✓ Complete |
 | Frontend (Player) | N/A |
 
-**Last Updated:** 2025-01-21 — Backend implementation complete, 279/279 tests passing.
+**Last Updated:** 2026-01-28 — Backend and Editor implementation complete.
 
 ### Backend Implementation Status
 - [x] Error classes (RateLimitError, ServiceUnavailableError, GenerationError)
@@ -30,12 +30,13 @@ Generate complete treasure hunts from natural language prompts using OpenAI gpt-
 - [x] DI container registration
 
 ### Editor Implementation Status
-- [ ] Inline prompt textarea in DashboardHero
-- [ ] Style selector (ToggleButtonGroup)
-- [ ] GenerationProgress component
-- [ ] Auto-trigger when arriving with pending prompt
-- [ ] Navigate to `/editor/:id` after success
-- [ ] Error handling (RATE_LIMIT_EXCEEDED, GENERATION_FAILED, etc.)
+- [x] Inline prompt textarea in DashboardHero (PromptInput component)
+- [x] Style selector (StyleSelector with ToggleButtonGroup)
+- [x] GenerationProgress component with typing animation
+- [x] Auto-trigger when arriving with pending prompt (useEffect + ref pattern)
+- [x] Navigate to `/editor/:id` after success
+- [x] Error handling with pure function (getGenerationErrorMessage)
+- [x] Race condition protection (isGenerating guard)
 
 ---
 
@@ -51,9 +52,10 @@ sequenceDiagram
 
     rect rgb(70, 70, 40)
     Note right of U: EDITOR: GENERATE HUNT
-    U->>FE: [FE ○] Click "Create with AI"
-    FE->>FE: [FE ○] Open AIGenerationDialog
-    U->>FE: [FE ○] Enter prompt + optional style
+    U->>FE: [FE ✓] Enter prompt in DashboardHero textarea
+    U->>FE: [FE ✓] Select style (optional)
+    U->>FE: [FE ✓] Click Generate button
+    FE->>FE: [FE ✓] Show GenerationProgress (typing animation)
     FE->>API: [BE ✓] POST /api/hunts/generate { prompt, style? }
     Note right of API: aiGenerationLimiter middleware
     API->>API: [BE ✓] Rate limit check (express-rate-limit)
@@ -70,7 +72,7 @@ sequenceDiagram
     API->>DB: [BE ✓] HuntService.createHunt()
     API->>DB: [BE ✓] HuntSaveService.saveHunt()
     API-->>FE: [BE ✓] 201 { hunt, generationMetadata }
-    FE->>FE: [FE ○] Navigate to /edit/{huntId}
+    FE->>FE: [FE ✓] Navigate to /editor/{huntId}
     end
 ```
 
@@ -283,6 +285,7 @@ Generated hunts will have these fields as null (user adds in editor):
 
 ## File Structure
 
+### Backend
 ```
 apps/backend/api/src/features/ai-generation/
 ├── ai-hunt-generation.routes.ts      # Express routes
@@ -295,99 +298,90 @@ apps/backend/api/src/features/ai-generation/
     └── ai-hunt-output.validator.ts   # Validation functions
 ```
 
+### Frontend (Editor)
+```
+apps/frontend/editor/src/
+├── api/Hunt/
+│   └── generateHunt.ts               # useGenerateHunt mutation hook
+└── pages/Dashboard/
+    ├── constants.ts                  # PROMPT_MIN/MAX_LENGTH constants
+    ├── hooks/
+    │   └── useHuntGeneration.ts      # Generation logic (executeGeneration, auto-trigger)
+    └── components/
+        ├── DashboardHero/
+        │   ├── DashboardHero.tsx
+        │   ├── DashboardHero.styles.ts
+        │   ├── PromptInput/          # Textarea + character counter + generate button
+        │   └── StyleSelector.tsx     # ToggleButtonGroup for hunt styles
+        └── GenerationProgress/
+            ├── GenerationProgress.tsx # Loading state with typing animation
+            ├── GenerationProgress.styles.ts
+            └── constants.ts          # 15 sequential progress messages
+```
+
 ---
 
-## Frontend Implementation Notes
+## Frontend Implementation Details
 
-> **Design Spec:** See `.claude/implementation-plans/landing-page/hunthub-design-spec.md`
-> **Implementation Plan:** See `.claude/implementation-plans/ai-hunt-generation-editor.md`
-
-### Editor: Dashboard Integration (Inline Hero)
-
-Per design spec, the AI prompt textarea is the **centerpiece** of the dashboard hero (NOT a dialog).
+### Dashboard Component Structure
 
 ```
-Dashboard
-├── DashboardNavBar (with "Create Hunt" button for manual flow)
-├── DashboardHero (gradient hero with prompt textarea)
-│   ├── Prompt textarea (10-500 chars)
-│   ├── Style selector (ToggleButtonGroup, optional)
-│   └── Generate button (magic wand icon)
+Dashboard.tsx
+├── DashboardNavBar
+├── DashboardHero
+│   ├── PromptInput (textarea + character counter + generate button)
+│   └── StyleSelector (ToggleButtonGroup)
 └── ContentContainer
-    ├── GenerationProgress (when generating)
+    ├── GenerationProgress (when isGenerating)
     ├── Hunt list (when has hunts)
     └── EmptyState (when no hunts)
 ```
 
-### Auto-Trigger Flow (Landing Page → Dashboard)
+### useHuntGeneration Hook
 
-1. User enters prompt on landing page
-2. Landing page redirects to `build.hedgehunt.app?prompt=...`
-3. `AppWithAuth.tsx` IIFE extracts prompt, stores in `sessionStorage.pendingPrompt`
-4. If not logged in → LoginPage shows PromptPreview
-5. After login → Dashboard reads sessionStorage, pre-fills textarea
-6. **Auto-trigger** → Generation starts automatically if prompt exists
-7. GenerationProgress → Shows loading state below hero
-8. On success → Navigate to `/editor/{huntId}`
-
-### Hooks Needed
+Central hook managing all generation logic:
 
 ```typescript
-// apps/frontend/editor/src/api/Hunt/generateHunt.ts
-export const useGenerateHunt = () => {
-  const queryClient = useQueryClient();
+// Key patterns used:
+const [prompt, setPrompt] = useState(readAndClearPendingPrompt);  // Read from sessionStorage
+const initialPromptRef = useRef(prompt);  // Capture initial value for auto-trigger
 
-  const mutation = useMutation({
-    mutationFn: generateHunt,
-    onSuccess: (data) => {
-      void queryClient.invalidateQueries({ queryKey: huntKeys.lists() });
-      queryClient.setQueryData(huntKeys.detail(data.hunt.huntId), data.hunt);
-    },
-  });
+const executeGeneration = useCallback(async (promptToUse, styleToUse?) => {
+  if (isGenerating) return;  // Race condition guard
+  // validation, API call, navigation
+}, [generateHuntAsync, isGenerating, navigate, snackbar]);
 
-  return {
-    generateHunt: mutation.mutate,
-    generateHuntAsync: mutation.mutateAsync,
-    isGenerating: mutation.isPending,
-    generationError: mutation.error,
-    reset: mutation.reset,
-  };
+// Auto-trigger on mount if pending prompt exists
+useEffect(() => {
+  if (!initialPromptRef.current) return;
+  initialPromptRef.current = '';  // Clear to prevent re-trigger
+  void executeGeneration(initialPromptRef.current);
+}, [executeGeneration]);
+```
+
+### Error Handling (Pure Function)
+
+```typescript
+const ERROR_MESSAGES: Record<string, string> = {
+  RATE_LIMIT_EXCEEDED: 'Generation limit reached. You can generate up to 10 hunts per hour.',
+  VALIDATION_ERROR: 'Invalid prompt. Please try again.',
+  SERVICE_UNAVAILABLE: 'AI service is temporarily unavailable. Please try again later.',
+  GENERATION_FAILED: 'Generation failed. Please try rephrasing your prompt.',
+};
+
+const getGenerationErrorMessage = (error: AxiosError<{ code?: string }>): string => {
+  const code = error.response?.data?.code;
+  return ERROR_MESSAGES[code ?? ''] ?? error.message ?? 'Failed to generate hunt.';
 };
 ```
 
-### Error Handling (Use Backend Error Codes)
+### Key Implementation Decisions
 
-```typescript
-catch (err) {
-  const axiosError = err as { response?: { data?: { code?: string; message?: string } } };
-  const code = axiosError.response?.data?.code;
-  const message = axiosError.response?.data?.message;
-
-  switch (code) {
-    case 'RATE_LIMIT_EXCEEDED':
-      snackbar.error('Generation limit reached. You can generate up to 10 hunts per hour.');
-      break;
-    case 'VALIDATION_ERROR':
-      snackbar.error(message || 'Invalid prompt. Please try again.');
-      break;
-    case 'SERVICE_UNAVAILABLE':
-      snackbar.error('AI service is temporarily unavailable. Please try again later.');
-      break;
-    case 'GENERATION_FAILED':
-      snackbar.error('Generation failed. Please try rephrasing your prompt.');
-      break;
-    default:
-      snackbar.error(message || 'Failed to generate hunt. Please try again.');
-  }
-}
-```
-
-### Critical Implementation Notes
-
-- **ToggleButtonGroup**: Use existing `@/components/common/ToggleButton` (NOT raw MUI)
-- **null → undefined**: MUI returns `null` on deselect, convert to `undefined` for frontend state
-- **Prompt validation**: 10-500 chars, enforce with `maxLength` and disable button when invalid
-- **Route**: Use `/editor/:id` (NOT `/edit/{huntId}`)
+- **Shared constants**: `PROMPT_MIN_LENGTH`, `PROMPT_MAX_LENGTH` in `Dashboard/constants.ts`
+- **ToggleButtonGroup**: Uses existing `@/components/common/ToggleButton`
+- **null → undefined**: MUI returns `null` on deselect, converted via `?? undefined`
+- **Route**: `/editor/:id` (not `/edit/{huntId}`)
+- **Mutation timeout**: 60s (AI generation can take time)
 
 ---
 
@@ -411,16 +405,17 @@ catch (err) {
 - [x] Type-check passes
 - [x] All 279 tests pass
 
-### Frontend
-- [ ] Prompt textarea visible in DashboardHero
-- [ ] Style selector (ToggleButtonGroup) works, optional
-- [ ] Generate button disabled when prompt < 10 or > 500 chars
-- [ ] Character counter shows X/500
-- [ ] Auto-trigger works when arriving from landing page
-- [ ] GenerationProgress shows during generation
-- [ ] Success navigates to `/editor/{huntId}`
-- [ ] Error codes show correct messages (RATE_LIMIT_EXCEEDED, etc.)
-- [ ] "Create manually" link opens HuntDialog
+### Frontend ✓
+- [x] Prompt textarea visible in DashboardHero
+- [x] Style selector (ToggleButtonGroup) works, optional
+- [x] Generate button disabled when prompt < 10 or > 500 chars
+- [x] Character counter shows X/500
+- [x] Auto-trigger works when arriving from landing page
+- [x] GenerationProgress shows during generation (typing animation)
+- [x] Success navigates to `/editor/{huntId}`
+- [x] Error codes show correct messages (pure function)
+- [x] Race condition protected (isGenerating guard)
+- [ ] "Create manually" link opens HuntDialog (not yet implemented)
 
 ---
 
