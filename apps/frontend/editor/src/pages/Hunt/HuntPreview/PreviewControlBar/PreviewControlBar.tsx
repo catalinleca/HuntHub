@@ -19,11 +19,11 @@ interface SimulationToggleProps {
 
 const SimulationToggle = ({ mode, onChange }: SimulationToggleProps) => (
   <S.ToggleGroup>
-    <S.ToggleButton $isActive={mode === 'success'} $variant="success" onClick={() => onChange('success')}>
+    <S.ToggleButton type="button" $isActive={mode === 'success'} $variant="success" onClick={() => onChange('success')}>
       <CheckIcon size={14} weight="bold" />
       Pass
     </S.ToggleButton>
-    <S.ToggleButton $isActive={mode === 'fail'} $variant="fail" onClick={() => onChange('fail')}>
+    <S.ToggleButton type="button" $isActive={mode === 'fail'} $variant="fail" onClick={() => onChange('fail')}>
       <XIcon size={14} weight="bold" />
       Fail
     </S.ToggleButton>

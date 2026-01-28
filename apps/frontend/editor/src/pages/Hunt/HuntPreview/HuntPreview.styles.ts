@@ -11,7 +11,7 @@ export const PreviewWrapper = styled(Stack)<PreviewWrapperProps>`
   top: ${PREVIEW_STICKY_TOP}px;
   align-self: flex-start;
   margin-top: ${({ theme }) => theme.spacing(4)};
-  margin-right: 12px;
+  margin-right: ${CONTROL_BAR_GAP}px;
   flex-shrink: 0;
   gap: ${CONTROL_BAR_GAP}px;
   transform: translateX(${({ $isOpen }) => ($isOpen ? '0' : `calc(100% + ${PREVIEW_GAP}px)`)});
