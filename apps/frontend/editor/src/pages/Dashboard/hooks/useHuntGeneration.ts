@@ -41,6 +41,10 @@ export const useHuntGeneration = () => {
 
   const executeGeneration = useCallback(
     async (promptToUse: string, styleToUse?: GenerateHuntStyle) => {
+      if (isGenerating) {
+        return;
+      }
+
       const trimmedPrompt = promptToUse.trim();
 
       if (trimmedPrompt.length < PROMPT_MIN_LENGTH) {
@@ -63,7 +67,7 @@ export const useHuntGeneration = () => {
         snackbar.error(getGenerationErrorMessage(err as AxiosError<{ code?: string }>));
       }
     },
-    [generateHuntAsync, navigate, snackbar],
+    [generateHuntAsync, isGenerating, navigate, snackbar],
   );
 
   const generate = () => {
@@ -81,6 +85,7 @@ export const useHuntGeneration = () => {
       return;
     }
 
+    initialPromptRef.current = '';
     void executeGeneration(initialPrompt);
   }, [executeGeneration]);
 
