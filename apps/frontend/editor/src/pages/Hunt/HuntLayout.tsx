@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useForm, useFormContext, useWatch, FormProvider, FieldErrors } from 'react-hook-form';
-import { Button } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import { DeviceMobileIcon } from '@phosphor-icons/react';
 import { Hunt } from '@hunthub/shared';
 import { NavBar } from '@/components';
@@ -123,14 +123,11 @@ const HuntLayoutContent = ({ huntFormData }: HuntLayoutContentProps) => {
   const selectedStepType = selectedStepIndex >= 0 ? steps[selectedStepIndex]?.type : undefined;
 
   const previewToggleButton = (
-    <Button
-      onClick={togglePreview}
-      variant={isPreviewOpen ? 'contained' : 'outlined'}
-      size="small"
-      startIcon={<DeviceMobileIcon size={18} weight={isPreviewOpen ? 'fill' : 'regular'} />}
-    >
-      {isPreviewOpen ? 'Hide Preview' : 'Show Preview'}
-    </Button>
+    <Tooltip title={isPreviewOpen ? 'Hide Preview' : 'Show Preview'} placement="bottom" arrow>
+      <IconButton onClick={togglePreview} color={isPreviewOpen ? 'primary' : 'default'}>
+        <DeviceMobileIcon size={24} weight={isPreviewOpen ? 'fill' : 'regular'} />
+      </IconButton>
+    </Tooltip>
   );
 
   return (
