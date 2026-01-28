@@ -9,13 +9,15 @@ interface HuntHeaderProps {
 }
 
 export const HuntHeader = ({ huntName, lastUpdatedBy, onSave }: HuntHeaderProps) => {
-  const { isDirty, isSubmitting } = useFormState();
+  const { dirtyFields, isSubmitting } = useFormState();
+
+  const hasUnsavedChanges = Object.keys(dirtyFields).length > 0;
 
   return (
     <S.Container>
-      <HuntTitle huntName={huntName} lastUpdatedBy={lastUpdatedBy} hasUnsavedChanges={isDirty} />
+      <HuntTitle huntName={huntName} lastUpdatedBy={lastUpdatedBy} />
 
-      <ActionBar hasUnsavedChanges={isDirty} isSaving={isSubmitting} onSave={onSave} />
+      <ActionBar hasUnsavedChanges={hasUnsavedChanges} isSaving={isSubmitting} onSave={onSave} />
     </S.Container>
   );
 };
