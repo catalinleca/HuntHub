@@ -1,11 +1,8 @@
 import type { KeyboardEvent } from 'react';
 import { CircularProgress } from '@mui/material';
 import { SparkleIcon } from '@phosphor-icons/react';
+import { PROMPT_MIN_LENGTH, PROMPT_MAX_LENGTH, PROMPT_WARNING_THRESHOLD } from '../../../constants';
 import * as S from './PromptInput.styles';
-
-const PROMPT_MIN_LENGTH = 10;
-const PROMPT_MAX_LENGTH = 500;
-const PROMPT_WARNING_THRESHOLD = 450;
 
 interface PromptInputProps {
   value: string;
