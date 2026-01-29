@@ -23,6 +23,7 @@
     "@sentry/react": "^10.34.0",
     "@tanstack/react-query": "^5.59.0",
     "axios": "^1.7.9",
+    "canvas-confetti": "^1.9.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^6.28.0",
@@ -31,6 +32,7 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/styled-components": "^5.1.34",

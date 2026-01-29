@@ -85,7 +85,12 @@ export const PlaySessionProvider = ({ playSlug, children }: PlaySessionProviderP
           }
 
           if (isComplete) {
-            return { ...old, status: HuntProgressStatus.Completed, currentStepId: null };
+            return {
+              ...old,
+              status: HuntProgressStatus.Completed,
+              currentStepId: null,
+              completedAt: new Date().toISOString(),
+            };
           }
 
           return {

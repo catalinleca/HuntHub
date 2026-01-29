@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { Typography, CircularProgress } from '@mui/material';
+import { CircularProgress } from '@mui/material';
 import { ChallengeType } from '@hunthub/shared';
 import {
   PlaySessionProvider,
@@ -8,7 +8,6 @@ import {
   useSessionError,
   useSessionActions,
   useCurrentStep,
-  useHuntMeta,
   useIsLastStep,
   ApiValidationProvider,
 } from '@/context';
@@ -16,6 +15,7 @@ import { parseApiError, ErrorCode } from '@/utils';
 import { PlayerIdentification } from './components/PlayerIdentification';
 import { StepRenderer } from './components/StepRenderer';
 import { ErrorState } from './components/ErrorState';
+import { CompletedView } from './CompletedView';
 import * as S from './PlayPage.styles';
 
 const playErrorContent: Record<string, { title: string; description: string }> = {
@@ -69,17 +69,6 @@ const IdentifyingView = () => {
   return (
     <S.Container>
       <PlayerIdentification onSubmit={startSession} />
-    </S.Container>
-  );
-};
-
-const CompletedView = () => {
-  const huntMeta = useHuntMeta();
-
-  return (
-    <S.Container>
-      <Typography variant="h4">Hunt Complete!</Typography>
-      <Typography color="text.secondary">Congratulations on finishing {huntMeta?.name}</Typography>
     </S.Container>
   );
 };
