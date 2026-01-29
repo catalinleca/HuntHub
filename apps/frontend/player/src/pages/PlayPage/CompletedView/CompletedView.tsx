@@ -2,7 +2,7 @@ import { useHuntMeta, useSessionId, useSessionActions } from '@/context';
 import { useGetSession } from '@/api';
 import { formatDuration } from '@/utils';
 import { useConfetti } from './useConfetti';
-import { LogoSection, TitleSection, StatsSection, CompletionSection, FooterSection } from './CompletedView.sections';
+import { LogoSection, TitleSection, SummarySection, FooterSection } from './CompletedView.sections';
 import * as S from './CompletedView.styles';
 
 export const CompletedView = () => {
@@ -21,8 +21,7 @@ export const CompletedView = () => {
     <S.Container>
       <LogoSection />
       <TitleSection />
-      <StatsSection totalSteps={totalSteps} time={duration} />
-      <CompletionSection huntName={huntName} />
+      <SummarySection totalSteps={totalSteps} time={duration} huntName={huntName} />
       <FooterSection onPlayAgain={abandonSession} />
     </S.Container>
   );

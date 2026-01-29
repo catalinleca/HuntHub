@@ -1,59 +1,58 @@
-import { Typography, Button, Divider } from '@mui/material';
+import { Button, Divider, Stack, Typography } from '@mui/material';
 import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react';
 import hedgehuntLogo from '@/assets/hedgehunt-logo.svg';
 import * as S from './CompletedView.styles';
 
 export const LogoSection = () => (
-  <S.LogoCircle>
-    <S.Logo src={hedgehuntLogo} alt="HedgeHunt" />
-  </S.LogoCircle>
+  <S.LogoWrap>
+    <S.SparkleRing />
+    <S.LogoCircle>
+      <S.Logo src={hedgehuntLogo} alt="HedgeHunt" />
+    </S.LogoCircle>
+  </S.LogoWrap>
 );
 
 export const TitleSection = () => (
   <>
     <Typography variant="displayH4">Hunt Complete!</Typography>
-    <Typography color="text.secondary">You conquered the adventure!</Typography>
+    <Typography variant="displayBody2" color="text.secondary">
+      You conquered the adventure!
+    </Typography>
   </>
 );
 
-interface StatsSectionProps {
+interface SummarySectionProps {
   totalSteps: number;
   time: string;
-}
-
-export const StatsSection = ({ totalSteps, time }: StatsSectionProps) => (
-  <S.StatsCard elevation={0}>
-    <S.StatItem>
-      <Typography variant="h5" color="primary.main">
-        {totalSteps}/{totalSteps}
-      </Typography>
-      <Typography variant="xsRegular" color="text.secondary">
-        CHALLENGES
-      </Typography>
-    </S.StatItem>
-    <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
-    <S.StatItem>
-      <Typography variant="h5" color="primary.main">
-        {time}
-      </Typography>
-      <Typography variant="xsRegular" color="text.secondary">
-        TIME
-      </Typography>
-    </S.StatItem>
-  </S.StatsCard>
-);
-
-interface CompletionSectionProps {
   huntName: string;
 }
 
-export const CompletionSection = ({ huntName }: CompletionSectionProps) => (
-  <S.CompletionCard>
-    <Typography variant="body2" color="text.secondary">
-      You completed
-    </Typography>
-    <Typography variant="h6">{huntName}</Typography>
-  </S.CompletionCard>
+export const SummarySection = ({ totalSteps, time, huntName }: SummarySectionProps) => (
+  <S.SummaryCard>
+    <Stack gap={3}>
+      <Typography variant="displayH6">{huntName}</Typography>
+      <Divider />
+      <Stack direction="row" alignItems="center" justifyContent="space-between">
+        <Stack flex={1} alignItems="center" gap={1}>
+          <Typography variant="h5" color="primary.main">
+            {totalSteps}/{totalSteps}
+          </Typography>
+          <Typography variant="label" color="text.secondary">
+            Challenges
+          </Typography>
+        </Stack>
+        <Divider orientation="vertical" flexItem sx={{ mx: 6 }} />
+        <Stack flex={1} alignItems="center" gap={1}>
+          <Typography variant="h5" color="primary.main">
+            {time}
+          </Typography>
+          <Typography variant="label" color="text.secondary">
+            Time
+          </Typography>
+        </Stack>
+      </Stack>
+    </Stack>
+  </S.SummaryCard>
 );
 
 interface FooterSectionProps {
