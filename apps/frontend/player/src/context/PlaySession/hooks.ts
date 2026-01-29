@@ -31,6 +31,10 @@ export const useIsLastStep = () => useSessionState().isLastStep;
 export const usePreviewHint = () => useSessionState().previewHint;
 export const useIsPreview = () => useSessionState().isPreview ?? false;
 export const useStepOrder = () => useSessionState().stepOrder ?? [];
+export const useSessionTimestamps = () => {
+  const { startedAt, completedAt } = useSessionState();
+  return { startedAt, completedAt };
+};
 
 export const useStepResponse = () => useSessionState().stepResponse;
 export const useCurrentStep = () => useSessionState().stepResponse?.step ?? null;

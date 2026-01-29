@@ -53,6 +53,8 @@ export const PlaySessionProvider = ({ playSlug, children }: PlaySessionProviderP
       huntMeta: session?.hunt ?? null,
       stepResponse: stepQuery.data ?? null,
       isLastStep,
+      startedAt: session?.startedAt ?? null,
+      completedAt: session?.completedAt ?? null,
     }),
     [status, error, session, stepQuery.data, isLastStep],
   );

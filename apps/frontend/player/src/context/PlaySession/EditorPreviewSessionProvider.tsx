@@ -41,6 +41,8 @@ export const EditorPreviewSessionProvider = ({
       huntMeta: huntMeta ?? null,
       stepResponse: stepResponse as StepResponse | null,
       isLastStep,
+      startedAt: null,
+      completedAt: null,
       previewHint,
     }),
     [huntMeta, stepResponse, isLastStep, previewHint],
