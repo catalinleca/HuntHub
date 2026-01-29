@@ -1,4 +1,4 @@
-import { useState, useCallback, type ReactNode } from 'react';
+import { useState, useCallback, useEffect, type ReactNode } from 'react';
 import type { AnswerType, AnswerPayload } from '@hunthub/shared';
 import type { ValidationMode } from '@hunthub/player-sdk';
 import { ValidationContext } from './ValidationContext';
@@ -17,6 +17,12 @@ export const EditorPreviewProvider = ({ validationMode, children }: EditorPrevie
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [attemptCount, setAttemptCount] = useState(0);
+
+  useEffect(() => {
+    setIsCorrect(null);
+    setFeedback(null);
+    setAttemptCount(0);
+  }, [validationMode]);
 
   const validate = useCallback(
     (_answerType: AnswerType, _payload: AnswerPayload) => {
