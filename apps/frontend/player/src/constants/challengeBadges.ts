@@ -8,6 +8,7 @@ import {
   CameraIcon,
   MicrophoneIcon,
   LightningIcon,
+  TargetIcon,
   Icon,
 } from '@phosphor-icons/react';
 
@@ -30,7 +31,7 @@ export const CHALLENGE_BADGES: Record<ChallengeType, BadgeConfig> = {
   },
   [ChallengeType.Mission]: {
     label: 'Mission',
-    icon: CameraIcon,
+    icon: TargetIcon,
     color: getColor(CHALLENGE_TYPE_COLORS[ChallengeType.Mission]),
   },
   [ChallengeType.Task]: {

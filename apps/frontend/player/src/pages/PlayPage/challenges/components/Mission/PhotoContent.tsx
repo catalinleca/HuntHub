@@ -1,26 +1,37 @@
-import { useRef } from 'react';
-import { Typography, Button, Alert, Stack } from '@mui/material';
-import { CameraIcon, ArrowCounterClockwiseIcon, CheckIcon } from '@phosphor-icons/react';
-import { Spinner } from '@/components/core';
-import { PhotoStatus, getPhotoStatus } from '@/constants';
-import { usePhotoCapture } from '@/hooks';
+import { useRef, type ChangeEvent } from 'react';
+import { Typography, Alert, Stack } from '@mui/material';
+import { CameraIcon, ArrowCounterClockwiseIcon } from '@phosphor-icons/react';
+import { PhotoStatus } from '@/constants';
 import * as S from './Mission.styles';
 
+export interface PhotoContentState {
+  status: PhotoStatus;
+  file: File | null;
+  preview: string | null;
+  hasPhoto: boolean;
+  error: string | null;
+  handleCapture: (event: ChangeEvent<HTMLInputElement>) => void;
+  reset: () => void;
+}
+
 interface PhotoContentProps {
-  onSubmit: (file: File) => void;
-  isSubmitting?: boolean;
+  state: PhotoContentState;
   uploadError?: string | null;
+  isCorrect?: boolean | null;
 }
 
 const CapturePrompt = () => (
-  <S.StatusZone>
+  <>
     <S.IconWrapper>
       <CameraIcon size={32} weight="duotone" />
     </S.IconWrapper>
     <Typography variant="body1" fontWeight={500}>
       Capture Your Photo
     </Typography>
-  </S.StatusZone>
+    <Typography variant="body2" color="text.secondary">
+      Tap to open camera
+    </Typography>
+  </>
 );
 
 interface PhotoPreviewProps {
@@ -30,66 +41,39 @@ interface PhotoPreviewProps {
 }
 
 const PhotoPreview = ({ src, onRetake, showRetake = true }: PhotoPreviewProps) => (
-  <Stack gap={2} alignItems="center">
+  <Stack gap={2} alignItems="center" sx={{ width: '100%' }}>
     <S.PreviewImage src={src} alt="Captured photo" />
     {showRetake && onRetake && (
-      <Button variant="outlined" size="small" onClick={onRetake} startIcon={<ArrowCounterClockwiseIcon size={18} />}>
-        Retake
-      </Button>
+      <S.ActionLink type="button" onClick={onRetake}>
+        <ArrowCounterClockwiseIcon size={16} />
+        Retake photo
+      </S.ActionLink>
     )}
   </Stack>
 );
 
-export const PhotoContent = ({ onSubmit, isSubmitting = false, uploadError }: PhotoContentProps) => {
-  const { file, preview, error, handleCapture, reset, hasPhoto } = usePhotoCapture();
+export const PhotoContent = ({ state, uploadError, isCorrect }: PhotoContentProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const { status, preview, error, handleCapture, reset } = state;
 
   const openCamera = () => inputRef.current?.click();
-  const status = getPhotoStatus(hasPhoto, isSubmitting);
-
-  const handleSubmit = () => {
-    if (file) {
-      onSubmit(file);
-    }
-  };
+  const isValidated = isCorrect === true;
 
   const views: Record<PhotoStatus, React.ReactNode> = {
     [PhotoStatus.Empty]: (
-      <>
+      <S.InteractionZone $hasContent={false} $clickable onClick={openCamera}>
         <CapturePrompt />
-        <Button
-          variant="contained"
-          fullWidth
-          size="large"
-          onClick={openCamera}
-          startIcon={<CameraIcon size={20} weight="bold" />}
-        >
-          Take Photo
-        </Button>
-      </>
+      </S.InteractionZone>
     ),
     [PhotoStatus.HasPhoto]: (
-      <>
-        <PhotoPreview src={preview!} onRetake={reset} />
-        <Button
-          variant="contained"
-          fullWidth
-          size="large"
-          onClick={handleSubmit}
-          disabled={!file}
-          startIcon={<CheckIcon size={20} weight="bold" />}
-        >
-          Submit Photo
-        </Button>
-      </>
+      <S.InteractionZone $hasContent>
+        <PhotoPreview src={preview!} onRetake={reset} showRetake={!isValidated} />
+      </S.InteractionZone>
     ),
     [PhotoStatus.Submitting]: (
-      <>
+      <S.InteractionZone $hasContent>
         <PhotoPreview src={preview!} showRetake={false} />
-        <Button variant="contained" fullWidth size="large" disabled startIcon={<Spinner />}>
-          Checking...
-        </Button>
-      </>
+      </S.InteractionZone>
     ),
   };
 

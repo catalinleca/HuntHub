@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { alpha, Box, Stack, Typography } from '@mui/material';
 
 const ZoneBase = styled(Stack)`
@@ -30,14 +30,83 @@ export const UploadZone = styled(ZoneBase)`
   }
 `;
 
-export const IconWrapper = styled(Stack)<{ $color?: string }>`
+interface InteractionZoneProps {
+  $hasContent?: boolean;
+  $clickable?: boolean;
+}
+
+export const InteractionZone = styled(ZoneBase)<InteractionZoneProps>`
+  transition: all 0.2s ease;
+  background-color: ${({ theme }) => alpha(theme.palette.challenge.mission, 0.03)};
+
+  ${({ $hasContent, theme }) =>
+    $hasContent
+      ? css`
+          border: 1px solid ${theme.palette.challenge.mission};
+        `
+      : css`
+          border: 2px dashed ${alpha(theme.palette.challenge.mission, 0.5)};
+        `}
+
+  ${({ $clickable, theme }) =>
+    $clickable &&
+    css`
+      cursor: pointer;
+
+      &:hover {
+        border-color: ${theme.palette.challenge.mission};
+        background-color: ${alpha(theme.palette.challenge.mission, 0.08)};
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+    `}
+`;
+
+export const ActionLink = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing(0.5)};
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: ${({ theme }) => theme.typography.body2.fontSize};
+  font-weight: 500;
+  color: ${({ theme }) => theme.palette.primary.main};
+  text-decoration: underline;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: ${({ theme }) => theme.palette.primary.dark};
+  }
+`;
+
+type IconVariant = 'default' | 'success' | 'warning' | 'error';
+
+export const IconWrapper = styled(Stack)<{ $variant?: IconVariant }>`
   align-items: center;
   justify-content: center;
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background-color: ${({ theme, $color }) => alpha($color || theme.palette.accent.main, 0.1)};
-  color: ${({ theme, $color }) => $color || theme.palette.accent.dark};
+
+  ${({ theme, $variant = 'default' }) => {
+    const missionColor = theme.palette.challenge.mission;
+    const variantColors: Record<IconVariant, { bg: string; fg: string }> = {
+      default: { bg: alpha(missionColor, 0.12), fg: missionColor },
+      success: { bg: alpha(theme.palette.success.main, 0.1), fg: theme.palette.success.main },
+      warning: { bg: alpha(theme.palette.warning.main, 0.1), fg: theme.palette.warning.main },
+      error: { bg: alpha(theme.palette.error.main, 0.1), fg: theme.palette.error.main },
+    };
+    const colors = variantColors[$variant];
+    return css`
+      background-color: ${colors.bg};
+      color: ${colors.fg};
+    `;
+  }}
 `;
 
 export const StatusIndicator = styled(Stack)<{ $isSuccess?: boolean }>`
