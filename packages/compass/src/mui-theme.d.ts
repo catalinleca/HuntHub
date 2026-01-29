@@ -1,5 +1,12 @@
 import React from 'react';
 import '@mui/material/styles';
+import { Color } from '@mui/material';
+
+declare module '@mui/material' {
+  interface Color {
+    150: string;
+  }
+}
 
 declare module '@mui/material/styles' {
   interface Shape {

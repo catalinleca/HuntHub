@@ -91,7 +91,7 @@ export const ChallengeCard = ({
     <S.Container>
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <IconButton size="small" onClick={() => setShowAbandonDialog(true)}>
-          <XIcon size={20} />
+          <XIcon size={16} />
         </IconButton>
         {huntMeta?.name && <S.HuntTitle>{huntMeta.name}</S.HuntTitle>}
         <Stack direction="row" alignItems="center" gap={1}>
@@ -105,7 +105,9 @@ export const ChallengeCard = ({
           )}
           {hasStepProgress && (
             <S.StepBadge>
-              {currentStepIndex + 1} / {totalSteps}
+              <Typography variant="xsRegular" color="grey.500">
+                {currentStepIndex + 1} / {totalSteps}
+              </Typography>
             </S.StepBadge>
           )}
         </Stack>

@@ -13,6 +13,7 @@ const fadeIn = keyframes`
 `;
 
 export const Container = styled(Paper)`
+  flex: 1;
   padding: ${({ theme }) => theme.spacing(3)};
   display: flex;
   flex-direction: column;
@@ -29,12 +30,8 @@ export const StepBadge = styled(Box)`
   display: inline-flex;
   align-items: center;
   padding: ${({ theme }) => theme.spacing(1, 2)};
-  background-color: ${({ theme }) => theme.palette.grey[100]};
+  background-color: ${({ theme }) => theme.palette.grey[150]};
   border-radius: 100px;
-  color: ${({ theme }) => theme.palette.grey[500]};
-  font-size: 0.75rem;
-  font-weight: 500;
-  white-space: nowrap;
 `;
 
 export const HuntTitle = styled(Box)`

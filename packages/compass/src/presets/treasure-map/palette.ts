@@ -49,6 +49,7 @@ export const treasureMapPaletteConfig = {
   grey: {
     50: '#F5EFE6',
     100: '#E4D5C1',
+    150: '#E9E6E0',
     200: '#D4C4B0',
     300: '#D4A574',
     400: '#8B7355',
