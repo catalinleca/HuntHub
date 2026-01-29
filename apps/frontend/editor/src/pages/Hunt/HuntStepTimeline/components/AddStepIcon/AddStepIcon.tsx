@@ -1,5 +1,5 @@
 import { Menu, MenuItem } from '@mui/material';
-import { PlusIcon, MapTrifoldIcon, QuestionIcon, CameraIcon, CheckSquareIcon } from '@phosphor-icons/react';
+import { PlusIcon, MapTrifoldIcon, QuestionIcon, TargetIcon, CheckSquareIcon } from '@phosphor-icons/react';
 import { ChallengeType } from '@hunthub/shared';
 import { useState } from 'react';
 import * as S from './AddStepIcon.styles';
@@ -40,7 +40,7 @@ export const AddStepIcon = ({ onAddStep }: AddStepIconProps) => {
           Quiz
         </MenuItem>
         <MenuItem onClick={() => handleSelect(ChallengeType.Mission)}>
-          <CameraIcon size={20} />
+          <TargetIcon size={20} />
           Mission
         </MenuItem>
         <MenuItem onClick={() => handleSelect(ChallengeType.Task)}>

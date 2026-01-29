@@ -1,4 +1,4 @@
-import { MapTrifoldIcon, QuestionIcon, CameraIcon, CheckSquareIcon, Icon } from '@phosphor-icons/react';
+import { MapTrifoldIcon, QuestionIcon, TargetIcon, CheckSquareIcon, Icon } from '@phosphor-icons/react';
 import { ChallengeType, Challenge } from '@hunthub/shared';
 import { CHALLENGE_TYPE_COLORS, type PaletteColor } from '@hunthub/compass';
 
@@ -26,7 +26,7 @@ export const STEP_TYPE_CONFIG: Record<ChallengeType, StepTypeConfig> = {
     getTitle: (challenge) => challenge.quiz?.title ?? undefined,
   },
   [ChallengeType.Mission]: {
-    icon: CameraIcon,
+    icon: TargetIcon,
     label: 'Mission',
     description: 'Physical action required',
     color: CHALLENGE_TYPE_COLORS[ChallengeType.Mission],
