@@ -1,14 +1,25 @@
-import { Typography, Button, Alert, Stack } from '@mui/material';
-import { MicrophoneIcon, StopIcon, ArrowCounterClockwiseIcon, CheckIcon } from '@phosphor-icons/react';
+import { Typography, Alert, Stack } from '@mui/material';
+import { MicrophoneIcon, ArrowCounterClockwiseIcon } from '@phosphor-icons/react';
 import { Spinner } from '@/components/core';
-import { SubmissionStatus, getSubmissionStatus } from '@/constants';
-import { useAudioRecorder } from '@/hooks';
+import { SubmissionStatus } from '@/constants';
 import * as S from './Mission.styles';
 
+export interface AudioContentState {
+  status: SubmissionStatus;
+  audioUrl: string | null;
+  audioBlob: Blob | null;
+  mimeType: string | null;
+  duration: number;
+  error: string | null;
+  startRecording: () => void;
+  stopRecording: () => void;
+  discardRecording: () => void;
+}
+
 interface AudioContentProps {
-  onSubmit: (blob: Blob, mimeType: string) => void;
-  isSubmitting?: boolean;
+  state: AudioContentState;
   uploadError?: string | null;
+  isCorrect?: boolean | null;
 }
 
 const formatDuration = (seconds: number): string => {
@@ -17,19 +28,36 @@ const formatDuration = (seconds: number): string => {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
-const ReadyPrompt = () => (
-  <S.StatusZone>
+const IdlePrompt = () => (
+  <>
     <S.IconWrapper>
       <MicrophoneIcon size={32} weight="duotone" />
     </S.IconWrapper>
     <Typography variant="body1" fontWeight={500}>
       Record Your Answer
     </Typography>
-  </S.StatusZone>
+    <Typography variant="body2" color="text.secondary">
+      Tap to start recording
+    </Typography>
+  </>
+);
+
+const RequestingPrompt = () => (
+  <>
+    <S.IconWrapper>
+      <MicrophoneIcon size={32} weight="duotone" />
+    </S.IconWrapper>
+    <Stack direction="row" alignItems="center" gap={1}>
+      <Spinner size="small" />
+      <Typography variant="body2" color="text.secondary">
+        Requesting microphone access...
+      </Typography>
+    </Stack>
+  </>
 );
 
 const RecordingDisplay = ({ duration }: { duration: number }) => (
-  <S.StatusZone>
+  <>
     <Stack direction="row" alignItems="center" gap={1}>
       <S.RecordingDot />
       <Typography variant="body2" color="error">
@@ -37,121 +65,78 @@ const RecordingDisplay = ({ duration }: { duration: number }) => (
       </Typography>
     </Stack>
     <S.TimerDisplay variant="h4">{formatDuration(duration)}</S.TimerDisplay>
-  </S.StatusZone>
+  </>
 );
 
 interface AudioPreviewProps {
   audioUrl: string;
   duration: number;
-  onReset?: () => void;
-  showReset?: boolean;
+  onRerecord?: () => void;
+  showRerecord?: boolean;
 }
 
-const AudioPreview = ({ audioUrl, duration, onReset, showReset = true }: AudioPreviewProps) => (
-  <Stack gap={2} alignItems="center">
+const AudioPreview = ({ audioUrl, duration, onRerecord, showRerecord = true }: AudioPreviewProps) => (
+  <Stack gap={2} alignItems="center" sx={{ width: '100%' }}>
     <S.AudioPlayerContainer>
       <audio src={audioUrl} controls style={{ width: '100%' }} />
     </S.AudioPlayerContainer>
     <Typography variant="body2" color="text.secondary">
       Duration: {formatDuration(duration)}
     </Typography>
-    {showReset && onReset && (
-      <Button variant="outlined" size="small" onClick={onReset} startIcon={<ArrowCounterClockwiseIcon size={18} />}>
+    {showRerecord && onRerecord && (
+      <S.ActionLink type="button" onClick={onRerecord}>
+        <ArrowCounterClockwiseIcon size={16} />
         Re-record
-      </Button>
+      </S.ActionLink>
     )}
   </Stack>
 );
 
-export const AudioContent = ({ onSubmit, isSubmitting = false, uploadError }: AudioContentProps) => {
-  const { status, audioUrl, audioBlob, mimeType, duration, error, startRecording, stopRecording, discardRecording } =
-    useAudioRecorder();
-
-  const displayStatus = getSubmissionStatus(status, isSubmitting);
+export const AudioContent = ({ state, uploadError, isCorrect }: AudioContentProps) => {
+  const { status, audioUrl, duration, error, startRecording, discardRecording } = state;
   const displayError = error || uploadError;
+  const isValidated = isCorrect === true;
 
   const views: Record<SubmissionStatus, React.ReactNode> = {
     [SubmissionStatus.Idle]: (
-      <>
-        <ReadyPrompt />
-        <Button
-          variant="contained"
-          fullWidth
-          size="large"
-          onClick={startRecording}
-          disabled={isSubmitting}
-          startIcon={<MicrophoneIcon size={20} weight="bold" />}
-        >
-          Start Recording
-        </Button>
-      </>
+      <S.InteractionZone $hasContent={false} $clickable onClick={startRecording}>
+        <IdlePrompt />
+      </S.InteractionZone>
     ),
     [SubmissionStatus.Requesting]: (
-      <>
-        <ReadyPrompt />
-        <Button
-          variant="contained"
-          fullWidth
-          size="large"
-          disabled
-          startIcon={<MicrophoneIcon size={20} weight="bold" />}
-        >
-          Requesting access...
-        </Button>
-      </>
+      <S.InteractionZone $hasContent={false}>
+        <RequestingPrompt />
+      </S.InteractionZone>
     ),
     [SubmissionStatus.Error]: (
-      <>
-        <ReadyPrompt />
-        <Button
-          variant="contained"
-          fullWidth
-          size="large"
-          onClick={startRecording}
-          disabled={isSubmitting}
-          startIcon={<MicrophoneIcon size={20} weight="bold" />}
-        >
-          Try Again
-        </Button>
-      </>
+      <S.InteractionZone $hasContent={false} $clickable onClick={startRecording}>
+        <S.IconWrapper>
+          <MicrophoneIcon size={32} weight="duotone" />
+        </S.IconWrapper>
+        <Typography variant="body1" fontWeight={500}>
+          Tap to try again
+        </Typography>
+      </S.InteractionZone>
     ),
     [SubmissionStatus.Recording]: (
-      <>
+      <S.InteractionZone $hasContent>
         <RecordingDisplay duration={duration} />
-        <Button
-          variant="contained"
-          color="error"
-          fullWidth
-          size="large"
-          onClick={stopRecording}
-          startIcon={<StopIcon size={20} weight="bold" />}
-        >
-          Stop Recording
-        </Button>
-      </>
+      </S.InteractionZone>
     ),
     [SubmissionStatus.Stopped]: (
-      <>
-        <AudioPreview audioUrl={audioUrl!} duration={duration} onReset={discardRecording} />
-        <Button
-          variant="contained"
-          fullWidth
-          size="large"
-          onClick={() => audioBlob && mimeType && onSubmit(audioBlob, mimeType)}
-          disabled={!audioBlob || !mimeType}
-          startIcon={<CheckIcon size={20} weight="bold" />}
-        >
-          Submit Recording
-        </Button>
-      </>
+      <S.InteractionZone $hasContent>
+        <AudioPreview
+          audioUrl={audioUrl!}
+          duration={duration}
+          onRerecord={discardRecording}
+          showRerecord={!isValidated}
+        />
+      </S.InteractionZone>
     ),
     [SubmissionStatus.Submitting]: (
-      <>
-        <AudioPreview audioUrl={audioUrl!} duration={duration} showReset={false} />
-        <Button variant="contained" fullWidth size="large" disabled startIcon={<Spinner />}>
-          Checking...
-        </Button>
-      </>
+      <S.InteractionZone $hasContent>
+        <AudioPreview audioUrl={audioUrl!} duration={duration} showRerecord={false} />
+      </S.InteractionZone>
     ),
   };
 
@@ -162,7 +147,7 @@ export const AudioContent = ({ onSubmit, isSubmitting = false, uploadError }: Au
           {displayError}
         </Alert>
       )}
-      {views[displayStatus]}
+      {views[status]}
     </Stack>
   );
 };

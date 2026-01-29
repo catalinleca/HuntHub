@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { Typography, CircularProgress } from '@mui/material';
+import { CircularProgress } from '@mui/material';
 import { ChallengeType } from '@hunthub/shared';
 import {
   PlaySessionProvider,
@@ -8,15 +8,14 @@ import {
   useSessionError,
   useSessionActions,
   useCurrentStep,
-  useHuntMeta,
   useIsLastStep,
-  useStepProgress,
   ApiValidationProvider,
 } from '@/context';
 import { parseApiError, ErrorCode } from '@/utils';
 import { PlayerIdentification } from './components/PlayerIdentification';
 import { StepRenderer } from './components/StepRenderer';
 import { ErrorState } from './components/ErrorState';
+import { CompletedView } from './CompletedView';
 import * as S from './PlayPage.styles';
 
 const playErrorContent: Record<string, { title: string; description: string }> = {
@@ -74,22 +73,9 @@ const IdentifyingView = () => {
   );
 };
 
-const CompletedView = () => {
-  const huntMeta = useHuntMeta();
-
-  return (
-    <S.Container>
-      <Typography variant="h4">Hunt Complete!</Typography>
-      <Typography color="text.secondary">Congratulations on finishing {huntMeta?.name}</Typography>
-    </S.Container>
-  );
-};
-
 const PlayingView = () => {
   const currentStep = useCurrentStep();
-  const huntMeta = useHuntMeta();
   const isLastStep = useIsLastStep();
-  const { currentStepIndex, totalSteps } = useStepProgress();
   const { advanceToNextStep } = useSessionActions();
 
   if (!currentStep) {
@@ -98,13 +84,6 @@ const PlayingView = () => {
 
   return (
     <S.Container>
-      <S.Header>
-        <Typography variant="h6">{huntMeta?.name}</Typography>
-        <Typography variant="body2" color="text.secondary">
-          Step {currentStepIndex + 1} of {totalSteps}
-        </Typography>
-      </S.Header>
-
       <S.Content>
         <ApiValidationProvider
           key={currentStep.stepId}

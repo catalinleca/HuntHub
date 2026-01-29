@@ -13,6 +13,7 @@ const fadeIn = keyframes`
 `;
 
 export const Container = styled(Paper)`
+  flex: 1;
   padding: ${({ theme }) => theme.spacing(3)};
   display: flex;
   flex-direction: column;

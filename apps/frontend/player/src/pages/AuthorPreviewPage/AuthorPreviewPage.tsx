@@ -78,7 +78,6 @@ const CompletedView = () => {
 
 const PlayingView = () => {
   const currentStep = useCurrentStep();
-  const huntMeta = useHuntMeta();
   const isLastStep = useIsLastStep();
   const { advanceToNextStep } = useSessionActions();
 
@@ -90,21 +89,15 @@ const PlayingView = () => {
     <S.PageContainer>
       <PreviewNavigation />
 
-      <Stack sx={{ p: 2 }}>
-        <Stack alignItems="center" sx={{ py: 2 }}>
-          <Typography variant="h6">{huntMeta?.name}</Typography>
-        </Stack>
-
-        <S.Content>
-          <ApiValidationProvider
-            key={currentStep.stepId}
-            onAdvance={advanceToNextStep}
-            showSuccessDialog={currentStep.type === ChallengeType.Task || currentStep.type === ChallengeType.Mission}
-          >
-            <StepRenderer step={currentStep} isLastStep={isLastStep} />
-          </ApiValidationProvider>
-        </S.Content>
-      </Stack>
+      <S.Content sx={{ p: 2 }}>
+        <ApiValidationProvider
+          key={currentStep.stepId}
+          onAdvance={advanceToNextStep}
+          showSuccessDialog={currentStep.type === ChallengeType.Task || currentStep.type === ChallengeType.Mission}
+        >
+          <StepRenderer step={currentStep} isLastStep={isLastStep} />
+        </ApiValidationProvider>
+      </S.Content>
     </S.PageContainer>
   );
 };

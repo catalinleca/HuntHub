@@ -33,7 +33,7 @@ import {
 } from '@/features/player-invitations/player-invitation.service';
 import { PreviewController, IPreviewController } from '@/features/preview/preview.controller';
 import { PreviewService, IPreviewService } from '@/features/preview/preview.service';
-import { GroqProvider, GeminiProvider, AIValidationService } from '@/services/ai-validation';
+import { OpenAIProvider, GeminiProvider, AIValidationService } from '@/services/ai-validation';
 import type {
   ITextValidationProvider,
   IAudioValidationProvider,
@@ -77,7 +77,7 @@ container.bind<ICloneService>(TYPES.CloneService).to(CloneService);
 container.bind<IPlayerInvitationService>(TYPES.PlayerInvitationService).to(PlayerInvitationService);
 container.bind<IPreviewService>(TYPES.PreviewService).to(PreviewService);
 
-container.bind<ITextValidationProvider>(TYPES.TextValidationProvider).to(GroqProvider).inSingletonScope();
+container.bind<ITextValidationProvider>(TYPES.TextValidationProvider).to(OpenAIProvider).inSingletonScope();
 container.bind<IAudioValidationProvider>(TYPES.AudioValidationProvider).to(GeminiProvider).inSingletonScope();
 container.bind<IImageValidationProvider>(TYPES.ImageValidationProvider).to(GeminiProvider).inSingletonScope();
 container.bind<IAIValidationService>(TYPES.AIValidationService).to(AIValidationService);

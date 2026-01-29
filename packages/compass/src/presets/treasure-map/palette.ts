@@ -49,6 +49,7 @@ export const treasureMapPaletteConfig = {
   grey: {
     50: '#F5EFE6',
     100: '#E4D5C1',
+    150: '#E9E6E0',
     200: '#D4C4B0',
     300: '#D4A574',
     400: '#8B7355',
@@ -57,6 +58,12 @@ export const treasureMapPaletteConfig = {
     700: '#2C1810',
     800: '#1F110A',
     900: '#120A06',
+  },
+  challenge: {
+    clue: '#B6591B',
+    quiz: '#4E7A4E',
+    task: '#8B6914',
+    mission: '#5A6878',
   },
 } as const;
 

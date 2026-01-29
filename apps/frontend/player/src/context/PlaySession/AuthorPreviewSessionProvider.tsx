@@ -44,6 +44,8 @@ export const AuthorPreviewSessionProvider = ({ previewToken, children }: AuthorP
       huntMeta: session?.hunt ?? null,
       stepResponse: stepQuery.data ?? null,
       isLastStep,
+      startedAt: session?.startedAt ?? null,
+      completedAt: session?.completedAt ?? null,
       isPreview: true,
       stepOrder: session?.stepOrder,
     }),

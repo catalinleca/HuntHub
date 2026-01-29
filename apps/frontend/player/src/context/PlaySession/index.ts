@@ -12,6 +12,7 @@ export {
   usePreviewHint,
   useIsPreview,
   useStepOrder,
+  useSessionTimestamps,
   useStepResponse,
   useStepProgress,
   useStepPlayProgress,

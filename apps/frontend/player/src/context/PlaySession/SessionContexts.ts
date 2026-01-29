@@ -18,6 +18,8 @@ export interface SessionState {
   huntMeta: HuntMetaPF | null;
   stepResponse: StepResponse | null;
   isLastStep: boolean;
+  startedAt: string | null;
+  completedAt: string | null;
   previewHint?: string;
   isPreview?: boolean;
   stepOrder?: number[];

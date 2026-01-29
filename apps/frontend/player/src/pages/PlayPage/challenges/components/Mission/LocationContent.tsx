@@ -1,14 +1,20 @@
-import { useEffect } from 'react';
-import { Typography, Button, Stack } from '@mui/material';
-import { MapPinIcon, NavigationArrowIcon, CheckIcon } from '@phosphor-icons/react';
+import { useMemo } from 'react';
+import { Typography, Stack } from '@mui/material';
+import { MapPinIcon, NavigationArrowIcon, CheckCircleIcon } from '@phosphor-icons/react';
 import { Spinner } from '@/components/core';
-import { LocationStatus, getLocationStatus } from '@/constants';
-import { useGeolocation } from '@/hooks';
+import { LocationStatus } from '@/constants';
 import * as S from './Mission.styles';
 
+export interface LocationContentState {
+  status: LocationStatus;
+  position: { lat: number; lng: number } | null;
+  error: string | null;
+}
+
 interface LocationContentProps {
-  onSubmit: (position: { lat: number; lng: number }) => void;
-  isSubmitting?: boolean;
+  state: LocationContentState;
+  isCorrect: boolean | null;
+  feedback: string | null;
 }
 
 const LoadingPrompt = () => (
@@ -22,109 +28,141 @@ const LoadingPrompt = () => (
 
 const IdlePrompt = () => (
   <>
+    <S.IconWrapper>
+      <MapPinIcon size={32} weight="duotone" />
+    </S.IconWrapper>
     <Typography variant="body1" fontWeight={500}>
       Find the Location
     </Typography>
     <Typography variant="body2" color="text.secondary">
-      Navigate to the target area and check your position
+      Navigate to the target area
     </Typography>
   </>
 );
 
 const ReadyPrompt = () => (
   <>
+    <S.IconWrapper>
+      <MapPinIcon size={32} weight="duotone" />
+    </S.IconWrapper>
     <Typography variant="body1" fontWeight={500}>
       Location Acquired
     </Typography>
     <Typography variant="body2" color="text.secondary">
-      Tap "Check Location" to verify you're at the right spot
+      Ready to check your position
+    </Typography>
+  </>
+);
+
+const SubmittingPrompt = () => (
+  <>
+    <Spinner size="large" />
+    <Typography variant="body2" color="text.secondary">
+      Checking your location...
     </Typography>
   </>
 );
 
 const ErrorPrompt = ({ message }: { message: string }) => (
-  <Typography variant="body2" color="error">
-    {message}
-  </Typography>
+  <>
+    <S.IconWrapper $variant="error">
+      <MapPinIcon size={32} weight="duotone" />
+    </S.IconWrapper>
+    <Typography variant="body2" color="error">
+      {message}
+    </Typography>
+  </>
 );
 
-export const LocationContent = ({ onSubmit, isSubmitting = false }: LocationContentProps) => {
-  const { position, error, isLoading, watchPosition, clearWatch } = useGeolocation();
+const SuccessPrompt = () => (
+  <>
+    <S.IconWrapper $variant="success">
+      <CheckCircleIcon size={32} weight="fill" />
+    </S.IconWrapper>
+    <Typography variant="body1" fontWeight={500} color="success.main">
+      You've arrived!
+    </Typography>
+    <Typography variant="body2" color="text.secondary">
+      Location verified successfully
+    </Typography>
+  </>
+);
 
-  useEffect(() => {
-    watchPosition();
-    return clearWatch;
-  }, [watchPosition, clearWatch]);
+const TooFarPrompt = ({ feedback }: { feedback: string }) => (
+  <>
+    <S.IconWrapper $variant="warning">
+      <MapPinIcon size={32} weight="duotone" />
+    </S.IconWrapper>
+    <Typography variant="body1" fontWeight={500} color="warning.main">
+      Not quite there yet
+    </Typography>
+    <Typography variant="body2" color="text.secondary">
+      {feedback}
+    </Typography>
+  </>
+);
 
-  const status = getLocationStatus(isLoading, error, !!position, isSubmitting);
+export const LocationContent = ({ state, isCorrect, feedback }: LocationContentProps) => {
+  const { status, error } = state;
+  const hasFeedback = !!feedback;
+  const hasValidationFailure = isCorrect === false;
 
-  const handleCheckLocation = () => {
-    if (position) {
-      onSubmit(position);
+  const prompts: Record<LocationStatus, React.ReactNode> = useMemo(
+    () => ({
+      [LocationStatus.Idle]: <IdlePrompt />,
+      [LocationStatus.Loading]: <LoadingPrompt />,
+      [LocationStatus.Error]: <ErrorPrompt message={error || 'Location error'} />,
+      [LocationStatus.Ready]: <ReadyPrompt />,
+      [LocationStatus.Submitting]: <SubmittingPrompt />,
+    }),
+    [error],
+  );
+
+  const getInteractionZone = (): React.ReactNode => {
+    if (isCorrect === true) {
+      return (
+        <S.InteractionZone $hasContent>
+          <SuccessPrompt />
+        </S.InteractionZone>
+      );
     }
-  };
 
-  const prompts: Record<LocationStatus, React.ReactNode> = {
-    [LocationStatus.Idle]: <IdlePrompt />,
-    [LocationStatus.Loading]: <LoadingPrompt />,
-    [LocationStatus.Error]: <ErrorPrompt message={error || 'Location error'} />,
-    [LocationStatus.Ready]: <ReadyPrompt />,
-    [LocationStatus.Submitting]: <ReadyPrompt />,
-  };
+    if (hasValidationFailure && hasFeedback) {
+      return (
+        <S.InteractionZone $hasContent>
+          <TooFarPrompt feedback={feedback!} />
+        </S.InteractionZone>
+      );
+    }
 
-  const buttons: Record<LocationStatus, React.ReactNode> = {
-    [LocationStatus.Idle]: (
-      <Button variant="contained" fullWidth size="large" disabled startIcon={<MapPinIcon size={20} weight="bold" />}>
-        Waiting for location...
-      </Button>
-    ),
-    [LocationStatus.Loading]: (
-      <Button variant="contained" fullWidth size="large" disabled startIcon={<Spinner />}>
-        Getting location...
-      </Button>
-    ),
-    [LocationStatus.Error]: (
-      <Button variant="contained" fullWidth size="large" disabled startIcon={<MapPinIcon size={20} weight="bold" />}>
-        Check Location
-      </Button>
-    ),
-    [LocationStatus.Ready]: (
-      <Button
-        variant="contained"
-        fullWidth
-        size="large"
-        onClick={handleCheckLocation}
-        startIcon={<CheckIcon size={20} weight="bold" />}
-      >
-        Check Location
-      </Button>
-    ),
-    [LocationStatus.Submitting]: (
-      <Button variant="contained" fullWidth size="large" disabled startIcon={<Spinner />}>
-        Checking...
-      </Button>
-    ),
+    if (hasValidationFailure) {
+      return (
+        <S.InteractionZone $hasContent $error>
+          <ErrorPrompt message="Location verification failed. Try again." />
+        </S.InteractionZone>
+      );
+    }
+
+    const hasError = status === LocationStatus.Error;
+    return (
+      <S.InteractionZone $hasContent={false} $error={hasError}>
+        {prompts[status]}
+      </S.InteractionZone>
+    );
   };
 
   const showGpsIndicator = status === LocationStatus.Ready || status === LocationStatus.Submitting;
 
   return (
     <Stack gap={2}>
-      <S.StatusZone>
-        <S.IconWrapper>
-          <MapPinIcon size={32} weight="duotone" />
-        </S.IconWrapper>
-        {prompts[status]}
-      </S.StatusZone>
+      {getInteractionZone()}
 
-      {showGpsIndicator && (
+      {showGpsIndicator && !isCorrect && (
         <S.StatusIndicator>
           <NavigationArrowIcon size={20} weight="fill" />
           <Typography variant="body2">GPS signal active</Typography>
         </S.StatusIndicator>
       )}
-
-      {buttons[status]}
     </Stack>
   );
 };

@@ -1,5 +1,12 @@
 import React from 'react';
 import '@mui/material/styles';
+import { Color } from '@mui/material';
+
+declare module '@mui/material' {
+  interface Color {
+    150: string;
+  }
+}
 
 declare module '@mui/material/styles' {
   interface Shape {
@@ -36,12 +43,21 @@ declare module '@mui/material/styles' {
     medium?: string;
   }
 
+  interface ChallengeColors {
+    clue: string;
+    quiz: string;
+    task: string;
+    mission: string;
+  }
+
   interface Palette {
     accent: PaletteColor;
+    challenge: ChallengeColors;
   }
 
   interface PaletteOptions {
     accent?: SimplePaletteColorOptions;
+    challenge?: Partial<ChallengeColors>;
   }
 
   interface TypeBackground {

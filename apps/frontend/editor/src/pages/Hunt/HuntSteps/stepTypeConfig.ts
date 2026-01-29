@@ -1,6 +1,6 @@
-import { MapTrifoldIcon, QuestionIcon, CameraIcon, CheckSquareIcon, Icon } from '@phosphor-icons/react';
+import { MapTrifoldIcon, QuestionIcon, TargetIcon, CheckSquareIcon, Icon } from '@phosphor-icons/react';
 import { ChallengeType, Challenge } from '@hunthub/shared';
-import type { PaletteColor } from '@hunthub/compass';
+import { CHALLENGE_TYPE_COLORS, type PaletteColor } from '@hunthub/compass';
 
 interface StepTypeConfig {
   icon: Icon;
@@ -15,28 +15,28 @@ export const STEP_TYPE_CONFIG: Record<ChallengeType, StepTypeConfig> = {
     icon: MapTrifoldIcon,
     label: 'Clue',
     description: 'Informational step - auto-completes on view',
-    color: 'primary.main',
+    color: CHALLENGE_TYPE_COLORS[ChallengeType.Clue],
     getTitle: (challenge) => challenge.clue?.title ?? undefined,
   },
   [ChallengeType.Quiz]: {
     icon: QuestionIcon,
     label: 'Quiz',
     description: 'Question with validation',
-    color: 'success.main',
+    color: CHALLENGE_TYPE_COLORS[ChallengeType.Quiz],
     getTitle: (challenge) => challenge.quiz?.title ?? undefined,
   },
   [ChallengeType.Mission]: {
-    icon: CameraIcon,
+    icon: TargetIcon,
     label: 'Mission',
     description: 'Physical action required',
-    color: 'common.black',
+    color: CHALLENGE_TYPE_COLORS[ChallengeType.Mission],
     getTitle: (challenge) => challenge.mission?.title ?? undefined,
   },
   [ChallengeType.Task]: {
     icon: CheckSquareIcon,
     label: 'Task',
     description: 'Open-ended with AI validation',
-    color: 'accent.dark',
+    color: CHALLENGE_TYPE_COLORS[ChallengeType.Task],
     getTitle: (challenge) => challenge.task?.title ?? undefined,
   },
 };

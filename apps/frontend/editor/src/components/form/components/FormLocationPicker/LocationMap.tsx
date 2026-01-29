@@ -1,16 +1,8 @@
-import {
-  Map as GoogleMap,
-  AdvancedMarker,
-  Pin,
-  useApiIsLoaded,
-  useMap,
-  MapMouseEvent,
-} from '@vis.gl/react-google-maps';
+import { Map as GoogleMap, useApiIsLoaded, MapMouseEvent } from '@vis.gl/react-google-maps';
 import { CircularProgress, Typography } from '@mui/material';
-import { useMapPan, useMapCircle } from '@/hooks';
 import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, GOOGLE_MAP_ID } from '@/config/google-maps';
-import { getColor } from '@hunthub/compass';
 import * as S from './FormLocationPicker.styles';
+import { MapController } from '@/components/form/components/FormLocationPicker/MapController';
 
 interface LocationMapProps {
   lat?: number | null;
@@ -22,18 +14,6 @@ interface LocationMapProps {
 
 export const LocationMap = ({ lat, lng, radius, onMarkerDragEnd, onMapClick }: LocationMapProps) => {
   const isLoaded = useApiIsLoaded();
-  const map = useMap();
-
-  const hasLocation = lat != null && lng != null;
-
-  useMapPan(map, lat, lng);
-  useMapCircle(map, lat, lng, radius);
-
-  const handleDragEnd = (e: google.maps.MapMouseEvent) => {
-    if (e.latLng && onMarkerDragEnd) {
-      onMarkerDragEnd(e.latLng.lat(), e.latLng.lng());
-    }
-  };
 
   const handleMapClick = (e: MapMouseEvent) => {
     if (e.detail.latLng && onMapClick) {
@@ -65,15 +45,7 @@ export const LocationMap = ({ lat, lng, radius, onMarkerDragEnd, onMapClick }: L
         onClick={handleMapClick}
         style={{ cursor: onMapClick ? 'crosshair' : 'grab' }}
       >
-        {hasLocation && (
-          <AdvancedMarker position={{ lat, lng }} draggable onDragEnd={handleDragEnd}>
-            <Pin
-              background={getColor('primary.main')}
-              borderColor={getColor('secondary.main')}
-              glyphColor={getColor('common.white')}
-            />
-          </AdvancedMarker>
-        )}
+        <MapController lat={lat} lng={lng} radius={radius} onMarkerDragEnd={onMarkerDragEnd} />
       </GoogleMap>
     </S.MapContainer>
   );
