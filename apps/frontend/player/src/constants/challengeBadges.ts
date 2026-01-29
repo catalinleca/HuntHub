@@ -48,7 +48,7 @@ export const QUIZ_BADGES: Record<OptionType, BadgeConfig> = {
     color: getColor(CHALLENGE_TYPE_COLORS[ChallengeType.Quiz]),
   },
   [OptionType.Input]: {
-    label: 'Puzzle',
+    label: 'Quiz',
     icon: KeyIcon,
     color: getColor(CHALLENGE_TYPE_COLORS[ChallengeType.Quiz]),
   },
