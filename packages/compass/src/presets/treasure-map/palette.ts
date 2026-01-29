@@ -63,7 +63,7 @@ export const treasureMapPaletteConfig = {
     clue: '#B6591B',
     quiz: '#4E7A4E',
     task: '#8B6914',
-    mission: '#7A687A',
+    mission: '#5A6878',
   },
 } as const;
 

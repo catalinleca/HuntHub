@@ -33,35 +33,41 @@ export const UploadZone = styled(ZoneBase)`
 interface InteractionZoneProps {
   $hasContent?: boolean;
   $clickable?: boolean;
+  $error?: boolean;
 }
 
 export const InteractionZone = styled(ZoneBase)<InteractionZoneProps>`
   transition: all 0.2s ease;
-  background-color: ${({ theme }) => alpha(theme.palette.challenge.mission, 0.03)};
 
-  ${({ $hasContent, theme }) =>
-    $hasContent
-      ? css`
-          border: 1px solid ${theme.palette.challenge.mission};
-        `
-      : css`
-          border: 2px dashed ${alpha(theme.palette.challenge.mission, 0.5)};
-        `}
+  ${({ $error, $hasContent, $clickable, theme }) => {
+    const color = $error ? theme.palette.error.main : theme.palette.challenge.mission;
 
-  ${({ $clickable, theme }) =>
-    $clickable &&
-    css`
-      cursor: pointer;
+    return css`
+      background-color: ${alpha(color, 0.03)};
 
-      &:hover {
-        border-color: ${theme.palette.challenge.mission};
-        background-color: ${alpha(theme.palette.challenge.mission, 0.08)};
-      }
+      ${$hasContent
+        ? css`
+            border: 1px solid ${color};
+          `
+        : css`
+            border: 2px dashed ${alpha(color, 0.5)};
+          `}
 
-      &:active {
-        transform: scale(0.98);
-      }
-    `}
+      ${$clickable &&
+      css`
+        cursor: pointer;
+
+        &:hover {
+          border-color: ${color};
+          background-color: ${alpha(color, 0.08)};
+        }
+
+        &:active {
+          transform: scale(0.98);
+        }
+      `}
+    `;
+  }}
 `;
 
 export const ActionLink = styled.button`

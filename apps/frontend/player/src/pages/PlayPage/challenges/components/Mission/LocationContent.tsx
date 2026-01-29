@@ -129,7 +129,12 @@ export const LocationContent = ({ state, isCorrect, feedback }: LocationContentP
       [LocationStatus.Submitting]: <SubmittingPrompt />,
     };
 
-    return <S.InteractionZone $hasContent={false}>{prompts[status]}</S.InteractionZone>;
+    const hasError = status === LocationStatus.Error;
+    return (
+      <S.InteractionZone $hasContent={false} $error={hasError}>
+        {prompts[status]}
+      </S.InteractionZone>
+    );
   };
 
   const showGpsIndicator = status === LocationStatus.Ready || status === LocationStatus.Submitting;
