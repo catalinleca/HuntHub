@@ -142,7 +142,9 @@ export class PlayService implements IPlayService {
 
   async getSession(sessionId: string): Promise<SessionResponse> {
     const progress = await SessionManager.requireSession(sessionId);
-    const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version);
+    const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version, {
+      allowUnpublished: !!progress.isPreview,
+    });
 
     const currentIndex = StepNavigator.getStepIndex(huntVersion.stepOrder, progress.currentStepId);
     const isInProgress = progress.status === HuntProgressStatus.InProgress;
@@ -163,7 +165,9 @@ export class PlayService implements IPlayService {
     const progress = await SessionManager.requireSession(sessionId);
     SessionManager.validateSessionActive(progress);
 
-    const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version);
+    const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version, {
+      allowUnpublished: !!progress.isPreview,
+    });
 
     if (progress.isPreview) {
       if (!huntVersion.stepOrder.includes(requestedStepId)) {
@@ -206,7 +210,9 @@ export class PlayService implements IPlayService {
     const progress = await SessionManager.requireSession(sessionId);
     SessionManager.validateSessionActive(progress);
 
-    const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version);
+    const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version, {
+      allowUnpublished: !!progress.isPreview,
+    });
     const step = await StepNavigator.getCurrentStepForSession(progress);
 
     if (!step) {
@@ -362,10 +368,16 @@ export class PlayService implements IPlayService {
     throw new NotInvitedError();
   }
 
-  private async requireHuntVersion(huntId: number, version: number): Promise<HydratedDocument<IHuntVersion>> {
-    const huntVersion = isDev
-      ? await HuntVersionModel.findOne({ huntId, version })
-      : await HuntVersionModel.findPublishedVersion(huntId, version);
+  private async requireHuntVersion(
+    huntId: number,
+    version: number,
+    options?: { allowUnpublished?: boolean },
+  ): Promise<HydratedDocument<IHuntVersion>> {
+    const allowUnpublished = options?.allowUnpublished ?? false;
+    const huntVersion =
+      isDev || allowUnpublished
+        ? await HuntVersionModel.findOne({ huntId, version })
+        : await HuntVersionModel.findPublishedVersion(huntId, version);
 
     if (!huntVersion) {
       throw new NotFoundError('Hunt version not found');
@@ -454,7 +466,9 @@ export class PlayService implements IPlayService {
       throw new ForbiddenError('Navigation is only available in preview mode');
     }
 
-    const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version);
+    const huntVersion = await this.requireHuntVersion(progress.huntId, progress.version, {
+      allowUnpublished: !!progress.isPreview,
+    });
 
     return SessionManager.navigateToStep(sessionId, stepId, huntVersion.stepOrder);
   }
