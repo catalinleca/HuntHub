@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, InputLabel, Stack } from '@mui/material';
+import hedgehuntLogo from '@/assets/hedgehunt-logo.svg';
 import * as S from './PlayerIdentification.styles';
 
 interface PlayerIdentificationProps {
@@ -23,12 +24,17 @@ export const PlayerIdentification = ({ onSubmit }: PlayerIdentificationProps) =>
   return (
     <S.Container>
       <S.Card>
-        <Typography variant="h5" gutterBottom>
-          Ready to Play?
-        </Typography>
-        <Typography variant="body2" color="text.secondary" gutterBottom>
-          Enter your name to start the adventure
-        </Typography>
+        <S.LogoCircle>
+          <S.Logo src={hedgehuntLogo} alt="HedgeHunt" />
+        </S.LogoCircle>
+        <Stack gap={1}>
+          <Typography variant="displayH4" color="primary.main">
+            Ready to Play?
+          </Typography>
+          <Typography variant="displayBody2" color="text.secondary">
+            Enter your name to start the adventure
+          </Typography>
+        </Stack>
 
         <S.Form onSubmit={handleSubmit}>
           <Stack gap={1}>
