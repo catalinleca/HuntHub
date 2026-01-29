@@ -6,7 +6,21 @@ type PrefetchAsset = {
   kind: 'image' | 'audio' | 'video';
 };
 
+const MAX_PREFETCHED_ASSETS = 30;
 const prefetchedAssets = new Map<string, HTMLImageElement | HTMLMediaElement>();
+
+const evictOldest = () => {
+  const oldestKey = prefetchedAssets.keys().next().value;
+  if (oldestKey) {
+    const element = prefetchedAssets.get(oldestKey);
+    if (element instanceof HTMLMediaElement) {
+      element.pause();
+      element.src = '';
+      element.load();
+    }
+    prefetchedAssets.delete(oldestKey);
+  }
+};
 
 const extractPrefetchAssets = (media?: Media | null): PrefetchAsset[] => {
   if (!media) {
@@ -45,6 +59,10 @@ const extractPrefetchAssets = (media?: Media | null): PrefetchAsset[] => {
 const prefetchAsset = ({ url, kind }: PrefetchAsset) => {
   if (!url || prefetchedAssets.has(url)) {
     return;
+  }
+
+  if (prefetchedAssets.size >= MAX_PREFETCHED_ASSETS) {
+    evictOldest();
   }
 
   if (kind === 'image') {
