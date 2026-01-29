@@ -86,6 +86,7 @@ export const PreviewContent = ({
         <EditorPreviewSessionProvider
           previewHint={previewHint}
           huntMeta={hunt}
+          step={currentStep}
           stepIndex={stepIndex}
           totalSteps={totalSteps}
           isLastStep={isLastStep}

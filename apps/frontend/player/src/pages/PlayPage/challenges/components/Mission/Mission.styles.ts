@@ -30,7 +30,7 @@ export const UploadZone = styled(ZoneBase)`
   }
 `;
 
-interface InteractionZoneProps {
+export interface InteractionZoneProps {
   $hasContent?: boolean;
   $clickable?: boolean;
   $error?: boolean;
@@ -90,7 +90,7 @@ export const ActionLink = styled.button`
   }
 `;
 
-type IconVariant = 'default' | 'success' | 'warning' | 'error';
+export type IconVariant = 'default' | 'success' | 'warning' | 'error';
 
 export const IconWrapper = styled(Stack)<{ $variant?: IconVariant }>`
   align-items: center;

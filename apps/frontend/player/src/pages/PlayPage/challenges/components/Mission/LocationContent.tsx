@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Typography, Stack } from '@mui/material';
 import { MapPinIcon, NavigationArrowIcon, CheckCircleIcon } from '@phosphor-icons/react';
 import { Spinner } from '@/components/core';
@@ -103,6 +104,19 @@ const TooFarPrompt = ({ feedback }: { feedback: string }) => (
 
 export const LocationContent = ({ state, isCorrect, feedback }: LocationContentProps) => {
   const { status, error } = state;
+  const hasFeedback = !!feedback;
+  const hasValidationFailure = isCorrect === false;
+
+  const prompts: Record<LocationStatus, React.ReactNode> = useMemo(
+    () => ({
+      [LocationStatus.Idle]: <IdlePrompt />,
+      [LocationStatus.Loading]: <LoadingPrompt />,
+      [LocationStatus.Error]: <ErrorPrompt message={error || 'Location error'} />,
+      [LocationStatus.Ready]: <ReadyPrompt />,
+      [LocationStatus.Submitting]: <SubmittingPrompt />,
+    }),
+    [error],
+  );
 
   const getInteractionZone = (): React.ReactNode => {
     if (isCorrect === true) {
@@ -113,21 +127,21 @@ export const LocationContent = ({ state, isCorrect, feedback }: LocationContentP
       );
     }
 
-    if (isCorrect === false && feedback) {
+    if (hasValidationFailure && hasFeedback) {
       return (
         <S.InteractionZone $hasContent>
-          <TooFarPrompt feedback={feedback} />
+          <TooFarPrompt feedback={feedback!} />
         </S.InteractionZone>
       );
     }
 
-    const prompts: Record<LocationStatus, React.ReactNode> = {
-      [LocationStatus.Idle]: <IdlePrompt />,
-      [LocationStatus.Loading]: <LoadingPrompt />,
-      [LocationStatus.Error]: <ErrorPrompt message={error || 'Location error'} />,
-      [LocationStatus.Ready]: <ReadyPrompt />,
-      [LocationStatus.Submitting]: <SubmittingPrompt />,
-    };
+    if (hasValidationFailure) {
+      return (
+        <S.InteractionZone $hasContent $error>
+          <ErrorPrompt message="Location verification failed. Try again." />
+        </S.InteractionZone>
+      );
+    }
 
     const hasError = status === LocationStatus.Error;
     return (
