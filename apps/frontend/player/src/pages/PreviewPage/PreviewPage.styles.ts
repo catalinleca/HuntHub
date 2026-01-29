@@ -9,6 +9,7 @@ export const Container = styled(Stack)`
 export const Content = styled(Stack)`
   flex: 1;
   padding: ${({ theme }) => theme.spacing(3)};
+  padding-top: ${({ theme }) => theme.spacing(7)};
 `;
 
 export const CenteredContainer = styled(Stack)`

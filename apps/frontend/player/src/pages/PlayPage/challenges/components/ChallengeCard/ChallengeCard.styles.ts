@@ -28,13 +28,25 @@ export const HeaderDivider = styled(Divider)`
 export const StepBadge = styled(Box)`
   display: inline-flex;
   align-items: center;
-  padding: ${({ theme }) => `${theme.spacing(0.5)} ${theme.spacing(1.5)}`};
-  background-color: ${({ theme }) => theme.palette.grey[200]};
+  padding: ${({ theme }) => theme.spacing(1, 2)};
+  background-color: ${({ theme }) => theme.palette.grey[100]};
   border-radius: 100px;
-  color: ${({ theme }) => theme.palette.grey[600]};
-  font-size: 0.875rem;
+  color: ${({ theme }) => theme.palette.grey[500]};
+  font-size: 0.75rem;
   font-weight: 500;
   white-space: nowrap;
+`;
+
+export const HuntTitle = styled(Box)`
+  flex: 1;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: ${({ theme }) => theme.palette.text.primary};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: ${({ theme }) => theme.spacing(0, 1)};
 `;
 
 export const MediaCard = styled(Box)`

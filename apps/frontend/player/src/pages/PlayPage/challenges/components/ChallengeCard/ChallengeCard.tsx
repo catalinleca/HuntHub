@@ -93,11 +93,7 @@ export const ChallengeCard = ({
         <IconButton size="small" onClick={() => setShowAbandonDialog(true)}>
           <XIcon size={20} />
         </IconButton>
-        {huntMeta?.name && (
-          <Typography variant="h6" sx={{ flex: 1, textAlign: 'center' }}>
-            {huntMeta.name}
-          </Typography>
-        )}
+        {huntMeta?.name && <S.HuntTitle>{huntMeta.name}</S.HuntTitle>}
         <Stack direction="row" alignItems="center" gap={1}>
           {hasIndicators && (
             <>
