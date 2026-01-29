@@ -1,4 +1,3 @@
-import { Typography } from '@mui/material';
 import type { Icon } from '@phosphor-icons/react';
 import * as S from './TypeBadge.styles';
 
@@ -10,9 +9,12 @@ interface TypeBadgeProps {
 
 export const TypeBadge = ({ label, icon: IconComponent, color }: TypeBadgeProps) => {
   return (
-    <S.Badge $color={color}>
-      <IconComponent size={18} weight="bold" />
-      <Typography variant="overline">{label}</Typography>
-    </S.Badge>
+    <S.Badge
+      size="small"
+      variant="outlined"
+      icon={<IconComponent size={14} weight="bold" />}
+      label={label}
+      $color={color}
+    />
   );
 };
