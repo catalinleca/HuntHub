@@ -73,7 +73,7 @@ export const InteractionZone = styled(ZoneBase)<InteractionZoneProps>`
 export const ActionLink = styled.button`
   display: inline-flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing(0.5)};
+  gap: ${({ theme }) => theme.spacing(1)};
   padding: 0;
   border: none;
   background: none;

@@ -15,7 +15,7 @@ export const EmptyState = ({ onCreateClick }: EmptyStateProps) => {
       <EmptyStateDescription variant="body1" color="text.secondary">
         Create your first treasure hunt to get started!
       </EmptyStateDescription>
-      <Button variant="contained" size="large" startIcon={<PlusIcon size={20} />} onClick={onCreateClick}>
+      <Button variant="contained" size="large" startIcon={<PlusIcon size={20} />} onClick={() => onCreateClick()}>
         Create Your First Hunt
       </Button>
     </EmptyStateContainer>
