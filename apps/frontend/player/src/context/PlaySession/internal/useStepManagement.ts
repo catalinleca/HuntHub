@@ -1,4 +1,5 @@
 import { useStep, usePrefetchStep } from '@/api';
+import { usePrefetchMedia } from './usePrefetchMedia';
 
 const extractStepIdFromLink = (link?: { href: string } | null): number | null => {
   if (!link) {
@@ -11,10 +12,11 @@ const extractStepIdFromLink = (link?: { href: string } | null): number | null =>
 };
 
 export const useStepManagement = (sessionId: string | null, currentStepId: number | null) => {
-  const stepQuery = useStep(sessionId, currentStepId);
-  const nextStepId = extractStepIdFromLink(stepQuery.data?._links?.next);
+  const currentStepQuery = useStep(sessionId, currentStepId);
+  const nextStepId = extractStepIdFromLink(currentStepQuery.data?._links?.next);
 
-  usePrefetchStep(sessionId, nextStepId);
+  const nextStepQuery = usePrefetchStep(sessionId, nextStepId);
+  usePrefetchMedia(nextStepQuery.data?.step.media ?? null);
 
-  return { stepQuery, nextStepId };
+  return { stepQuery: currentStepQuery, nextStepId };
 };
