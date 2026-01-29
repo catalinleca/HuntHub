@@ -59,6 +59,12 @@ export const treasureMapPaletteConfig = {
     800: '#1F110A',
     900: '#120A06',
   },
+  challenge: {
+    clue: '#B6591B',
+    quiz: '#4A6841',
+    task: '#8B6914',
+    mission: '#2E7D7B',
+  },
 } as const;
 
 export const treasureMapThemeOptions = {
