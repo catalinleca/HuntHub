@@ -127,12 +127,10 @@ export const StatusIndicator = styled(Stack)<{ $isSuccess?: boolean }>`
 `;
 
 export const PreviewImage = styled.img`
-  width: 100%;
+  max-width: 100%;
   max-height: 300px;
-  object-fit: contain;
   border-radius: ${({ theme }) => theme.shape.md}px;
-  border: 1px solid ${({ theme }) => theme.palette.grey[300]};
-  background-color: ${({ theme }) => theme.palette.background.surface};
+  border: 3px solid ${({ theme }) => theme.palette.divider};
 `;
 
 export const AudioPlayerContainer = styled(Box)`
