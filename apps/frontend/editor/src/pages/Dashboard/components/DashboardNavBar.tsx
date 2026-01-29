@@ -11,7 +11,7 @@ export const DashboardNavBar = ({ onCreateClick }: DashboardNavBarProps) => {
     <NavBar
       actions={
         <>
-          <Button variant="contained" size="medium" startIcon={<PlusIcon size={20} />} onClick={onCreateClick}>
+          <Button variant="contained" size="medium" startIcon={<PlusIcon size={20} />} onClick={() => onCreateClick()}>
             Create Hunt
           </Button>
           <UserMenu />

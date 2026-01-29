@@ -8,7 +8,7 @@ export const HeroContainer = styled(Box)`
   min-height: 50vh;
   display: flex;
   align-items: center;
-  padding: ${({ theme }) => theme.spacing(10, 4)};
+  padding: ${({ theme }) => theme.spacing(8, 4)};
   background: linear-gradient(
     135deg,
     ${({ theme }) => theme.palette.accent.light} 0%,
