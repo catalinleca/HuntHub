@@ -6,32 +6,43 @@ export const getMuiChipOverrides = (): Components<Theme>['MuiChip'] => ({
       fontWeight: 600,
       borderRadius: 100,
     },
-    sizeSmall: {
-      height: 'auto',
-      padding: '2px 6px',
-    },
-    sizeMedium: ({ theme }) => ({
-      padding: theme.spacing(2),
-      borderRadius: theme.shape.sm,
+    label: ({ ownerState }) => ({
+      ...(ownerState.size === 'small' && {
+        fontSize: 11,
+        fontWeight: 700,
+        letterSpacing: '0.05em',
+        textTransform: 'uppercase' as const,
+        padding: '0 2px',
+      }),
+      ...(ownerState.size === 'medium' && {
+        fontSize: 14,
+      }),
     }),
-    labelSmall: {
-      fontSize: 11,
-      fontWeight: 700,
-      letterSpacing: '0.05em',
-      textTransform: 'uppercase' as const,
-      padding: '0 2px',
-    },
-    labelMedium: ({ theme }) => ({
-      fontSize: 14,
-      padding: theme.spacing(0, 1),
+    icon: ({ ownerState }) => ({
+      ...(ownerState.size === 'small' && {
+        fontSize: 14,
+        marginLeft: 0,
+        marginRight: 2,
+      }),
     }),
-    iconSmall: {
-      fontSize: 14,
-      marginLeft: 0,
-      marginRight: 2,
-    },
     outlined: {
       borderWidth: 1,
     },
   },
+  variants: [
+    {
+      props: { size: 'small' },
+      style: {
+        height: 'auto',
+        padding: '2px 6px',
+      },
+    },
+    {
+      props: { size: 'medium' },
+      style: ({ theme }) => ({
+        padding: theme.spacing(2),
+        borderRadius: theme.shape.sm,
+      }),
+    },
+  ],
 });
