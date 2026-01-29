@@ -10,7 +10,6 @@ import {
   useCurrentStep,
   useHuntMeta,
   useIsLastStep,
-  useStepProgress,
   ApiValidationProvider,
 } from '@/context';
 import { parseApiError, ErrorCode } from '@/utils';
@@ -87,9 +86,7 @@ const CompletedView = () => {
 
 const PlayingView = () => {
   const currentStep = useCurrentStep();
-  const huntMeta = useHuntMeta();
   const isLastStep = useIsLastStep();
-  const { currentStepIndex, totalSteps } = useStepProgress();
   const { advanceToNextStep } = useSessionActions();
 
   if (!currentStep) {
@@ -98,13 +95,6 @@ const PlayingView = () => {
 
   return (
     <S.Container>
-      <S.Header>
-        <Typography variant="h6">{huntMeta?.name}</Typography>
-        <Typography variant="body2" color="text.secondary">
-          Step {currentStepIndex + 1} of {totalSteps}
-        </Typography>
-      </S.Header>
-
       <S.Content>
         <ApiValidationProvider
           key={currentStep.stepId}

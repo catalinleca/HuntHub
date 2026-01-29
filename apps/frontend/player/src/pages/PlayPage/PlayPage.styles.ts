@@ -7,11 +7,6 @@ export const Container = styled(Stack)`
   padding: ${({ theme }) => theme.spacing(2)};
 `;
 
-export const Header = styled(Stack)`
-  align-items: center;
-  padding: ${({ theme }) => theme.spacing(2, 0)};
-`;
-
 export const Content = styled(Stack)`
   flex: 1;
   width: 100%;

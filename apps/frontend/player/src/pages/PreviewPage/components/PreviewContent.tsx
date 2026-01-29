@@ -83,7 +83,13 @@ export const PreviewContent = ({
       )}
 
       <S.Content>
-        <EditorPreviewSessionProvider previewHint={previewHint}>
+        <EditorPreviewSessionProvider
+          previewHint={previewHint}
+          huntMeta={hunt}
+          stepIndex={stepIndex}
+          totalSteps={totalSteps}
+          isLastStep={isLastStep}
+        >
           <EditorPreviewProvider key={currentStep.stepId} validationMode={validationMode}>
             <StepRenderer step={currentStep} isLastStep={isLastStep} />
           </EditorPreviewProvider>

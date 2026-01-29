@@ -14,7 +14,7 @@ import { MediaType } from '@hunthub/shared';
 import type { Media } from '@hunthub/shared';
 import type { BadgeConfig } from '@/constants';
 import { MediaDisplay } from '@/components/media';
-import { useSessionActions, useStepPlayProgress } from '@/context';
+import { useSessionActions, useStepPlayProgress, useHuntMeta, useStepProgress } from '@/context';
 import { useIsCorrect } from '@/context/Validation';
 import { TypeBadge, BadgeContainer } from '../TypeBadge';
 import { HintSection } from '../HintSection';
@@ -75,6 +75,8 @@ export const ChallengeCard = ({
   const [showAbandonDialog, setShowAbandonDialog] = useState(false);
   const isCorrect = useIsCorrect();
   const stepPlayProgress = useStepPlayProgress();
+  const huntMeta = useHuntMeta();
+  const { currentStepIndex, totalSteps } = useStepProgress();
 
   const remainingSeconds = timeLimit ? calculateRemainingSeconds(timeLimit, stepPlayProgress?.startedAt ?? null) : null;
 
@@ -83,22 +85,37 @@ export const ChallengeCard = ({
   const needsBorderedContainer = media && BORDERED_MEDIA_TYPES.includes(media.type);
   const hasContent = title || description;
   const feedbackVariant = isCorrect === true ? 'success' : 'info';
+  const hasStepProgress = totalSteps > 0;
 
   return (
     <S.Container>
-      <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+      <Stack direction="row" justifyContent="space-between" alignItems="center">
         <IconButton size="small" onClick={() => setShowAbandonDialog(true)}>
           <XIcon size={20} />
         </IconButton>
-        {hasIndicators && (
-          <Stack direction="row" gap={1}>
-            {remainingSeconds !== null && <TimeLimit seconds={remainingSeconds} onExpire={onTimeExpire} />}
-            {maxAttempts && (
-              <AttemptsCounter current={currentAttempts} max={maxAttempts} onMaxAttempts={onMaxAttempts} />
-            )}
-          </Stack>
+        {huntMeta?.name && (
+          <Typography variant="h6" sx={{ flex: 1, textAlign: 'center' }}>
+            {huntMeta.name}
+          </Typography>
         )}
+        <Stack direction="row" alignItems="center" gap={1}>
+          {hasIndicators && (
+            <>
+              {remainingSeconds !== null && <TimeLimit seconds={remainingSeconds} onExpire={onTimeExpire} />}
+              {maxAttempts && (
+                <AttemptsCounter current={currentAttempts} max={maxAttempts} onMaxAttempts={onMaxAttempts} />
+              )}
+            </>
+          )}
+          {hasStepProgress && (
+            <S.StepBadge>
+              {currentStepIndex + 1} / {totalSteps}
+            </S.StepBadge>
+          )}
+        </Stack>
       </Stack>
+
+      <S.HeaderDivider />
 
       <BadgeContainer>
         <TypeBadge {...badge} />

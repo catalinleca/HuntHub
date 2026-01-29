@@ -1,5 +1,5 @@
 import styled, { keyframes } from 'styled-components';
-import { alpha, Box, Paper } from '@mui/material';
+import { alpha, Box, Divider, Paper } from '@mui/material';
 
 const fadeIn = keyframes`
   from {
@@ -18,6 +18,23 @@ export const Container = styled(Paper)`
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing(3)};
   animation: ${fadeIn} 0.3s ease-out;
+`;
+
+export const HeaderDivider = styled(Divider)`
+  margin: ${({ theme }) => theme.spacing(0, -3)};
+  border-color: ${({ theme }) => theme.palette.grey[200]};
+`;
+
+export const StepBadge = styled(Box)`
+  display: inline-flex;
+  align-items: center;
+  padding: ${({ theme }) => `${theme.spacing(0.5)} ${theme.spacing(1.5)}`};
+  background-color: ${({ theme }) => theme.palette.grey[200]};
+  border-radius: 100px;
+  color: ${({ theme }) => theme.palette.grey[600]};
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
 `;
 
 export const MediaCard = styled(Box)`
