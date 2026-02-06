@@ -1,5 +1,5 @@
 import { useRef, type ChangeEvent } from 'react';
-import { Typography, Alert, Stack } from '@mui/material';
+import { Typography, Alert, Stack, CircularProgress } from '@mui/material';
 import { CameraIcon, ArrowCounterClockwiseIcon } from '@phosphor-icons/react';
 import { PhotoStatus } from '@/constants';
 import * as S from './Mission.styles';
@@ -63,6 +63,14 @@ export const PhotoContent = ({ state, uploadError, isCorrect }: PhotoContentProp
     [PhotoStatus.Empty]: (
       <S.InteractionZone $hasContent={false} $clickable onClick={openCamera}>
         <CapturePrompt />
+      </S.InteractionZone>
+    ),
+    [PhotoStatus.Compressing]: (
+      <S.InteractionZone $hasContent={false}>
+        <CircularProgress size={32} />
+        <Typography variant="body2" color="text.secondary">
+          Processing image...
+        </Typography>
       </S.InteractionZone>
     ),
     [PhotoStatus.HasPhoto]: (

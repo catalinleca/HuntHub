@@ -32,11 +32,15 @@ export const getSubmissionStatus = (recorderStatus: RecorderStatus, isSubmitting
 
 export enum PhotoStatus {
   Empty = 'empty',
+  Compressing = 'compressing',
   HasPhoto = 'has-photo',
   Submitting = 'submitting',
 }
 
-export const getPhotoStatus = (hasPhoto: boolean, isSubmitting: boolean): PhotoStatus => {
+export const getPhotoStatus = (hasPhoto: boolean, isSubmitting: boolean, isCompressing: boolean): PhotoStatus => {
+  if (isCompressing) {
+    return PhotoStatus.Compressing;
+  }
   if (hasPhoto && isSubmitting) {
     return PhotoStatus.Submitting;
   }

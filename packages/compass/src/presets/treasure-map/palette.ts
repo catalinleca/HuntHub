@@ -63,7 +63,7 @@ export const treasureMapPaletteConfig = {
     clue: '#B6591B',
     quiz: '#4E7A4E',
     task: '#8B6914',
-    mission: '#5A6878',
+    mission: '#3D7A8A',
   },
 } as const;
 
@@ -73,8 +73,8 @@ export const treasureMapThemeOptions = {
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica", "Arial", sans-serif',
     displayFontFamily: 'Georgia, "Times New Roman", serif',
     fontWeightRegular: 400,
-    fontWeightMedium: 500,
     fontWeightBold: 600,
+    fontWeightMedium: 500,
     h1: {
       fontSize: 40,
       fontWeight: 600,
