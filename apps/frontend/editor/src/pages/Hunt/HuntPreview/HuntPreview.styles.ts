@@ -21,6 +21,10 @@ export const PreviewWrapper = styled(Stack)<PreviewWrapperProps>`
     opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform, opacity;
   pointer-events: ${({ $isOpen }) => ($isOpen ? 'auto' : 'none')};
+
+  ${({ theme }) => theme.breakpoints.down('lg')} {
+    display: none;
+  }
 `;
 
 export const Iframe = styled('iframe')`

@@ -76,7 +76,7 @@ export const AllHunts = ({ hunts }: AllHuntsProps) => {
 
   return (
     <HuntCard transition={false}>
-      <Box sx={{ p: 4 }}>
+      <Box sx={{ p: { xs: 3, md: 4 } }}>
         <HuntCardTitle icon={<StackIcon size={24} color={getColor('grey.600')} />} count={hunts.length}>
           All Hunts
         </HuntCardTitle>

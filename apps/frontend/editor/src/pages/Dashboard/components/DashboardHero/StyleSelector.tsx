@@ -25,6 +25,7 @@ export const StyleSelector = ({ value, onChange, disabled }: StyleSelectorProps)
       options={styleOptions}
       size="small"
       disabled={disabled}
+      sx={{ flexWrap: { xs: 'wrap', md: 'nowrap' }, justifyContent: 'center', gap: { xs: 1, md: 0 } }}
     />
   </Stack>
 );

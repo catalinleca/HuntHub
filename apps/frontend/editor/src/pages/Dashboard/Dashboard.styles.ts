@@ -8,6 +8,10 @@ export const DashboardContainer = styled(Box)`
 
 export const ContentContainer = styled(Container)`
   padding: ${({ theme }) => theme.spacing(8, 0)};
+
+  ${({ theme }) => theme.breakpoints.down('md')} {
+    padding: ${({ theme }) => theme.spacing(5, 0)};
+  }
 `;
 
 export const PageTitle = styled(Typography)`
@@ -28,6 +32,11 @@ export const EmptyStateContainer = styled(Box)`
   text-align: center;
   padding-top: ${({ theme }) => theme.spacing(8)};
   padding-bottom: ${({ theme }) => theme.spacing(8)};
+
+  ${({ theme }) => theme.breakpoints.down('md')} {
+    padding-top: ${({ theme }) => theme.spacing(5)};
+    padding-bottom: ${({ theme }) => theme.spacing(5)};
+  }
 `;
 
 export const EmptyStateDescription = styled(Typography)`

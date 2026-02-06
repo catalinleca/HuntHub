@@ -5,6 +5,10 @@ export const Container = styled(Stack)`
   flex-direction: row;
   align-items: center;
   gap: ${({ theme }) => theme.spacing(2)};
+
+  ${({ theme }) => theme.breakpoints.down('md')} {
+    margin-left: auto;
+  }
 `;
 
 export const UnsavedDot = styled.span`
