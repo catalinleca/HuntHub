@@ -30,7 +30,7 @@ export const PhotoMission = ({
   const advanceToNextStep = useAdvanceToNextStep();
 
   const isSubmitting = isValidating || isUploading;
-  const status = getPhotoStatus(photoCapture.hasPhoto, isSubmitting);
+  const status = getPhotoStatus(photoCapture.hasPhoto, isSubmitting, photoCapture.isCompressing);
 
   const state: PhotoContentState = {
     status,

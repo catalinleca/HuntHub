@@ -45,6 +45,11 @@ const reducer = (state: State, action: Action): State => {
 const SUPPORTED_MIME_TYPES = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'];
 const DEFAULT_MIME_TYPE = 'audio/webm';
 
+// 32kbps = speech-quality audio, sufficient for Gemini transcription.
+// Reduces 30s recording from ~480KB (default 128kbps) to ~120KB.
+// Best-effort hint — some browsers (Safari) may ignore it.
+const SPEECH_AUDIO_BITRATE = 32_000;
+
 const isBrowserSupported = (): boolean => {
   return !!navigator.mediaDevices?.getUserMedia;
 };
@@ -134,7 +139,10 @@ export const useAudioRecorder = () => {
       const mimeType = getSupportedMimeType();
       mimeTypeRef.current = mimeType || DEFAULT_MIME_TYPE;
 
-      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+      const recorder = new MediaRecorder(stream, {
+        ...(mimeType ? { mimeType } : {}),
+        audioBitsPerSecond: SPEECH_AUDIO_BITRATE,
+      });
       recorderRef.current = recorder;
       return recorder;
     };
