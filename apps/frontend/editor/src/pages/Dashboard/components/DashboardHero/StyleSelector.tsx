@@ -1,4 +1,5 @@
 import { Stack } from '@mui/material';
+import styled from 'styled-components';
 import { GraduationCapIcon, CompassIcon, UsersThreeIcon, HouseIcon } from '@phosphor-icons/react';
 import { GenerateHuntStyle } from '@hunthub/shared';
 import { ToggleButtonGroup, type ToggleButtonOption } from '@/components/common/ToggleButton';
@@ -10,6 +11,15 @@ const styleOptions: ToggleButtonOption[] = [
   { value: GenerateHuntStyle.FamilyFriendly, label: 'Family', icon: <HouseIcon size={18} /> },
 ];
 
+const ResponsiveToggleGroup = styled(ToggleButtonGroup)`
+  justify-content: center;
+
+  ${({ theme }) => theme.breakpoints.down('md')} {
+    flex-wrap: wrap;
+    gap: ${({ theme }) => theme.spacing(1)};
+  }
+`;
+
 interface StyleSelectorProps {
   value: GenerateHuntStyle | undefined;
   onChange: (value: GenerateHuntStyle | null) => void;
@@ -18,7 +28,7 @@ interface StyleSelectorProps {
 
 export const StyleSelector = ({ value, onChange, disabled }: StyleSelectorProps) => (
   <Stack alignItems="center" sx={{ mt: 3 }}>
-    <ToggleButtonGroup
+    <ResponsiveToggleGroup
       exclusive
       value={value ?? null}
       onChange={(_, newValue) => onChange(newValue)}

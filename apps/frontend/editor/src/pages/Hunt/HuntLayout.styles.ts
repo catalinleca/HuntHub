@@ -4,6 +4,7 @@ import { Stack, alpha } from '@mui/material';
 export const Container = styled(Stack)`
   flex-direction: column;
   min-height: 100vh;
+  overflow-x: clip;
   background-color: ${({ theme }) => theme.palette.background.defaultLight};
 `;
 
@@ -15,6 +16,14 @@ export const ContentArea = styled(Stack)`
   justify-content: center;
   overflow-x: clip;
   position: relative;
+
+  ${({ theme }) => theme.breakpoints.down('lg')} {
+    justify-content: flex-start;
+  }
+
+  ${({ theme }) => theme.breakpoints.down('md')} {
+    padding: ${({ theme }) => theme.spacing(0, 2)};
+  }
 `;
 
 export const ShowPreviewTab = styled.button`
@@ -41,5 +50,9 @@ export const ShowPreviewTab = styled.button`
     background: ${({ theme }) => theme.palette.background.surface};
     color: ${({ theme }) => theme.palette.primary.main};
     width: 44px;
+  }
+
+  ${({ theme }) => theme.breakpoints.down('lg')} {
+    display: none;
   }
 `;

@@ -29,8 +29,6 @@ export const PlaceholderBox = styled(Stack).attrs({
   background-color: ${({ theme }) => theme.palette.action.hover};
 `;
 
-export const ActionBar = styled(Stack).attrs({
-  direction: 'row',
-})`
+export const ActionBar = styled(Stack)`
   border-top: 1px solid ${({ theme }) => theme.palette.divider};
 `;

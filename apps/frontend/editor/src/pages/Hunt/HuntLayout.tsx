@@ -66,7 +66,7 @@ interface HuntLayoutContentProps {
   hunt: Hunt;
 }
 
-const HuntLayoutContent = ({ huntFormData }: HuntLayoutContentProps) => {
+const HuntLayoutContent = ({ huntFormData, hunt }: HuntLayoutContentProps) => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const snackbar = useSnackbarStore();
@@ -124,7 +124,12 @@ const HuntLayoutContent = ({ huntFormData }: HuntLayoutContentProps) => {
   return (
     <S.Container>
       <NavBar />
-      <HuntHeader huntName={huntFormData.name} lastUpdatedBy="You" onSave={handleSubmit(onSubmit, onInvalid)} />
+      <HuntHeader
+        huntId={hunt.huntId}
+        huntName={huntFormData.name}
+        lastUpdatedBy="You"
+        onSave={handleSubmit(onSubmit, onInvalid)}
+      />
       <HuntStepTimeline />
       <S.ContentArea>
         {selectedStepIndex !== -1 && (

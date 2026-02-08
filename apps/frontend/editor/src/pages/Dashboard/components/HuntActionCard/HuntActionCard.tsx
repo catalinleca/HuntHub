@@ -41,13 +41,13 @@ export const HuntActionCard = ({
 
       <HuntCardBody>
         <S.IconTextRow $color={getColor('primary.main')}>
-          <BookOpenIcon weight="bold" />
+          <BookOpenIcon weight="bold" size={14} />
           <Typography variant="displayH6">{title}</Typography>
         </S.IconTextRow>
 
         {subtitle && (
           <S.IconTextRow $color={getColor('grey.600')}>
-            <ClockIcon weight="bold" size={14} />
+            <ClockIcon weight="bold" size={12} />
             <Typography variant="displayBody2">{subtitle}</Typography>
           </S.IconTextRow>
         )}

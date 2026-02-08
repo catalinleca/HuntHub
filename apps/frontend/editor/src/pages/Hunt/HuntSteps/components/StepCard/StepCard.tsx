@@ -29,7 +29,13 @@ export const StepCard = ({ stepIndex, type, title, children }: StepCardProps) =>
 
   return (
     <>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" px={5} py={4}>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        px={{ xs: 3, md: 5 }}
+        py={{ xs: 3, md: 4 }}
+      >
         <Stack direction="row" alignItems="center" gap={2}>
           <S.IconWrapper $bgColor={config.color}>
             <Icon size={24} weight="fill" />
@@ -52,7 +58,7 @@ export const StepCard = ({ stepIndex, type, title, children }: StepCardProps) =>
 
       <Divider />
 
-      <Stack gap={3} px={5} py={4}>
+      <Stack gap={3} px={{ xs: 3, md: 5 }} py={{ xs: 3, md: 4 }}>
         {children}
       </Stack>
     </>

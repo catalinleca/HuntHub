@@ -3,7 +3,10 @@ import { Box } from '@mui/material';
 
 export const IconTextRow = styled(Box)<{ $color?: string }>(({ theme, $color }) => ({
   display: 'flex',
-  alignItems: 'center',
   gap: theme.spacing(1),
   color: $color || theme.palette.text.secondary,
+  '& > svg': {
+    flexShrink: 0,
+    marginTop: theme.spacing(1),
+  },
 }));

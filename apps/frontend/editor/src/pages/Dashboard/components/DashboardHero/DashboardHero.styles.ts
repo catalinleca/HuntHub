@@ -17,6 +17,11 @@ export const HeroContainer = styled(Box)`
   );
   overflow: hidden;
 
+  ${({ theme }) => theme.breakpoints.down('md')} {
+    min-height: auto;
+    padding: ${({ theme }) => theme.spacing(5, 3)};
+  }
+
   &::before {
     content: '';
     position: absolute;

@@ -3,12 +3,13 @@ import { HuntTitle, ActionBar } from './components';
 import * as S from './HuntHeader.styles';
 
 interface HuntHeaderProps {
+  huntId: number;
   huntName: string;
   lastUpdatedBy: string;
   onSave: () => void;
 }
 
-export const HuntHeader = ({ huntName, lastUpdatedBy, onSave }: HuntHeaderProps) => {
+export const HuntHeader = ({ huntId, huntName, lastUpdatedBy, onSave }: HuntHeaderProps) => {
   const { dirtyFields, isSubmitting } = useFormState();
 
   // TODO: check this, we shouldn't need it
@@ -18,7 +19,7 @@ export const HuntHeader = ({ huntName, lastUpdatedBy, onSave }: HuntHeaderProps)
     <S.Container>
       <HuntTitle huntName={huntName} lastUpdatedBy={lastUpdatedBy} />
 
-      <ActionBar hasUnsavedChanges={hasUnsavedChanges} isSaving={isSubmitting} onSave={onSave} />
+      <ActionBar huntId={huntId} hasUnsavedChanges={hasUnsavedChanges} isSaving={isSubmitting} onSave={onSave} />
     </S.Container>
   );
 };

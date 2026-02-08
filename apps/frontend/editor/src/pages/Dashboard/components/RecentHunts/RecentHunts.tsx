@@ -22,7 +22,7 @@ export const RecentHunts = ({ hunts }: RecentHuntsProps) => {
 
   return (
     <HuntCard transition={false}>
-      <Box sx={{ p: 4 }}>
+      <Box sx={{ p: { xs: 3, md: 4 } }}>
         <HuntCardTitle icon={<ScrollIcon size={24} color={getColor('grey.600')} />}>Resume Your Crafting</HuntCardTitle>
 
         <Grid2 container spacing={3} sx={{ mt: 2 }}>

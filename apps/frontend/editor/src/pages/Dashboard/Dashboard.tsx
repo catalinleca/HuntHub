@@ -24,7 +24,7 @@ const Dashboard = () => {
 
   return (
     <DashboardContainer>
-      <DashboardNavBar onCreateClick={openHuntDialog} />
+      <DashboardNavBar onCreateClick={() => openHuntDialog()} />
       <DashboardHero
         prompt={prompt}
         onPromptChange={setPrompt}
@@ -43,10 +43,10 @@ const Dashboard = () => {
 
             {error && <ErrorState />}
 
-            {!isLoading && !error && !hasHunts && <EmptyState onCreateClick={openHuntDialog} />}
+            {!isLoading && !error && !hasHunts && <EmptyState onCreateClick={() => openHuntDialog()} />}
 
             {!isLoading && hasHunts && (
-              <Stack direction="column" gap={8}>
+              <Stack direction="column" gap={{ xs: 5, md: 8 }}>
                 <RecentHunts hunts={recentHunts} />
                 <AllHunts hunts={hunts} />
               </Stack>
