@@ -172,7 +172,7 @@ export const HuntDialogForm = ({ hunt }: HuntDialogFormProps) => {
           />
         </S.FormContent>
 
-        <Grid2 container spacing={2} sx={{ mt: 3, pt: 2, borderTop: 1, borderColor: 'divider' }}>
+        <Grid2 container spacing={2} component={S.ActionBar} sx={{ mt: 3, pt: 2 }}>
           <Grid2 size={{ xs: 12, sm: 6 }}>
             <Button variant="outlined" onClick={close} disabled={isPending} fullWidth>
               Cancel
