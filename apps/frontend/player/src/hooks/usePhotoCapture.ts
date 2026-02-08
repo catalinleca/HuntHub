@@ -1,19 +1,23 @@
 import { useState, useCallback, useEffect, useRef, useMemo, type ChangeEvent } from 'react';
+import { compressImage } from '@/utils';
 
 interface PhotoCaptureState {
   file: File | null;
   preview: string | null;
   error: string | null;
+  isCompressing: boolean;
 }
 
 const initialState: PhotoCaptureState = {
   file: null,
   preview: null,
   error: null,
+  isCompressing: false,
 };
 
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_INPUT_FILE_SIZE = 25 * 1024 * 1024;
+const MAX_COMPRESSED_FILE_SIZE = 10 * 1024 * 1024;
 
 export const usePhotoCapture = () => {
   const [state, setState] = useState<PhotoCaptureState>(initialState);
@@ -27,7 +31,7 @@ export const usePhotoCapture = () => {
   }, []);
 
   const handleCapture = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
+    async (event: ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
 
       if (!file) {
@@ -42,23 +46,46 @@ export const usePhotoCapture = () => {
         return;
       }
 
-      if (file.size > MAX_FILE_SIZE) {
+      if (file.size > MAX_INPUT_FILE_SIZE) {
         setState((prev) => ({
           ...prev,
-          error: 'Image is too large. Maximum size is 10MB.',
+          error: 'Image is too large. Maximum size is 25MB.',
         }));
         return;
       }
 
       revokePreviewUrl();
+      setState((prev) => ({ ...prev, isCompressing: true, error: null }));
 
-      const newPreviewUrl = URL.createObjectURL(file);
+      let compressed: File;
+      try {
+        compressed = await compressImage(file);
+      } catch {
+        setState((prev) => ({
+          ...prev,
+          isCompressing: false,
+          error: 'Failed to process image. Please try again.',
+        }));
+        return;
+      }
+
+      if (compressed.size > MAX_COMPRESSED_FILE_SIZE) {
+        setState((prev) => ({
+          ...prev,
+          isCompressing: false,
+          error: 'Image is too large after processing. Please try a smaller image.',
+        }));
+        return;
+      }
+
+      const newPreviewUrl = URL.createObjectURL(compressed);
       previewUrlRef.current = newPreviewUrl;
 
       setState({
-        file,
+        file: compressed,
         preview: newPreviewUrl,
         error: null,
+        isCompressing: false,
       });
     },
     [revokePreviewUrl],
