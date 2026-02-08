@@ -20,6 +20,7 @@ export const FormArea = styled(Container).attrs({
 
   ${({ theme }) => theme.breakpoints.down('lg')} {
     transform: none;
+    max-width: 100%;
   }
 
   ${({ theme }) => theme.breakpoints.down('md')} {

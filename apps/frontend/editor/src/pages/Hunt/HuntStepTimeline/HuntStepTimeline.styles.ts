@@ -22,4 +22,6 @@ export const InnerWrapper = styled(Stack)`
   flex-direction: row;
   align-items: center;
   max-width: ${({ theme }) => theme.breakpoints.values.lg}px;
+  width: 100%;
+  overflow: hidden;
 `;

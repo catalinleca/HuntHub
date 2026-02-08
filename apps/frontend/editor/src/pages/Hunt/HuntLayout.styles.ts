@@ -16,6 +16,10 @@ export const ContentArea = styled(Stack)`
   overflow-x: clip;
   position: relative;
 
+  ${({ theme }) => theme.breakpoints.down('lg')} {
+    justify-content: flex-start;
+  }
+
   ${({ theme }) => theme.breakpoints.down('md')} {
     padding: ${({ theme }) => theme.spacing(0, 2)};
   }

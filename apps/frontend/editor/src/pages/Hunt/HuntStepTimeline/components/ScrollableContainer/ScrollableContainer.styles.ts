@@ -16,6 +16,10 @@ export const Container = styled(Stack)<{ $canScrollLeft: boolean; $canScrollRigh
   &::-webkit-scrollbar {
     display: none;
   }
+
+  ${({ theme }) => theme.breakpoints.down('md')} {
+    padding: ${({ theme }) => theme.spacing(2)};
+  }
 `;
 
 export const ScrollButton = styled(IconButton)<{ $visible: boolean }>`

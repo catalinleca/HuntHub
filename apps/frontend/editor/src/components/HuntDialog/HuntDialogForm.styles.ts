@@ -28,9 +28,3 @@ export const PlaceholderBox = styled(Stack).attrs({
   border-radius: ${({ theme }) => theme.shape.borderRadius}px;
   background-color: ${({ theme }) => theme.palette.action.hover};
 `;
-
-export const ActionBar = styled(Stack).attrs({
-  direction: 'row',
-})`
-  border-top: 1px solid ${({ theme }) => theme.palette.divider};
-`;

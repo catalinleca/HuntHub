@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 
 export const Container = styled(Stack)`
   flex-direction: row;
@@ -17,4 +17,12 @@ export const UnsavedDot = styled.span`
   border-radius: 50%;
   background: ${({ theme }) => theme.palette.accent.main};
   flex-shrink: 0;
+`;
+
+export const MobileOnly = styled(Box)`
+  display: none;
+
+  ${({ theme }) => theme.breakpoints.down('lg')} {
+    display: inline-flex;
+  }
 `;

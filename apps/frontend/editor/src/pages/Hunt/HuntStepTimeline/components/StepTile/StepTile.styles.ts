@@ -21,6 +21,11 @@ export const Container = styled(Stack)<{ $selected: boolean; $color: PaletteColo
   &:hover {
     background: ${({ theme, $selected, $color }) => ($selected ? getColor($color) : theme.palette.grey[200])};
   }
+
+  ${({ theme }) => theme.breakpoints.down('md')} {
+    width: 70px;
+    height: 70px;
+  }
 `;
 
 export const TitleArea = styled(Stack)`

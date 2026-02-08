@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, FormProvider, useWatch } from 'react-hook-form';
-import { Stack, Button, Alert, Typography, Divider } from '@mui/material';
+import { Stack, Button, Alert, Typography, Divider, Grid2 } from '@mui/material';
 import { UsersIcon } from '@phosphor-icons/react';
 import type { Hunt, HuntCreate, HuntUpdate } from '@hunthub/shared';
 import { MediaType } from '@hunthub/shared';
@@ -172,14 +172,18 @@ export const HuntDialogForm = ({ hunt }: HuntDialogFormProps) => {
           />
         </S.FormContent>
 
-        <S.ActionBar spacing={2} sx={{ mt: 3, pt: 2 }}>
-          <Button variant="outlined" onClick={close} disabled={isPending} fullWidth>
-            Cancel
-          </Button>
-          <Button type="submit" variant="contained" disabled={isPending || (isEditMode && !isDirty)} fullWidth>
-            {isPending ? (isEditMode ? 'Saving...' : 'Creating...') : isEditMode ? 'Save Changes' : 'Create Hunt'}
-          </Button>
-        </S.ActionBar>
+        <Grid2 container spacing={2} sx={{ mt: 3, pt: 2, borderTop: 1, borderColor: 'divider' }}>
+          <Grid2 size={{ xs: 12, sm: 6 }}>
+            <Button variant="outlined" onClick={close} disabled={isPending} fullWidth>
+              Cancel
+            </Button>
+          </Grid2>
+          <Grid2 size={{ xs: 12, sm: 6 }}>
+            <Button type="submit" variant="contained" disabled={isPending || (isEditMode && !isDirty)} fullWidth>
+              {isPending ? (isEditMode ? 'Saving...' : 'Creating...') : isEditMode ? 'Save Changes' : 'Create Hunt'}
+            </Button>
+          </Grid2>
+        </Grid2>
       </S.Form>
     </FormProvider>
   );
