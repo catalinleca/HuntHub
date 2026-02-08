@@ -8,6 +8,7 @@ export const Container = styled(Stack)`
 
   ${({ theme }) => theme.breakpoints.down('md')} {
     margin-left: auto;
+    gap: ${({ theme }) => theme.spacing(1)};
   }
 `;
 
@@ -24,5 +25,21 @@ export const MobileOnly = styled(Box)`
 
   ${({ theme }) => theme.breakpoints.down('lg')} {
     display: inline-flex;
+  }
+`;
+
+export const TextActions = styled(Box)`
+  display: contents;
+
+  ${({ theme }) => theme.breakpoints.down('md')} {
+    display: none;
+  }
+`;
+
+export const IconActions = styled(Box)`
+  display: none;
+
+  ${({ theme }) => theme.breakpoints.down('md')} {
+    display: contents;
   }
 `;

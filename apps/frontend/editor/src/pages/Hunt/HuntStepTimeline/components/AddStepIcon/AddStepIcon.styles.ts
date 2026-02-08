@@ -21,4 +21,8 @@ export const Container = styled(Stack)`
     box-shadow: ${({ theme }) => theme.shadows[4]};
     transform: scale(1.05);
   }
+
+  ${({ theme }) => theme.breakpoints.down('md')} {
+    display: none;
+  }
 `;
