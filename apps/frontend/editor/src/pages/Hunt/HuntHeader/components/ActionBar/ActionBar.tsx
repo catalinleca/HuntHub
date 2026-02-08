@@ -26,7 +26,7 @@ export const ActionBar = ({ huntId, hasUnsavedChanges, isSaving, onSave }: Actio
   const handleMobilePreview = async () => {
     try {
       const { previewUrl } = await getPreviewLink(huntId);
-      window.open(previewUrl, '_blank');
+      window.open(previewUrl, '_blank', 'noopener,noreferrer');
     } catch {
       snackbar.error('Failed to generate preview link');
     }
