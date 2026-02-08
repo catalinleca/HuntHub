@@ -46,15 +46,15 @@ export const ActionBar = ({ huntId, hasUnsavedChanges, isSaving, onSave }: Actio
 
   return (
     <S.Container>
-      <S.MobileOnly>
+      <S.PreviewTrigger>
         <Tooltip title="Preview hunt" placement="bottom" arrow>
           <IconButton size="small" onClick={handleMobilePreview} disabled={isGettingPreviewLink}>
             <DeviceMobileIcon size={20} />
           </IconButton>
         </Tooltip>
-      </S.MobileOnly>
+      </S.PreviewTrigger>
 
-      <S.TextActions>
+      <S.DesktopActions>
         {hasUnsavedChanges && !isSaving ? (
           <Tooltip title="You have unsaved changes" placement="bottom" arrow>
             {saveButton}
@@ -72,9 +72,9 @@ export const ActionBar = ({ huntId, hasUnsavedChanges, isSaving, onSave }: Actio
         >
           Share
         </Button>
-      </S.TextActions>
+      </S.DesktopActions>
 
-      <S.IconActions>
+      <S.MobileActions>
         <Tooltip title={hasUnsavedChanges ? 'Save changes' : 'All changes saved'} placement="bottom" arrow>
           <span>
             <IconButton size="small" onClick={onSave} disabled={isSaveDisabled}>
@@ -92,7 +92,7 @@ export const ActionBar = ({ huntId, hasUnsavedChanges, isSaving, onSave }: Actio
             </IconButton>
           </span>
         </Tooltip>
-      </S.IconActions>
+      </S.MobileActions>
 
       <SharePanel anchorEl={shareAnchor} open={Boolean(shareAnchor)} onClose={() => setShareAnchor(null)} />
 

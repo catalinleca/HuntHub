@@ -20,7 +20,7 @@ export const UnsavedDot = styled.span`
   flex-shrink: 0;
 `;
 
-export const MobileOnly = styled(Box)`
+export const PreviewTrigger = styled(Box)`
   display: none;
 
   ${({ theme }) => theme.breakpoints.down('lg')} {
@@ -28,7 +28,7 @@ export const MobileOnly = styled(Box)`
   }
 `;
 
-export const TextActions = styled(Box)`
+export const DesktopActions = styled(Box)`
   display: contents;
 
   ${({ theme }) => theme.breakpoints.down('md')} {
@@ -36,7 +36,7 @@ export const TextActions = styled(Box)`
   }
 `;
 
-export const IconActions = styled(Box)`
+export const MobileActions = styled(Box)`
   display: none;
 
   ${({ theme }) => theme.breakpoints.down('md')} {
